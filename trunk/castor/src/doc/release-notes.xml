@@ -98,8 +98,39 @@
    &lt;/field&gt;                    
                 </code-panel>
 
+				<h3>Added WeblogicXMLSerializerFactory</h3>
+                
+                <p>To use the Xerces implementation delivered with Weblogic 7 and 8 you
+                   have to change castor.properties file to contain the following entry:</p>
+                
+                <code>
+# Defines the (default) XML serializer factory to use by Castor, 
+# which must implement org.exolab.castor.xml.SerializerFactory;
+# default is org.exolab.castor.xml.XercesXMLSerializerFactory  
+org.exolab.castor.xml.serializer.factory=org.exolab.castor.xml.wls8.WeblogicXercesXMLSerializerFactory
+                </code>
 			</summary>
 			<bugs>
+                <bug id="1324" tool="jira">
+                    <description>
+		                Added WeblogicXMLSerializerFactory.
+                    </description>
+                    <contributor>
+                        <name>Thierry Guerin</name>
+                        <email>thierry.guerin@prima-solutions.com</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Thierry Guerin</name>
+                        <email>thierry.guerin@prima-solutions.com</email>
+                    </reporter>
+                    <type>Enh.</type>
+                    <module>XML</module>
+                    <date>20060215</date>
+                </bug>
                 <bug id="1322" tool="jira">
                     <description>
 				       Fixed problem in Windows batch files related to directory names with spaces.
@@ -136,7 +167,7 @@
                     <reporter>
                         <name>Rutger Lubbers</name>
                         <email>rutger.lubbers@vodafone.com</email>
-                   </reporter>
+                    </reporter>
                     <type>Bug</type>
                     <module>XML</module>
                     <date>20060214</date>
