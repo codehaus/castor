@@ -491,6 +491,12 @@
   </contributor>
 
   <contributor type="Contributor">
+    <name surname="Guerin" given="Thierry" />
+    <email>thierry.guerin@prima-solutions.com</email>
+    <description>Added WeblogicXMLSerializerFactory.</description>
+  </contributor>
+
+  <contributor type="Contributor">
     <name surname="Hafner" given="Ulli"/>
     <email>hafner@sdm.de</email>
     <description>Patch for bug 1632</description>
