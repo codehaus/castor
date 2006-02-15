@@ -111,6 +111,26 @@ org.exolab.castor.xml.serializer.factory=org.exolab.castor.xml.wls8.WeblogicXerc
                 </code>
 			</summary>
 			<bugs>
+                <bug id="1325" tool="jira">
+                    <description>
+		                Added how to wrap a collection with a wrapper element.
+                    </description>
+                    <contributor>
+                        <name>James Adams</name>
+                        <email></email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>James Adams</name>
+                        <email></email>
+                    </reporter>
+                    <type>Enh.</type>
+                    <module>XML</module>
+                    <date>20060215</date>
+                </bug>
                 <bug id="1324" tool="jira">
                     <description>
 		                Added WeblogicXMLSerializerFactory.
