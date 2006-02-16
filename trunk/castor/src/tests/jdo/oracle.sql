@@ -1,3 +1,5 @@
+spool oracle.log
+
 -- tc0x TESTS
 
 drop table tc0x_sample;
@@ -1040,32 +1042,32 @@ insert into self_refer_child (id, descr) values (3, 'description3');
 
 drop table tc8x_test_depends_ns;
 create table tc8x_test_depends_ns (
-  id int(11) NOT NULL,
-  master_id int(11) NOT NULL default '0',
-  descrip varchar(50) NOT NULL default '',
-  CONSTRAINT prim_id PRIMARY KEY  (id)
+  id int NOT NULL,
+  master_id int default 0 NOT NULL,
+  descrip varchar(50) default '' NOT NULL,
+  CONSTRAINT tc8x_depends_id PRIMARY KEY  (id)
 );
 
 drop table tc8x_test_master_ns;
 create table tc8x_test_master_ns (
-  id int(11) NOT NULL,
-  descrip varchar(50) NOT NULL default '',
-  constraint prim_id PRIMARY KEY  (id)
+  id int NOT NULL,
+  descrip varchar(50) default '' NOT NULL,
+  constraint tc8x_master_id PRIMARY KEY  (id)
 );
 
 drop table tc8x_test_depends_ns_nokg;
 create table tc8x_test_depends_ns_nokg (
-  id int(11) NOT NULL,
-  master_id int(11) NOT NULL default '0',
-  descrip varchar(50) NOT NULL default '',
-  constraint prim_id PRIMARY KEY (id)
+  id int NOT NULL,
+  master_id int default 0 NOT NULL,
+  descrip varchar(50) default '' NOT NULL,
+  constraint tc8x_depends_nokg_id PRIMARY KEY (id)
 );
 
 drop table tc8x_test_master_ns_nokg;
 create table tc8x_test_master_ns_nokg (
-  id int(11) NOT NULL,
-  descrip varchar(50) NOT NULL default '',
-  constraint prim_id PRIMARY KEY (id)
+  id int NOT NULL,
+  descrip varchar(50) default '' NOT NULL,
+  constraint tc8x_master_npkg_id PRIMARY KEY (id)
 );
 
 
@@ -1330,7 +1332,7 @@ CREATE TABLE poly_depend_object (
 
 INSERT INTO poly_depend_object VALUES(1, 1, 'This is a description');
 
-# TC129 
+-- TC129 
 
 DROP TABLE container;
 CREATE TABLE container (
@@ -1340,31 +1342,29 @@ CREATE TABLE container (
   PRIMARY KEY (id)
 );
 
-INSERT INTO container (id, name, prop) VALUES 
-  (1,'Container 1',1),
-  (2,'Container 2',2),
-  (3,'Container 3',3),
-  (4,'Container 4',4);
+INSERT INTO container (id, name, prop) VALUES (1,'Container 1',1);
+INSERT INTO container (id, name, prop) VALUES (2,'Container 2',2);
+INSERT INTO container (id, name, prop) VALUES (3,'Container 3',3);
+INSERT INTO container (id, name, prop) VALUES (4,'Container 4',4);
 
 DROP TABLE container_item;
 CREATE TABLE container_item (
   id int NOT NULL,
-  item int default DEFAULT NULL,
+  item int DEFAULT NULL,
   value varchar(200) DEFAULT NULL,
   PRIMARY KEY (id)
 );
 
-INSERT INTO container_item (id, item, value) VALUES 
-  (1,1,'Container item 1'),
-  (2,2,'Container item 2'),
-  (3,3,'Container item 3'),
-  (4,4,'Container item 4'),
-  (5,1,'Container item 5'),
-  (6,2,'Container item 6'),
-  (7,3,'Container item 7'),
-  (8,4,'Container item 8');
+INSERT INTO container_item (id, item, value) VALUES (1,1,'Container item 1');
+INSERT INTO container_item (id, item, value) VALUES (2,2,'Container item 2');
+INSERT INTO container_item (id, item, value) VALUES (3,3,'Container item 3');
+INSERT INTO container_item (id, item, value) VALUES (4,4,'Container item 4');
+INSERT INTO container_item (id, item, value) VALUES (5,1,'Container item 5');
+INSERT INTO container_item (id, item, value) VALUES (6,2,'Container item 6');
+INSERT INTO container_item (id, item, value) VALUES (7,3,'Container item 7');
+INSERT INTO container_item (id, item, value) VALUES (8,4,'Container item 8');
 		
-# TC128a
+-- TC128a
 
 drop table sorted_container;
 create table sorted_container (
@@ -1387,3 +1387,6 @@ insert into sorted_item (id, id_1, name) values (1, 1, 'container item 1');
 insert into sorted_item (id, id_1, name) values (2, 1, 'container item 2');
 insert into sorted_item (id, id_1, name) values (3, 2, 'container item 3');
 	
+spool off
+
+commit;
