@@ -332,7 +332,7 @@ public final class ClassMolderHelper {
             FieldMapping[] fieldMappings = clsMap.getClassChoice().getFieldMapping();
             for (int i = 0; i < fieldMappings.length; i++)
             {
-                if (fieldMappings[i].hasIdentity())
+                if (fieldMappings[i].getIdentity() == true)
                 {
                     identityCount++;
                 }
@@ -349,7 +349,7 @@ public final class ClassMolderHelper {
             {
                 for (int i = 0; i < fieldMappings.length; i++)
                 {
-                    if (fieldMappings[i].hasIdentity())
+                    if (fieldMappings[i].getIdentity() == true)
                     {
                         identityDescriptorList.add(fieldMappings[i].getName());
                     }
