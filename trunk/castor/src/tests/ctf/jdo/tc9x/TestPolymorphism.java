@@ -18,6 +18,7 @@
  */
 package ctf.jdo.tc9x;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -555,6 +556,8 @@ public final class TestPolymorphism extends CastorTestCase {
                 count = (Long) obj;
             } else if (obj instanceof Integer) {
                 count = new Long(((Integer) obj).intValue());
+            } else if (obj instanceof BigDecimal) {
+                count = new Long(((BigDecimal) obj).longValue());
             }
         	assertNotNull (count);
         	assertEquals (1, count.intValue());

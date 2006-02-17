@@ -21,8 +21,6 @@ package ctf.jdo.tc8x;
 
 import jdo.JDOCategory;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.jdo.Database;
 
 import harness.CastorTestCase;
@@ -33,9 +31,6 @@ import harness.TestHarness;
  * database.
  */
 public final class TestDepends extends CastorTestCase {
-
-    private static final Log LOG = LogFactory.getLog(TestDepends.class);
-
     private JDOCategory _category;
 
     /**
