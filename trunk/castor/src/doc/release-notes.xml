@@ -55,6 +55,15 @@
 				<p>to automatically retrieve the value assigned due to 'SERIAL' column 
 				   during the insert operation.</p>
 
+				<h3>Added fully self-contained Castor JDO sample application</h3>
+
+				<p>Added new ZIP archive to distribution that contains a fully self-contained Castor JDO 
+				   sample applicationthat runs against an embedded Apache Derby database.</p>
+				   
+				<p>Simply download the the archive, unpack it, and in the target directory created, execute
+				   'java -jar castor-1.0M2-examples.jar' to have the test executed. This will (magically)
+				   create a Derby database (on-the-fly) and use it to execute the Castor JDO code against it.</p>
+
 				<h3>Added additional syntax for specifying identity columns</h3>
 				
 				<p>In addition to the current way of specifying the identity column(s) for a given
@@ -111,6 +120,27 @@ org.exolab.castor.xml.serializer.factory=org.exolab.castor.xml.wls8.WeblogicXerc
                 </code>
 			</summary>
 			<bugs>
+                <bug id="998" tool="jira">
+                    <description>
+				    	Added new ZIP file to distribution that contains fully self-containd Castor JDO sample 
+       					code running against Apache Derby (embedded).
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                   </reporter>
+                    <type>Enh</type>
+                    <module>JDO</module>
+                    <date>20060217</date>
+                </bug>
                 <bug id="1325" tool="jira">
                     <description>
 		                Added how to wrap a collection with a wrapper element.

@@ -320,9 +320,15 @@
     <target name="compile.examples" depends="prepare, compile"
             description="Builds the example packages (including debugging info) and creates the webapp war file for the servlet example">
         <mkdir dir="${build}/examples"/>
+        <mkdir dir="${build}/examples/META-INF"/>
         <javac srcdir="${source}/examples" destdir="${build}/examples" debug="on" deprecation="${deprecation}" excludes="${exampleexcludes}">
-        <classpath refid="build.classpath"/>
-    </javac>
+    	    <classpath refid="build.classpath"/>
+	    </javac>
+
+    	<!-- copy manifest file to expected location -->
+    	<copy file="${source}/etc/MANIFEST.EXAMPLES.MF" tofile="${build}/examples/META-INF/MANIFEST.MF"/>
+        <replace file="${build}/examples/META-INF/MANIFEST.MF" token="$$VERSION$$" value="${version}"/>
+        <replace file="${build}/examples/META-INF/MANIFEST.MF" token="$$RELEASE$$" value="${release}"/>
 
         <copy todir="${build}/examples">
             <fileset dir="${source}/examples">
@@ -434,7 +440,65 @@
         includes="LICENSE,README,jdo/**,harness/**,*" excludes="xml" />
 
     </target>
+	
+    <target name="jar.examples" depends="compile.examples"
+            description="Creates a JAR file for the JDO examples.">
+        <delete file="${dist}/${archive.name}-examples.jar" />   
+        <delete file="${dist}/${archive.name}-examples-sources.jar" />   
+    	
+    	<!-- Create JAR for Castor examples (excl. web application) -->
+        <jar jarfile="${dist}/${archive.name}-examples.jar" manifest="${build}/examples/META-INF/MANIFEST.MF">
+             <fileset dir="${build}/examples">
+                <exclude name="webapp/**" />
+                <exclude name="**/*.war"/>  
+                <exclude name="servlet/**" />
+             </fileset>
+        </jar>   
+    	<!-- Create JAR for the sources of the Castor examples -->
+        <jar jarfile="${dist}/${archive.name}-examples-sources.jar">
+            <fileset dir="${basedir}" includes="${source}/examples/**" />
+        </jar>   
+    </target>   
+	
+	<target name="zip.examples" depends="jar.examples">
+		<delete dir="target" />
+		<mkdir dir="target" />
+		<mkdir dir="target/lib" />
+		<copy todir="target">
+			<fileset dir="${dist}">
+				<include name="${archive.name}-examples.jar" />
+			</fileset>
+		</copy>
+		<copy todir="target/lib">
+			<fileset dir="${dist}">
+				<include name="${archive.name}.jar" />
+			</fileset>
+		</copy>
+		<copy todir="target/lib">
+			<fileset dir="${lib}">
+				<include name="commons-logging.jar" />
+				<include name="log4j-1.2.8.jar" />
+				<include name="xerces-J_1.4.0.jar" />
+				<include name="jta1.0.1.jar" />
+				<include name="derby-10.1.2.1.jar" />
+			</fileset>
+		</copy>
+        <zip zipfile="${dist}/${archive.name}-examples.zip" 
+        	 basedir="target" 
+        	includes="**"/>
+	</target>
 
+	<!--
+    <target name="jar.example.webapp" depends="compile.examples"
+            description="Creates a WAR file for JDO example webapp.">
+        <delete file="${dist}/${archive.name}-example-webapp.war" />   
+        <war warfile="${dist}/${archive.name}-example-webapp.war" 
+             basedir="${build}/examples/webapp" 
+        	 webxml="${build}/examples/webapp/WEB-INF/web.xml"
+             includes="**"/>
+    </target>   
+    -->
+   
     <target name="srcgen.anttask.jar" depends="compile" description="Build the castor-srcgen-ant-task.jar files">
         <jar jarfile="${dist}/${srcgen.ant.task.name}.jar" basedir="${classes}"
               includes="org/exolab/castor/tools/ant/taskdefs/*,
@@ -655,7 +719,7 @@
         <zip zipfile="${dist}/${archive.name}-src.zip" basedir="${build}" includes="${archive.name}/**"/>
     </target>
 
-    <target name="release" depends="clean,jar,srcgen.anttask.jar,source,docs,tarball"
+    <target name="release" depends="clean,jar,jar.examples,srcgen.anttask.jar,source,docs,tarball"
             description="An alias to call the clean, jar, source, docs and tarball targets"/>
 
     <target name="tarball" depends="prepare,doc,jar,srcgen.anttask.jar" description="Build the binary distrutions (tarball and zip archive.names)">

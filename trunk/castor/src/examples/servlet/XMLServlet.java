@@ -458,6 +458,25 @@ public abstract class XMLServlet
         }
 
 
+        public String getContentType()
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+
+        public void setCharacterEncoding(String arg0)
+        {
+            // TODO Auto-generated method stub
+        }
+
+
+        public void resetBuffer()
+        {
+            // TODO Auto-generated method stub
+        }
+
+
     }
 
 
