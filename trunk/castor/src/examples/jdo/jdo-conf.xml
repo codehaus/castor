@@ -14,17 +14,18 @@
     <transaction-demarcation mode="local" />
 -->
 
+<!-- 
     <database name="test" engine="mysql" >
-        <driver url="jdbc:mysql://wolf/castor_examples" class-name="org.gjt.mm.mysql.Driver">
+        <driver url="jdbc:mysql://localhost:3306/castor_examples" class-name="org.gjt.mm.mysql.Driver">
             <param name="user" value="test" />
             <param name="password" value="test" />
         </driver>
         <mapping href="jdo/mapping.xml" />
     </database>
-    <!--transaction-demarcation mode="local" /-->
     <transaction-demarcation mode="local">
         <transaction-manager name="local" />
     </transaction-demarcation>
+-->
 
 <!--
     <database name="test" engine="postgresql" >
@@ -38,4 +39,16 @@
         <transaction-manager name="local" />
     </transaction-demarcation>
 -->
+
+    <database name="test" engine="derby" >
+        <driver url="jdbc:derby:castor_examples;create=true" class-name="org.apache.derby.jdbc.EmbeddedDriver">
+            <param name="user" value="test" />
+            <param name="password" value="test" />
+        </driver>
+        <mapping href="jdo/mapping.xml" />
+    </database>
+    <transaction-demarcation mode="local">
+        <transaction-manager name="local" />
+    </transaction-demarcation>
+
 </jdo-conf>

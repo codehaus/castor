@@ -59,9 +59,25 @@
             <url>http://dist.codehaus.org/castor/$STABLE_VERSION$/castor-$STABLE_VERSION$$STABLE_RELEASE$-src.tgz</url><br/>
             <url>http://dist.codehaus.org/castor/$STABLE_VERSION$/castor-$STABLE_VERSION$$STABLE_RELEASE$-src.zip</url>
             <br/>&#xA0;</li>
+	  </ul>
+	  
+	  <p>and</p>
+	  
+	  <ul>
         <li>Ant task definition for the source generator<br/>
             <url>http://dist.codehaus.org/castor/$STABLE_VERSION$/castor-$STABLE_VERSION$$STABLE_RELEASE$-srcgen-ant-task.jar</url>
             <br/>&#xA0;</li>
+		<li>Self-executable JDO examples using Apache Derby (big)<br/>
+			<url>http://dist.codehaus.org/castor/$STABLE_VERSION$/castor-$STABLE_VERSION$$STABLE_RELEASE$-examples.zip</url>
+			<br/>&#xA0;</li>
+<!-- 			
+		<li>Castor examples - sources (incl. xml, JDO, source generator)<br/>
+			<url>http://dist.codehaus.org/castor/$STABLE_VERSION$/castor-$STABLE_VERSION$$STABLE_RELEASE$-examples-sources.jar</url>
+			<br/>&#xA0;</li>
+		<li>Castor sample webapp<br/>
+			<url>http://dist.codehaus.org/castor/$STABLE_VERSION$/castor-$STABLE_VERSION$$STABLE_RELEASE$-example-webapp.war</url>
+			<br/>&#xA0;</li>
+-->
       </ul>
 
          <p><small>The tarball and zips includes all the JARs required by Castor, the
@@ -85,6 +101,18 @@
             open source license and available from our FTP server.
             Open source licenses in use include Apache (ASF), Exolab, Mozilla (MPL),
             and public domain. All licenses are fully compatible with each other.</small></p>
+
+         <p><small>The example JAR includes fully functional samples that demonstrate the use
+			of various features of Castor, including marshalling and unmarshalling to/from XML, 
+			data persistence using JDO, source code generation from an XML Schema instance.
+			</small></p>
+
+         <p><small>The example wep application (in form of a WAR archive) includes fully
+			functional samples that demonstrate the use of Castor from within a standard
+			J2EE web application. The WAR file can be deployed to any J2EE compliant web
+			application container (including amongst others Tomcat, WebSphere, JBoss, Weblogic,
+			etc.) using the standard way of deployment of your web application server.
+			</small></p>
 
       </section>
 
@@ -114,9 +142,25 @@
             <url>http://dist.codehaus.org/castor/$VERSION$/castor-$VERSION$$RELEASE$-src.tgz</url><br/>
             <url>http://dist.codehaus.org/castor/$VERSION$/castor-$VERSION$$RELEASE$-src.zip</url>
             <br/>&#xA0;</li>
+      </ul>
+      
+	  <p>and</p>
+	  
+	  <ul>
         <li>Ant task definition for the source generator<br/>
             <url>http://dist.codehaus.org/castor/$VERSION$/castor-$VERSION$$RELEASE$-srcgen-ant-task.jar</url>
             <br/>&#xA0;</li>
+		<li>Self-executable JDO examples using Apache Derby (big)<br/>
+			<url>http://dist.codehaus.org/castor/$VERSION$/castor-$VERSION$$RELEASE$-examples.zip</url>
+			<br/>&#xA0;</li>
+		<li>Castor examples - sources (incl. xml, JDO, source generator)<br/>
+			<url>http://dist.codehaus.org/castor/$VERSION$/castor-$VERSION$$RELEASE$-examples-sources.jar</url>
+			<br/>&#xA0;</li>
+<!-- 
+		<li>Castor sample webapp<br/>
+			<url>http://dist.codehaus.org/castor/$VERSION$/castor-$VERSION$$RELEASE$-example-webapp.war</url>
+			<br/>&#xA0;</li>
+-->			
       </ul>
 
 <!--	  

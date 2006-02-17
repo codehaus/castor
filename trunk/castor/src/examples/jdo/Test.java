@@ -1,7 +1,10 @@
 package jdo;
 
 
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.Statement;
 
 import myapp.*;
 
@@ -13,6 +16,7 @@ import org.exolab.castor.jdo.JDOManager;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.mapping.Mapping;
+import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
 import org.exolab.castor.mapping.xml.MappingRoot;
@@ -27,61 +31,67 @@ import org.exolab.castor.xml.Marshaller;
  * found in the full CVS snapshot and located under the directory of 
  * src/tests/jdo and src/tests/myapp.
  */
-public class Test
+public class Test 
 {
+    private static final String DATABASE_NAME = "test";
 
-    private static Log _log =
-        LogFactory.getFactory().getInstance( Test.class );
+    private static Log LOG = LogFactory.getLog(Test.class);
 
-    public static final String JdoConfFile = "jdo-conf.xml";
+    public static final String JDO_CONFIG_FILE = "jdo-conf.xml";
 
-    
-    public static final String MappingFile = "mapping.xml";
+    public static final String MAPPING_FILE = "mapping.xml";
 
-
-    public static final String Usage = "Usage: example jdo";
-
+    public static final String USAGE_INSTRUCTIONS = "Usage: example jdo";
 
     private Mapping  _mapping;
 
-
-    private JDOManager      _jdo;
-
-
+    private JDOManager _jdo;
+    
+    private static PrintWriter writer = new Logger( System.out ).setPrefix( DATABASE_NAME );
+    
     public static void main( String[] args )
     {
-        Test          test;
-        
-        PrintWriter writer = new Logger( System.out ).setPrefix( "test" );
-
-        try 
+        try
         {
-            test = new Test( writer );
-            test.run( writer );
-        } 
-        catch ( Exception except ) 
+            Test test = new Test();
+            test.setup();
+            test.run();
+        }
+        catch (Exception except)
         {
-            _log.error( except );
-            except.printStackTrace( writer );
+            LOG.error(except);
+            except.printStackTrace(writer);
         }
     }
 
-
-    public Test( PrintWriter writer )
-        throws Exception
-    {
+    public Test () throws IOException, MappingException {
+        
         // Load the mapping file
-        _mapping = new Mapping( getClass().getClassLoader() );
-         _mapping.loadMapping( getClass().getResource( MappingFile ) );
+        _mapping = new Mapping(getClass().getClassLoader());
+        _mapping.loadMapping(getClass().getResource(MAPPING_FILE));
 
-         String jdoConf =  getClass().getResource( JdoConfFile ).toString();
-         JDOManager.loadConfiguration (jdoConf);
-         _jdo = JDOManager.createInstance("test");
+        String jdoConf = getClass().getResource(JDO_CONFIG_FILE).toString();
+        JDOManager.loadConfiguration(jdoConf);
+        _jdo = JDOManager.createInstance(DATABASE_NAME);
     }
 
 
-    public void run( PrintWriter writer )
-        throws Exception
+    public void setup () throws Exception {
+        Database db = _jdo.getDatabase();
+        db.begin();
+        Connection connection = db.getJdbcConnection();
+        Statement statement = connection.createStatement();
+        statement.executeUpdate("create table prod (id int not null, name varchar(200) not null, price numeric(18,2) not null,  group_id int not null)");
+        statement.executeUpdate("create table prod_group (id int not null, name varchar(200) not null)");
+        statement.executeUpdate("create table prod_detail (id int not null, prod_id int not null, name varchar(200) not null)");
+        statement.executeUpdate("create table computer (id int not null, cpu varchar(200) not null)");
+        statement.executeUpdate("create table category (id int not null, name varchar(200) not null)");
+        statement.executeUpdate("create table category_prod (prod_id int not null, category_id int not null)");
+        db.commit();
+        db.close();
+    }
+
+    public void run() throws Exception
     {
         Database      db;
         Product       product = null;
@@ -98,7 +108,7 @@ public class Test
         db = _jdo.getDatabase();
 
         db.begin();
-        _log.info( "Begin transaction to remove Product objects" );
+        LOG.info( "Begin transaction to remove Product objects" );
 
         // Look up the products and if found in the database,
         // delete them from the database
@@ -106,23 +116,23 @@ public class Test
 
         for ( int i = 4; i < 10; ++i )
         {
-            _log.debug( "Executing OQL" );
+            LOG.debug( "Executing OQL" );
             productOql.bind( i );
             results = productOql.execute();
 
             while ( results.hasMore() ) 
             {
                 product = ( Product ) results.next();
-                _log.debug( "Deleting existing product: " + product );
+                LOG.debug( "Deleting existing product: " + product );
                 db.remove( product );
             }
         }
 
-        _log.info( "End transaction to remove Product objects" );
+        LOG.info( "End transaction to remove Product objects" );
         db.commit();
 
         db.begin();
-        _log.info( "Begin transaction to remove Computer object" );
+        LOG.info( "Begin transaction to remove Computer object" );
         
         // Look up the computer and if found in the database,
         // delete ethis object from the database
@@ -133,15 +143,15 @@ public class Test
         while ( results.hasMore() ) 
         {
             computer = ( Computer ) results.next();
-            _log.debug( "Deleting existing computer: " + computer );
+            LOG.debug( "Deleting existing computer: " + computer );
             db.remove( computer );
         }
 
-        _log.info( "End transaction to remove Computer objects" );
+        LOG.info( "End transaction to remove Computer objects" );
         db.commit();
 
         db.begin();
-        _log.info( "Begin transaction to remove Category objects" );
+        LOG.info( "Begin transaction to remove Category objects" );
 
         // Look up the categories and if found in the database,
         // delete this object from the database
@@ -156,16 +166,16 @@ public class Test
             while ( results.hasMore() ) 
             {
                 category = ( Category ) results.next();
-                _log.debug( "Deleting existing category: " + category );
+                LOG.debug( "Deleting existing category: " + category );
                 db.remove( category );
             }
         }
         
-        _log.info( "End transaction to remove Category objects" );
+        LOG.info( "End transaction to remove Category objects" );
         db.commit();
 
         db.begin();
-        _log.info( "Begin transaction: one-to-one, one-to-many, and dependent relations" );
+        LOG.info( "Begin transaction: one-to-one, one-to-many, and dependent relations" );
         // If no such group exists in the database, create a new
         // object and persist it
         groupOql = db.getOQLQuery( "SELECT g FROM myapp.ProductGroup g WHERE id = $1" );
@@ -178,12 +188,12 @@ public class Test
             group.setId( 3 );
             group.setName( "a group" );
             db.create( group );
-            _log.debug( "Creating new group: " + group );
+            LOG.debug( "Creating new group: " + group );
         } 
         else 
         {
             group = ( ProductGroup ) results.next();
-            _log.debug( "Query result: " + group );
+            LOG.debug( "Query result: " + group );
         }
 
         // If no such product exists in the database, create a new
@@ -212,12 +222,12 @@ public class Test
             detail.setId( 3 );
             detail.setName( "monitor" );
             product.addDetail( detail );
-            _log.debug( "Creating new product: " + product );
+            LOG.debug( "Creating new product: " + product );
             db.create( product );
         } 
         else 
         {
-            _log.debug( "Query result: " + results.next() );
+            LOG.debug( "Query result: " + results.next() );
         }
 
         // If no such computer exists in the database, create a new
@@ -242,19 +252,19 @@ public class Test
             detail.setId( 5 );
             detail.setName( "scsi card" );
             computer.addDetail( detail );
-            _log.debug( "Creating new computer: " + computer );
+            LOG.debug( "Creating new computer: " + computer );
             db.create( computer );
         } else {
-            _log.debug( "Query result: " + results.next() );
+            LOG.debug( "Query result: " + results.next() );
         }
-        _log.info( "End transaction: one-to-one, one-to-many and dependent relations" );
+        LOG.info( "End transaction: one-to-one, one-to-many and dependent relations" );
         db.commit();
 
 
 
         // Many-to-many example using one existing product
         db.begin();
-        _log.info( "Begin transaction: one-to-one and dependent relations" );
+        LOG.info( "Begin transaction: one-to-one and dependent relations" );
 
         // If no such products with ids 5-8 exist, create new
         // objects and persist them
@@ -275,21 +285,21 @@ public class Test
                 detail.setId( j );
                 detail.setName( "detail" + detail.getId() );
                 product.addDetail( detail );
-                _log.debug( "Creating new product: " + product );
+                LOG.debug( "Creating new product: " + product );
                 db.create( product );
             } 
             else 
             {
-                _log.debug( "Query result: " + results.next() );
+                LOG.debug( "Query result: " + results.next() );
             }
         }
 
-        _log.info( "End transaction: one-to-one and dependent relations " );
+        LOG.info( "End transaction: one-to-one and dependent relations " );
         db.commit();
 
 
         db.begin();
-        _log.info( "Begin transaction: many-to-many relations" );
+        LOG.info( "Begin transaction: many-to-many relations" );
 
         for ( int x = 4; x < 7; ++x )
         {
@@ -308,34 +318,34 @@ public class Test
                 category.setName( "category" + category.getId() );
                 category.addProduct( product );
                 db.create( category );
-                _log.debug( "Creating new category: " + category );
+                LOG.debug( "Creating new category: " + category );
             } 
             else 
             {
                 category = ( Category ) results.next();
-                _log.debug( "Query result: " + category );
+                LOG.debug( "Query result: " + category );
             }
         }
 
-        _log.info( "End transaction: many-to-many relations" );
+        LOG.info( "End transaction: many-to-many relations" );
         db.commit();
 
         product.setPrice( 333 );
-        _log.info( "Updated Product price: " + product );
+        LOG.info( "Updated Product price: " + product );
 
         db.begin();
-        _log.info( "Begin transaction: long transaction" );
+        LOG.info( "Begin transaction: long transaction" );
 
         //
         // Don't forget to implement TimeStampable for the long transaction!!!
         //
         db.update( product );
-        _log.info( "End transaction: long transaction" );
+        LOG.info( "End transaction: long transaction" );
         db.commit();
 
 
         db.begin();
-        _log.info( "Begin transaction: update extends relation in long transaction " );
+        LOG.info( "Begin transaction: update extends relation in long transaction " );
 
         computerOql.bind( 44 );
         results = computerOql.execute();
@@ -344,28 +354,28 @@ public class Test
         {
             computer = new Computer();
             computer = ( Computer ) results.next();
-            _log.debug( "Found existing computer: " + computer );
+            LOG.debug( "Found existing computer: " + computer );
         }
 
-        _log.info( "End transaction: update extends relation in long transaction" );
+        LOG.info( "End transaction: update extends relation in long transaction" );
         db.commit();
 
         computer.setPrice( 425 );
-        _log.info( "Updated Computer price: " + product );
+        LOG.info( "Updated Computer price: " + product );
 
         db.begin();
-        _log.info( "Begin transaction: update extends relation in long transaction " );
+        LOG.info( "Begin transaction: update extends relation in long transaction " );
 
         //
         // Don't forget to implement TimeStampable for the long transaction!!!
         //
         db.update( computer );
 
-        _log.info( "End transaction: update extends relation in long transaction" );
+        LOG.info( "End transaction: update extends relation in long transaction" );
         db.commit();
 
         db.begin();
-        _log.info( "Begin transaction: simple load and update within the same transaction" );
+        LOG.info( "Begin transaction: simple load and update within the same transaction" );
 
         computerOql.bind( 44 );
         results = computerOql.execute();
@@ -376,21 +386,21 @@ public class Test
             computer.setCpu( "Opteron" );
         }
 
-        _log.info( "End transaction: simple load and update within the same transaction" );
+        LOG.info( "End transaction: simple load and update within the same transaction" );
         db.commit();
 
         db.begin();
-        _log.info( "Begin transaction: simple load to test the previous change" );
+        LOG.info( "Begin transaction: simple load to test the previous change" );
 
         computerOql.bind( 44 );
         results = computerOql.execute();
 
         if ( results.hasMore() )
         {
-            _log.info( "Loaded computer:" + ( Computer ) results.next() );
+            LOG.info( "Loaded computer:" + ( Computer ) results.next() );
         }
 
-        _log.info( "End transaction: simple load to test the previous change" );
+        LOG.info( "End transaction: simple load to test the previous change" );
         db.commit();
 
         Marshaller     marshaller;
@@ -399,7 +409,7 @@ public class Test
         marshaller.setMapping( _mapping );
 
         db.begin();
-        _log.info( "Begin transaction: marshalling objects to XML" );
+        LOG.info( "Begin transaction: marshalling objects to XML" );
 
         computerOql = db.getOQLQuery( "SELECT c FROM myapp.Computer c WHERE c.id >= $1" );
         computerOql.bind( 10 );
@@ -408,14 +418,14 @@ public class Test
         while( results.hasMore() )
             marshaller.marshal( results.next() );
 
-        _log.info( "End transaction: marshalling objects to XML" );
+        LOG.info( "End transaction: marshalling objects to XML" );
         db.commit();
 
         db.close();
-        _log.info( "Test complete" );
+        LOG.info( "Test complete" );
 
         // --------------------------------------------------------------------
-        _log.info( "Begin: Walking the mapping descriptor via objects" );
+        LOG.info( "Begin: Walking the mapping descriptor via objects" );
 
         MappingRoot mappingRoot = _mapping.getRoot();
         ClassMapping classMap;
@@ -428,23 +438,23 @@ public class Test
         for ( int i = 0; i < mappingCount; ++i )
         {
             classMap = mappingRoot.getClassMapping( i );
-            _log.debug( "Class name: " + classMap.getName() );
+            LOG.debug( "Class name: " + classMap.getName() );
 
             int fieldCount = classMap.getClassChoice().getFieldMappingCount();
             fieldMaps = classMap.getClassChoice().getFieldMapping();
 
-            _log.debug( "fieldMaps.length: " + fieldMaps.length );
+            LOG.debug( "fieldMaps.length: " + fieldMaps.length );
 
             // loop over the fields in each class
             for ( int j = 0; j < fieldMaps.length; ++j )
             {
                 fieldMap = fieldMaps[j];
-                _log.debug( "        Field name: " + fieldMap.getName() );
-                _log.debug( "        Field type: " + fieldMap.getType() );
+                LOG.debug( "        Field name: " + fieldMap.getName() );
+                LOG.debug( "        Field type: " + fieldMap.getType() );
             }
         }
 
-        _log.info( "End: Walking the mapping descriptor via objects" );
+        LOG.info( "End: Walking the mapping descriptor via objects" );
         // --------------------------------------------------------------------
     }
 }
