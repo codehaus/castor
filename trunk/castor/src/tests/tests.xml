@@ -450,7 +450,10 @@
     <case id="TC75" class="ctf.jdo.tc7x.TestSelfReferentialExtend"/>
 
     <!-- tc8x -->
-    <case id="TC81" class="ctf.jdo.tc8x.TestDepends"/>
+    <!-- <case id="TC81" class="ctf.jdo.tc8x.TestDepends"/>
+		 oracle do not support identity keygen and according to
+		 description in CASTOR-1128 I'm not sure if keygen=MAX
+		 reproduces the original problem -->
     <case id="TC82" class="ctf.jdo.tc8x.TestDependsNoKeyGen"/>
 
     <!-- tc9x -->
