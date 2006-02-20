@@ -815,7 +815,7 @@ insert into trans_child2 (id, descr, entityOneId) values (3, 'description3', 1);
 
 -- tc7x
 
-drop table tc7x_self_refer_parent;
+drop table if exists tc7x_self_refer_parent;
 create table tc7x_self_refer_parent (
   id        int not null primary key,
   fid		int,
@@ -826,7 +826,7 @@ insert into tc7x_self_refer_parent (id, fid, name) values (1, null, 'entity1');
 insert into tc7x_self_refer_parent (id, fid, name) values (2, 1, 'entity2');
 insert into tc7x_self_refer_parent (id, fid, name) values (3, 1, 'entity3');
 
-drop table tc7x_self_refer_child;
+drop table if exists tc7x_self_refer_child;
 create table tc7x_self_refer_child (
   id        int not null primary key,
   descr     varchar(200) not null
