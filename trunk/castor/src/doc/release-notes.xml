@@ -120,6 +120,26 @@ org.exolab.castor.xml.serializer.factory=org.exolab.castor.xml.wls8.WeblogicXerc
                 </code>
 			</summary>
 			<bugs>
+                <bug id="1323" tool="jira">
+                    <description>
+		                Fixed failure in MappingTool that always caused a NullPointerException.
+                    </description>
+                    <contributor>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Stefan Lober</name>
+                        <email>stefan_lober@yahoo.de</email>
+                    </reporter>
+                    <type>Bug</type>
+                    <module>XML</module>
+                    <date>20060221</date>
+                </bug>
                 <bug id="998" tool="jira">
                     <description>
 				    	Added new ZIP file to distribution that contains fully self-containd Castor JDO sample 

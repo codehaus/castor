@@ -2309,7 +2309,7 @@ public class Marshaller extends MarshalFramework {
             }
         }        
         //-- handle multi-value attributes
-        else if (attDescriptor.isMultivalued()) {
+        else if (attDescriptor.isMultivalued() && (value != null)) {
             Enumeration enumeration = null;
             if (value instanceof Enumeration) {
                 enumeration = (Enumeration)value;
