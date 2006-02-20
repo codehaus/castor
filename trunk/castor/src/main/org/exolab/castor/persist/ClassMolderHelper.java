@@ -19,6 +19,7 @@ import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.loader.MappingLoader;
+import org.exolab.castor.mapping.xml.ClassChoice;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
 import org.exolab.castor.persist.spi.Persistence;
@@ -329,7 +330,11 @@ public final class ClassMolderHelper {
         if (ids == null || ids.length == 0)
         {
             int identityCount = 0;
-            FieldMapping[] fieldMappings = clsMap.getClassChoice().getFieldMapping();
+            ClassChoice classChoice = clsMap.getClassChoice();
+            if (classChoice == null) { 
+                classChoice = new ClassChoice(); 
+            }
+            FieldMapping[] fieldMappings = classChoice.getFieldMapping();
             for (int i = 0; i < fieldMappings.length; i++)
             {
                 if (fieldMappings[i].getIdentity() == true)
