@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+XML:   Fixed bug CASTOR-1323 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
+       Fixed failure in MappingTool that always caused a NullPointerException.
+       Details: http://jira.codehaus.org/browse/CASTOR-1323
+       (Ralf - 20060221)
+
 JDO:   Fixed bug CASTOR-998 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        Added new ZIP file to distribution that contains fully self-containd Castor JDO sample 
        code running against Apache Derby (embedded).
