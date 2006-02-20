@@ -1,5 +1,5 @@
 /*
- * Copyright 2005 Ralf Joachim
+ * Copyright 2006 Werner Guttmann
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,30 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package utf.org.castor;
+package utf.org.castor.jdo.drivers;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 /**
- * Run all tests of the org.castor package.
+ * Run all tests of the org.castor.jdo.drivers package.
  * 
- * @author <a href="mailto:ralf DOT joachim AT syscon-world DOT de">Ralf Joachim</a>
+ * @author <a href="mailto:werner DOT guttmann AT gmx DOT net">Werner Guttmann</a>
  * @version $Revision$ $Date$
+ * @since 1.0
  */
 public final class TestAll extends TestCase {
+    
     public static Test suite() throws Exception {
-        TestSuite suite = new TestSuite("All org.castor tests");
+        TestSuite suite = new TestSuite("All org.castor.jdo.drivers tests");
 
-        suite.addTest(utf.org.castor.jdo.drivers.TestAll.suite());
-        suite.addTest(utf.org.castor.util.TestAll.suite());
-        suite.addTest(utf.org.castor.cache.TestAll.suite());
-        suite.addTest(utf.org.castor.persist.TestAll.suite());
-        suite.addTest(utf.org.castor.transactionmanager.TestAll.suite());
+        suite.addTestSuite(TestPointbaseFactory.class);
 
         return suite;
     }
 
-    public TestAll(final String name) { super(name); }
+    public TestAll(final String name) { 
+        super(name); 
+    }
 }
