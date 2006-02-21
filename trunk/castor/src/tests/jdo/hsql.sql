@@ -355,6 +355,22 @@ create table tc2x_keygen_ext (
 
 create unique index tc2x_keygen_ext_pk on tc2x_keygen_ext ( id );
 
+drop table if exists tc2x_keygen_string;
+create table tc2x_keygen_string (
+  id    varchar(200)  not null,
+  attr  varchar(200)  not null
+);
+
+create unique index tc2x_keygen_string_pk on tc2x_keygen_string ( id );
+
+drop table if exists tc2x_keygen_ext_string;
+create table tc2x_keygen_ext_string (
+  id   varchar(200) not null,
+  ext  varchar(200) not null
+);
+
+create unique index tc2x_keygen_ext_string_pk on tc2x_keygen_ext_string ( id );
+
 drop table if exists tc2x_uuid;
 
 create table tc2x_uuid (

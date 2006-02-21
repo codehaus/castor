@@ -43,15 +43,12 @@
  * $Id$
  */
 
-
 package org.exolab.castor.jdo.drivers;
-
 
 import org.exolab.castor.persist.spi.QueryExpression;
 
-
 /**
- * {@link org.exolab.castor.persist.spi.PersistenceFactory} for DB 2 driver.
+ * {@link org.exolab.castor.persist.spi.PersistenceFactory} for IBM DB2 driver.
  *
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
@@ -60,18 +57,28 @@ public final class DB2Factory
     extends GenericFactory
 {
 
+    /**
+     * Internal name of this PersistenceFactory instance. 
+     */
+    public static final String FACTORY_NAME = "db2";
 
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.persist.spi.PersistenceFactory#getFactoryName()
+     */
     public String getFactoryName()
     {
-        return "db2";
+        return FACTORY_NAME;
     }
 
-
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.persist.spi.PersistenceFactory#getQueryExpression()
+     */
     public QueryExpression getQueryExpression()
     {
         return new DB2QueryExpression( this );
     }
-
 
 }
 

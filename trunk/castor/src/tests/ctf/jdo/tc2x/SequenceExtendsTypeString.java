@@ -43,46 +43,25 @@
  * $Id$
  */
 
-
-package org.exolab.castor.jdo.drivers;
-
-
-import org.exolab.castor.persist.spi.QueryExpression;
-
+package ctf.jdo.tc2x;
 
 /**
- * {@link org.exolab.castor.persist.spi.PersistenceFactory} for DB 2 driver.
- *
- * @author <a href="arkin@intalio.com">Assaf Arkin</a>
- * @version $Revision$ $Date$
+ * Test "extends" relation for SEQUENCE key generator.
  */
-public final class DerbyFactory
-    extends GenericFactory
-{
+public final class SequenceExtendsTypeString extends SequenceObjectTypeString {
+    public static final String DEFAULT_EXT = "ext";
 
-    /**
-     * Internal name of this PersistenceFactory implementation 
-     */
-    public static final String FACTORY_NAME = "derby";
+    private String _ext;
 
-    /**
-     * @inheritDoc
-     * @see org.exolab.castor.persist.spi.PersistenceFactory#getFactoryName()
-     */
-    public String getFactoryName()
-    {
-        return FACTORY_NAME;
-    }
-    
-    /**
-     * @inheritDoc
-     * @see org.exolab.castor.persist.spi.PersistenceFactory#getQueryExpression()
-     */
-    public QueryExpression getQueryExpression()
-    {
-        return new DerbyQueryExpression( this );
+    public SequenceExtendsTypeString() {
+        super();
+        _ext = DEFAULT_EXT;
     }
 
+    public void setExt(final String ext) { _ext = ext; }
+    public String getExt() { return _ext; }
+
+    public String toString() {
+        return super.toString() + " / " + _ext;
+    }
 }
-
-

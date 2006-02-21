@@ -229,6 +229,25 @@
     </field>
   </class>
 
+  <class name="ctf.jdo.tc2x.SequenceObjectTypeString" identity="id" key-generator="SEQUENCE">
+    <description>Table used for SEQUENCE key generator testing with Strings</description>
+    <map-to table="tc2x_keygen_string" />
+    <field name="id" type="string">
+      <sql name="id" type="varchar" />
+    </field>
+    <field name="attr" type="string" required="true">
+      <sql name="attr" type="varchar"/>
+    </field>
+  </class>
+
+  <class name="ctf.jdo.tc2x.SequenceExtendsTypeString" extends="ctf.jdo.tc2x.SequenceObjectTypeString">
+    <description>Table used for SEQUENCE key generator testing with Strings</description>
+    <map-to table="tc2x_keygen_ext_string" />
+    <field name="ext" type="string" required="true">
+      <sql name="ext" type="varchar"/>
+    </field>
+  </class>
+
   <class name="ctf.jdo.tc2x.SequenceObject" identity="id" key-generator="SEQUENCE">
     <description>Table used for SEQUENCE key generator testing</description>
     <map-to table="tc2x_keygen" />

@@ -4,10 +4,10 @@
 
 <jdo-conf>
     <database name="postgresql" engine="postgresql" >
-        <driver url="jdbc:postgresql:test"
+        <driver url="jdbc:postgresql://localhost:5532/test"
                 class-name="org.postgresql.Driver">
-            <param name="user" value="test"/>
-            <param name="password" value="secret"/>
+            <param name="user" value="postgres"/>
+            <param name="password" value="postgres"/>
         </driver>
         <mapping href="jdo/mapping.xml" />
     </database>

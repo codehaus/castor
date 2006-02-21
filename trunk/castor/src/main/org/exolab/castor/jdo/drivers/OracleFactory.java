@@ -61,20 +61,31 @@ public class OracleFactory
     extends GenericFactory
 {
 
+    public static final String FACTORY_NAME = "oracle";
 
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.persist.spi.PersistenceFactory#getFactoryName()
+     */
     public String getFactoryName()
     {
-        return "oracle";
+        return FACTORY_NAME;
     }
 
-
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.persist.spi.PersistenceFactory#getQueryExpression()
+     */
     public QueryExpression getQueryExpression()
     {
         return new OracleQueryExpression( this );
     }
 
-
-    public Boolean isDuplicateKeyException( Exception except )
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.persist.spi.PersistenceFactory#isDuplicateKeyException(java.lang.Exception)
+     */
+    public Boolean isDuplicateKeyException(final Exception except)
     {
         // Sometime gives wrong results
         //if ( except instanceof SQLException )
@@ -82,12 +93,14 @@ public class OracleFactory
         return null;
     }
 
-
-    public String quoteName( String name )
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.persist.spi.PersistenceFactory#quoteName(java.lang.String)
+     */
+    public String quoteName(final String name)
     {
-        return doubleQuoteName( name ).toUpperCase();
+        return doubleQuoteName(name).toUpperCase();
     }
-
 
     /**
      * Needed to process OQL queries of "CALL" type (using stored procedure
@@ -109,6 +122,8 @@ public class OracleFactory
      * For INTEGER type ResultSet.getObject() returns BigDecimal:
      * dependent objects with integer identity cause type conversion error
      * (need to fix SimpleQueryExecutor).
+     * @inheritDoc
+     * @see org.exolab.castor.jdo.engine.BaseFactory#adjustSqlType(java.lang.Class)
      */
     public Class adjustSqlType( Class sqlType )
     {

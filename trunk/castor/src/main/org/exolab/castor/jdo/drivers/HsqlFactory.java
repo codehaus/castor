@@ -41,12 +41,9 @@
  * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
  */
 
-
 package org.exolab.castor.jdo.drivers;
 
-
 import org.exolab.castor.persist.spi.QueryExpression;
-
 
 /**
  * {@link org.exolab.castor.persist.spi.PersistenceFactory} for HypersonicSQL driver.
@@ -56,12 +53,26 @@ import org.exolab.castor.persist.spi.QueryExpression;
 public final class HsqlFactory extends GenericFactory
 {
 
-    public String getFactoryName()
-        { return "hsql"; }
+    /**
+     * Internal name for this {@see PersistenceFactory} instance.
+     */
+    public static final String FACTORY_NAME = "hsql";
+    
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.persist.spi.PersistenceFactory#getFactoryName()
+     */
+    public String getFactoryName(){ 
+        return FACTORY_NAME; 
+    }
 
-
-    public QueryExpression getQueryExpression()
-        { return new HsqlQueryExpression( this ); }
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.persist.spi.PersistenceFactory#getQueryExpression()
+     */
+    public QueryExpression getQueryExpression() { 
+        return new HsqlQueryExpression( this ); 
+    }
 
 }
 
