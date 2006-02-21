@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1127 using contribution from Tim Telcik [ttelcik@hbf.com.au]
+       Added support for non-numeric identities to sequence key generator 
+       Details: http://jira.codehaus.org/browse/CASTOR-1127
+       (Werner - 20060221)
+
 XML:   Fixed bug CASTOR-1323 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
        Fixed failure in MappingTool that always caused a NullPointerException.
        Details: http://jira.codehaus.org/browse/CASTOR-1323

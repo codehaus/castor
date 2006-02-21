@@ -120,6 +120,26 @@ org.exolab.castor.xml.serializer.factory=org.exolab.castor.xml.wls8.WeblogicXerc
                 </code>
 			</summary>
 			<bugs>
+                <bug id="1127" tool="jira">
+                    <description>
+				    	Added support for non-numeric identities to sequence key generator
+                    </description>
+                    <contributor>
+                        <name>Tim Telcik</name>
+                        <email>ttelcik@hbf.com.au</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Tim Telcik</name>
+                        <email>ttelcik@hbf.com.au</email>
+                   </reporter>
+                    <type>Enh</type>
+                    <module>JDO</module>
+                    <date>20060221</date>
+                </bug>
                 <bug id="1323" tool="jira">
                     <description>
 		                Fixed failure in MappingTool that always caused a NullPointerException.
