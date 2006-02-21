@@ -19,32 +19,42 @@ import org.exolab.castor.persist.spi.QueryExpression;
   *    &lt;/database&gt;
   *  </pre> 
   *
-  *
   *  @author <a href="mailto:bozyurt@san.rr.com">I. Burak Ozyurt</a>
   *  @version 1.0
   */
 
-
-
 public class InstantDBFactory extends GenericFactory {
 
+    public static final String FACTORY_NAME = "instantdb";
 
-  public String getFactoryName(){
-        return "instantdb";
-  }
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.persist.spi.PersistenceFactory#getFactoryName()
+     */
+    public String getFactoryName()
+    {
+        return FACTORY_NAME;
+    }
 
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.persist.spi.PersistenceFactory#getQueryExpression()
+     */
+    public QueryExpression getQueryExpression()
+    {
+        return new InstantDBQueryExpression(this);
+    }
 
-  public QueryExpression getQueryExpression() {
-        return new InstantDBQueryExpression( this );
-  }
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.persist.spi.PersistenceFactory#isDuplicateKeyException(java.lang.Exception)
+     */
+    public Boolean isDuplicateKeyException(Exception except)
+    {
+        return null;
+    }
 
-
-   public Boolean isDuplicateKeyException( Exception except ) {      
-      return null;
-   }
-
-
-   /**
+    /**
      * Needed to process OQL queries of "CALL" type (using stored procedure
      * call). This feature is specific for JDO.
      * @param call Stored procedure call (without "{call")
@@ -54,22 +64,26 @@ public class InstantDBFactory extends GenericFactory {
      * @param sqlTypes The field SQL types
      * @return null if this feature is not supported.
      */
-    public PersistenceQuery getCallQuery( String call, Class[] paramTypes, Class javaClass,
-                                          String[] fields, int[] sqlTypes )
+    public PersistenceQuery getCallQuery(String call, Class[] paramTypes, Class javaClass, String[] fields, int[] sqlTypes)
     {
         // stored procedures are not supported by Instant DB
         return null;
     }
 
-
     /**
      * For NUMERIC type ResultSet.getObject() returns Double instead of
      * BigDecimal for InstantDB.
+     * @inheritDoc
+     * @see org.exolab.castor.jdo.engine.BaseFactory#adjustSqlType(java.lang.Class)
      */
-    public Class adjustSqlType( Class sqlType ) {
-        if (sqlType == java.math.BigDecimal.class) {
+    public Class adjustSqlType(Class sqlType)
+    {
+        if (sqlType == java.math.BigDecimal.class)
+        {
             return java.lang.Double.class;
-        } else {
+        }
+        else
+        {
             return sqlType;
         }
     }

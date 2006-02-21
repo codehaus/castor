@@ -161,4 +161,75 @@ public class TestKeyGenGeneric extends CastorTestCase {
 
         _db.commit();
     }
+    
+    /**
+     * The main goal of the test is to verify key generators in the case
+     * of "extends" relation between two classes.
+     * For each key generator we have a pair of classes: TestXXXObject and
+     * TestXXXExtends which use key generator XXX.
+     */
+    protected final void testOneKeyGenString(final Class objClass, final Class extClass)
+    throws Exception {
+
+        OQLQuery oql;
+        AbstractKeyGenObjectTypeString object;
+        AbstractKeyGenObjectTypeString ext;
+        QueryResults enumeration;
+
+        // Open transaction in order to perform JDO operations
+        _db.begin();
+
+        // Create first object
+        object = (AbstractKeyGenObjectTypeString) objClass.newInstance();
+        LOG.debug("Creating first object: " + object);
+        _db.create(object);
+        LOG.debug("Created first object: " + object);
+
+        // Create second object
+        ext = (AbstractKeyGenObjectTypeString) extClass.newInstance();
+        LOG.debug("Creating second object: " + ext);
+        _db.create(ext);
+        LOG.debug("Created second object: " + ext);
+
+        _db.commit();
+
+        _db.begin();
+
+        // Find the first object and remove it 
+        //object = (TestKeyGenObject) _db.load( objClass, object.getId() );
+        oql = _db.getOQLQuery();
+        oql.create("SELECT object FROM " + objClass.getName()
+                + " object WHERE id = $1");
+        oql.bind(object.getId());
+        enumeration = oql.execute();
+        LOG.debug("Removing first object: " + object);
+        if (enumeration.hasMore()) {
+            object = (AbstractKeyGenObjectTypeString) enumeration.next();
+            _db.remove(object);
+            LOG.debug("OK: Removed");
+        } else {
+            LOG.error("first object not found");
+            fail("first object not found");
+        }
+
+        // Find the second object and remove it
+        //ext = (TestKeyGenObject) _db.load( extClass, ext.getId() );
+        oql = _db.getOQLQuery();
+        oql.create("SELECT ext FROM " + extClass.getName()
+                + " ext WHERE id = $1");
+        oql.bind(ext.getId());
+        enumeration = oql.execute();
+        LOG.debug("Removing second object: " + ext);
+        if (enumeration.hasMore()) {
+            ext = (AbstractKeyGenObjectTypeString) enumeration.next();
+            _db.remove(ext);
+            LOG.debug("OK: Removed");
+        } else {
+            LOG.error("second object not found");
+            fail("second object not found");
+        }
+
+        _db.commit();
+    }
+
 }

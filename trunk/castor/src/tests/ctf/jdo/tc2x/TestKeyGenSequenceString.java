@@ -43,46 +43,19 @@
  * $Id$
  */
 
+package ctf.jdo.tc2x;
 
-package org.exolab.castor.jdo.drivers;
-
-
-import org.exolab.castor.persist.spi.QueryExpression;
-
+import harness.TestHarness;
 
 /**
- * {@link org.exolab.castor.persist.spi.PersistenceFactory} for DB 2 driver.
- *
- * @author <a href="arkin@intalio.com">Assaf Arkin</a>
- * @version $Revision$ $Date$
+ * Test for SEQUENCE key generator.
  */
-public final class DerbyFactory
-    extends GenericFactory
-{
-
-    /**
-     * Internal name of this PersistenceFactory implementation 
-     */
-    public static final String FACTORY_NAME = "derby";
-
-    /**
-     * @inheritDoc
-     * @see org.exolab.castor.persist.spi.PersistenceFactory#getFactoryName()
-     */
-    public String getFactoryName()
-    {
-        return FACTORY_NAME;
-    }
-    
-    /**
-     * @inheritDoc
-     * @see org.exolab.castor.persist.spi.PersistenceFactory#getQueryExpression()
-     */
-    public QueryExpression getQueryExpression()
-    {
-        return new DerbyQueryExpression( this );
+public final class TestKeyGenSequenceString extends TestKeyGenGeneric {
+    public TestKeyGenSequenceString(final TestHarness category) {
+        super(category, "TC21a", "Key generator: SEQUENCE for non-numeric values");
     }
 
+    public void runTest() throws Exception {
+        testOneKeyGenString(SequenceObjectTypeString.class, SequenceExtendsTypeString.class);
+    }
 }
-
-

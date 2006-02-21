@@ -52,7 +52,7 @@ import org.exolab.castor.persist.spi.QueryExpression;
 
 
 /**
- * {@link org.exolab.castor.persist.spi.PersistenceFactory} for generic JDBC driver.
+ * {@link org.exolab.castor.persist.spi.PersistenceFactory} for postgreSQL JDBC driver.
  *
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
@@ -61,18 +61,28 @@ public final class PostgreSQLFactory
     extends GenericFactory
 {
 
-
-    public String getFactoryName()
+    /**
+     * Internal name for this {@see org.exolab.castor.persist.spi.PersistenceFactory} instance. 
+     */
+    public static final String FACTORY_NAME = "postgresql";
+    
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.persist.spi.PersistenceFactory#getFactoryName()
+     */
+    public String getFactoryName() 
     {
-        return "postgresql";
+        return FACTORY_NAME;
     }
 
-
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.persist.spi.PersistenceFactory#getQueryExpression()
+     */
     public QueryExpression getQueryExpression()
     {
         return new PostgreSQLQueryExpression( this );
     }
-
 
     /**
      * Determine if the given SQLException is DuplicateKeyException
@@ -84,14 +94,16 @@ public final class PostgreSQLFactory
     {
         Boolean isDuplicateKey = Boolean.FALSE;
 
-        if ( ex.getMessage().indexOf( "duplicate key" ) > 0 )
+        if (ex.getMessage().indexOf("duplicate key") > 0) {
             isDuplicateKey = Boolean.TRUE;
+        }
 
         return isDuplicateKey;
     }
 
 
-    /* (non-Javadoc)
+    /**
+     * @inheritDoc
      * @see org.exolab.castor.persist.spi.PersistenceFactory#quoteName(java.lang.String)
      */
     public String quoteName( String name )
@@ -124,8 +136,9 @@ public final class PostgreSQLFactory
     }
 
 
-    /**
-     * For BLOB/CLOB types are not supported.
+    /** @inheritDoc
+     * BLOB/CLOB types are not supported.
+     * @see org.exolab.castor.jdo.engine.BaseFactory#adjustSqlType(java.lang.Class)
      */
     public Class adjustSqlType( Class sqlType ) {
         if (sqlType == java.sql.Clob.class) {

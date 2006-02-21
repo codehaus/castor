@@ -40,13 +40,9 @@
  *
  * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
  */
-
-
 package org.exolab.castor.jdo.drivers;
 
-
 import org.exolab.castor.persist.spi.QueryExpression;
-
 
 /**
  * {@link org.exolab.castor.persist.spi.PersistenceFactory} for Informix driver.
@@ -55,14 +51,28 @@ import org.exolab.castor.persist.spi.QueryExpression;
  */
 public final class InformixFactory extends GenericFactory
 {
+    /**
+     * Internal name for this {@see PersistenceFactory} instance.
+     */
+    public static final String FACTORY_NAME = "informix";
 
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.persist.spi.PersistenceFactory#getFactoryName()
+     */
     public String getFactoryName()
-        { return "informix"; }
+    {
+        return FACTORY_NAME;
+    }
 
-
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.persist.spi.PersistenceFactory#getQueryExpression()
+     */
     public QueryExpression getQueryExpression()
-        { return new InformixQueryExpression( this ); }
-
+    { 
+        return new InformixQueryExpression(this); 
+    }
 
 }
 

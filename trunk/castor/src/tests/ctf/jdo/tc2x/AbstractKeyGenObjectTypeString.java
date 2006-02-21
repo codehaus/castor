@@ -43,46 +43,18 @@
  * $Id$
  */
 
-
-package org.exolab.castor.jdo.drivers;
-
-
-import org.exolab.castor.persist.spi.QueryExpression;
-
+package ctf.jdo.tc2x;
 
 /**
- * {@link org.exolab.castor.persist.spi.PersistenceFactory} for DB 2 driver.
- *
- * @author <a href="arkin@intalio.com">Assaf Arkin</a>
- * @version $Revision$ $Date$
+ * The base class of all test object for key generators for non-numeric key columns.
  */
-public final class DerbyFactory
-    extends GenericFactory
-{
+public abstract class AbstractKeyGenObjectTypeString {
+    private String _id;
 
-    /**
-     * Internal name of this PersistenceFactory implementation 
-     */
-    public static final String FACTORY_NAME = "derby";
+    public final void setId(final String id) { _id = id; }
+    public final String getId() { return _id; }
 
-    /**
-     * @inheritDoc
-     * @see org.exolab.castor.persist.spi.PersistenceFactory#getFactoryName()
-     */
-    public String getFactoryName()
-    {
-        return FACTORY_NAME;
+    public String toString() {
+        return _id;
     }
-    
-    /**
-     * @inheritDoc
-     * @see org.exolab.castor.persist.spi.PersistenceFactory#getQueryExpression()
-     */
-    public QueryExpression getQueryExpression()
-    {
-        return new DerbyQueryExpression( this );
-    }
-
 }
-
-

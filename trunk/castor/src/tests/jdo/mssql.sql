@@ -452,6 +452,28 @@ go
 grant all on tc2x_keygen_ext to test
 go
 
+drop table if exists tc2x_keygen_string
+go
+create table tc2x_keygen_string (
+  id    varchar(200)  not null,
+  attr  varchar(200)  not null
+)
+go
+
+create unique index tc2x_keygen_string_pk on tc2x_keygen_string ( id )
+go
+
+drop table if exists tc2x_keygen_ext_string
+go
+create table tc2x_keygen_ext_string (
+  id   varchar(200) not null,
+  ext  varchar(200) not null
+)
+go
+
+create unique index tc2x_keygen_ext_string_pk on tc2x_keygen_ext_string ( id )
+go
+
 drop table tc2x_uuid
 go
 create table tc2x_uuid (

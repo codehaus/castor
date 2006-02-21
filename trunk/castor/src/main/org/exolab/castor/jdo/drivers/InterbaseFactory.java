@@ -14,26 +14,26 @@ public final class InterbaseFactory
     extends GenericFactory
 {
 
+    public static final String FACTORY_NAME = "interbase";
 
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.persist.spi.PersistenceFactory#getFactoryName()
+     */
     public String getFactoryName()
     {
-        return "interbase";
+        return FACTORY_NAME;
     }
 
-
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.persist.spi.PersistenceFactory#getQueryExpression()
+     */
     public QueryExpression getQueryExpression()
     {
         return new InterbaseQueryExpression( this );
     }
 
-/*
-    public Boolean isDuplicateKeyException( Exception except )
-    {
-        if ( except instanceof SQLException )
-            return ( (SQLException) except ).getErrorCode() == 335544349 ? Boolean.TRUE : Boolean.FALSE;
-        return null;
-    }
-*/
 }
 
 

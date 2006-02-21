@@ -47,12 +47,9 @@
 
  */
 
-
 package org.exolab.castor.jdo.drivers;
 
-
 import org.exolab.castor.persist.spi.QueryExpression;
-
 
 /**
  * {@link org.exolab.castor.persist.spi.PersistenceFactory} for MySQL JDBC driver.
@@ -64,15 +61,27 @@ public final class MySQLFactory
     extends GenericFactory
 {
 
+    /**
+     * Internal name for this {@see PersistenceFactory} instance.
+     */
+    public static final String FACTORY_NAME = "mysql";
 
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.persist.spi.PersistenceFactory#getFactoryName()
+     */
     public String getFactoryName()
     {
-        return "mysql";
+        return FACTORY_NAME;
     }
 
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.persist.spi.PersistenceFactory#getQueryExpression()
+     */
     public QueryExpression getQueryExpression()
     {
-        return new MySQLQueryExpression( this );
+        return new MySQLQueryExpression(this);
     }
 
     /**

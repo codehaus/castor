@@ -62,19 +62,30 @@ public class SybaseFactory
     extends GenericFactory
 {
 
+    public static final String FACTORY_NAME = "sybase";
 
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.persist.spi.PersistenceFactory#getFactoryName()
+     */
     public String getFactoryName()
     {
-        return "sybase";
+        return FACTORY_NAME;
     }
 
-
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.persist.spi.PersistenceFactory#getQueryExpression()
+     */
     public QueryExpression getQueryExpression()
     {
         return new SybaseQueryExpression( this );
     }
 
-
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.persist.spi.PersistenceFactory#isDuplicateKeyException(java.lang.Exception)
+     */
     public Boolean isDuplicateKeyException( Exception except )
     {
         // Sometime gives wrong results
@@ -89,12 +100,14 @@ public class SybaseFactory
         return null;
     }
 
-
-    public String quoteName( String name )
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.persist.spi.PersistenceFactory#quoteName(java.lang.String)
+     */
+    public String quoteName(String name)
     {
-        return doubleQuoteName( name );
+        return doubleQuoteName(name);
     }
-
 
     /**
      * Needed to process OQL queries of "CALL" type (using stored procedure
@@ -113,7 +126,8 @@ public class SybaseFactory
     }
 
     /**
-     * Sybase supports setNull for "WHERE fld=?".
+     * @inheritDoc
+     * @see org.exolab.castor.jdo.engine.BaseFactory#supportsSetNullInWhere()
      */
     public boolean supportsSetNullInWhere()
     {

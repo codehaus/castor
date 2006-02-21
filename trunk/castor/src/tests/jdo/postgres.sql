@@ -353,7 +353,6 @@ create table tc2x_keygen (
 create unique index tc2x_keygen_pk on tc2x_keygen ( id );
 
 drop sequence tc2x_keygen_seq;
-
 create sequence tc2x_keygen_seq;
 
 drop table tc2x_keygen_ext;
@@ -364,6 +363,25 @@ create table tc2x_keygen_ext (
 );
 
 create unique index tc2x_keygen_ext_pk on tc2x_keygen_ext ( id );
+
+drop sequence tc2x_keygen_string_seq;
+create sequence tc2x_keygen_string_seq;
+
+drop table tc2x_keygen_string;
+create table tc2x_keygen_string (
+  id    varchar(200)  not null,
+  attr  varchar(200)  not null
+);
+
+create unique index tc2x_keygen_string_pk on tc2x_keygen_string ( id );
+
+drop table tc2x_keygen_ext_string;
+create table tc2x_keygen_ext_string (
+  id   varchar(200) not null,
+  ext  varchar(200) not null
+);
+
+create unique index tc2x_keygen_ext_string_pk on tc2x_keygen_ext_string ( id );
 
 drop table tc2x_uuid;
 
@@ -571,7 +589,7 @@ drop table test_comp_item;
 
 create table test_comp_item (
   iid       integer         not null,
-  id      integer         not null
+  id      integer
 );
 
 create unique index test_comp_item_pk on test_comp_item( iid );
