@@ -16,7 +16,7 @@
  * $Id$
  */
 
-package org.castor.xml;
+package org.exolab.castor.xml;
 
 import org.xml.sax.ContentHandler;
 
