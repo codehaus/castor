@@ -9,8 +9,7 @@
   </properties>
   <body>
     <title>Submitting a bug report</title>
-    <header>
-    </header>
+
 	<section title="Submitting a problem report">
 
 		<section title="Driver">
@@ -24,11 +23,11 @@
 				it's quite easy to see that most of the time ...</p>
 					
 			<ol>
-				<li> An initial question is posted.</li>
-				<li> An initial reply is posted with some follow-up questions, e.g. request for 
-				     code fragments, mapping files, etc.</li>
-				<li> One or more code fragments, mapping files, etc. are being posted.</li>
-				<li> etc.</li>
+				<li><p>An initial question is posted.</p></li>
+				<li><p>An initial reply is posted with some follow-up questions, e.g. request for 
+				     code fragments, mapping files, etc.</p></li>
+				<li><p>One or more code fragments, mapping files, etc. are being posted.</p></li>
+				<li><p>etc.</p></li>
 			</ol>
 			
 			<p>This document will establish guidelines with regards to step 3) above.</p>
@@ -47,12 +46,12 @@
 			   include the following artefacts:</p>
 				
 			<ul>
-				<li> A JUnit test case that 'showcases' your problem.</li>
-				<li> Castor JDO configuration file.</li>
-				<li> Castor JDO mapping file.</li>
-				<li> One or more 'entity' classes required to run your test case.</li>
-				<li> A SQL schema file (to help in the creation of required tables).</li>
-				<li> A README file (with any additional information/instructions required to understand
+				<li>A JUnit test case that 'showcases' your problem.</li>
+				<li>Castor JDO configuration file.</li>
+				<li>Castor JDO mapping file.</li>
+				<li>One or more 'entity' classes required to run your test case.</li>
+				<li>A SQL schema file (to help in the creation of required tables).</li>
+				<li>A <tt>README</tt> file (with any additional information/instructions required to understand
 				     /run your test case.</li>
 			</ul>
 	
@@ -73,48 +72,44 @@
 					
 				<p>This directory holds all artefacts mentioned above, as is structured as follows:</p>
 				   
-				<table>	
-					<tbody>
-						<tr><td><i>src</i></td><td>Source code</td></tr>
-						<tr><td><i>src/bugs</i></td><td>Common root for bug reports</td></tr>
-						<tr><td><i>src/bugs/jdo</i></td><td>Common root for JDO bug reports</td></tr>
-						<tr><td><i>src/bugs/jdo/template</i></td><td>Patch template</td></tr>
-						<tr><td>src/bugs/jdo/template/TestTemplate.java</td><td>JUnit test case.</td></tr>
-						<tr><td>src/bugs/jdo/template/EntityOne.java</td><td>Entity required by the test case</td></tr>
-						<tr><td>src/bugs/jdo/template/jdo-conf.xml</td><td>Castor JDO configuration</td></tr>
-						<tr><td>src/bugs/jdo/template/mapping.xml</td><td>Castor mapping file</td></tr>
-						<tr><td>src/bugs/jdo/template/create.sql</td><td>SQL schema to create database table(s)</td></tr>
-						<tr><td>src/bugs/jdo/template/README</td><td>Test instructions</td></tr>
-					</tbody>
-				</table>
+				<ctable cellpadding="3">	
+                    <crow><td><i>src</i></td><td>Source code</td></crow>
+                    <crow><td><i>src/bugs</i></td><td>Common root for bug reports</td></crow>
+                    <crow><td><i>src/bugs/jdo</i></td><td>Common root for JDO bug reports</td></crow>
+                    <crow><td><i>src/bugs/jdo/template</i></td><td>Patch template</td></crow>
+                    <crow><td>src/bugs/jdo/template/TestTemplate.java</td><td>JUnit test case.</td></crow>
+                    <crow><td>src/bugs/jdo/template/EntityOne.java</td><td>Entity required by the test case</td></crow>
+                    <crow><td>src/bugs/jdo/template/jdo-conf.xml</td><td>Castor JDO configuration</td></crow>
+                    <crow><td>src/bugs/jdo/template/mapping.xml</td><td>Castor mapping file</td></crow>
+                    <crow><td>src/bugs/jdo/template/create.sql</td><td>SQL schema to create database table(s)</td></crow>
+                    <crow><td>src/bugs/jdo/template/README</td><td>Test instructions</td></crow>
+				</ctable>
 				
-				<p>To create you own bug report, please copy 'template' to e.g. bug1820, assuming
+				<p>To create you own bug report, please copy '<tt>template</tt>' to e.g. <tt>bug1820</tt>, assuming
 				   that 1820 is the number assigned to your BugZilla problem report). Subsequently, please
 				   amend the files provided to match your own requirements. After you have consolidated your 
 				   changes, the original directory structure in src/bugs could look as follows:</p>
 				   
-				<table>	
-					<tbody>
-						<tr><td><i>src</i></td><td>Source code</td></tr>
-						<tr><td><i>src/bugs</i></td><td>Common root for bug reports</td></tr>
-						<tr><td><i>src/bugs/jdo</i></td><td>Common root for JDO bug reports</td></tr>
-						<tr><td>src/bugs/jdo/template</td><td>Patch template</td></tr>
-						<tr><td>src/bugs/jdo/template/TestTemplate.java</td><td>JUnit test case.</td></tr>
-						<tr><td>src/bugs/jdo/template/EntityOne.java</td><td>Entity required by the test case</td></tr>
-						<tr><td>src/bugs/jdo/template/jdo-conf.xml</td><td>Castor JDO configuration</td></tr>
-						<tr><td>src/bugs/jdo/template/mapping.xml</td><td>Castor mapping file</td></tr>
-						<tr><td>src/bugs/jdo/template/create.sql</td><td>SQL schema to create database table(s)</td></tr>
-						<tr><td>src/bugs/jdo/template/README</td><td>Test instructions</td></tr>
-						<tr><td>src/bugs/jdo/bug1820</td><td>Your specific bug (as per BugZilla bug number)</td></tr>
-						<tr><td>src/bugs/jdo/bug1820/TestCase.java</td><td>JUnit test case.</td></tr>
-						<tr><td>src/bugs/jdo/bug1820/Entity1.java</td><td>Entity required</td></tr>
-						<tr><td>src/bugs/jdo/bug1820/Entity2.java</td><td>Entity required</td></tr>
-						<tr><td>src/bugs/jdo/bug1820/jdo-conf.xml</td><td>Castor JDO configuration</td></tr>
-						<tr><td>src/bugs/jdo/bug1820/mapping.xml</td><td>Castor mapping file</td></tr>
-						<tr><td>src/bugs/jdo/bug1820/schema.sql</td><td>SQL schema to create database table(s)</td></tr>
-						<tr><td>src/bugs/jdo/bug1820/README</td><td>Test instructions</td></tr>
-					</tbody>
-				</table>
+				<ctable cellpadding="3">	
+                    <crow><td><i>src</i></td><td>Source code</td></crow>
+                    <crow><td><i>src/bugs</i></td><td>Common root for bug reports</td></crow>
+                    <crow><td><i>src/bugs/jdo</i></td><td>Common root for JDO bug reports</td></crow>
+                    <crow><td>src/bugs/jdo/template</td><td>Patch template</td></crow>
+                    <crow><td>src/bugs/jdo/template/TestTemplate.java</td><td>JUnit test case.</td></crow>
+                    <crow><td>src/bugs/jdo/template/EntityOne.java</td><td>Entity required by the test case</td></crow>
+                    <crow><td>src/bugs/jdo/template/jdo-conf.xml</td><td>Castor JDO configuration</td></crow>
+                    <crow><td>src/bugs/jdo/template/mapping.xml</td><td>Castor mapping file</td></crow>
+                    <crow><td>src/bugs/jdo/template/create.sql</td><td>SQL schema to create database table(s)</td></crow>
+                    <crow><td>src/bugs/jdo/template/README</td><td>Test instructions</td></crow>
+                    <crow><td>src/bugs/jdo/bug1820</td><td>Your specific bug (as per BugZilla bug number)</td></crow>
+                    <crow><td>src/bugs/jdo/bug1820/TestCase.java</td><td>JUnit test case.</td></crow>
+                    <crow><td>src/bugs/jdo/bug1820/Entity1.java</td><td>Entity required</td></crow>
+                    <crow><td>src/bugs/jdo/bug1820/Entity2.java</td><td>Entity required</td></crow>
+                    <crow><td>src/bugs/jdo/bug1820/jdo-conf.xml</td><td>Castor JDO configuration</td></crow>
+                    <crow><td>src/bugs/jdo/bug1820/mapping.xml</td><td>Castor mapping file</td></crow>
+                    <crow><td>src/bugs/jdo/bug1820/schema.sql</td><td>SQL schema to create database table(s)</td></crow>
+                    <crow><td>src/bugs/jdo/bug1820/README</td><td>Test instructions</td></crow>
+				</ctable>
 				
 				</section>
 			
