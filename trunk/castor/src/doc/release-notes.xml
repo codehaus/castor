@@ -41,6 +41,10 @@
 				
 				<h2>Additions</h2>
 				
+				<h3>New XML HOW-TOs added</h3>
+				
+				<p>Added XML HOW-TOs for mapping collections and maps.</p>
+				
 				<h3>Added new SAX2EventProducer interface</h3>
 				
 				<p>Added new <api>org.castor.xml.SAX2EventProducer</api> interface to allow passing 
@@ -130,6 +134,26 @@ org.exolab.castor.xml.serializer.factory=org.exolab.castor.xml.wls8.WeblogicXerc
                 </code>
 			</summary>
 			<bugs>
+                <bug id="1329" tool="jira">
+                    <description>
+				    	Added XML HOW-TOs for mapping collections and maps.
+                    </description>
+                    <contributor>
+                        <name>Robby Pelssers</name>
+                        <email>robby.pelssers@vodafone.com</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Robby Pelssers</name>
+                        <email>robby.pelssers@vodafone.com</email>
+                   </reporter>
+                    <type>Enh</type>
+                    <module>XML</module>
+                    <date>20060222</date>
+                </bug>
                 <bug id="1326" tool="jira">
                     <description>
 				    	Added new EventProducer2 interface to allow streaming of SAX 2 events into Castor XML
