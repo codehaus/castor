@@ -33,6 +33,8 @@
         
         <section title="Mapping">
             <ul>
+                <li><a href="how-to-map-a-collection.html">How to map a collection of elements</a></li>
+                <li><a href="how-to-map-a-hashtable.html">How to map a map/hashtable of elements</a></li>
                 <li><a href="how-to-wrap-a-collection-with-a-wrapper-element.html">How to wrap a collection with a wrapper element</a></li>
             </ul>
         </section>
