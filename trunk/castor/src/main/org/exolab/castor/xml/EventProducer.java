@@ -52,6 +52,7 @@ import org.xml.sax.*;
  * This allows any EventProducer to be used with the Unmarshaller
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
+ * @deprecated use @see org.castor.xml.SAX2EventProducer instead. 
 **/
 public interface EventProducer {
     

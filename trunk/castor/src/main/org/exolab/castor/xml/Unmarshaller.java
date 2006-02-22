@@ -47,6 +47,7 @@ package org.exolab.castor.xml;
 
 
 //-- castor imports
+import org.castor.xml.SAX2EventProducer;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.util.Configuration;
@@ -573,6 +574,7 @@ public class Unmarshaller {
      * @exception MarshalException when there is an error during
      * the unmarshalling process
      * @exception ValidationException when there is a validation error
+     * @deprecated please use @see #unmarshal(SAX2EventProducer) instead. 
     **/
     public Object unmarshal(EventProducer eventProducer)
         throws MarshalException, ValidationException
@@ -600,6 +602,43 @@ public class Unmarshaller {
 
     } //-- unmarshal(EventProducer)
 
+    /**
+     * Unmarshals Objects of this Unmarshaller's Class type.
+     * The Class must specify the proper access methods
+     * (setters/getters) in order for instances of the Class
+     * to be properly unmarshalled.
+     * @param eventProducer the SAX2EventProducer instance which produces
+     * the SAX 2 events
+     * @exception MarshalException when there is an error during
+     * the unmarshalling process
+     * @exception ValidationException when there is a validation error
+     * @since 1.0M3
+    **/
+    public Object unmarshal(SAX2EventProducer eventProducer)
+        throws MarshalException, ValidationException
+    {
+        UnmarshalHandler handler = createHandler();
+        eventProducer.setContentHandler(handler);
+        try {
+            eventProducer.start();
+        }
+        catch(org.xml.sax.SAXException sx) {
+            Exception except = sx.getException();
+            if (except == null) except = sx;
+            MarshalException marshalEx = new MarshalException(except);
+            if(handler.getDocumentLocator()!=null)
+            {
+                FileLocation location = new FileLocation();
+                location.setFilename(handler.getDocumentLocator().getSystemId());
+                location.setLineNumber(handler.getDocumentLocator().getLineNumber());
+                location.setColumnNumber(handler.getDocumentLocator().getColumnNumber());
+                marshalEx.setLocation(location);
+            }
+            throw marshalEx;
+        }
+        return handler.getObject();
+
+    } //-- unmarshal(SAX2EventProducer)
 
 
     /**

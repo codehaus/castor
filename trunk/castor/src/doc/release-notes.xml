@@ -41,6 +41,16 @@
 				
 				<h2>Additions</h2>
 				
+				<h3>Added new SAX2EventProducer interface</h3>
+				
+				<p>Added new <api>org.castor.xml.SAX2EventProducer</api> interface to allow passing 
+				   SAX 2 events to Castor XML, deprecating the existing 
+				   <api>org.exolab.castor.xml.EventProducer</api> interface at the same time. At the same time,
+				   a new <api class="org.exolab.castor.xml.Unmarshaller">unmarshal(SAX2EventProducer)</api>
+				    method has been added to <api>org.exolab.castor.xml.Unmarshaller</api>, deprecating 
+				    the existing <api class="org.exolab.castor.xml.Unmarshaller">unmarshal(EventProducer)</api> 
+				   method at the same time.</p>
+				
 				<h3>Added support for postgreSQL to identity key generator</h3>
 				
 				<p>Added support for the postgreSQL column type 'SERIAL' to the 
@@ -120,6 +130,26 @@ org.exolab.castor.xml.serializer.factory=org.exolab.castor.xml.wls8.WeblogicXerc
                 </code>
 			</summary>
 			<bugs>
+                <bug id="1326" tool="jira">
+                    <description>
+				    	Added new EventProducer2 interface to allow streaming of SAX 2 events into Castor XML
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>David Leal</name>
+                        <email>achepati67@yahoo.es</email>
+                   </reporter>
+                    <type>Enh</type>
+                    <module>XML</module>
+                    <date>20060221</date>
+                </bug>
                 <bug id="1127" tool="jira">
                     <description>
 				    	Added support for non-numeric identities to sequence key generator

@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1326 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Added new EventProducer2 interface to allow streaming of SAX 2 events into Castor XML
+       Details: http://jira.codehaus.org/browse/CASTOR-1326
+       (Werner - 20060221)
+       
 JDO:   Fixed bug CASTOR-1127 using contribution from Tim Telcik [ttelcik@hbf.com.au]
        Added support for non-numeric identities to sequence key generator 
        Details: http://jira.codehaus.org/browse/CASTOR-1127
