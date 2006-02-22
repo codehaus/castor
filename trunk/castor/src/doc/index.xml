@@ -23,6 +23,13 @@
       </p>
 
     </section>
+    
+    <section title="Recent documentation changes">
+        
+        <p>Please check <a href="changes.html">here</a> for any information
+           related to changes of the HTML documentation.</p>
+           
+    </section>
 
     <section title="News">
       <!-- include the latest news -->
