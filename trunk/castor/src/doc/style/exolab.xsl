@@ -865,10 +865,20 @@
   </xsl:template>
   
   <xsl:template match="ctable">
+
+      <xsl:variable name="cellpadding">
+        <xsl:choose>
+           <xsl:when test="@cellpadding">
+               <xsl:value-of select="@cellpadding"/>
+           </xsl:when>
+           <xsl:otherwise>8</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
      <table border="0" cellspacing="1" cellpadding="2" bgcolor="#7270c2">
         <tr>
            <td>
-              <table border="0" cellspacing="1" cellpadding="8" bgcolor="#ededed">
+              <table border="0" cellspacing="1" cellpadding="{$cellpadding}" bgcolor="#ededed">
                  <caption style="font-weight:bold">
                     <xsl:value-of select="@caption" />
                  </caption>
