@@ -18,7 +18,11 @@
             <ul>
                 <li>Added a <a href="jdo-self-executable-examples.html">page</a>
                     describing how to execute the new self-executable
-                    Castor JDO samples to the Castor JDO section.</li>
+                    Castor JDO samples to the Castor JDO section. (Castor JDO)</li>
+                <li>Added HOW-TO document on preparing a (unified) patch for
+                    submission. (Castor XML)</li>
+                <li>Added HOW-TO document on mapping a collection of elements. (Castor XML)</li>
+                <li>Added HOW-TO document on mapping a map/hashtable of elements. (Castor XML)</li>
             </ul>    
             
         </section>
