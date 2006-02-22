@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<document url="http://castor.codehaus.org/changes.xml">
+    <properties>
+        <title>Recent changes to the HTML documentation</title>
+        <author email="werner DOT guttmann AT gmx DOT net">Werner Guttmann</author>
+        <abstract>
+            Outlines recent changes to the HTML documentation.
+        </abstract>
+        <status>Final</status>
+    </properties>
+
+    <body>
+
+        <title>Recent changes to the HTML documentation</title>
+
+        <section title="Additions">
+        
+            <ul>
+                <li>Added a <a href="jdo-self-executable-examples.html">page</a>
+                    describing how to execute the new self-executable
+                    Castor JDO samples to the Castor JDO section.</li>
+            </ul>    
+            
+        </section>
+        
+        <section title="Changes/improvements">
+            
+            
+        </section>
+        
+    </body>
+</document>
