@@ -72,8 +72,8 @@
       <navLink>
          <url>http://castor.org/phpBB2</url>
          <display>Castor Forums</display>
--->         
       </navLink>
+-->         
       <navLink>
         <url>lists.xml</url>
         <display>Mailing Lists</display>
