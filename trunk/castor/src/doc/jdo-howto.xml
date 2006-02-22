@@ -5,19 +5,19 @@
 
       <section title="Introduction">
 
-        <p>This is a collection of HOW-To. The Castor project is actively seeking 
+        <p>This is a collection of HOW-TOs. The Castor project is actively seeking 
            additional HOW-TO contributors to expand this collection. For information 
-           on how to do that, please see 'How to write a HOW-TO'.</p>
+           on how to do that, please see 'How to author a HOW-TO'.</p>
         
       </section>
 	
 		<section title="Documentation">
 		
 		    <ul>
-		        <li><font color="lightgrey">How to Author a HOW-TO</font></li>
-		        <li><font color="lightgrey">How to Author an FAQ</font></li>
-		        <li><font color="lightgrey">How to Author a Code Snippet</font></li>
-		        <li><font color="lightgrey">How to Author Core Documentation</font></li>
+		        <li><font color="lightgrey">How to author a HOW-TO document</font></li>
+		        <li><font color="lightgrey">How to author an FAQ entry</font></li>
+		        <li><font color="lightgrey">How to author a code snippet</font></li>
+		        <li><font color="lightgrey">How to author core documentation</font></li>
 		    </ul>
 		    
 		</section>
