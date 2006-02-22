@@ -94,6 +94,10 @@
         <url>http://castor.codehaus.org/rss/castor-announce.xml</url>
         <display>RSS news feed</display>
       </navLink>
+      <navLink>
+        <url>changes.xml</url>
+        <display>Recent changes</display>
+      </navLink>
     </section>
 
     <section name="XML">
@@ -163,6 +167,10 @@
       <navLink>
         <url>jdo-other-features.xml</url>
         <display>Other Features</display>
+      </navLink>
+      <navLink>
+        <url>jdo-self-executable-examples.xml</url>
+        <display>JDO sample JAR</display>
       </navLink>
     </section>
 
