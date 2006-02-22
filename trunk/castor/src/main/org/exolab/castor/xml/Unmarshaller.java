@@ -47,7 +47,6 @@ package org.exolab.castor.xml;
 
 
 //-- castor imports
-import org.castor.xml.SAX2EventProducer;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.util.Configuration;

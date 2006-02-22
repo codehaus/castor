@@ -47,7 +47,7 @@
 				
 				<h3>Added new SAX2EventProducer interface</h3>
 				
-				<p>Added new <api>org.castor.xml.SAX2EventProducer</api> interface to allow passing 
+				<p>Added new <api>org.exolab.castor.xml.SAX2EventProducer</api> interface to allow passing 
 				   SAX 2 events to Castor XML, deprecating the existing 
 				   <api>org.exolab.castor.xml.EventProducer</api> interface at the same time. At the same time,
 				   a new <api class="org.exolab.castor.xml.Unmarshaller">unmarshal(SAX2EventProducer)</api>
