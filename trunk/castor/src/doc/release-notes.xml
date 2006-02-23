@@ -41,6 +41,15 @@
 				
 				<h2>Additions</h2>
 				
+				<h3>Added 'abstract/concrete' annotation to XMLDescriptor</h3>
+				
+				<p>With this addition, it is now possibel to query whether a particular XML element (represented
+				   by an XMLClassDesscriptor internally) is <i>abstract</i> or <i>concrete</i>, that is (in the 
+				   context of source generation) a result of a &lt;complexType&gt; definition or an 
+				   &lt;element&gt; declaration. This is particularly relevant for tool providers who need to 
+				   integrate with Castor XML, and as a result of this addition can now use the new
+				   <tt>isElementDefinition()</tt> method to query an artefact's state.</p>
+				
 				<h3>New XML HOW-TOs added</h3>
 				
 				<p>Added XML HOW-TOs for mapping collections and maps.</p>
@@ -134,6 +143,26 @@ org.exolab.castor.xml.serializer.factory=org.exolab.castor.xml.wls8.WeblogicXerc
                 </code>
 			</summary>
 			<bugs>
+                <bug id="1326" tool="jira">
+                    <description>
+				    	Added property to XMLClassDescriptor to distinguish whether XML artefact represented is abstract/concrete
+                    </description>
+                    <contributor>
+                        <name>Adam Kramer</name>
+                        <email>adam@monkey.org</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Adam Kramer</name>
+                        <email>adam@monkey.org</email>
+                   </reporter>
+                    <type>Enh</type>
+                    <module>XML</module>
+                    <date>20060222</date>
+                </bug>
                 <bug id="1159" tool="jira">
                     <description>
 				    	Fixed problem with range checking in code generated for collections.

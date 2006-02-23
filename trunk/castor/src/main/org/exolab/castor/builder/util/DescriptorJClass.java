@@ -75,7 +75,9 @@ public class DescriptorJClass extends JClass {
     private static JType _TypeValidatorClass
         = new JClass("org.exolab.castor.xml.TypeValidator");
 
-
+    //-- methods defined by org.exolab.castor.xml.util.XMLClassDescriptorImpl
+    private JMethod _getElementDefinition    = null;
+    
     //-- methods defined by org.exolab.castor.xml.XMLClassDescriptor
     private JMethod _getNameSpacePrefix      = null;
     private JMethod _getNameSpaceURI         = null;
@@ -131,6 +133,9 @@ public class DescriptorJClass extends JClass {
         addImport("org.exolab.castor.xml.validators.*");
 //        addImport("org.exolab.castor.xml.FieldValidator");
 
+
+        addField(new JField(JType.Boolean, "elementDefinition"));
+        
         addField(new JField(SGTypes.String,  "nsPrefix"));
         addField(new JField(SGTypes.String,  "nsURI"));
         addField(new JField(SGTypes.String,  "xmlName"));
@@ -155,6 +160,17 @@ public class DescriptorJClass extends JClass {
         //jsc.add("Class[] emptyClassArgs = new Class[0];");
         //jsc.add("Class[] classArgs = new Class[1];");
 
+        //---------------------------------------------/
+        //- Methods Defined by XMLClassDescriptorImpl -/
+        //---------------------------------------------/
+        
+        //-- create getElementDefinition method
+        method = new JMethod(JType.Boolean, "getElementDefinition");
+        jsc = method.getSourceCode();
+        jsc.add("return elementDefinition;");
+        addMethod(method);
+        _getElementDefinition = method;
+        
         //-----------------------------------------/
         //- Methods Defined by XMLClassDescriptor -/
         //-----------------------------------------/
@@ -242,6 +258,10 @@ public class DescriptorJClass extends JClass {
 
     } //-- createSource
 
+    public JMethod getElementDefinitionMethod() {
+    		return _getElementDefinition;
+    } //-- getElementDefinitionMethod
+    
     public JMethod getNameSpacePrefixMethod() {
         return _getNameSpacePrefix;
     } //-- getNamespaceURIMethod

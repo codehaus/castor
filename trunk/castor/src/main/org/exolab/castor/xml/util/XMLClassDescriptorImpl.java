@@ -163,7 +163,14 @@ public class XMLClassDescriptorImpl extends Validator
      */
     private String  _xmlName;
 
-
+    /**
+     * Flag to indicate XML refers to global element or element with 
+     * anonymous type in XSD. Useful information for frameworks
+     * that use Castor for XML binding and generate additional schema 
+     * definition elements.
+     */
+    private boolean elementDefinition = false;
+    
     /**
      * The descriptor of the class which this class extends,
      * or null if this is a top-level class.
@@ -475,6 +482,14 @@ public class XMLClassDescriptorImpl extends Validator
     } //-- getXMLName
     
     /**
+     * Returns true if XML schema definition of this Class is that of a global
+     * element or element with anonymous type definition.
+     */
+    public boolean isElementDefinition() {
+    		return elementDefinition;
+    } //-- isElementDefinition
+    
+    /**
      * Returns true if this XMLClassDescriptorImpl has any fields which are
      * container objects. A container object is a Java object which holds
      * data the should be marshalled, but the object itself should not be.
@@ -640,6 +655,17 @@ public class XMLClassDescriptorImpl extends Validator
         else this._xmlName = xmlName;
     } //-- setXMLName
 
+    /**
+     * Set elementDefinition to true to indicate Class XML schema 
+     * definition is a global element or element with anonymous type.
+     * 
+     * @param elementDefinition flag to indicate XML definition is 
+     * global element or element with anonymous type
+     */
+    public void setElementDefinition(boolean elementDefinition){
+    		this.elementDefinition = elementDefinition;
+    } //-- setElementDefinition
+    
     /**
      * This method is used to keep the set of descriptors in the proper
      * sorted lists. If you dynamically change the NodeType of

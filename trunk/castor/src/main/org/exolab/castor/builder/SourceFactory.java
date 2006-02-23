@@ -362,15 +362,17 @@ public class SourceFactory {
         //5--processing the type
         XMLType type = component.getXMLType();
         boolean createForSingleGroup = false;
-        boolean creatingForAnElement = false;
+        boolean creatingForAnElement =
+            (component.getAnnotated().getStructureType() == Structure.ELEMENT);
+        
+        //-- created from element definition information
+        classInfo.setElementDefinition(creatingForAnElement);
         
         if (type != null) {
 
             //5a--the type is a complexType
             if (type.isComplexType()) {
 
-                creatingForAnElement =
-                   (component.getAnnotated().getStructureType() == Structure.ELEMENT);
                 ComplexType complexType = (ComplexType)type;
                 
                 if (complexType.isTopLevel() && creatingForAnElement) {

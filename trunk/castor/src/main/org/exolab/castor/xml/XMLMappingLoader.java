@@ -323,10 +323,11 @@ public class XMLMappingLoader
         } //-- End of auto-complete
 
 
-        //-- copy ns-uri + ns-prefix
+        //-- copy ns-uri + ns-prefix + element-definition
         if (mapTo != null) {
             xmlClassDesc.setNameSpacePrefix(mapTo.getNsPrefix());
             xmlClassDesc.setNameSpaceURI(mapTo.getNsUri());
+            xmlClassDesc.setElementDefinition(mapTo.getElementDefinition());
         }
         return xmlClassDesc;
     } //-- createDescriptor

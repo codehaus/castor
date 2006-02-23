@@ -70,6 +70,7 @@
       <xsd:attribute name="xml"       type="xsd:string"   use="optional"/>
       <xsd:attribute name="ns-uri"    type="xsd:string"   use="optional"/>
       <xsd:attribute name="ns-prefix" type="xsd:NMTOKEN"  use="optional"/>
+      <xsd:attribute name="element-definition" type="xsd:boolean" use="optional" default="false"/>
       <xsd:attribute name="ldap-dn"   type="xsd:string"   use="optional"/>
       <xsd:attribute name="ldap-oc"   type="xsd:string"   use="optional"/>
     </xsd:complexType>
