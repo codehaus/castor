@@ -96,6 +96,7 @@
     xml        NMTOKEN  #IMPLIED
     ns-uri     CDATA    #IMPLIED
     ns-prefix  NMTOKEN  #IMPLIED
+    element-definition  (true|false) "false"
     ldap-dn    NMTOKEN  #IMPLIED
     ldap-oc    NMTOKEN  #IMPLIED>
 

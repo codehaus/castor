@@ -108,7 +108,10 @@ public class MappingFileSourceFactory {
 
 		//-- set XML Name
 		mapTo.setXml(classInfo.getNodeName());
-
+		
+		//-- set Element Definition flag
+		mapTo.setElementDefinition(classInfo.isElementDefinition());
+		
 		//-- set grouping compositor
 		if (classInfo.isChoice()) {
             //-- TODO: need a way to specify choice in 

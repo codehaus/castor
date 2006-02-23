@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+XML:   Fixed bug CASTOR-1326 using contribution from Adam Kramer [adam@monkey.org]
+       Added property to XMLClassDescriptor to distinguish whether XML artefact represented is abstract/concrete
+       Details: http://jira.codehaus.org/browse/CASTOR-1326
+       (Werner - 20060222)
+
 XML:   Fixed bug CASTOR-1159 using contribution from Martin Kleppmann [codehaus@kleppmann.de]
        Fixed problem with range checking in code generated for collections.
        Details: http://jira.codehaus.org/browse/CASTOR-1159

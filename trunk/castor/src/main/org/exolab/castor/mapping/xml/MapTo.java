@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://www.castor.org">Castor 1.0M1</a>, using an XML
+ * <a href="http://www.castor.org">Castor 1.0M2</a>, using an XML
  * Schema.
  * $Id$
  */
@@ -54,6 +54,16 @@ public class MapTo implements java.io.Serializable {
     private java.lang.String _nsPrefix;
 
     /**
+     * Field _elementDefinition
+     */
+    private boolean _elementDefinition = false;
+
+    /**
+     * keeps track of state for field: _elementDefinition
+     */
+    private boolean _has_elementDefinition;
+
+    /**
      * Field _ldapDn
      */
     private java.lang.String _ldapDn;
@@ -77,6 +87,26 @@ public class MapTo implements java.io.Serializable {
       //-----------/
      //- Methods -/
     //-----------/
+
+    /**
+     * Method deleteElementDefinition
+     * 
+     */
+    public void deleteElementDefinition()
+    {
+        this._has_elementDefinition= false;
+    } //-- void deleteElementDefinition() 
+
+    /**
+     * Returns the value of field 'elementDefinition'.
+     * 
+     * @return boolean
+     * @return the value of field 'elementDefinition'.
+     */
+    public boolean getElementDefinition()
+    {
+        return this._elementDefinition;
+    } //-- boolean getElementDefinition() 
 
     /**
      * Returns the value of field 'ldapDn'.
@@ -145,6 +175,18 @@ public class MapTo implements java.io.Serializable {
     } //-- java.lang.String getXml() 
 
     /**
+     * Method hasElementDefinition
+     * 
+     * 
+     * 
+     * @return boolean
+     */
+    public boolean hasElementDefinition()
+    {
+        return this._has_elementDefinition;
+    } //-- boolean hasElementDefinition() 
+
+    /**
      * Method isValid
      * 
      * 
@@ -189,6 +231,18 @@ public class MapTo implements java.io.Serializable {
         
         Marshaller.marshal(this, handler);
     } //-- void marshal(org.xml.sax.ContentHandler) 
+
+    /**
+     * Sets the value of field 'elementDefinition'.
+     * 
+     * @param elementDefinition the value of field
+     * 'elementDefinition'.
+     */
+    public void setElementDefinition(boolean elementDefinition)
+    {
+        this._elementDefinition = elementDefinition;
+        this._has_elementDefinition = true;
+    } //-- void setElementDefinition(boolean) 
 
     /**
      * Sets the value of field 'ldapDn'.

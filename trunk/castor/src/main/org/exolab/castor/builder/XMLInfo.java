@@ -98,6 +98,12 @@ public class XMLInfo {
     private String nsURI    = null;
 
     /**
+     * indicates XML schema definition is global element
+     * or element with anonymous type.
+     */
+    private boolean elementDef = false;
+    
+    /**
      * indicates the XML object must appear at least once
     **/
     private boolean required = false;
@@ -159,6 +165,15 @@ public class XMLInfo {
         return nsURI;
     } //-- getNamespaceURI
 
+    /**
+     * Returns true if XSD is global element or element with 
+     * anonymous type.
+     * @return true if xsd is element
+     */
+    public boolean isElementDefinition() {
+    		return elementDef;
+    } //-- isElementDefinition
+    
     /**
      * Returns the node type for the object described by this XMLInfo
      * @return the node type for the object described by this XMLInfo
@@ -249,6 +264,16 @@ public class XMLInfo {
         this.nsURI = nsURI;
     } //-- setNamespaceURI
 
+    /**
+     * Sets whether or not XSD is element or not.
+     * @param elementDefinition  the flag indicating whether
+     * or not XSD is global element, element with anonymous
+     * type or not
+     */
+    public void setElementDefinition(boolean elementDef) {
+    		this.elementDef = elementDef;
+    } //-- setElementDefinition
+    
     /**
      * Sets the nodeType for this XMLInfo
      * @param nodeType the node type of the described object

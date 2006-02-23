@@ -245,8 +245,8 @@
         <ul>
              <li><b>description</b>: an optional &lt;description></li>
 
-             <li><b>cache-type:</b> for more information on this field see JDO
-             documentation</li>
+             <li><b>cache-type:</b> used for Castor JDO only; for more information on this field, please 
+                 see the section on <a href="jdo-mapping.xml">Castor JDO mapping</a></li>
 
              <li><b>an optional &lt;map-to></b>. Used if the name of the element is not the
              name of the class. By default, Castor will infer the name of the
@@ -259,68 +259,47 @@
              Java objects.</li>
         </ul>
 
-        <p>If you want to map the following class into the element '&lt;data>':</p>
+        <p>If you want to map the following class into the element '&lt;data&gt;':</p>
 
-        <code>
+        <code-panel>
 package mypackage
 
-public class myclass {
-       ...
+public class MyClass {
 
        public int foo;
-       ...
 
-       public String getBar()
-       ...
+       public String getBar() { ... }
 
-       public void setBar(String bar)
-       ...
-}
-        </code>
+       public void setBar(String bar) { ... }
+}</code-panel>
 
         <p>Into an XML document like:</p>
 
-        <code>
-        &lt;data foo-like="12">
-                &lt;something>
-                        ...
-                &lt;/something>
-
-        &lt;/data>
-        </code>
+        <code-panel>
+  &lt;data foo-like="12"&gt;
+     &lt;something&gt;...&lt;/something&gt;
+  &lt;/data&gt;</code-panel>
 
         <p>You might use the following mapping file:</p>
 
-        <code>
-        &lt;mapping>
+        <code-panel>
+  &lt;mapping&gt;
+     ...
+     &lt;class name="mypackage.MyClass"&gt;
+                
+        &lt;map-to xml="data"/&gt;
 
-                ...
+        &lt;field name="foo" direct="true" ...&gt;
+           &lt;bind-xml name="foo-like" node="attribute"/&gt;
+        &lt;/field&gt;
 
-                &lt;class name="mypackage.myclass">
-                        &lt;map-to xml="data"/>
+        &lt;/field name="bar" ....&gt;
+           &lt;bind-xml name="something" node="element"/&gt;
+        &lt;/field&gt;
 
-
-                        &lt;field name="foo"
-                               direct="true"
-                                ....
-                               >
-                                &lt;bind-xml name="foo-like" node="attribute"/>
-                        &lt;/field>
-
-
-                        &lt;/field name="bar"
-                                ....
-                               >
-                                &lt;bind-xml name="something" node="element"/>
-                        &lt;/field>
-
-               &lt;/class>
-
-               ...
-
-        &lt;/mapping>
-
-        </code>
+     &lt;/class&gt;
+     ...
+  &lt;/mapping&gt;</code-panel>
 
       </section>
 
@@ -329,12 +308,13 @@ public class myclass {
         <code>
         &lt;!ELEMENT map-to EMPTY>
         &lt;!ATTLIST map-to
-                  table      NMTOKEN  #IMPLIED
-                  xml        NMTOKEN  #IMPLIED
-                  ns-uri     NMTOKEN  #IMPLIED
-                  ns-prefix  NMTOKEN  #IMPLIED
-                  ldap-dn    NMTOKEN  #IMPLIED
-                  ldap-oc    NMTOKEN  #IMPLIED>
+                  table               NMTOKEN  #IMPLIED
+                  xml                 NMTOKEN  #IMPLIED
+                  ns-uri              NMTOKEN  #IMPLIED
+                  ns-prefix           NMTOKEN  #IMPLIED
+                  ldap-dn             NMTOKEN  #IMPLIED
+                  element-definition  (true|false) "false"     <font color="red"><b>NEW</b> as of 1.0M3</font>
+                  ldap-oc             NMTOKEN  #IMPLIED>
         </code>
 
         <p>&lt;map-to> is used to specify the name of the element that should be associated
@@ -354,13 +334,12 @@ public class myclass {
 
         <ul>
           <li><b>xml:</b> name of the element that the class is associated to.</li>
-
           <li><b>ns-uri</b>: namespace URI</li>
-
           <li><b>ns-prefix:</b> desired namespace</li>
-
+          <li><b>element-definition:</b> true if the descriptor as created from a schema definition that 
+              was of type element (as opposed to a &lt;complexType&gt; definition). This only is useful 
+              in the context of source code generation.</li>
           <li><b>ldap-dn:</b> not used for XML</li>
-
           <li><b>ldap-oc:</b> not used for XML</li>
         </ul>
 
