@@ -143,6 +143,26 @@ org.exolab.castor.xml.serializer.factory=org.exolab.castor.xml.wls8.WeblogicXerc
                 </code>
 			</summary>
 			<bugs>
+                <bug id="1333" tool="jira">
+                    <description>
+				    	Fixed inconsistency related to not calling setPreserveWhiteSpace(true) in Unmarshaller.unmarshal(Class, Node)
+                    </description>
+                    <contributor>
+                        <name>Thomas Tatzel</name>
+                        <email>thomas.tatzel@db.com</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Thomas Tatzel</name>
+                        <email>thomas.tatzel@db.com</email>
+                   </reporter>
+                    <type>Bug</type>
+                    <module>XML</module>
+                    <date>20060223</date>
+                </bug>
                 <bug id="962" tool="jira">
                     <description>
 				       Improved code quality of DataObjectAccessException.
