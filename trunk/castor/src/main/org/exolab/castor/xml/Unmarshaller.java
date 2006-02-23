@@ -840,6 +840,11 @@ public class Unmarshaller {
                 "ignore any mapping files or changes made to an Unmarshaller instance.";
             System.out.println(warning);
         }
+        
+        //-- for backward compatibility with Castor versions
+        //-- prior to version 0.9.5.3
+        unmarshaller.setWhitespacePreserve(true);
+        
         return unmarshaller.unmarshal(node);
     } //-- void unmarshal(Writer)
 

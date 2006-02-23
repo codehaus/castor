@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+XML:   Fixed bug CASTOR-13336 using contribution from Thomas Tatzel [thomas.tatzel@db.com]
+       Fixed inconsistency related to not calling setPreserveWhiteSpace(true) in Unmarshaller.unmarshal(Class, Node)
+       Details: http://jira.codehaus.org/browse/CASTOR-1332
+       (Werner - 20060223)
+
 JDO:   Fixed bug CASTOR-962 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        Improved code quality of DataObjectAccessException.
        Details: http://jira.codehaus.org/browse/CASTOR-962
