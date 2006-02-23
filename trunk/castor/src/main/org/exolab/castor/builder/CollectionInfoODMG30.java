@@ -159,7 +159,7 @@ public class CollectionInfoODMG30 extends CollectionInfo {
         JType jType = method.getReturnType();
 
         jsc.add("//-- check bounds for index");
-        jsc.add("if ((index < 0) || (index > ");
+        jsc.add("if ((index < 0) || (index >= ");
         jsc.append(getName());
         jsc.append(".size())) {");
         jsc.indent();
@@ -234,7 +234,7 @@ public class CollectionInfoODMG30 extends CollectionInfo {
         JSourceCode jsc = method.getSourceCode();
 
         jsc.add("//-- check bounds for index");
-        jsc.add("if ((index < 0) || (index > ");
+        jsc.add("if ((index < 0) || (index >= ");
         jsc.append(getName());
         jsc.append(".size())) {");
         jsc.indent();
