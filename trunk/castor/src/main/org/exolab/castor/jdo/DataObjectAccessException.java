@@ -55,14 +55,26 @@ package org.exolab.castor.jdo;
  * @version $Revision$ $Date$
  */
 public class DataObjectAccessException extends RuntimeException {
-    /** SerialVersionUID */
+
+    /** SerialVersionUID. */
     private static final long serialVersionUID = -6741547483776196810L;
 
-    public DataObjectAccessException(final String message, final Throwable except) {
-        super(message /*, except */);
+    /**
+     * Creates an instance of this exception.
+     * @param message The error message.
+     * @param except The original excepton.
+     */
+    public DataObjectAccessException(
+            final String message,
+            final Throwable except) {
+        super(message, except);
     }
 
-    public DataObjectAccessException(String message) {
+    /**
+     * Creates an instance of this exception.
+     * @param message The error message.
+     */
+    public DataObjectAccessException(final String message) {
         super(message);
     }
 }
