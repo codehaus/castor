@@ -134,6 +134,26 @@ org.exolab.castor.xml.serializer.factory=org.exolab.castor.xml.wls8.WeblogicXerc
                 </code>
 			</summary>
 			<bugs>
+                <bug id="1159" tool="jira">
+                    <description>
+				    	Fixed problem with range checking in code generated for collections.
+                    </description>
+                    <contributor>
+                        <name>Martin Kleppmann</name>
+                        <email>codehaus@kleppmann.de</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Martin Kleppmann</name>
+                        <email>codehaus@kleppmann.de</email>
+                   </reporter>
+                    <type>Bug</type>
+                    <module>XML</module>
+                    <date>20060222</date>
+                </bug>
                 <bug id="1329" tool="jira">
                     <description>
 				    	Added XML HOW-TOs for mapping collections and maps.

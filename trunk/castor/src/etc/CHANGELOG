@@ -2,7 +2,12 @@
 Version (CVS)
 -------------
 
-JDO:   Fixed bug CASTOR-1329 using contribution from Robby Pelssers [robby.pelssers@vodafone.com]
+XML:   Fixed bug CASTOR-1159 using contribution from Martin Kleppmann [codehaus@kleppmann.de]
+       Fixed problem with range checking in code generated for collections.
+       Details: http://jira.codehaus.org/browse/CASTOR-1159
+       (Werner - 20060222)
+
+XML:   Fixed bug CASTOR-1329 using contribution from Robby Pelssers [robby.pelssers@vodafone.com]
        Added XML HOW-TOs for mapping collections and maps.
        Details: http://jira.codehaus.org/browse/CASTOR-1329
        (Werner - 20060222)

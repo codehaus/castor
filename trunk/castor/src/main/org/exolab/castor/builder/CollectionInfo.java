@@ -507,15 +507,15 @@ public class CollectionInfo extends FieldInfo {
         JType jType = method.getReturnType();
 
         jsc.add("//-- check bounds for index");
-        jsc.add("if ((index < 0) || (index > ");
+        jsc.add("if ((index < 0) || (index >= ");
         jsc.append(getName());
         jsc.append(".size())) {");
         jsc.indent();
         jsc.add("throw new IndexOutOfBoundsException(\"");
         jsc.append(method.getName());
-        jsc.append(": Index value '\"+index+\"' not in range [0..\"+");
+        jsc.append(": Index value '\"+index+\"' not in range [0..\"+(");
         jsc.append(getName());
-        jsc.append(".size()+ \"]");        
+        jsc.append(".size() - 1) + \"]");
         jsc.append("\");"); 
         jsc.unindent();
         jsc.add("}");
@@ -588,15 +588,15 @@ public class CollectionInfo extends FieldInfo {
         JSourceCode jsc = method.getSourceCode();
 
         jsc.add("//-- check bounds for index");
-        jsc.add("if ((index < 0) || (index > ");
+        jsc.add("if ((index < 0) || (index >= ");
         jsc.append(getName());
         jsc.append(".size())) {");
         jsc.indent();
         jsc.add("throw new IndexOutOfBoundsException(\"");
         jsc.append(method.getName());
-        jsc.append(": Index value '\"+index+\"' not in range [0..\"+");
+        jsc.append(": Index value '\"+index+\"' not in range [0..\" + (");
         jsc.append(getName());
-        jsc.append(".size()+ \"]");        
+        jsc.append(".size() - 1) + \"]");        
         jsc.append("\");"); 
         jsc.unindent();
         jsc.add("}");
