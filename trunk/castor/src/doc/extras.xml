@@ -5,6 +5,7 @@
 
     <header>
        <p>
+          - <b><font color="red">New</font></b> - <a href="#XFire">XFire</a><br/>
           - <b><font color="red">New</font></b> - Apple's <a href="#Apple WebObjects">Apple WebObjects</a>
        </p>
     </header>
@@ -14,10 +15,8 @@
           This section contains pointers to 3rd party tools.
        </p>
        <p>
-          <b>Note: We do not provide
-          support for these tools, please visit their respective websites for
-          support, questions, or concerns.
-          </b>
+          <b>Note: We do not provide support for these tools, please visit their respective 
+             websites for support, questions, or concerns.</b>
        </p>
 
        <section title="Apple WebObjects">
@@ -378,6 +377,22 @@
     </font>
     </p>
 
+		<section title="XFire">
+            <table border="0">
+                <tr>
+                    <td valign="top">Description:</td>
+                    <td>
+						XFire is a next-generation Java SOAP framework. XFire makes service oriented 
+						development approachable through its easy to use API and support for standards. 
+						It is also highly performant since it is built on a low memory StAX based model.                    </td>
+                </tr>
+                <tr>
+                    <td valign="top">URL:</td>
+                    <td><url>http://xfire.codehaus.org/</url></td>
+                </tr>
+            </table>
+		</section>
+		
         <section title="OpenEJB">
             <table border="0">
                 <tr>
