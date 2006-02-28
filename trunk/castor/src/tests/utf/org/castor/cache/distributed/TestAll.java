@@ -40,6 +40,8 @@ public final class TestAll extends TestCase {
         suite.addTest(TestJCache.suite());
         suite.addTest(TestJcsCacheFactory.suite());
         suite.addTest(TestJcsCache.suite());
+        suite.addTest(TestOsCacheFactory.suite());
+        suite.addTest(TestOsCache.suite());
 
         return suite;
     }
