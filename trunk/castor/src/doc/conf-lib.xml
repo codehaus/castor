@@ -126,7 +126,8 @@
     org.castor.cache.distributed.FKCacheFactory,\
     org.castor.cache.distributed.JcsCacheFactory,\
     org.castor.cache.distributed.JCacheFactory,\
-    org.castor.cache.distributed.CoherenceCacheFactory
+    org.castor.cache.distributed.CoherenceCacheFactory,\
+    org.castor.cache.distributed.OsCacheFactory
 
   #
   # List of supported TransactionManagerFactory implementations; please expand

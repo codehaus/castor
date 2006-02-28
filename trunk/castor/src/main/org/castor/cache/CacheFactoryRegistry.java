@@ -17,7 +17,6 @@
  */
 package org.castor.cache;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Hashtable;
@@ -28,7 +27,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.exolab.castor.util.LocalConfiguration;
-import org.exolab.castor.util.Messages;
 
 /**
  * Registry for {@link CacheFactory} implementations obtained from the Castor
@@ -45,6 +43,9 @@ public final class CacheFactoryRegistry {
     /** The <a href="http://jakarta.apache.org/commons/logging/">Jakarta Commons
      *  Logging </a> instance used for all logging. */
     private static final Log LOG = LogFactory.getLog(CacheFactoryRegistry.class);
+    
+    /** Name of the proxy class. */
+    private static final String PROXY_CLASSNAME = DebuggingCacheProxy.class.getName();
     
     /** Property listing all available {@link Cache} implementations 
      *  (<tt>org.castor.cache.Factories</tt>). */
@@ -115,35 +116,14 @@ public final class CacheFactoryRegistry {
         if (cacheTypeDebug || (cacheDebug && objectDebug)) {
             try {
                 ClassLoader loader = CacheFactoryRegistry.class.getClassLoader();
-                Class cls = loader.loadClass(DebuggingCacheProxy.class.getName());
+                Class cls = loader.loadClass(PROXY_CLASSNAME);
                 Class[] types = new Class[] {Cache.class};
                 Object[] params = new Object[] {cache};
                 cache = (Cache) cls.getConstructor(types).newInstance(params);
-            } catch (ClassNotFoundException cnfe) {
-                String msg = Messages.format("jdo.engine.classNotFound",
-                        DebuggingCacheProxy.class.getName());
-                LOG.error(msg, cnfe);
-                throw new CacheAcquireException(msg, cnfe);
-            } catch (IllegalAccessException iae) {
-                String msg = Messages.format("jdo.engine.classIllegalAccess",
-                        DebuggingCacheProxy.class.getName());
-                LOG.error(msg, iae);
-                throw new CacheAcquireException(msg, iae);
-            } catch (NoSuchMethodException iae) {
-                String msg = Messages.format("jdo.engine.classIllegalAccess",
-                        DebuggingCacheProxy.class.getName());
-                LOG.error(msg, iae);
-                throw new CacheAcquireException(msg, iae);
-            } catch (InvocationTargetException iae) {
-                String msg = Messages.format("jdo.engine.classIllegalAccess",
-                        DebuggingCacheProxy.class.getName());
-                LOG.error(msg, iae);
-                throw new CacheAcquireException(msg, iae);
-            } catch (InstantiationException ie) {
-                String msg = Messages.format("jdo.engine.classNotInstantiable",
-                        DebuggingCacheProxy.class.getName());
-                LOG.error(msg, ie);
-                throw new CacheAcquireException(msg, ie);
+            } catch (Exception e) {
+                String msg = "Error creating instance of: " + PROXY_CLASSNAME;
+                LOG.error(msg, e);
+                throw new CacheAcquireException(msg, e);
             }
         }
         

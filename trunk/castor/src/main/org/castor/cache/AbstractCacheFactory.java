@@ -20,8 +20,6 @@ package org.castor.cache;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.exolab.castor.util.Messages;
-
 /**
  * Base implementation of {@link CacheFactory}. Users interested in supplying their
  * own cache implementations might want to extend this class to provide their
@@ -48,21 +46,10 @@ public abstract class AbstractCacheFactory implements CacheFactory {
         Cache cache = null;
         try {
             cache = (Cache) loader.loadClass(getCacheClassName()).newInstance();
-        } catch (ClassNotFoundException cnfe) {
-            String msg = Messages.format("jdo.engine.classNotFound",
-                    getCacheClassName());
-            LOG.error(msg, cnfe);
-            throw new CacheAcquireException(msg, cnfe);
-        } catch (IllegalAccessException iae) {
-            String msg = Messages.format("jdo.engine.classIllegalAccess",
-                    getCacheClassName());
-            LOG.error(msg, iae);
-            throw new CacheAcquireException(msg, iae);
-        } catch (InstantiationException ie) {
-            String msg = Messages.format("jdo.engine.classNotInstantiable",
-                    getCacheClassName());
-            LOG.error(msg, ie);
-            throw new CacheAcquireException(msg, ie);
+        } catch (Exception e) {
+            String msg = "Error creating cache instance of: " + getCacheClassName();
+            LOG.error(msg, e);
+            throw new CacheAcquireException(msg, e);
         }
         
         return cache;

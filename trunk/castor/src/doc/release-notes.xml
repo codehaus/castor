@@ -41,6 +41,13 @@
 				
 				<h2>Additions</h2>
 				
+				<h3>Added support for OSCache</h3>
+				
+				<p>By specifing
+                   <code-panel><![CDATA[
+<cache-type type="oscache"/>]]></code-panel>
+                   at class mapping you can now use OSCache with Castor JDO.</p>
+				
 				<h3>Added 'abstract/concrete' annotation to XMLDescriptor</h3>
 				
 				<p>With this addition, it is now possibel to query whether a particular XML element (represented
@@ -143,6 +150,26 @@ org.exolab.castor.xml.serializer.factory=org.exolab.castor.xml.wls8.WeblogicXerc
                 </code>
 			</summary>
 			<bugs>
+                <bug id="1186" tool="jira">
+                    <description>
+		                Added support for OSCache.
+                    </description>
+                    <contributor>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </reporter>
+                    <type>Enh.</type>
+                    <module>JDO</module>
+                    <date>20060228</date>
+                </bug>
                 <bug id="1333" tool="jira">
                     <description>
 				    	Fixed inconsistency related to not calling setPreserveWhiteSpace(true) in Unmarshaller.unmarshal(Class, Node)

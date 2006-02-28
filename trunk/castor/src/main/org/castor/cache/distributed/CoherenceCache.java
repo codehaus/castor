@@ -50,6 +50,9 @@ public final class CoherenceCache extends AbstractDistributedCache {
     /** The classname of the implementations factory class. */
     public static final String IMPLEMENTATION = "com.tangosol.net.CacheFactory";
     
+    /** Parameter types for calling getCache() method on IMPLEMENTATION. */
+    private static final Class[] TYPES_GET_CACHE = new Class[] {String.class};
+    
     //--------------------------------------------------------------------------
     // operations for life-cycle management of cache
     
@@ -77,13 +80,11 @@ public final class CoherenceCache extends AbstractDistributedCache {
             ClassLoader ldr = this.getClass().getClassLoader();
             Class cls = ldr.loadClass(implementation);
             setCache((Map) invokeStaticMethod(
-                    cls, "getCache", 
-                    new Class[] {String.class}, 
-                    new Object[] {getName()}));
+                    cls, "getCache", TYPES_GET_CACHE, new Object[] {getName()}));
         } catch (Exception e) {
-            String msg = "Error creating cache: " + e.getMessage();
+            String msg = "Error creating Coherence cache: " + e.getMessage();
             LOG.error(msg, e);
-            throw new CacheAcquireException(msg);
+            throw new CacheAcquireException(msg, e);
         }
     }
 
@@ -93,18 +94,13 @@ public final class CoherenceCache extends AbstractDistributedCache {
     public void close() {
         super.close();
         
-        try {
-            if (getCache() != null) {
-                try {
-                    invokeMethod(getCache(), "release", null, null);
-                } catch (Exception e) {
-                    String msg = "Error closing cache: " + e.getMessage();
-                    LOG.error(msg, e);
-                    throw new CacheAcquireException(msg);
-                }
+        if (getCache() != null) {
+            try {
+                invokeMethod(getCache(), "release", null, null);
+            } catch (Exception e) {
+                String msg = "Error closing Coherence cache: " + e.getMessage();
+                LOG.error(msg, e);
             }
-        } catch (Throwable t) {
-            LOG.error("Problem releasing Coherence cache ...", t);
         }
     }
 
