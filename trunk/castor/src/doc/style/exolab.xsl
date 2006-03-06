@@ -402,10 +402,12 @@
 
   <xsl:template match="code-panel">
     <p/>
-    <xsl:if test="@top-caption">
-     <i><xsl:value-of select="@top-caption"/></i>
-    </xsl:if>
     <table width="100%" border="0" cellspacing="1" cellpadding="1" bgcolor="#7270c2">
+	    <xsl:if test="@top-caption">
+		       <tr>
+		          <td><i><font color="yellow"><xsl:value-of select="@top-caption"/></font></i></td>
+		       </tr>
+	    </xsl:if>
       <tr>
         <td>
           <table width="100%" border="0" cellspacing="1" cellpadding="4" bgcolor="#dddddd">
