@@ -150,6 +150,26 @@ org.exolab.castor.xml.serializer.factory=org.exolab.castor.xml.wls8.WeblogicXerc
                 </code>
 			</summary>
 			<bugs>
+                <bug id="1341" tool="jira">
+                    <description>
+		                Fixed issue with bad dates being persisted in Oracle 9.2.
+                    </description>
+                    <contributor>
+                        <name>August Detlefsen</name>
+                        <email>augustd@codemagi.com</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>August Detlefsen</name>
+                        <email>augustd@codemagi.com</email>
+                    </reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20060306</date>
+                </bug>
                 <bug id="1186" tool="jira">
                     <description>
 		                Added support for OSCache.

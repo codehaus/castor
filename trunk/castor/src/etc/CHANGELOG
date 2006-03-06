@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1341 using contribution from August Detlefsen [augustd@codemagi.com]
+       Fixed issue with bad dates being persisted in Oracle 9.2.
+       Details: http://jira.codehaus.org/browse/CASTOR-1341
+       (Ralf - 20060306)
+
 JDO:   Fixed bug CASTOR-1186 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
        Added support for OSCache.
        Details: http://jira.codehaus.org/browse/CASTOR-1186

@@ -427,7 +427,6 @@
     <description>Patch for DateTimeValidator.</description>
   </contributor>
 
-
   <contributor type="Contributor">
     <name surname="De Smedt" given="Thomas"/>
     <email>thomas.de.smedt@pandora.be</email>
@@ -444,14 +443,22 @@
   </contributor>
 
   <contributor type="Contributor">
+    <name surname="Detlefsen" given="August"/>
+    <email>augustd@codemagi.com</email>
+    <description>
+        Fixed issue with bad dates being persisted in Oracle 9.2.
+    </description>
+  </contributor>
+
+  <!-- Last names begin with E-H -->
+
+  <contributor type="Contributor">
     <name surname="Eliassen" given="Stein"/>
     <email>stein.m.eliassen@start.no</email>
     <description>
        Fix for but 1313, count-limited cache type is 30 not 100.
     </description>
   </contributor>
-
-  <!-- Last names begin with E-H -->
 
   <contributor type="Contributor">
     <name surname="La Ferla" given="Robert"/>
