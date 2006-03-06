@@ -19,9 +19,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Blob;
 import java.sql.Clob;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -287,6 +289,12 @@ public final class SQLTypeInfos {
                     break;
                 case Types.REAL:
                     stmt.setFloat(index, ((Float) value).floatValue());
+                    break;
+                case Types.DATE:
+                    stmt.setDate(index, (Date) value);
+                    break;
+                case Types.TIMESTAMP:
+                    stmt.setTimestamp(index, (Timestamp) value);
                     break;
                 case Types.BLOB:
                     try {
