@@ -38,7 +38,7 @@
         <property name="deprecation" value="false"/>
         <property name="main.opt.debug" value="true"/>
         <property name="archive.name" value="${project}-${version}${release}"/>
-        <property name="srcgen.ant.task.name" value="${project}-${version}-srcgen-ant-task"/>
+        <property name="srcgen.ant.task.name" value="${project}-${version}${release}-srcgen-ant-task"/>
         <property name="exampleexcludes" value="SourceGenerator/*,**/dax/**"/>
         <property name="excludes" value="**/package.html,**/dax/**,**/dax/engine/**"/>
         <property name="testexcludes" value="**/package.html, **/MasterTestSuite/**, **/RegressionTestSuite/**" />
@@ -719,7 +719,7 @@
         <zip zipfile="${dist}/${archive.name}-src.zip" basedir="${build}" includes="${archive.name}/**"/>
     </target>
 
-    <target name="release" depends="clean,jar,jar.examples,srcgen.anttask.jar,source,docs,tarball"
+    <target name="release" depends="clean,jar,jar.examples,srcgen.anttask.jar,source,docs,tarball,zip.examples"
             description="An alias to call the clean, jar, source, docs and tarball targets"/>
 
     <target name="tarball" depends="prepare,doc,jar,srcgen.anttask.jar" description="Build the binary distrutions (tarball and zip archive.names)">
