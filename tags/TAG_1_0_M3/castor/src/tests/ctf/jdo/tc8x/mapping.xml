@@ -1,0 +1,72 @@
+<?xml version="1.0" ?>
+<!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Mapping DTD Version 1.0//EN"
+                         "http://castor.org/mapping.dtd">
+<mapping>
+
+<!-- 
+    <key-generator name="IDENTITY">
+    </key-generator>
+-->    
+
+    <class name="ctf.jdo.tc8x.MasterObject"
+            identity="id"
+            key-generator="IDENTITY">
+        <map-to table="tc8x_test_master_ns" />
+        <field name="id" type="int">
+            <sql name="id"/>
+        </field>
+        <field name="depends" type="ctf.jdo.tc8x.DependentObject">
+            <sql many-key="master_id"/>
+        </field>
+        <field name="descrip" type="string">
+            <sql name="descrip"/>
+        </field>
+    </class>
+
+    <class name="ctf.jdo.tc8x.DependentObject"
+            identity="id"
+            key-generator="IDENTITY"
+            depends="ctf.jdo.tc8x.MasterObject">
+        <map-to table="tc8x_test_depends_ns"/>
+        <field name="id" type="int">
+            <sql name="id"/>
+        </field>
+        <field name="master" type="ctf.jdo.tc8x.MasterObject">
+            <sql name="master_id"/>
+        </field>
+        <field name="descrip" type="string">
+            <sql name="descrip"/>
+        </field>
+    </class>
+
+    <class name="ctf.jdo.tc8x.MasterObjectNoKeyGen"
+        identity="id">
+        <map-to table="tc8x_test_master_ns_nokg" />
+        <field name="id" type="int">
+            <sql name="id"/>
+        </field>
+        <field name="depends" type="ctf.jdo.tc8x.DependentObjectNoKeyGen">
+            <sql many-key="master_id"/>
+        </field>
+        <field name="descrip" type="string">
+            <sql name="descrip"/>
+        </field>
+    </class>
+
+    <class name="ctf.jdo.tc8x.DependentObjectNoKeyGen"
+            identity="id"
+            depends="ctf.jdo.tc8x.MasterObjectNoKeyGen">
+        <map-to table="tc8x_test_depends_ns_nokg"/>
+        <field name="id" type="int">
+            <sql name="id"/>
+        </field>
+        <field name="master" type="ctf.jdo.tc8x.MasterObjectNoKeyGen">
+            <sql name="master_id"/>
+        </field>
+        <field name="descrip" type="string">
+            <sql name="descrip"/>
+        </field>
+    </class>
+  
+</mapping>
+
