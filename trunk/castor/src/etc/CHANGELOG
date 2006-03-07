@@ -2,6 +2,9 @@
 Version (CVS)
 -------------
 
+Version 1.0M3, Mar 07, 2006
+-------------------------------
+
 JDO:   Fixed bug CASTOR-1341 using contribution from August Detlefsen [augustd@codemagi.com]
        Fixed issue with bad dates being persisted in Oracle 9.2.
        Details: http://jira.codehaus.org/browse/CASTOR-1341
