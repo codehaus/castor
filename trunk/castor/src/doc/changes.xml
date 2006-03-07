@@ -23,12 +23,19 @@
                     submission. (Castor XML)</li>
                 <li>Added HOW-TO document on mapping a collection of elements. (Castor XML)</li>
                 <li>Added HOW-TO document on mapping a map/hashtable of elements. (Castor XML)</li>
+                <li>Added a new page full of information relevant for people that want to 
+                    contribute in one way or the other to the project.</li>
             </ul>    
             
         </section>
         
         <section title="Changes/improvements">
-            
+
+            <ul>
+                <li>The <a href="download.html">download page</a> now holds information
+                    about libraries required for using/building Castor.</li>
+                
+            </ul>            
             
         </section>
         
