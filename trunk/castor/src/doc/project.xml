@@ -7,6 +7,10 @@
   <href>http://castor.codehaus.org</href>
 
   <topNav>
+      <navLink>
+        <url>license.xml</url>
+        <display>License</display>
+      </navLink>
     <navLink>
       <url>http://www.codehaus.org</url>
       <display>Codehaus</display>
