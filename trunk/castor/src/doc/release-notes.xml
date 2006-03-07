@@ -28,6 +28,15 @@
     		<date>tbd</date>
     		<managed-by>Werner Guttmann</managed-by>
             <summary>
+            </summary>
+            <bugs>
+            </bugs>
+        </release>
+	    <release version="1.0M3">
+	        <description>3rd milestone release for Castor 1.0</description>
+    		<date>March 07, 2006</date>
+    		<managed-by>Werner Guttmann</managed-by>
+            <summary>
 				<h2>Requirements</h2>
 
 				<h3>Introduced <font color="red">Java 1.4</font> as a dependecy</h3>
