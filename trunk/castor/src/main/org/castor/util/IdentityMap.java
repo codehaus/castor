@@ -271,7 +271,17 @@ public final class IdentityMap implements Map {
      * @see java.util.Map#entrySet()
      */
     public Set entrySet() {
-        throw new UnsupportedOperationException();
+        Set set = new IdentitySet(_capacity);
+        
+        for (int i = 0; i < _capacity; i++) {
+            Entry entry = _buckets[i];
+            while (entry != null) {
+                set.add(entry);
+                entry = entry.getNext();
+            }
+        }
+        
+        return set;
     }
 
     /**

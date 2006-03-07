@@ -159,6 +159,26 @@ org.exolab.castor.xml.serializer.factory=org.exolab.castor.xml.wls8.WeblogicXerc
                 </code>
 			</summary>
 			<bugs>
+                <bug id="1330" tool="jira">
+                    <description>
+		                Fixed problem with prioritizing delete operations.
+                    </description>
+                    <contributor>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Raúl Sanz de Acedo Pérez</name>
+                        <email>rsanz@cein.es</email>
+                    </reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20060307</date>
+                </bug>
                 <bug id="1341" tool="jira">
                     <description>
 		                Fixed issue with bad dates being persisted in Oracle 9.2.

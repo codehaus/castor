@@ -68,10 +68,10 @@ public final class ObjectTracker {
     private final Map _objectToOID = new IdentityMap();
     
     /** Set of all objects marked 'deleted'. */
-    private final Set _deletedSet = new IdentitySet();
+    private final Map _deletedMap = new IdentityMap();
     
     /** Set of all objects marked 'creating'. */
-    private final Set _creatingSet = new IdentitySet();
+    private final Map _creatingMap = new IdentityMap();
     
     /** Set of all objects marked 'created'. */
     private final Set _createdSet = new IdentitySet();
@@ -87,6 +87,9 @@ public final class ObjectTracker {
     
     /** Set of all objects marked read-write in this transaction. */
     private final Set _readWriteSet = new IdentitySet();
+    
+    /** Operation counter of ObjectTracker. */
+    private long _operation = Long.MIN_VALUE;
     
     //--------------------------------------------------------------------------
 
@@ -120,13 +123,15 @@ public final class ObjectTracker {
     }
     
     public void unmarkAllDeleted() {
-        _deletedSet.clear();
+        _operation++;
+        _deletedMap.clear();
     }
     
     public void clear() {
+        _operation++;
         _createdSet.clear();
-        _creatingSet.clear();
-        _deletedSet.clear();
+        _creatingMap.clear();
+        _deletedMap.clear();
         _engineToOIDToObject.clear();
         _objectToEngine.clear();
         _objectToMolder.clear();
@@ -148,6 +153,7 @@ public final class ObjectTracker {
     }
     
     public void markUpdateCacheNeeded(final Object object) {
+        _operation++;
         Object aObject = supportCGLibObject(object);
         if (!isTracking(aObject)) {
             return;
@@ -157,6 +163,7 @@ public final class ObjectTracker {
     }
     
     public void unmarkUpdateCacheNeeded(final Object object) {
+        _operation++;
         Object aObject = supportCGLibObject(object);
         _updateCacheNeededSet.remove(aObject);
     }
@@ -166,6 +173,7 @@ public final class ObjectTracker {
     }
     
     public void markUpdatePersistNeeded(final Object object) {
+        _operation++;
         Object aObject = supportCGLibObject(object);
         if (!isTracking(aObject)) {
             return;
@@ -177,11 +185,13 @@ public final class ObjectTracker {
     }
     
     public void unmarkUpdatePersistNeeded(final Object object) {
+        _operation++;
         Object aObject = supportCGLibObject(object);
         _updatePersistNeededSet.remove(aObject);
     }
     
     public void markCreating(final Object object) throws PersistenceException {
+        _operation++;
         Object aObject = supportCGLibObject(object);
         if (!isTracking(aObject)) {
             return;
@@ -191,31 +201,34 @@ public final class ObjectTracker {
             throw new PersistenceException("Invalid state change; can't mark something " 
                     + " creating which is already marked created.");
         }
-        _creatingSet.add(aObject);
+        _creatingMap.put(aObject, new Long(_operation));
     }
     
     public void markCreated(final Object object) {
+        _operation++;
         Object aObject = supportCGLibObject(object);
         if (!isTracking(aObject)) {
             return;
         }
         
         _createdSet.add(aObject);
-        _creatingSet.remove(aObject);
+        _creatingMap.remove(aObject);
     }
     
     public void markDeleted(final Object object) {
+        _operation++;
         Object aObject = supportCGLibObject(object);
         if (!isTracking(aObject)) {
             return;
         }
         
-        _deletedSet.add(aObject);
+        _deletedMap.put(aObject, new Long(_operation));
     }
     
     public void unmarkDeleted(final Object object) {
+        _operation++;
         Object aObject = supportCGLibObject(object);
-        _deletedSet.remove(aObject);
+        _deletedMap.remove(aObject);
     }
     
     /**
@@ -241,6 +254,7 @@ public final class ObjectTracker {
             final LockEngine engine, 
             final OID oldoid, 
             final OID newoid) {
+        _operation++;
         Object object = supportCGLibObject(obj);
         
         removeOIDForObject(engine, oldoid);
@@ -258,6 +272,7 @@ public final class ObjectTracker {
     public void setOIDForObject(final Object obj, 
             final LockEngine engine, 
             final OID oid) {
+        _operation++;
         Object object = supportCGLibObject(obj);
         
         // Remove any current mapping.
@@ -283,6 +298,7 @@ public final class ObjectTracker {
      * @param oid The oid of the object to stop tracking on.
      */
     public void removeOIDForObject(final LockEngine engine, final OID oid) {
+        _operation++;
         Object found = null;
         Map oidToObject = (Map) _engineToOIDToObject.get(engine);
         if (oidToObject != null) {
@@ -296,7 +312,7 @@ public final class ObjectTracker {
     
     public boolean isCreating(final Object o) {
         Object object = supportCGLibObject(o);
-        return _creatingSet.contains(object);
+        return _creatingMap.containsKey(object);
     }
     
     public boolean isCreated(final Object o) {
@@ -306,7 +322,7 @@ public final class ObjectTracker {
     
     public boolean isDeleted(final Object o) {
         Object object = supportCGLibObject(o);
-        return _deletedSet.contains(object);
+        return _deletedMap.containsKey(object);
     }
     
     /** Retrieve the ClassMolder associated with a specific object. */
@@ -321,6 +337,7 @@ public final class ObjectTracker {
     }
     
     public void setLockEngineForObject(final Object obj, final LockEngine engine) {
+        _operation++;
         Object object = supportCGLibObject(obj);
         
         // remove if exists
@@ -330,11 +347,13 @@ public final class ObjectTracker {
     }
     
     private void removeLockEngineForObject(final Object obj) {
+        _operation++;
         Object object = supportCGLibObject(obj);
         _objectToEngine.remove(object);
     }
     
     private void setMolderForObject(final Object obj, final ClassMolder molder) {
+        _operation++;
         Object object = supportCGLibObject(obj);
         
         // remove if exists
@@ -344,6 +363,7 @@ public final class ObjectTracker {
     }
     
     private void removeMolderForObject(final Object obj) {
+        _operation++;
         Object object = supportCGLibObject(obj);
         _objectToMolder.remove(object);
     }
@@ -363,16 +383,24 @@ public final class ObjectTracker {
     /** Retrieve the list of creating objects, sorted in the order they should be 
      * created. */
     public Collection getObjectsWithCreatingStateSortedByLowestMolderPriority() {
-        ArrayList returnedList = new ArrayList(_creatingSet);
-        Collections.sort(returnedList, new ObjectMolderPriorityComparator(this, false));
+        ArrayList entryList = new ArrayList(_creatingMap.entrySet());
+        Collections.sort(entryList, new ObjectMolderPriorityComparator(this, false));
+        ArrayList returnedList = new ArrayList(entryList.size());
+        for (int i = 0; i < entryList.size(); i++) {
+            returnedList.add(((IdentityMap.Entry) entryList.get(i)).getKey());
+        }
         return returnedList;
     }
     
     /** Retrieve the list of deleted objects, sorted in the order they should be 
      * deleted. */
     public Collection getObjectsWithDeletedStateSortedByHighestMolderPriority() {
-        ArrayList returnedList = new ArrayList(_deletedSet);
-        Collections.sort(returnedList, new ObjectMolderPriorityComparator(this, true));
+        ArrayList entryList = new ArrayList(_deletedMap.entrySet());
+        Collections.sort(entryList, new ObjectMolderPriorityComparator(this, true));
+        ArrayList returnedList = new ArrayList(entryList.size());
+        for (int i = 0; i < entryList.size(); i++) {
+            returnedList.add(((IdentityMap.Entry) entryList.get(i)).getKey());
+        }
         return returnedList;
     }
     
@@ -380,6 +408,7 @@ public final class ObjectTracker {
             final ClassMolder molder, 
             final OID oid, 
             final Object object) {
+        _operation++;
         Object aObject = supportCGLibObject(object);
         
         setLockEngineForObject(aObject, engine);
@@ -390,6 +419,7 @@ public final class ObjectTracker {
     
     
     public void untrackObject(final Object object) {
+        _operation++;
         Object aObject = supportCGLibObject(object);
         
         // Grab any lockengine/OID information for removal of the nested 
@@ -401,8 +431,8 @@ public final class ObjectTracker {
         removeLockEngineForObject(aObject);
         removeOIDForObject(engine, oid);
         
-        _deletedSet.remove(aObject);
-        _creatingSet.remove(aObject);
+        _deletedMap.remove(aObject);
+        _creatingMap.remove(aObject);
         _createdSet.remove(aObject);
         _updatePersistNeededSet.remove(aObject);
         _updateCacheNeededSet.remove(aObject);
@@ -421,6 +451,7 @@ public final class ObjectTracker {
     }
     
     public void markReadOnly(final Object o) {
+        _operation++;
         Object object = supportCGLibObject(o);
         
         if (!isTracking(object)) {
@@ -434,6 +465,7 @@ public final class ObjectTracker {
     }
     
     public void unmarkReadOnly(final Object o) {
+        _operation++;
         Object object = supportCGLibObject(o);
         
         if (!isTracking(object)) {
@@ -505,8 +537,8 @@ public final class ObjectTracker {
     public String objectStateToString(final Object obj) {
         StringBuffer sb = new StringBuffer();
         sb.append(getOIDForObject(obj));
-        sb.append('\t'); sb.append("deleted: ");  sb.append(_deletedSet.contains(obj));
-        sb.append('\t'); sb.append("creating: "); sb.append(_creatingSet.contains(obj));
+        sb.append('\t'); sb.append("deleted: ");  sb.append(_deletedMap.containsKey(obj));
+        sb.append('\t'); sb.append("creating: "); sb.append(_creatingMap.containsKey(obj));
         sb.append('\t'); sb.append("created: ");  sb.append(_createdSet.contains(obj));
         return sb.toString();
     }
@@ -518,25 +550,42 @@ public final class ObjectTracker {
         private boolean _reverseOrder;
         
         public ObjectMolderPriorityComparator(
-                final ObjectTracker tracker, 
-                final boolean reverseOrder) {
-            this._tracker = tracker;
-            this._reverseOrder = reverseOrder;
+                final ObjectTracker tracker, final boolean reverseOrder) {
+            _tracker = tracker;
+            _reverseOrder = reverseOrder;
         }
         
         public int compare(final Object object1, final Object object2) {
-            ClassMolder molder1 = _tracker.getMolderForObject(object1);
-            ClassMolder molder2 = _tracker.getMolderForObject(object2);
+            IdentityMap.Entry entry1 = (IdentityMap.Entry) object1;
+            IdentityMap.Entry entry2 = (IdentityMap.Entry) object2;
+            
+            long oper1 = ((Long) entry1.getValue()).longValue();
+            long oper2 = ((Long) entry2.getValue()).longValue();
+            
+            ClassMolder molder1 = _tracker.getMolderForObject(entry1.getKey());
+            ClassMolder molder2 = _tracker.getMolderForObject(entry2.getKey());
             
             if (molder1 == null || molder2 == null) {
-                return 0;
+                if (oper1 > oper2) {
+                    return 1;
+                } else if (oper1 < oper2) {
+                    return -1;
+                } else {
+                    return 0;
+                }
             }
             
             int pri1 = molder1.getPriority();
             int pri2 = molder2.getPriority();
             
             if (pri1 == pri2) {
-                return 0;
+                if (oper1 > oper2) {
+                    return 1;
+                } else if (oper1 < oper2) {
+                    return -1;
+                } else {
+                    return 0;
+                }
             }
             
             if (_reverseOrder) {
