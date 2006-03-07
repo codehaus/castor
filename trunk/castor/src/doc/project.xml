@@ -90,10 +90,12 @@
         <url>support.xml</url>
         <display>Support</display>
       </navLink>
+<!--       
       <navLink>
          <url>http://www.brainopolis.com/castorwiki/Wiki.jsp?page=Main</url>
          <display>CastorWiki</display>
       </navLink>
+-->      
       <navLink>
         <url>http://castor.codehaus.org/rss/castor-announce.xml</url>
         <display>RSS news feed</display>
