@@ -198,8 +198,6 @@ public interface Query
     throws QueryException, PersistenceException, TransactionNotInProgressException;
 
     /**
-     * <b>Experimental</b>
-     * <p>
      * Execute the query. The query is executed returning an enumeration
      * of all the objects found. If no objects were found, the
      * enumeration will be empty.
@@ -231,8 +229,6 @@ public interface Query
     throws QueryException, PersistenceException, TransactionNotInProgressException;
 
     /**
-     * <b>Experimental</b>
-     * <p>
      * Execute the query. The query is executed returning an enumeration
      * of all the objects found. If no objects were found, the
      * enumeration will be empty.
