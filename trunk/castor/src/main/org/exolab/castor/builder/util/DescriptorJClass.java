@@ -164,8 +164,8 @@ public class DescriptorJClass extends JClass {
         //- Methods Defined by XMLClassDescriptorImpl -/
         //---------------------------------------------/
         
-        //-- create getElementDefinition method
-        method = new JMethod(JType.Boolean, "getElementDefinition");
+        //-- create isElementDefinition method
+        method = new JMethod(JType.Boolean, "isElementDefinition");
         jsc = method.getSourceCode();
         jsc.add("return elementDefinition;");
         addMethod(method);

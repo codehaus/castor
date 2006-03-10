@@ -30,6 +30,27 @@
             <summary>
             </summary>
             <bugs>
+                <bug id="1347" tool="jira">
+                    <description>
+		                Fixed issue with XMLDescriptor generating wrong method name
+                        'getElementDefinition' instead of 'isElementDefinition'.
+                    </description>
+                    <contributor>
+                        <name>Adam Kramer</name>
+                        <email>adam@monkey.org</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Adam Kramer</name>
+                        <email>adam@monkey.org</email>
+                    </reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20060310</date>
+                </bug>
             </bugs>
         </release>
 	    <release version="1.0M3">
@@ -259,9 +280,10 @@ org.exolab.castor.xml.serializer.factory=org.exolab.castor.xml.wls8.WeblogicXerc
                     <module>JDO</module>
                     <date>20060223</date>
                 </bug>
-                <bug id="1326" tool="jira">
+                <bug id="1328" tool="jira">
                     <description>
-				    	Added property to XMLClassDescriptor to distinguish whether XML artefact represented is abstract/concrete
+				    	Added property to XMLClassDescriptor to distinguish whether XML
+                        artefact represented is abstract/concrete
                     </description>
                     <contributor>
                         <name>Adam Kramer</name>
