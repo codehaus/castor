@@ -17,6 +17,7 @@ package utf.org.castor.util;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import junit.framework.Test;
@@ -42,6 +43,7 @@ public final class TestIdentityMap extends TestCase {
         suite.addTest(new TestIdentityMap("testGet"));
         suite.addTest(new TestIdentityMap("testRemove"));
         suite.addTest(new TestIdentityMap("testKeySet"));
+        suite.addTest(new TestIdentityMap("testEntrySet"));
         suite.addTest(new TestIdentityMap("testRehash"));
         
         return suite;
@@ -191,6 +193,32 @@ public final class TestIdentityMap extends TestCase {
             Object test = iter.next();
             assertTrue((test == key1) || (test == key2) || (test == key3));
         }
+    }
+
+    public void testEntrySet() {
+        IdentityMap map = new IdentityMap();
+        Object key1 = new Integer(123);
+        Object key2 = new Integer(123);
+        Object key3 = new Integer(123);
+
+        map.put(key1, "value 1");
+        map.put(key2, "value 2");
+        map.put(key3, "value 3");
+        
+        Set set = map.entrySet();
+        assertTrue(set.size() == 3);
+        
+        Iterator iter = set.iterator();
+        while (iter.hasNext()) {
+            Object test = iter.next();
+            assertTrue(test instanceof Map.Entry);
+            Map.Entry entry = (Map.Entry) test;
+            Object key = entry.getKey();
+            Object value = entry.getValue();
+            assertTrue((key == key1) || (key == key2) || (key == key3));
+            if (key == key1) { assertEquals(value, "value 1"); }
+            if (key == key2) { assertEquals(value, "value 2"); }
+            if (key == key3) { assertEquals(value, "value 3"); }        }
     }
 
     public void testRehash() {

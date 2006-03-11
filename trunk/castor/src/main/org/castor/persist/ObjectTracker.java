@@ -387,7 +387,7 @@ public final class ObjectTracker {
         Collections.sort(entryList, new ObjectMolderPriorityComparator(this, false));
         ArrayList returnedList = new ArrayList(entryList.size());
         for (int i = 0; i < entryList.size(); i++) {
-            returnedList.add(((IdentityMap.Entry) entryList.get(i)).getKey());
+            returnedList.add(((Map.Entry) entryList.get(i)).getKey());
         }
         return returnedList;
     }
@@ -399,7 +399,7 @@ public final class ObjectTracker {
         Collections.sort(entryList, new ObjectMolderPriorityComparator(this, true));
         ArrayList returnedList = new ArrayList(entryList.size());
         for (int i = 0; i < entryList.size(); i++) {
-            returnedList.add(((IdentityMap.Entry) entryList.get(i)).getKey());
+            returnedList.add(((Map.Entry) entryList.get(i)).getKey());
         }
         return returnedList;
     }
@@ -556,8 +556,8 @@ public final class ObjectTracker {
         }
         
         public int compare(final Object object1, final Object object2) {
-            IdentityMap.Entry entry1 = (IdentityMap.Entry) object1;
-            IdentityMap.Entry entry2 = (IdentityMap.Entry) object2;
+            Map.Entry entry1 = (Map.Entry) object1;
+            Map.Entry entry2 = (Map.Entry) object2;
             
             long oper1 = ((Long) entry1.getValue()).longValue();
             long oper2 = ((Long) entry2.getValue()).longValue();

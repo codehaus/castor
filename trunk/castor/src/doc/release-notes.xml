@@ -30,6 +30,26 @@
             <summary>
             </summary>
             <bugs>
+                <bug id="1350" tool="jira">
+                    <description>
+		                Added UTF test of IdentityMap.entrySet.
+                    </description>
+                    <contributor>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </reporter>
+                    <type>Enh.</type>
+                    <module>JDO</module>
+                    <date>20060311</date>
+                </bug>
                 <bug id="1347" tool="jira">
                     <description>
 		                Fixed issue with XMLDescriptor generating wrong method name
