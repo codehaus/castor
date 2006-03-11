@@ -320,7 +320,7 @@ public final class IdentityMap implements Map {
     /**
      * An entry of the <code>IdentityMap</code>.
      */
-    public final class Entry {
+    public final class Entry implements Map.Entry {
         /** Key of entry. */
         private Object  _key;
         
@@ -364,8 +364,13 @@ public final class IdentityMap implements Map {
          * Set value of entry.
          *
          * @param  value    New value of entry.
+         * @return Previous entry in the map.
          */
-        public void setValue(final Object value) { _value = value; }
+        public Object setValue(final Object value) {
+            Object temp = _value;
+            _value = value;
+            return temp;
+        }
 
         /**
          * Get value of entry.

@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1350 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
+       Added UTF test of IdentityMap.entrySet.
+       Details: http://jira.codehaus.org/browse/CASTOR-1350
+       (Ralf - 20060311)
+
 XML:   Fixed bug CASTOR-1347 using contribution from Adam Kramer [adam@monkey.org]
        Fixed issue with XMLDescriptor generating wrong method name
        'getElementDefinition' instead of 'isElementDefinition'.
