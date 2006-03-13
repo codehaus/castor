@@ -30,6 +30,26 @@
             <summary>
             </summary>
             <bugs>
+                <bug id="1353" tool="jira">
+                    <description>
+		                Fixed incorrect DOCTYPE references in various XML Mapping docs.
+                    </description>
+                    <contributor>
+                        <name>Stephen Bash</name>
+                        <email>scbash@gmail.com</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Stephen Bash</name>
+                        <email>scbash@gmail.com</email>
+                    </reporter>
+                    <type>Enh.</type>
+                    <module>XML</module>
+                    <date>20060311</date>
+                </bug>
                 <bug id="1352" tool="jira">
                     <description>
 		                Add HOW-TO on how to fetch DTDs from JAR file
@@ -47,7 +67,7 @@
                         <email>scbash@gmail.com</email>
                     </reporter>
                     <type>Enh.</type>
-                    <module>JDO</module>
+                    <module>XML</module>
                     <date>20060311</date>
                 </bug>
                 <bug id="1350" tool="jira">
