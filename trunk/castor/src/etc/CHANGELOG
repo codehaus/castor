@@ -3,6 +3,11 @@ Version (CVS)
 -------------
 
 XML:   Fixed bug CASTOR-1353 using contribution from Stephen Bash [scbash@gmail.com]
+       Fixed incorrect DOCTYPE references in various XML Mapping docs.
+       Details: http://jira.codehaus.org/browse/CASTOR-1353
+       (Werner - 20060313)
+
+XML:   Fixed bug CASTOR-1352 using contribution from Stephen Bash [scbash@gmail.com]
        Add HOW-TO on how to fetch DTDs from JAR file
        Details: http://jira.codehaus.org/browse/CASTOR-1352
        (Werner - 20060313)

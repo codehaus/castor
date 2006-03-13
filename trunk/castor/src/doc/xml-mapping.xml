@@ -167,7 +167,7 @@
         <code>
         &lt;?xml version="1.0"?>
 
-        &lt;!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Object Mapping DTD Version 1.0//EN"
+        &lt;!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Mapping DTD Version 1.0//EN"
                                  "http://castor.org/mapping.dtd">
 
         &lt;mapping>
@@ -796,7 +796,7 @@ public class Item {
 
       <code-panel top-caption="mapping.xml">
 &lt;?xml version="1.0"?>
-&lt;!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Object Mapping DTD Version 1.0//EN"
+&lt;!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Mapping DTD Version 1.0//EN"
                          "http://castor.org/mapping.dtd">
 
 &lt;mapping>
