@@ -14,9 +14,14 @@ fi
 
 JAVA=$JAVA_HOME/bin/java
 
-CLASSPATH=$CLASSPATH:../build/classes:../build/tests
-CLASSPATH=`echo ../lib/*.jar | tr ' ' ':'`:$CLASSPATH
-CLASSPATH=`echo ../lib/tests/*.jar | tr ' ' ':'`:$CLASSPATH
+DIRNAME=`dirname $0`
+CASTOR_HOME=`cd $DIRNAME/..; pwd`
+BUILD_D=$CASTOR_HOME/build
+LIB_D=$CASTOR_HOME/lib
+
+CLASSPATH=$CLASSPATH:$BUILD_D/classes:$BUILD_D/tests
+CLASSPATH=`echo $LIB_D/*.jar | tr ' ' ':'`:$CLASSPATH
+CLASSPATH=`echo $LIB_D/tests/*.jar | tr ' ' ':'`:$CLASSPATH
 
 $JAVA -cp $CLASSPATH Main -execute $1 $2 $3 $4 $5 $6
 

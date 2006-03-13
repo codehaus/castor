@@ -14,8 +14,13 @@ fi
 
 JAVA=$JAVA_HOME/bin/java
 
-CLASSPATH=../build/classes:../build/examples:$CLASSPATH
-CLASSPATH=`echo ../lib/*.jar | tr ' ' ':'`:$CLASSPATH
+DIRNAME=`dirname $0`
+CASTOR_HOME=`cd $DIRNAME/..; pwd`
+BUILD_D=$CASTOR_HOME/build
+LIB_D=$CASTOR_HOME/lib
+
+CLASSPATH=$BUILD_D/classes:$BUILD_D/examples:$CLASSPATH
+CLASSPATH=`echo $LIB_D/*.jar | tr ' ' ':'`:$CLASSPATH
 
 if [ -z $1 ] ; then
   echo "Usage: example <pkg>";
