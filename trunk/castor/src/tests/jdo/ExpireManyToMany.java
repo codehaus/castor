@@ -58,7 +58,6 @@ import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.QueryResults;
-import org.exolab.castor.jdo.engine.DatabaseImpl;
 
 /**
  * Expire Cache test. Tests the ability to clear objects from the cache.  This
@@ -425,7 +424,7 @@ public class ExpireManyToMany extends CastorTestCase {
 
         Object[] identityArray = null;
         try {
-            CacheManager cacheManager = ((DatabaseImpl) _db).getCacheManager();
+            CacheManager cacheManager = _db.getCacheManager();
             if (byType) {
                 Class[] typeArray = new Class[2];
                 typeArray[0] = TestManyGroup.class;

@@ -73,7 +73,8 @@ import org.castor.jdo.engine.ConnectionFactory;
 import org.castor.jdo.engine.DatabaseRegistry;
 import org.castor.transactionmanager.LocalTransactionManager;
 
-import org.exolab.castor.jdo.engine.DatabaseImpl;
+import org.exolab.castor.jdo.engine.GlobalDatabaseImpl;
+import org.exolab.castor.jdo.engine.LocalDatabaseImpl;
 import org.exolab.castor.jdo.engine.TxDatabaseMap;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.MappingException;
@@ -725,9 +726,8 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
         
         if (transactionManager instanceof LocalTransactionManager) {
             // We are in LOCAL mode and need only to return a new database instance.
-            return new DatabaseImpl(_databaseName, _lockTimeout, _callbackInterceptor,
-                                    _instanceFactory, null, _classLoader, _autoStore, 
-                                    getDatabasePooling());
+            return new LocalDatabaseImpl(_databaseName, _lockTimeout, _callbackInterceptor,
+                                    _instanceFactory, _classLoader, _autoStore);
         } else {
             // We are in J2EE mode and need a valid Transaction.
             Transaction tx = null;
@@ -756,8 +756,8 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
             }
 
             // In all other cases we need to create a new database instance.
-            DatabaseImpl dbImpl;
-            dbImpl = new DatabaseImpl(_databaseName, _lockTimeout, _callbackInterceptor,
+            GlobalDatabaseImpl dbImpl;
+            dbImpl = new GlobalDatabaseImpl(_databaseName, _lockTimeout, _callbackInterceptor,
                                       _instanceFactory, tx, _classLoader, _autoStore, 
                                       getDatabasePooling());
 

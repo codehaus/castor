@@ -68,7 +68,9 @@ import org.castor.jdo.engine.AbstractConnectionFactory;
 import org.castor.jdo.engine.DatabaseRegistry;
 
 import org.castor.jdo.conf.JdoConf;
-import org.exolab.castor.jdo.engine.DatabaseImpl;
+import org.exolab.castor.jdo.engine.AbstractDatabaseImpl;
+import org.exolab.castor.jdo.engine.GlobalDatabaseImpl;
+import org.exolab.castor.jdo.engine.LocalDatabaseImpl;
 import org.exolab.castor.jdo.engine.TxDatabaseMap;
 import org.castor.transactionmanager.LocalTransactionManager;
 import org.exolab.castor.mapping.MappingException;
@@ -589,7 +591,7 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
          */
         if (!(_transactionManager instanceof LocalTransactionManager)) {
             Transaction        transaction;
-            DatabaseImpl       dbImpl;
+            AbstractDatabaseImpl       dbImpl;
 
             try {
                 transaction = _transactionManager.getTransaction();
@@ -600,15 +602,15 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
                 if ((transaction != null)
                         && (transaction.getStatus() == Status.STATUS_ACTIVE)) {
                     
-                    dbImpl = new DatabaseImpl(_dbName, _lockTimeout, _callback,
+                    dbImpl = new GlobalDatabaseImpl(_dbName, _lockTimeout, _callback,
                             _instanceFactory, transaction, _classLoader,
                             _autoStore, getDatabasePooling());
                                         
                     if (_txDbPool != null) {
-                        _txDbPool.put(transaction, dbImpl);
+                        _txDbPool.put(transaction, (GlobalDatabaseImpl) dbImpl);
                     }
                     
-                    transaction.registerSynchronization(dbImpl);
+                    transaction.registerSynchronization((GlobalDatabaseImpl) dbImpl);
                     return dbImpl;
                 }
             } catch (Exception ex) {
@@ -619,9 +621,8 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
             }
         }
         
-        return new DatabaseImpl(_dbName, _lockTimeout, _callback,
-                _instanceFactory, null, _classLoader, _autoStore,
-                getDatabasePooling());
+        return new LocalDatabaseImpl(_dbName, _lockTimeout, _callback,
+                _instanceFactory, _classLoader, _autoStore);
     }
 
     /**

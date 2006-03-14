@@ -42,16 +42,25 @@
  *
  * $Id$
  */
-
-
 package org.exolab.castor.jdo.engine;
-
 
 import org.castor.jdo.engine.SQLTypeConverters;
 import org.castor.jdo.util.ClassLoadingUtils;
 import org.castor.persist.TransactionContext;
-import org.exolab.castor.jdo.*;
-import org.exolab.castor.jdo.oql.*;
+import org.exolab.castor.jdo.Database;
+import org.exolab.castor.jdo.DbMetaInfo;
+import org.exolab.castor.jdo.OQLQuery;
+import org.exolab.castor.jdo.ObjectNotFoundException;
+import org.exolab.castor.jdo.PersistenceException;
+import org.exolab.castor.jdo.Query;
+import org.exolab.castor.jdo.QueryException;
+import org.exolab.castor.jdo.QueryResults;
+import org.exolab.castor.jdo.TransactionNotInProgressException;
+import org.exolab.castor.jdo.oql.Lexer;
+import org.exolab.castor.jdo.oql.ParamInfo;
+import org.exolab.castor.jdo.oql.ParseTreeNode;
+import org.exolab.castor.jdo.oql.ParseTreeWalker;
+import org.exolab.castor.jdo.oql.Parser;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.MappingException;
@@ -68,7 +77,7 @@ import java.util.NoSuchElementException;
 import java.util.Vector;
 
 /**
- *
+ * An OQLQuery implementation to execute a query based upon an OQL statement   
  *
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
@@ -77,53 +86,51 @@ public class OQLQueryImpl
     implements Query, OQLQuery
 {
 
+    private LockEngine _dbEngine;
 
-    private LockEngine          _dbEngine;
+    private Database _database;
 
+    private Class _objClass;
 
-    private DatabaseImpl        _dbImpl;
+    private JDOClassDescriptor _clsDesc;
 
-
-    private Class               _objClass;
-
-
-    private JDOClassDescriptor  _clsDesc;
-
-
-    private QueryExpression     _expr;
-
+    private QueryExpression _expr;
 
     /**
      * Stored procedure call
      */
-    private String             _spCall;
+    private String _spCall;
 
+    private Class[] _bindTypes;
 
-    private Class[]            _bindTypes;
+    private Object[] _bindValues;
 
+    private Hashtable _paramInfo;
 
-    private Object[]           _bindValues;
+    private int _fieldNum;
 
-    private Hashtable          _paramInfo;
+    private int _projectionType;
+    
+    private Vector _projectionInfo;
 
+    private PersistenceQuery _query;
 
-    private int                _fieldNum;
+    private QueryResults _results;
 
-    private int                _projectionType;
-    private Vector             _projectionInfo;
-
-    private PersistenceQuery   _query;
-
-    private QueryResults       _results;
-
-
-    OQLQueryImpl( DatabaseImpl dbImpl )
+    /**
+     * Creates an instance to execute a query based upon an OQL statement
+     * @param database The Castor database to run the query against.
+     */
+    OQLQueryImpl(final Database database)
     {
-        _dbImpl = dbImpl;
+        _database = database;
     }
 
-
-    public void bind( Object value )
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.jdo.Query#bind(java.lang.Object)
+     */
+    public void bind(Object value)
     {
         if ( _expr == null && _spCall == null )
             throw new IllegalStateException( "Must create query before using it" );
@@ -142,10 +149,10 @@ public class OQLQueryImpl
                 Class valueClass = value.getClass();
 
                 if ( paramClass.isAssignableFrom( valueClass ) ) {
-                    ClassMolder molder = _dbImpl.getLockEngine().getClassMolder( valueClass );
+                    ClassMolder molder = ((AbstractDatabaseImpl) _database).getLockEngine().getClassMolder( valueClass );
 
                     if ( molder != null ) {
-                        value = molder.getActualIdentity( _dbImpl.getClassLoader(), value );
+                        value = molder.getActualIdentity( _database.getClassLoader(), value );
                     }
                 } else if ( info.isUserDefined() ) {
                         //If the user specified a type they must pass that exact type.
@@ -157,7 +164,7 @@ public class OQLQueryImpl
                                                             " it is an instance of the class "
                                                             + valueClass );
                 }
-                if ( sqlClass != null && ! sqlClass.isAssignableFrom( valueClass ) ) {
+                if ( sqlClass != null && !sqlClass.isAssignableFrom( valueClass ) ) {
                     // First convert the actual value to the field value
                     if ( fieldClass != valueClass ) {
                         try {
@@ -187,45 +194,66 @@ public class OQLQueryImpl
         }
     }
 
-    public void bind( boolean value )
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.jdo.Query#bind(boolean)
+     */
+    public void bind(final boolean value)
     {
-        bind( new Boolean( value ) );
+        bind(new Boolean(value));
     }
 
-
-    public void bind( short value )
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.jdo.Query#bind(short)
+     */
+    public void bind(final short value)
     {
-        bind( new Short( value ) );
+        bind(new Short(value));
     }
 
-
-    public void bind( int value )
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.jdo.Query#bind(int)
+     */
+    public void bind(final int value)
     {
-        bind( new Integer( value ) );
+        bind(new Integer(value));
     }
 
-
-    public void bind( long value )
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.jdo.Query#bind(long)
+     */
+    public void bind(final long value)
     {
-        bind( new Long( value ) );
+        bind(new Long(value));
     }
 
-
-    public void bind( float value )
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.jdo.Query#bind(float)
+     */
+    public void bind(final float value)
     {
-        bind( new Float( value ) );
+        bind(new Float(value));
     }
 
-
-    public void bind( double value )
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.jdo.Query#bind(double)
+     */
+    public void bind(final double value)
     {
-        bind( new Double( value ) );
+        bind(new Double(value));
     }
 
-    public void create( String oql )
-    throws PersistenceException
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.jdo.OQLQuery#create(java.lang.String)
+     */
+    public void create(final String oql) throws PersistenceException
     {
-
         _fieldNum = 0;
         _expr = null;
         _spCall = null;
@@ -240,14 +268,14 @@ public class OQLQueryImpl
         Parser parser = new Parser(lexer);
         ParseTreeNode parseTree = parser.getParseTree();
 
-        _dbEngine = _dbImpl.getLockEngine();
+        _dbEngine = ((AbstractDatabaseImpl) _database).getLockEngine();
         if ( _dbEngine == null )
             throw new QueryException( "Could not get a persistence engine" );
 
-	    TransactionContext trans = _dbImpl.getTransaction();
+	    TransactionContext trans = ((AbstractDatabaseImpl) _database).getTransaction();
 	    DbMetaInfo dbInfo = trans.getConnectionInfo(_dbEngine);
 
-	    ParseTreeWalker walker = new ParseTreeWalker(_dbEngine, parseTree, _dbImpl.getClassLoader(), dbInfo);
+	    ParseTreeWalker walker = new ParseTreeWalker(_dbEngine, parseTree, _database.getClassLoader(), dbInfo);
 
         _objClass = walker.getObjClass();
         _clsDesc = walker.getClassDescriptor();
@@ -266,7 +294,11 @@ public class OQLQueryImpl
         }
     }
 
-    public void createCall( String oql ) throws QueryException {
+    /**
+     * @param oql
+     * @throws QueryException
+     */
+    public void createCall(final String oql) throws QueryException {
         StringBuffer sql;
         int as;
         int leftParen;
@@ -321,7 +353,7 @@ public class OQLQueryImpl
                         }
                         info = (ParamInfo) _paramInfo.get( paramNo );
                         if ( info == null ) {
-                            info = new ParamInfo( "", "java.lang.Object", null, _dbImpl.getClassLoader());
+                            info = new ParamInfo( "", "java.lang.Object", null, _database.getClassLoader());
                         }
                         //info.mapToSQLParam( paramCnt + 1 );
                         _paramInfo.put( paramNo , info );
@@ -365,7 +397,7 @@ public class OQLQueryImpl
                     }
                     info = (ParamInfo) _paramInfo.get( paramNo );
                     if ( info == null ) {
-                        info = new ParamInfo( "", "java.lang.Object", null, _dbImpl.getClassLoader());
+                        info = new ParamInfo( "", "java.lang.Object", null, _database.getClassLoader());
                     }
                     //info.mapToSQLParam( paramCnt + 1 );
                     _paramInfo.put( paramNo , info );
@@ -390,40 +422,64 @@ public class OQLQueryImpl
             throw new QueryException( "Missing object name" );
         }
         try {
-            _objClass = ClassLoadingUtils.loadClass(_dbImpl.getClassLoader(), objType);
+            _objClass = ClassLoadingUtils.loadClass(_database.getClassLoader(), objType);
         } catch ( ClassNotFoundException except ) {
             throw new QueryException( "Could not find class " + objType );
         }
-        _dbEngine = _dbImpl.getLockEngine();
+        _dbEngine = ((AbstractDatabaseImpl) _database).getLockEngine();
         if ( _dbEngine == null || _dbEngine.getPersistence( _objClass ) == null )
             throw new QueryException( "Could not find an engine supporting class " + objType );
     }
 
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.jdo.Query#execute()
+     */
     public QueryResults execute()
     throws QueryException, PersistenceException, TransactionNotInProgressException {
         return execute( null );
     }
 
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.jdo.Query#execute(boolean)
+     */
     public QueryResults execute(final boolean scrollable)
     throws QueryException, PersistenceException, TransactionNotInProgressException {
         return execute( null, scrollable );
     }
 
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.jdo.Query#execute(short)
+     */
     public QueryResults execute(final short accessMode)
     throws QueryException, PersistenceException, TransactionNotInProgressException {
         return execute(AccessMode.valueOf(accessMode), false);
     }
 
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.jdo.Query#execute(short, boolean)
+     */
     public QueryResults execute(final short accessMode, final boolean scrollable)
     throws QueryException, PersistenceException, TransactionNotInProgressException {
         return execute(AccessMode.valueOf(accessMode), scrollable);
     }
 
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.jdo.Query#execute(org.exolab.castor.mapping.AccessMode)
+     */
     public QueryResults execute(final AccessMode accessMode)
     throws QueryException, PersistenceException, TransactionNotInProgressException {
         return execute(accessMode, false);
     }
 
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.jdo.Query#execute(org.exolab.castor.mapping.AccessMode, boolean)
+     */
     public QueryResults execute(final AccessMode accessMode, final boolean scrollable)
     throws QueryException, PersistenceException, TransactionNotInProgressException {
         org.exolab.castor.persist.QueryResults      results;
@@ -453,7 +509,7 @@ public class OQLQueryImpl
                     } catch ( QueryException except ) {
                         throw new QueryException( except.getMessage() );
                     }
-                    results = _dbImpl.getTransaction().query( _dbEngine, _query, accessMode, scrollable );
+                    results = ((AbstractDatabaseImpl) _database).getTransaction().query( _dbEngine, _query, accessMode, scrollable );
                     _fieldNum = 0;
 
                     if ( _projectionType == ParseTreeWalker.PARENT_OBJECT )
@@ -466,8 +522,9 @@ public class OQLQueryImpl
                 case ParseTreeWalker.AGGREGATE:
                 case ParseTreeWalker.FUNCTION:
                     try {
-                        java.sql.Connection conn = (java.sql.Connection)_dbImpl.getTransaction().getConnection(_dbEngine);
-                        SimpleQueryExecutor sqe = new SimpleQueryExecutor( _dbImpl );
+                        
+                        java.sql.Connection conn = (java.sql.Connection)((AbstractDatabaseImpl) _database).getTransaction().getConnection(_dbEngine);
+                        SimpleQueryExecutor sqe = new SimpleQueryExecutor( _database );
                         _results =  sqe.execute(conn, _expr, _bindValues);
 		            } catch ( QueryException except ) {
 		                throw new QueryException(Messages.message ("persist.simple.query.failed"), except);
@@ -494,6 +551,10 @@ public class OQLQueryImpl
 	  return _spCall;
     }
 
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.jdo.Query#close()
+     */
     public void close()
     {
         if ( _query != null ) {
@@ -506,23 +567,28 @@ public class OQLQueryImpl
         }
     }
 
-    class OQLEnumeration
-        implements QueryResults, Enumeration
+    /**
+     * {@see java.util.Enumeration} implementation to traverse the result as returned by the
+     * execution of the OQL query.
+     */
+    class OQLEnumeration implements QueryResults, Enumeration
     {
-
-
         private Object                 _lastObject;
 
         private Vector                 _pathInfo;
 
         private JDOClassDescriptor     _classDescriptor;
 
-
         private org.exolab.castor.persist.QueryResults _results;
 
-
-        OQLEnumeration( org.exolab.castor.persist.QueryResults results,
-                        Vector pathInfo, JDOClassDescriptor clsDesc )
+        /**
+         * Creates an instance of this class.
+         * @param results
+         * @param pathInfo
+         * @param clsDesc
+         */
+        OQLEnumeration(org.exolab.castor.persist.QueryResults results,
+                       Vector pathInfo, JDOClassDescriptor clsDesc)
         {
             _results = results;
             _pathInfo = pathInfo;
@@ -537,18 +603,28 @@ public class OQLQueryImpl
             _classDescriptor = null;
         }
 
-         public boolean absolute(int row)
-            throws PersistenceException
-         {
-               return _results.absolute(row);
-         }
+        /**
+         * @inheritDoc
+         * @see org.exolab.castor.jdo.QueryResults#absolute(int)
+         */
+        public boolean absolute(int row) throws PersistenceException
+        {
+            return _results.absolute(row);
+        }
+        
+        /**
+         * @inheritDoc
+         * @see org.exolab.castor.jdo.QueryResults#size()
+         */
+        public int size() throws PersistenceException
+        {
+            return _results.size();
+        }
 
-         public int size()
-            throws PersistenceException
-         {
-               return _results.size();
-         }
-
+        /**
+         * @inheritDoc
+         * @see java.util.Enumeration#hasMoreElements()
+         */
         public boolean hasMoreElements()
         {
             try {
@@ -559,7 +635,10 @@ public class OQLQueryImpl
             }
         }
 
-
+        /**
+         * @inheritDoc
+         * @see org.exolab.castor.jdo.QueryResults#hasMore()
+         */
         public boolean hasMore()
             throws PersistenceException
         {
@@ -567,7 +646,7 @@ public class OQLQueryImpl
         }
 
 
-        public boolean hasMore( boolean skipError )
+        public boolean hasMore(final boolean skipError)
             throws PersistenceException
         {
             Object identity;
@@ -607,7 +686,10 @@ public class OQLQueryImpl
             return ( _lastObject != null );
         }
 
-
+        /**
+         * @inheritDoc
+         * @see java.util.Enumeration#nextElement()
+         */
         public Object nextElement()
             throws NoSuchElementException
         {
@@ -619,7 +701,10 @@ public class OQLQueryImpl
             }
         }
 
-
+        /**
+         * @inheritDoc
+         * @see org.exolab.castor.jdo.QueryResults#next()
+         */
         public Object next()
             throws PersistenceException, NoSuchElementException
         {
@@ -679,24 +764,26 @@ public class OQLQueryImpl
             throw new NoSuchElementException();
         }
 
-       public void close()
+        /**
+         * @inheritDoc
+         * @see org.exolab.castor.jdo.QueryResults#close()
+         */
+        public void close()
         {
             if ( _results != null ) {
                 _results.close();
                 _results = null;
             }
         }
-
+        
         private Object followPath(Object parent) {
-            // _log.debug ("Following the path.");
-            //follow the path
             JDOClassDescriptor curClassDesc = _classDescriptor;
             Object curObject = parent;
             for ( int i = 1; i < _pathInfo.size(); i++ ) {
                 String curFieldName = (String) _pathInfo.elementAt(i);
                 try {
                     JDOFieldDescriptor curFieldDesc =
-                              curClassDesc.getField( curFieldName );
+                        curClassDesc.getField( curFieldName );
                     FieldHandler handler = curFieldDesc.getHandler();
                     curObject = handler.getValue( curObject );
                     curClassDesc = (JDOClassDescriptor) curFieldDesc.getClassDescriptor();
@@ -705,11 +792,10 @@ public class OQLQueryImpl
                     throw new NoSuchElementException( "An exception was thrown trying to access get methods to follow the path expression. " + ex.toString() );
                 }
             }
-
+            
             return curObject;
         }
-
-     }
-
+        
+    }
 
 }
