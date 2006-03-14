@@ -30,6 +30,26 @@
             <summary>
             </summary>
             <bugs>
+                <bug id="1354" tool="jira">
+                    <description>
+		                Add HOW-TO on using identities and references in XML
+                    </description>
+                    <contributor>
+                        <name>Stephen Bash</name>
+                        <email>scbash@gmail.com</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Stephen Bash</name>
+                        <email>scbash@gmail.com</email>
+                    </reporter>
+                    <type>Enh.</type>
+                    <module>XML</module>
+                    <date>20060314</date>
+                </bug>
                 <bug id="1353" tool="jira">
                     <description>
 		                Fixed incorrect DOCTYPE references in various XML Mapping docs.
@@ -67,7 +87,7 @@
                         <email>scbash@gmail.com</email>
                     </reporter>
                     <type>Enh.</type>
-                    <module>XML</module>
+                    <module>JDO</module>
                     <date>20060311</date>
                 </bug>
                 <bug id="1350" tool="jira">
