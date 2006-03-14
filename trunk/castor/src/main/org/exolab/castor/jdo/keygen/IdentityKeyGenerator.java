@@ -248,8 +248,7 @@ implements KeyGenerator
 
     private class DB2Type extends AbstractType {
     	Object getValue(Connection conn, String tableName) throws PersistenceException {
-    		StringBuffer buf = new StringBuffer("SELECT IDENTITY_VAL_LOCAL() FROM ");
-    		buf.append(tableName).append(" FETCH FIRST ROW ONLY");
+			StringBuffer buf = new StringBuffer("SELECT IDENTITY_VAL_LOCAL() FROM sysibm.sysdummy1");    		
     		return getValue(buf.toString(), conn);
     	}
     }

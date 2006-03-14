@@ -30,6 +30,26 @@
             <summary>
             </summary>
             <bugs>
+                <bug id="1089" tool="jira">
+                    <description>
+		                Revised SQL statement used by IdentityKeyGenerator for IBM DB2.
+                    </description>
+                    <contributor>
+                        <name>Tim Telcik</name>
+                        <email>ttelcik@hbf.com.au</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Tim Telcik</name>
+                        <email>ttelcik@hbf.com.au</email>
+                    </reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20060308</date>
+                </bug>
                 <bug id="1345" tool="jira">
                     <description>
                         Refactored DatabaseImpl into Local/GlobaldatabaseImpl.            

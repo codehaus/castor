@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1089 using contribution from Tim Telcik [ttelcik@hbf.com.au]
+       Revised SQL statement used by IdentityKeyGenerator for IBM DB2.
+       Details: http://jira.codehaus.org/browse/CASTOR-1089
+       (Werner - 20060308)
+
 JDO:   Fixed bug CASTOR-1345 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        Refactored DatabaseImpl into Local/GlobaldatabaseImpl.
        Details: http://jira.codehaus.org/browse/CASTOR-1345
