@@ -2,6 +2,10 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1345 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Refactored DatabaseImpl into Local/GlobaldatabaseImpl.
+       Details: http://jira.codehaus.org/browse/CASTOR-1345
+      
 XML:   Fixed bug CASTOR-1354 using contribution from Stephen Bash [scbash@gmail.com]
        Add HOW-TO on using identities and references in XML.
        Details: http://jira.codehaus.org/browse/CASTOR-1354

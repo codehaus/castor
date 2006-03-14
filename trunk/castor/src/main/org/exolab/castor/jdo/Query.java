@@ -73,7 +73,6 @@ import org.exolab.castor.mapping.AccessMode;
 public interface Query
 {
 
-
     /**
      * Bind a parameter value to the query. Parameters are set in the
      * order in which they appear in the query and must match in number

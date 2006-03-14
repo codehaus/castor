@@ -53,7 +53,7 @@ import jdo.JDOCategory;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
 
-import org.exolab.castor.jdo.engine.DatabaseImpl;
+import org.exolab.castor.jdo.Database;
 
 public class CastorTestCase extends TestCase {
 
@@ -84,7 +84,7 @@ public class CastorTestCase extends TestCase {
     private void clearCache() {
         try {
             if (suite instanceof JDOCategory) {
-                DatabaseImpl db = (DatabaseImpl) ((JDOCategory) suite).getDatabase();
+                Database db = (Database) ((JDOCategory) suite).getDatabase();
                 db.getCacheManager().expireCache();
             }
         } catch (Exception e) {

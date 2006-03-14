@@ -28,7 +28,6 @@ import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.JDOManager;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.QueryResults;
-import org.exolab.castor.jdo.engine.DatabaseImpl;
 import org.exolab.castor.mapping.AccessMode;
 
 /**
@@ -46,7 +45,7 @@ public final class TestLoadUni1toN extends TestCase {
     
     private JDOManager      _jdo = null;
     
-    private DatabaseImpl    _db = null;
+    private Database        _db = null;
     private OQLQuery        _queryState = null;
     private OQLQuery        _queryStateOID = null;
     private OQLQuery        _queryEquipment = null;
@@ -101,7 +100,7 @@ public final class TestLoadUni1toN extends TestCase {
     public void testReadWriteEmpty() throws Exception {
         long start = System.currentTimeMillis();
         
-        _db = (DatabaseImpl) _jdo.getDatabase();
+        _db = _jdo.getDatabase();
         _db.getCacheManager().expireCache();
         _db.begin();
         
@@ -143,7 +142,7 @@ public final class TestLoadUni1toN extends TestCase {
     public void testReadWriteCached() throws Exception {
         long start = System.currentTimeMillis();
         
-        _db = (DatabaseImpl) _jdo.getDatabase();
+        _db = _jdo.getDatabase();
         _db.begin();
         
         long begin = System.currentTimeMillis();
@@ -184,7 +183,7 @@ public final class TestLoadUni1toN extends TestCase {
     public void testReadOnlyEmpty() throws Exception {
         long start = System.currentTimeMillis();
         
-        _db = (DatabaseImpl) _jdo.getDatabase();
+        _db = _jdo.getDatabase();
         _db.getCacheManager().expireCache();
         _db.begin();
         
@@ -226,7 +225,7 @@ public final class TestLoadUni1toN extends TestCase {
     public void testReadOnlyCached() throws Exception {
         long start = System.currentTimeMillis();
         
-        _db = (DatabaseImpl) _jdo.getDatabase();
+        _db =  _jdo.getDatabase();
         _db.begin();
         
         long begin = System.currentTimeMillis();
@@ -267,7 +266,7 @@ public final class TestLoadUni1toN extends TestCase {
     public void testReadWriteOidEmpty() throws Exception {
         long start = System.currentTimeMillis();
         
-        _db = (DatabaseImpl) _jdo.getDatabase();
+        _db =  _jdo.getDatabase();
         _db.getCacheManager().expireCache();
         _db.begin();
         
@@ -313,7 +312,7 @@ public final class TestLoadUni1toN extends TestCase {
     public void testReadWriteOidCached() throws Exception {
         long start = System.currentTimeMillis();
         
-        _db = (DatabaseImpl) _jdo.getDatabase();
+        _db =  _jdo.getDatabase();
         _db.begin();
         
         long begin = System.currentTimeMillis();
@@ -358,7 +357,7 @@ public final class TestLoadUni1toN extends TestCase {
     public void testReadOnlyOidEmpty() throws Exception {
         long start = System.currentTimeMillis();
         
-        _db = (DatabaseImpl) _jdo.getDatabase();
+        _db =  _jdo.getDatabase();
         _db.getCacheManager().expireCache();
         _db.begin();
         
@@ -404,7 +403,7 @@ public final class TestLoadUni1toN extends TestCase {
     public void testReadOnlyOidCached() throws Exception {
         long start = System.currentTimeMillis();
         
-        _db = (DatabaseImpl) _jdo.getDatabase();
+        _db =  _jdo.getDatabase();
         _db.begin();
         
         long begin = System.currentTimeMillis();
@@ -449,7 +448,7 @@ public final class TestLoadUni1toN extends TestCase {
     public void testReadOnlyOidOnly() throws Exception {
         long start = System.currentTimeMillis();
         
-        _db = (DatabaseImpl) _jdo.getDatabase();
+        _db =  _jdo.getDatabase();
         _db.begin();
         
         long begin = System.currentTimeMillis();

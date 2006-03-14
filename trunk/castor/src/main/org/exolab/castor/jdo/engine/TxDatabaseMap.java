@@ -48,6 +48,8 @@ package org.exolab.castor.jdo.engine;
 
 
 import javax.transaction.Transaction;
+
+
 import java.io.Serializable;
 import java.util.HashMap;
 
@@ -68,15 +70,15 @@ public final class TxDatabaseMap implements Serializable {
         return _txDbMap.containsKey( tx );
     }
 
-    public synchronized boolean containsDatabase( DatabaseImpl dbImpl ) {
+    public synchronized boolean containsDatabase( GlobalDatabaseImpl dbImpl ) {
         return _txDbMap.containsValue( dbImpl );
     }
 
-    public synchronized DatabaseImpl get( Transaction tx ) {
-        return (DatabaseImpl) _txDbMap.get( tx );
+    public synchronized GlobalDatabaseImpl get( Transaction tx ) {
+        return (GlobalDatabaseImpl) _txDbMap.get( tx );
     }
 
-    public synchronized void put( Transaction tx, DatabaseImpl dbImpl ) {
+    public synchronized void put( Transaction tx, GlobalDatabaseImpl dbImpl ) {
         Object oldDb = _txDbMap.put( tx, dbImpl );
         if ( oldDb != null && oldDb != dbImpl ) {
             _txDbMap.put( tx, oldDb );
@@ -85,8 +87,8 @@ public final class TxDatabaseMap implements Serializable {
         dbImpl.setTxMap( this );
     }
 
-    public synchronized DatabaseImpl remove( Transaction tx ) {
-        return (DatabaseImpl) _txDbMap.remove( tx );
+    public synchronized GlobalDatabaseImpl remove( Transaction tx ) {
+        return (GlobalDatabaseImpl) _txDbMap.remove( tx );
     }
 
     public synchronized int size() {

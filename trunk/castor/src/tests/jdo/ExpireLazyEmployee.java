@@ -62,7 +62,6 @@ import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.QueryResults;
-import org.exolab.castor.jdo.engine.DatabaseImpl;
 import org.exolab.castor.persist.spi.Complex;
 
 /**
@@ -398,7 +397,7 @@ public class ExpireLazyEmployee extends CastorTestCase {
         log("expiring cache...");
 
         try {
-            CacheManager cacheManager = ((DatabaseImpl) _db).getCacheManager();
+            CacheManager cacheManager = _db.getCacheManager();
             if (byType) {
                 Class[] typeArray = new Class[5];
                 typeArray[0] = TestLazyContract.class;
