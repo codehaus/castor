@@ -161,8 +161,7 @@ public abstract class AbstractDatabaseImpl
      * Returns the {@see LockEngine} in use by this database instance. 
      * @return
      */
-    LockEngine getLockEngine()
-    {
+    LockEngine getLockEngine() {
         return _scope.getLockEngine();
     }
 
@@ -190,8 +189,9 @@ public abstract class AbstractDatabaseImpl
      * @return True if 'auto-store' mode is in use.
      */
     public boolean isAutoStore() {
-        if ( _ctx != null )
+        if (_ctx != null) {
             return _ctx.isAutoStore();
+        }
 
         return _autoStore;
     }
@@ -200,17 +200,15 @@ public abstract class AbstractDatabaseImpl
      * Gets the current application ClassLoader's instance.
      * @return the current ClassLoader's instance, or <code>null</code> if not provided
      */
-    public ClassLoader getClassLoader()
-    {
+    public ClassLoader getClassLoader() {
         return _classLoader;
     }
 
-    /**                              }
+    /**                              
      * Return the name of the database
      * @return Name of the database.
      */                               
-    public String getDatabaseName()  
-    {                                
+    public String getDatabaseName() {                                
         return _dbName;                  
     }
 
@@ -226,7 +224,7 @@ public abstract class AbstractDatabaseImpl
      * @see org.exolab.castor.jdo.Database#isClosed()
      */
     public boolean isClosed() {
-        return ( _scope == null );
+        return (_scope == null);
     }
     
     /**
@@ -237,7 +235,7 @@ public abstract class AbstractDatabaseImpl
         if (_scope == null) {
             throw new IllegalStateException(Messages.message("jdo.dbClosed"));
         }
-        if (_ctx != null && _ctx.isOpen()) {
+        if (isActive()) {
             return _ctx.isLocked(cls, identity, _scope.getLockEngine());
         }
         return false;
@@ -249,7 +247,7 @@ public abstract class AbstractDatabaseImpl
 	 */
 	public Object load(final Class type, final Object identity) 
     throws ObjectNotFoundException, LockNotGrantedException, 
-    TransactionNotInProgressException, PersistenceException {
+           TransactionNotInProgressException, PersistenceException {
         return load(type, identity, null, null);
     }
 
@@ -257,7 +255,8 @@ public abstract class AbstractDatabaseImpl
      * @inheritDoc
      * @see org.exolab.castor.jdo.Database#load(java.lang.Class, java.lang.Object, java.lang.Object)
      */
-    public Object load(final Class type, 
+    public Object load(
+            final Class type, 
             final Object identity,
             final Object object) 
     throws TransactionNotInProgressException, ObjectNotFoundException,
@@ -269,10 +268,11 @@ public abstract class AbstractDatabaseImpl
      * @inheritDoc
      * @see org.exolab.castor.jdo.Database#load(java.lang.Class, java.lang.Object, short)
      */
-    public Object load(final Class type, final Object identity,
-                       final short accessMode)
+    public Object load(final Class type, 
+            final Object identity,
+            final short accessMode)
     throws ObjectNotFoundException, LockNotGrantedException,
-    TransactionNotInProgressException, PersistenceException {
+           TransactionNotInProgressException, PersistenceException {
         AccessMode mode = AccessMode.valueOf(accessMode);
         return load(type, identity, null, mode);
     }
@@ -284,7 +284,7 @@ public abstract class AbstractDatabaseImpl
     public Object load(final Class type, final Object identity,
                        final AccessMode mode) 
     throws TransactionNotInProgressException, ObjectNotFoundException,
-    LockNotGrantedException, PersistenceException {
+           LockNotGrantedException, PersistenceException {
         return load(type, identity, null, mode);
     }
 
@@ -308,7 +308,7 @@ public abstract class AbstractDatabaseImpl
         PersistenceInfo info = _scope.getPersistenceInfo(type);
 
         ProposedObject proposedObject = new ProposedObject();
-        return tx.load( info.engine, info.molder, identity, proposedObject, mode );
+        return tx.load(info.engine, info.molder, identity, proposedObject, mode);
     }
 
     /**
@@ -322,9 +322,9 @@ public abstract class AbstractDatabaseImpl
         PersistenceInfo    info;
 
         tx = getTransaction();
-        info = _scope.getPersistenceInfo( object.getClass() );
+        info = _scope.getPersistenceInfo(object.getClass());
 
-        tx.create( info.engine, info.molder, object, null );
+        tx.create(info.engine, info.molder, object, null);
     }
     
     /**
@@ -332,8 +332,9 @@ public abstract class AbstractDatabaseImpl
      * @see org.exolab.castor.jdo.Database#getCacheManager()
      */
     public CacheManager getCacheManager() {
-        if(cacheManager == null)
+        if(cacheManager == null) {
             cacheManager = new CacheManager(this, _ctx, getLockEngine());
+        }
         return cacheManager;
     }
 
@@ -349,9 +350,9 @@ public abstract class AbstractDatabaseImpl
         PersistenceInfo    info;
 
         tx = getTransaction();
-        info = _scope.getPersistenceInfo( object.getClass() );
+        info = _scope.getPersistenceInfo(object.getClass());
 
-        tx.update( info.engine, info.molder, object, null );
+        tx.update(info.engine, info.molder, object, null);
     }
 
     /**
@@ -365,9 +366,9 @@ public abstract class AbstractDatabaseImpl
         TransactionContext tx;
         
         tx = getTransaction();
-        _scope.getPersistenceInfo( object.getClass() );
+        _scope.getPersistenceInfo(object.getClass());
 
-        tx.delete( object );
+        tx.delete(object);
     }
 
     /**
@@ -376,10 +377,12 @@ public abstract class AbstractDatabaseImpl
      */
     public boolean isPersistent(final Object object)
     {
-        if ( _scope == null )
-            throw new IllegalStateException( Messages.message( "jdo.dbClosed" ) );
-        if ( _ctx != null && _ctx.isOpen()  )
-            return _ctx.isPersistent( object );
+        if (_scope == null) {
+            throw new IllegalStateException(Messages.message("jdo.dbClosed"));
+        }
+        if (isActive()) {
+            return _ctx.isPersistent(object);
+        }
         return false;
     }
 
@@ -406,18 +409,17 @@ public abstract class AbstractDatabaseImpl
         throws LockNotGrantedException, ObjectNotPersistentException,
                TransactionNotInProgressException,  PersistenceException
     {
-        if (_ctx == null || !_ctx.isOpen()) {
+        if (!isActive()) {
             throw new TransactionNotInProgressException(Messages.message("jdo.txNotInProgress"));
         }
-        _ctx.writeLock( object, _lockTimeout );
+        _ctx.writeLock(object, _lockTimeout);
     }
 
     /**
      * @inheritDoc
      * @see org.exolab.castor.jdo.Database#getOQLQuery()
      */
-    public OQLQuery getOQLQuery()
-    {
+    public OQLQuery getOQLQuery() {
         return new OQLQueryImpl(this);
     }
 
@@ -426,7 +428,7 @@ public abstract class AbstractDatabaseImpl
      * @see org.exolab.castor.jdo.Database#getOQLQuery(java.lang.String)
      */
     public OQLQuery getOQLQuery(final String oql)
-        throws PersistenceException
+    throws PersistenceException
     {
         OQLQuery oqlImpl;
 
@@ -455,7 +457,7 @@ public abstract class AbstractDatabaseImpl
         if (_scope == null) {
             throw new TransactionNotInProgressException(Messages.message("jdo.dbClosed"));
         }
-        if (_ctx != null && _ctx.isOpen()) {
+        if (isActive()) {
             return _ctx;
         }
         throw new TransactionNotInProgressException(Messages.message("jdo.dbTxNotInProgress"));
@@ -514,21 +516,24 @@ public abstract class AbstractDatabaseImpl
     	if ( _synchronizables == null ) {
     		_synchronizables = new ArrayList();
     		
-    		String syncName = LocalConfiguration.getInstance().getProperty( TxSynchronizableProperty, "" );
-    		StringTokenizer tokenizer = new StringTokenizer( syncName, ", " );
-    		while ( tokenizer.hasMoreTokens() ) {
-    			syncName = tokenizer.nextToken();
-    			try {
-                	Class cls = null;
+    		String syncName = LocalConfiguration.getInstance().getProperty(TxSynchronizableProperty, "");
+            StringTokenizer tokenizer = new StringTokenizer(syncName, ", ");
+    		while (tokenizer.hasMoreTokens()) {
+                syncName = tokenizer.nextToken();
+                try {
+                    Class cls = null;
                     cls = ClassLoadingUtils.loadClass(_classLoader, syncName);
-    				TxSynchronizable sync = (TxSynchronizable)cls.newInstance();
-    				if ( sync != null ) _synchronizables.add(sync);
-    			} catch ( Exception except ) {
-    				_log.warn(Messages.format( "jdo.missingTxSynchronizable", syncName ));
-    			}
-    		}
+                    TxSynchronizable sync = (TxSynchronizable) cls.newInstance();
+                    if (sync != null)
+                        _synchronizables.add(sync);
+                } catch (Exception except) {
+                    _log.warn(Messages.format("jdo.missingTxSynchronizable", syncName));
+                }
+            }
     		
-    		if (_synchronizables.size() == 0) _synchronizables = null;
+    		if (_synchronizables.size() == 0) {
+                _synchronizables = null;
+            }
     	}
     }
     
@@ -536,8 +541,7 @@ public abstract class AbstractDatabaseImpl
      * Register the {@link TxSynchronizable} implementations at the
      * TransactionContect at end of begin().
      */
-    protected void registerSynchronizables()
-    {
+    protected void registerSynchronizables() {
         if (_synchronizables != null && _synchronizables.size() > 0) {
             Iterator iter = _synchronizables.iterator();
             while (iter.hasNext()) {

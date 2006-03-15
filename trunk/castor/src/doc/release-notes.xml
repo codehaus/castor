@@ -30,6 +30,26 @@
             <summary>
             </summary>
             <bugs>
+                <bug id="1345" tool="jira">
+                    <description>
+                        Refactored redundant code in *DatabaseImpl classes            
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                   </reporter>
+                    <type>Enh</type>
+                    <module>JDO</module>
+                    <date>20060315</date>
+                </bug>
                 <bug id="1089" tool="jira">
                     <description>
 		                Revised SQL statement used by IdentityKeyGenerator for IBM DB2.
