@@ -2,14 +2,20 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1358 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Refactored redundant code in *DatabaseImpl classes
+       Details: http://jira.codehaus.org/browse/CASTOR-1358
+       (Werner - 20060315)
+
 JDO:   Fixed bug CASTOR-1089 using contribution from Tim Telcik [ttelcik@hbf.com.au]
        Revised SQL statement used by IdentityKeyGenerator for IBM DB2.
        Details: http://jira.codehaus.org/browse/CASTOR-1089
-       (Werner - 20060308)
+       (Werner - 20060314)
 
 JDO:   Fixed bug CASTOR-1345 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        Refactored DatabaseImpl into Local/GlobaldatabaseImpl.
        Details: http://jira.codehaus.org/browse/CASTOR-1345
+       (Werner - 20060314)
       
 XML:   Fixed bug CASTOR-1354 using contribution from Stephen Bash [scbash@gmail.com]
        Add HOW-TO on using identities and references in XML.

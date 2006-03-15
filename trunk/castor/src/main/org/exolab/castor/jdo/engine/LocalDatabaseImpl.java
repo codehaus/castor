@@ -84,17 +84,15 @@ public class LocalDatabaseImpl extends AbstractDatabaseImpl
         throws PersistenceException
     {
         try {
-            if (_ctx != null && _ctx.isOpen()) {
+            if (isActive()) {
                 try {
                     _ctx.rollback();
-                }
-                catch (Exception except) {
+                } catch (Exception except) {
                 }
                 
                 try {
                     _ctx.close();
-                }
-                catch (Exception except) {
+                } catch (Exception except) {
                 }
                 
                 throw new PersistenceException(Messages.message("jdo.dbClosedTxRolledback"));
@@ -135,7 +133,7 @@ public class LocalDatabaseImpl extends AbstractDatabaseImpl
     {
         _log.debug( "Beginning tx" );
 
-        if (_ctx != null && _ctx.isOpen()) {
+        if (isActive()) {
             throw new PersistenceException(Messages.message("jdo.txInProgress"));
         }
 
@@ -159,7 +157,7 @@ public class LocalDatabaseImpl extends AbstractDatabaseImpl
     {
         _log.debug( "Committing tx" );
 
-        if (_ctx == null || !_ctx.isOpen()) {
+        if (!isActive()) {
             throw new TransactionNotInProgressException(Messages.message("jdo.txNotInProgress"));
         }
         
@@ -197,7 +195,7 @@ public class LocalDatabaseImpl extends AbstractDatabaseImpl
     {
         _log.debug("Rolling back tx");
 
-        if (_ctx == null || ! _ctx.isOpen()) {
+        if (!isActive()) {
             throw new TransactionNotInProgressException(Messages.message("jdo.txNotInProgress"));
         }
         _ctx.rollback();
