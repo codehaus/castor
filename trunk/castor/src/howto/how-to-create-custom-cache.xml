@@ -68,7 +68,9 @@ org.castor.cache.Factories=\
   org.castor.cache.distributed.JcsCacheFactory,\
   org.castor.cache.distributed.JCacheFactory,\
   org.castor.cache.distributed.CoherenceCacheFactory,\
-  org.castor.cache.distributed.OsCacheFactory
+  org.castor.cache.distributed.OsCacheFactory,\
+  org.castor.cache.hashbelt.FIFOHashbeltFactory,\
+  org.castor.cache.hashbelt.LRUHashbeltFactory
             </code-panel>
 
             <p>To add your own performance cache provider, please append 
@@ -88,6 +90,8 @@ org.castor.cache.Factories=\
   org.castor.cache.distributed.JCacheFactory,\
   org.castor.cache.distributed.CoherenceCacheFactory,\
   org.castor.cache.distributed.OsCacheFactory,\
+  org.castor.cache.hashbelt.FIFOHashbeltFactory,\
+  org.castor.cache.hashbelt.LRUHashbeltFactory,\
   <b><font color="red">org.whatever.somewhere.nevermind.CustomCache</font></b>
             </code-panel>
             

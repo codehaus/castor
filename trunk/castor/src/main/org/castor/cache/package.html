@@ -41,7 +41,9 @@ org.castor.cache.Factories=\
   org.castor.cache.distributed.JcsCacheFactory,\
   org.castor.cache.distributed.JCacheFactory,\
   org.castor.cache.distributed.CoherenceCacheFactory,\
-  org.castor.cache.distributed.OsCacheFactory
+  org.castor.cache.distributed.OsCacheFactory,\
+  org.castor.cache.hashbelt.FIFOHashbeltFactory,\
+  org.castor.cache.hashbelt.LRUHashbeltFactory
 </pre>
 
     <p>To add your own performance cache implementation, please append the fully-qualified
@@ -61,6 +63,8 @@ org.castor.cache.Factories=\
   org.castor.cache.distributed.JCacheFactory,\
   org.castor.cache.distributed.CoherenceCacheFactory,\
   org.castor.cache.distributed.OsCacheFactory,\
+  org.castor.cache.hashbelt.FIFOHashbeltFactory,\
+  org.castor.cache.hashbelt.LRUHashbeltFactory,\
   org.whatever.somewhere.nevermind.CustomCache
 </pre>
        

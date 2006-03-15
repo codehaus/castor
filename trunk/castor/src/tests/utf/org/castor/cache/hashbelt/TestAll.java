@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package utf.org.castor.cache;
+package utf.org.castor.cache.hashbelt;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 /**
- * Run all tests of the org.castor.cache package.
+ * Run all tests of the org.castor.cache.hashbelt package.
  * 
  * @author <a href="mailto:ralf DOT joachim AT syscon-world DOT de">Ralf Joachim</a>
  * @version $Revision$ $Date$
@@ -28,18 +28,15 @@ import junit.framework.TestSuite;
  */
 public final class TestAll extends TestCase {
     public static Test suite() throws Exception {
-        TestSuite suite = new TestSuite("All org.castor.cache tests");
+        TestSuite suite = new TestSuite("All org.castor.cache.hashbelt tests");
 
-        suite.addTest(TestCacheAcquireException.suite());
-        suite.addTest(TestAbstractBaseCache.suite());
-        suite.addTest(TestDebuggingCacheProxy.suite());
-        suite.addTest(TestAbstractCacheFactory.suite());
-
-        suite.addTest(utf.org.castor.cache.distributed.TestAll.suite());
-        suite.addTest(utf.org.castor.cache.hashbelt.TestAll.suite());
-        suite.addTest(utf.org.castor.cache.simple.TestAll.suite());
-
-        suite.addTest(TestCacheFactoryRegistry.suite());
+        suite.addTest(utf.org.castor.cache.hashbelt.container.TestAll.suite());
+        suite.addTest(utf.org.castor.cache.hashbelt.reaper.TestAll.suite());
+        
+        suite.addTest(TestFIFOHashbeltFactory.suite());
+        suite.addTest(TestFIFOHashbelt.suite());
+        suite.addTest(TestLRUHashbeltFactory.suite());
+        suite.addTest(TestLRUHashbelt.suite());
 
         return suite;
     }
