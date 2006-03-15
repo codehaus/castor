@@ -37,6 +37,12 @@ import org.castor.cache.distributed.JCache;
 import org.castor.cache.distributed.JCacheFactory;
 import org.castor.cache.distributed.JcsCache;
 import org.castor.cache.distributed.JcsCacheFactory;
+import org.castor.cache.distributed.OsCache;
+import org.castor.cache.distributed.OsCacheFactory;
+import org.castor.cache.hashbelt.FIFOHashbelt;
+import org.castor.cache.hashbelt.FIFOHashbeltFactory;
+import org.castor.cache.hashbelt.LRUHashbelt;
+import org.castor.cache.hashbelt.LRUHashbeltFactory;
 import org.castor.cache.simple.CountLimited;
 import org.castor.cache.simple.CountLimitedFactory;
 import org.castor.cache.simple.NoCache;
@@ -105,7 +111,7 @@ public final class TestCacheFactoryRegistry extends TestCase {
     public void testGetCacheNames() {
         LocalConfiguration config = LocalConfiguration.getInstance();
         Collection col = new CacheFactoryRegistry(config).getCacheNames();
-        assertEquals(8, col.size());
+        assertEquals(11, col.size());
         assertTrue(col.contains(CountLimited.TYPE));
         assertTrue(col.contains(NoCache.TYPE));
         assertTrue(col.contains(TimeLimited.TYPE));
@@ -114,12 +120,15 @@ public final class TestCacheFactoryRegistry extends TestCase {
         assertTrue(col.contains(FKCache.TYPE));
         assertTrue(col.contains(JCache.TYPE));
         assertTrue(col.contains(JcsCache.TYPE));
+        assertTrue(col.contains(OsCache.TYPE));
+        assertTrue(col.contains(FIFOHashbelt.TYPE));
+        assertTrue(col.contains(LRUHashbelt.TYPE));
     }
 
     public void testGetCacheFactories() {
         LocalConfiguration config = LocalConfiguration.getInstance();
         Collection col = new CacheFactoryRegistry(config).getCacheFactories();
-        assertEquals(8, col.size());
+        assertEquals(11, col.size());
         assertTrue(containsInstanceOf(col, CountLimitedFactory.class));
         assertTrue(containsInstanceOf(col, NoCacheFactory.class));
         assertTrue(containsInstanceOf(col, TimeLimitedFactory.class));
@@ -128,6 +137,9 @@ public final class TestCacheFactoryRegistry extends TestCase {
         assertTrue(containsInstanceOf(col, FKCacheFactory.class));
         assertTrue(containsInstanceOf(col, JCacheFactory.class));
         assertTrue(containsInstanceOf(col, JcsCacheFactory.class));
+        assertTrue(containsInstanceOf(col, OsCacheFactory.class));
+        assertTrue(containsInstanceOf(col, FIFOHashbeltFactory.class));
+        assertTrue(containsInstanceOf(col, LRUHashbeltFactory.class));
     }
     
     private boolean containsInstanceOf(final Collection col, final Class cls) {

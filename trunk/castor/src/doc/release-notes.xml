@@ -28,8 +28,51 @@
     		<date>tbd</date>
     		<managed-by>Werner Guttmann</managed-by>
             <summary>
+				<h2>Additions</h2>
+				
+				<h3>Added cache implementation for large cache sizes</h3>
+				
+				<p>TODO: add docs on the new cache types</p>
+
+                <code>
+# 
+# Cache implementations
+# 
+org.castor.cache.Factories=\
+  org.castor.cache.simple.NoCacheFactory,\
+  org.castor.cache.simple.TimeLimitedFactory,\
+  org.castor.cache.simple.CountLimitedFactory,\
+  org.castor.cache.simple.UnlimitedFactory,\
+  org.castor.cache.distributed.FKCacheFactory,\
+  org.castor.cache.distributed.JcsCacheFactory,\
+  org.castor.cache.distributed.JCacheFactory,\
+  org.castor.cache.distributed.CoherenceCacheFactory,\
+  org.castor.cache.distributed.OsCacheFactory,\
+  org.castor.cache.hashbelt.FIFOHashbeltFactory,\
+  org.castor.cache.hashbelt.LRUHashbeltFactory
+                </code>
             </summary>
             <bugs>
+                <bug id="867" tool="jira">
+                    <description>
+		                Added cache implementation for large cache sizes.
+                    </description>
+                    <contributor>
+                        <name>Gregory Block</name>
+                        <email>gblock@ctoforaday.com</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Gregory Block</name>
+                        <email>gblock@ctoforaday.com</email>
+                    </reporter>
+                    <type>Enh.</type>
+                    <module>JDO</module>
+                    <date>20060315</date>
+                </bug>
                 <bug id="1345" tool="jira">
                     <description>
                         Refactored redundant code in *DatabaseImpl classes            
@@ -46,7 +89,7 @@
                         <name>Werner Guttmann</name>
                         <email>werner.guttmann@gmx.net</email>
                    </reporter>
-                    <type>Enh</type>
+                    <type>Enh.</type>
                     <module>JDO</module>
                     <date>20060315</date>
                 </bug>
