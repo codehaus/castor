@@ -2,7 +2,12 @@
 Version (CVS)
 -------------
 
-JDO:   Fixed bug CASTOR-867 using contribution from Gregory Block[gblock@ctoforaday.com]
+XML:   Fixed bug CASTOR-1360 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Fixed problem with missing class file in XML jar.
+       Details: http://jira.codehaus.org/browse/CASTOR-1360
+       (Werner - 20060315)
+
++JDO:   Fixed bug CASTOR-867 using contribution from Gregory Block[gblock@ctoforaday.com]
        Added cache implementation for large cache sizes.
        Details: http://jira.codehaus.org/browse/CASTOR-867
        (Ralf - 20060315)
