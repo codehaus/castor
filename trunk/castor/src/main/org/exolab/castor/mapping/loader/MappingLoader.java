@@ -55,7 +55,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 import java.util.Enumeration;
 
@@ -69,10 +72,10 @@ import org.exolab.castor.mapping.MappingResolver;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.handlers.EnumFieldHandler;
 import org.exolab.castor.mapping.handlers.TransientFieldHandler;
+import org.exolab.castor.mapping.xml.ClassChoice;
 import org.exolab.castor.mapping.xml.MappingRoot;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
-import org.exolab.castor.persist.ClassMolderHelper;
 import org.exolab.castor.util.Messages;
 
 
@@ -476,7 +479,7 @@ public abstract class MappingLoader implements MappingResolver {
             origin = (ClassMapping) origin.getExtends();
         }
         ids = origin.getIdentity();
-        ids = ClassMolderHelper.getIdentityColumnNames (ids, origin);
+        ids = MappingLoader.getIdentityColumnNames (ids, origin);
         
         if (( ids != null ) && ( ids.length > 0)) {
 
@@ -1300,6 +1303,57 @@ public abstract class MappingLoader implements MappingResolver {
         return Character.toUpperCase( first ) + name.substring( 1 );
     }
     
+    /**
+     * Returns a list of column names that are part of the identity.
+     * @param ids Known identity names.
+     * @param clsMap Class mapping.
+     * @return List of identity column names.
+     */
+    public static String[] getIdentityColumnNames (String[] ids, ClassMapping clsMap) {
+        
+        String[] identityColumnNames = ids;
+        
+        if (ids == null || ids.length == 0)
+        {
+            int identityCount = 0;
+            ClassChoice classChoice = clsMap.getClassChoice();
+            if (classChoice == null) { 
+                classChoice = new ClassChoice(); 
+            }
+            FieldMapping[] fieldMappings = classChoice.getFieldMapping();
+            for (int i = 0; i < fieldMappings.length; i++)
+            {
+                if (fieldMappings[i].getIdentity() == true)
+                {
+                    identityCount++;
+                }
+    
+            }
+    
+            List identityDescriptorList = new ArrayList();
+            if (identityCount > 0)
+            {
+                for (int i = 0; i < fieldMappings.length; i++)
+                {
+                    if (fieldMappings[i].getIdentity() == true)
+                    {
+                        identityDescriptorList.add(fieldMappings[i].getName());
+                    }
+                }
+                
+                Iterator idIter = identityDescriptorList.iterator();
+                int i = 0;
+                identityColumnNames = new String[identityDescriptorList.size()]; 
+                while (idIter.hasNext()) {
+                    identityColumnNames[i] = (String) idIter.next();
+                    i++;
+                }
+            }
+        }
+    
+        return identityColumnNames;
+    }
+
     /**
      * Returns true if the given class should be treated as a primitive
      * type

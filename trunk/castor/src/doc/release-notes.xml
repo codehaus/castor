@@ -53,6 +53,26 @@ org.castor.cache.Factories=\
                 </code>
             </summary>
             <bugs>
+                <bug id="1360" tool="jira">
+                    <description>
+		                Fixed problem with missing class file in XML jar.
+                    </description>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Uwe Langbecker</name>
+                        <email>Uwe.Langbecker@gl-group.com</email>
+                    </reporter>
+                    <type>Bug</type>
+                    <module>XML</module>
+                    <date>20060314</date>
+                </bug>
                 <bug id="867" tool="jira">
                     <description>
 		                Added cache implementation for large cache sizes.
