@@ -29,7 +29,17 @@
     		<managed-by>Werner Guttmann</managed-by>
             <summary>
 				<h2>Additions</h2>
-				
+                
+				<h3>Updated/Added to XML Documentation</h3>
+                
+                <p>Two new XML how-tos have been added to the XML HOW-TOs page,
+                   one on fetching XML dependencies (DTDs and schemas) from JAR
+                   files rather than network locations, and one on using identities
+                   and references in XML.  The XML Mapping documentation was also 
+                   updated so that the DTD public ID used in examples matches one
+                   in Castor's DTDResolver (this aids in fetching the DTD from the 
+                   Castor JAR rather than the web address).</p>
+                
 				<h3>Added cache implementation for large cache sizes</h3>
 				
 				<p>TODO: add docs on the new cache types</p>
