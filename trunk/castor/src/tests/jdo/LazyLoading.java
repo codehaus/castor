@@ -812,7 +812,7 @@ public class LazyLoading extends CastorTestCase {
             _db.commit();
         }
         catch (TransactionAbortedException e) {
-            if (e.getException() instanceof DuplicateIdentityException) {
+            if (e.getCause() instanceof DuplicateIdentityException) {
                 stream.println("Error: The dependent object Address was just duplicated");
                 fail("The dependent object Address was just duplicated");
             }

@@ -266,19 +266,6 @@ public abstract class AbstractDatabaseImpl
     
     /**
      * @inheritDoc
-     * @see org.exolab.castor.jdo.Database#load(java.lang.Class, java.lang.Object, short)
-     */
-    public Object load(final Class type, 
-            final Object identity,
-            final short accessMode)
-    throws ObjectNotFoundException, LockNotGrantedException,
-           TransactionNotInProgressException, PersistenceException {
-        AccessMode mode = AccessMode.valueOf(accessMode);
-        return load(type, identity, null, mode);
-    }
-
-    /**
-     * @inheritDoc
      * @see org.exolab.castor.jdo.Database#load(java.lang.Class, java.lang.Object, org.exolab.castor.mapping.AccessMode)
      */
     public Object load(final Class type, final Object identity,
@@ -563,34 +550,5 @@ public abstract class AbstractDatabaseImpl
             }
         }
     }
-
-    /**
-     * Expire objects from the cache.  Objects expired from the cache will be
-     * read from persistent storage, as opposed to being read from the
-     * performance cache, during subsequent load/query operations.
-     *
-     * Objects may be expired from the cache individually, using explicit
-     * type/identity pairs in the argument list, or whole classes of objects
-     * may be expired by specifying a class type without a corresponding 
-     * entry in the identity array.
-     *
-     * Objects contained within a "master" object, for example objects
-     * maintained in a one-to-many relationship, will automatically be expired
-     * from the cache without the need to explicitly identify them.  This does
-     * not apply when expiring objects by type.  Each type, both container and
-     * contained objects need to be specified.
-     * 
-     * @param type An array of class types.
-     * @param identity An array of object identifiers.
-     * @throws PersistenceException Indicates that a problem has occured expiring objects from the cache. 
-     * @deprecated Please use the new {@link org.exolab.castor.jdo.CacheManager} which can be 
-     * obtained by calling {@link #getCacheManager()}.
-     */
-    public void expireCache( Class[] type, Object[] identity )
-        throws PersistenceException 
-    {
-    	throw new PersistenceException ("Please use the new CacheManager to manage Castor performance caches.");
-    }
-
 }  
                                 

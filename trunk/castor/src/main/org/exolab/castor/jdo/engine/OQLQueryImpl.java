@@ -451,24 +451,6 @@ public class OQLQueryImpl
 
     /**
      * @inheritDoc
-     * @see org.exolab.castor.jdo.Query#execute(short)
-     */
-    public QueryResults execute(final short accessMode)
-    throws QueryException, PersistenceException, TransactionNotInProgressException {
-        return execute(AccessMode.valueOf(accessMode), false);
-    }
-
-    /**
-     * @inheritDoc
-     * @see org.exolab.castor.jdo.Query#execute(short, boolean)
-     */
-    public QueryResults execute(final short accessMode, final boolean scrollable)
-    throws QueryException, PersistenceException, TransactionNotInProgressException {
-        return execute(AccessMode.valueOf(accessMode), scrollable);
-    }
-
-    /**
-     * @inheritDoc
      * @see org.exolab.castor.jdo.Query#execute(org.exolab.castor.mapping.AccessMode)
      */
     public QueryResults execute(final AccessMode accessMode)

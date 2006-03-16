@@ -113,17 +113,6 @@ public class CastorException extends Exception {
         return cause;
     }
     
-    /**
-     * Match some internal API and some surrounding API to provide this method.
-     * @return the exception, which in turn caused this Exception to
-     * be thrown, or null if nested exception exists.
-     * @deprecated Please move to getCause().
-    **/
-    public Throwable getException() {
-        return cause;
-    } //-- getException
-
-
     /** Retrieve the cause of a specific exception.  This is a nice, safe, easy thing to call internally
      * to ensure we never call getCause on something that shouldn't have it.  More hand-holding than anything
      * else, really, but it makes it easy to read.
