@@ -138,18 +138,18 @@ public class GlobalDatabaseImpl extends AbstractDatabaseImpl
 	 * @see java.lang.Object#finalize()
 	 */
 	protected void finalize() throws Throwable {
-		if (_scope != null) {
-			
-		    if (!_isPoolInUseForGlobalTransactions) {
-				// retrieve SQL bound to this Database instance
-				OQLQuery oqlQuery = getOQLQuery(); 
-				String sql = ((OQLQueryImpl) oqlQuery).getSQL(); 
-				
-				_log.warn(Messages.format("jdo.finalize_close", this.toString(), _dbName, sql));
-			}
-			close();
-		}
-	}
+        if (_scope != null || !isActive()) { return; }
+            
+        if (!_isPoolInUseForGlobalTransactions) {
+            // retrieve SQL bound to this Database instance
+            OQLQuery oqlQuery = getOQLQuery(); 
+            String sql = ((OQLQueryImpl) oqlQuery).getSQL(); 
+            
+            _log.warn(Messages.format("jdo.finalize_close", this.toString(), _dbName, sql));
+        }
+        
+        close();
+    }
 
     /**
      * @inheritDoc

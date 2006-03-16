@@ -93,6 +93,26 @@ org.castor.cache.Factories=\
                 </ctable>
             </summary>
             <bugs>
+                <bug id="1356" tool="jira">
+                    <description>
+		                Fixed false alarm log message at DatabaseImpl.finalize.
+                    </description>
+                    <contributor>
+                        <name>Bruce Snyder</name>
+                        <email>bruce DOT snyder AT gmail DOT com</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Bruce Snyder</name>
+                        <email>bruce DOT snyder AT gmail DOT com</email>
+                    </reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20060316</date>
+                </bug>
                 <bug id="1363" tool="jira">
                     <description>
 		                Removed deprecated classes and methods.
