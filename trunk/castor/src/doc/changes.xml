@@ -25,6 +25,8 @@
                 <li>Added HOW-TO document on mapping a map/hashtable of elements. (Castor XML)</li>
                 <li>Added a new page full of information relevant for people that want to 
                     contribute in one way or the other to the project.</li>
+                <li>Added HOW-TO document on fetching XML dependencies from JAR files</li>
+                <li>Added HOW-TO document on using identities and references in XML</li>
             </ul>    
             
         </section>
@@ -34,7 +36,8 @@
             <ul>
                 <li>The <a href="download.html">download page</a> now holds information
                     about libraries required for using/building Castor.</li>
-                
+                <li>Modified XML Mapping documentation so that DOCTYPE public IDs match
+                    those defined in org.exolab.castor.util.DTDResolver</li>
             </ul>            
             
         </section>
