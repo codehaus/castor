@@ -485,11 +485,9 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
      * <p/>
      * The standard name for this property is <tt>configuration</tt>.
      *
-     * @deprecated Will be private in one of the next releases.
-     *  
      * @param source The URL of the database configuration file as InputSource.
      */
-    public void setConfiguration(final InputSource source) {
+    private void setConfiguration(final InputSource source) {
         _jdoConfURI = source;
     }
 
@@ -726,8 +724,8 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
         
         if (transactionManager instanceof LocalTransactionManager) {
             // We are in LOCAL mode and need only to return a new database instance.
-            return new LocalDatabaseImpl(_databaseName, _lockTimeout, _callbackInterceptor,
-                                    _instanceFactory, _classLoader, _autoStore);
+            return new LocalDatabaseImpl(_databaseName, _lockTimeout,
+                    _callbackInterceptor, _instanceFactory, _classLoader, _autoStore);
         } else {
             // We are in J2EE mode and need a valid Transaction.
             Transaction tx = null;
@@ -757,9 +755,9 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
 
             // In all other cases we need to create a new database instance.
             GlobalDatabaseImpl dbImpl;
-            dbImpl = new GlobalDatabaseImpl(_databaseName, _lockTimeout, _callbackInterceptor,
-                                      _instanceFactory, tx, _classLoader, _autoStore, 
-                                      getDatabasePooling());
+            dbImpl = new GlobalDatabaseImpl(_databaseName, _lockTimeout,
+                    _callbackInterceptor, _instanceFactory, tx, _classLoader,
+                    _autoStore, getDatabasePooling());
 
             // We have to register the database at the transaction next.
             try {

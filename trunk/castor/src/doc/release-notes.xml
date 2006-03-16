@@ -51,8 +51,68 @@ org.castor.cache.Factories=\
   org.castor.cache.hashbelt.FIFOHashbeltFactory,\
   org.castor.cache.hashbelt.LRUHashbeltFactory
                 </code>
+                
+                <h2>Code cleanup</h2>
+				
+                <p>We removed following classes and methods that had been deprecated for
+                   a while now. </p>
+                   
+                <ctable>
+                    <cheader>
+                        <th align="left">removed</th>
+                        <th align="left">replacement</th>
+                    </cheader>
+                    <crow>
+                        <td>Throwable CastorException.getException()</td>
+                        <td>Throwable CastorException.getClause()</td>
+                    </crow>
+                    <crow>
+                        <td>Object Database.load(Class, Object, short)</td>
+                        <td>Object Database.load(Class, Object, AccessMode)</td>
+                    </crow>
+                    <crow>
+                        <td>void JDOManager.setConfiguration(InputSource)</td>
+                        <td>no replacement</td>
+                    </crow>
+                    <crow>
+                        <td>QueryResults Query.execute(short)</td>
+                        <td>QueryResults Query.execute(AccessMode)</td>
+                    </crow>
+                    <crow>
+                        <td>QueryResults Query.execute(short, boolean)</td>
+                        <td>QueryResults Query.execute(AccessMode, boolean)</td>
+                    </crow>
+                    <crow>
+                        <td>org.exolab.castor.jdo.Utils</td>
+                        <td>org.castor.jdo.util.JDOUtils</td>
+                    </crow>
+                    <crow>
+                        <td>org.exolab.castor.util.JdoConfFactory</td>
+                        <td>org.castor.jdo.util.JDOConfFactory</td>
+                    </crow>
+                </ctable>
             </summary>
             <bugs>
+                <bug id="1363" tool="jira">
+                    <description>
+		                Removed deprecated classes and methods.
+                    </description>
+                    <contributor>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </reporter>
+                    <type>Enh.</type>
+                    <module>All</module>
+                    <date>20060316</date>
+                </bug>
                 <bug id="1364" tool="jira">
                     <description>
 		                Fixed wrong generation of 'setFixed(String)'-method for XSNormalizeStrings.

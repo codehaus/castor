@@ -231,34 +231,6 @@ public interface Database
      * object. This method is equivalent to a query that returns a
      * single object.
      *
-     * @deprecated Use load(Class, Object, AccessMode) instead.
-     * 
-     * @param type The object's type
-     * @param identity The object's identity
-     * @param accessMode The access mode
-     * @return The object instance.
-     * @throws ObjectNotFoundException No object of the given type and
-     *  identity was found in persistent storage
-     * @throws LockNotGrantedException Timeout or deadlock occured
-     *  attempting to acquire a lock on the object
-     * @throws TransactionNotInProgressException Method called while
-     *   transaction is not in progress
-     * @throws PersistenceException An error reported by the
-     *  persistence engine
-     */
-    public Object load(final Class type, final Object identity,
-                       final short accessMode)
-    throws TransactionNotInProgressException, ObjectNotFoundException,
-    LockNotGrantedException, PersistenceException;
-
-    /**
-     * <p>
-     * Load an object of the specified type and given identity.
-     * Once loaded the object is persistent. Calling this method with
-     * the same identity in the same transaction will return the same
-     * object. This method is equivalent to a query that returns a
-     * single object.
-     *
      * @param type The object's type
      * @param identity The object's identity
      * @param mode The access mode

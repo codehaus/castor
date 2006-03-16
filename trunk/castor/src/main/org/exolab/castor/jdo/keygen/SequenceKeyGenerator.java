@@ -60,8 +60,8 @@ import java.util.StringTokenizer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.castor.jdo.util.JDOUtils;
 import org.exolab.castor.jdo.PersistenceException;
-import org.exolab.castor.jdo.Utils;
 import org.exolab.castor.jdo.drivers.DB2Factory;
 import org.exolab.castor.jdo.drivers.InterbaseFactory;
 import org.exolab.castor.jdo.drivers.OracleFactory;
@@ -258,7 +258,7 @@ public final class SequenceKeyGenerator implements KeyGenerator
             throw new PersistenceException( Messages.format(
                     "persist.keyGenSQL", getClass().getName(), ex.toString() ) );
         } finally {
-            Utils.closeStatement(stmt);
+            JDOUtils.closeStatement(stmt);
         }
     }
 
