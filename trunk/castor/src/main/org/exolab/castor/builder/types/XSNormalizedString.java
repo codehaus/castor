@@ -241,9 +241,10 @@ public final class XSNormalizedString extends XSPatternBase {
 		}
 		//-- fixed values
 		if (fixedValue != null) {
-			jsc.add("typeValidator.setFixed(\"");
+			jsc.add("typeValidator.setFixed(");
+            //fixed should be "the value"
 			jsc.append(fixedValue);
-			jsc.append("\");");
+			jsc.append(");");
 		}
 		//-- pattern facet
 		String pattern = getPattern();
