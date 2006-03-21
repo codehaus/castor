@@ -174,12 +174,12 @@
 
   <contributor type="Committer">
     <name surname="Yip" given="Thomas"/>
-    <email>yip@intalio.com</email>
-    <company id="intalio"/>
+	<email>tomtactic-web@yahoo.com</email>
+    <company id="leafsoft"/>    
     <project>JDO</project>
     <description>
       Lead developer of Castor JDO from late v.0.8 to early v.0.9.
-      Enhancements to the lock model, LRU cache, lazy loading, multi-pk, m-n support, etc; bugs fixes, test cases, and documentation. (non-active)
+      Enhancements to the lock model, LRU cache, lazy loading, multi-pk, m-n support, etc; bugs fixes, test cases, and documentation.
     </description>
     <status>inactive</status>
   </contributor>
@@ -1296,6 +1296,11 @@
   <company id="kenamea">
     <name>Kenamea, Inc.</name>
     <url>www.kenamea.com</url>
+  </company>
+
+  <company id="leafsoft">
+    <name>Leafsoft.com</name>
+    <url>leafsoft.com/aboutus.html</url>
   </company>
 
   <!-- Company Names (M-P) -->
