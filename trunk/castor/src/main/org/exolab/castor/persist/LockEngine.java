@@ -62,6 +62,7 @@ import org.castor.jdo.engine.ConnectionFactory;
 import org.castor.persist.ProposedObject;
 import org.castor.persist.TransactionContext;
 import org.castor.persist.cache.CacheEntry;
+import org.castor.util.Configuration;
 
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.LockNotGrantedException;
@@ -76,7 +77,6 @@ import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.loader.MappingLoader;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceFactory;
-import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.util.Messages;
 
 /**
@@ -166,7 +166,7 @@ public final class LockEngine {
                       final PersistenceFactory persistenceFactory)
     throws MappingException {
         if (_cacheFactoryRegistry == null) {
-            LocalConfiguration config = LocalConfiguration.getInstance();
+            Configuration config = Configuration.getInstance();
             _cacheFactoryRegistry = new CacheFactoryRegistry(config);
         }
         

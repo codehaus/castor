@@ -24,7 +24,7 @@ import javax.transaction.TransactionManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.exolab.castor.util.LocalConfiguration;
+import org.castor.util.Configuration;
 
 /**
  * Registry for {@link TransactionManager} instances obtained by their name.
@@ -132,7 +132,7 @@ public final class TransactionManagerRegistry {
      * 
      * @param config The LocalConfiguration.
      */
-    public TransactionManagerRegistry(final LocalConfiguration config) {
+    public TransactionManagerRegistry(final Configuration config) {
         _registry = new TransactionManagerFactoryRegistry(config);
 
         String property = config.getProperty(PROPERTY_INIT_AT_REGISTRATION, "false");

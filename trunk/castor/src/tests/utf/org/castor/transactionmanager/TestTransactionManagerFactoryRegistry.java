@@ -26,7 +26,7 @@ import org.castor.transactionmanager.TransactionManagerAcquireException;
 import org.castor.transactionmanager.TransactionManagerFactory;
 import org.castor.transactionmanager.TransactionManagerFactoryRegistry;
 
-import org.exolab.castor.util.LocalConfiguration;
+import org.castor.util.Configuration;
 
 /**
  * @author <a href="mailto:ralf DOT joachim AT syscon-world DOT de">Ralf Joachim</a>
@@ -55,7 +55,7 @@ public final class TestTransactionManagerFactoryRegistry extends TestCase {
         assertEquals("org.castor.transactionmanager.Factories",
                 TransactionManagerFactoryRegistry.PROPERTY_TRANSACTION_MANAGER_FACTORY);
         
-        LocalConfiguration config = LocalConfiguration.getInstance();
+        Configuration config = Configuration.getInstance();
         String mem = config.getProperty("org.castor.transactionmanager.Factories", null);
         config.getProperties().put("org.castor.transactionmanager.Factories",
                 "org.castor.transactionmanager.LocalTransactionManagerFactory, "

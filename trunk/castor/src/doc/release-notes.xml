@@ -103,6 +103,26 @@ org.castor.cache.Factories=\
                 </ctable>
             </summary>
             <bugs>
+                <bug id="1281" tool="jira">
+                    <description>
+		                Introduced new org.castor.util.Configuration.
+                    </description>
+                    <contributor>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </reporter>
+                    <type>Enh.</type>
+                    <module>All</module>
+                    <date>20060321</date>
+                </bug>
                 <bug id="1356" tool="jira">
                     <description>
 		                Fixed false alarm log message at DatabaseImpl.finalize.

@@ -22,7 +22,7 @@ import java.util.StringTokenizer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.exolab.castor.util.LocalConfiguration;
+import org.castor.util.Configuration;
 
 /**
  * Registry for {@link TransactionManagerFactory} implementations obtained from the
@@ -60,7 +60,7 @@ public final class TransactionManagerFactoryRegistry {
      * 
      * @param config The LocalConfiguration.
      */
-    public TransactionManagerFactoryRegistry(final LocalConfiguration config) {
+    public TransactionManagerFactoryRegistry(final Configuration config) {
         String prop = config.getProperty(PROPERTY_TRANSACTION_MANAGER_FACTORY, "");
         StringTokenizer tokenizer = new StringTokenizer(prop, ", ");
         ClassLoader loader = TransactionManagerFactoryRegistry.class.getClassLoader();

@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1281 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
+       Introduced new org.castor.util.Configuration.
+       Details: http://jira.codehaus.org/browse/CASTOR-1281
+       (Ralf - 20060321)
+
 JDO:   Fixed bug CASTOR-1356 using contribution from Bruce Snyder [bruce.snyder@gmail.com]
        Fixed false alarm log message at DatabaseImpl.finalize.
        Details: http://jira.codehaus.org/browse/CASTOR-1356

@@ -28,6 +28,7 @@ import org.castor.jdo.conf.JdoConf;
 import org.castor.jdo.util.JDOConfAdapter;
 import org.castor.transactionmanager.TransactionManagerAcquireException;
 import org.castor.transactionmanager.TransactionManagerRegistry;
+import org.castor.util.Configuration;
 
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.MappingException;
@@ -35,7 +36,6 @@ import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.PersistenceEngineFactory;
 import org.exolab.castor.persist.PersistenceFactoryRegistry;
 import org.exolab.castor.persist.spi.PersistenceFactory;
-import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.util.Messages;
 
 /**
@@ -139,7 +139,7 @@ public abstract class AbstractConnectionFactory implements ConnectionFactory {
             String txm = adapt.getTransactionManager();
             Properties prop = adapt.getTransactionManagerParameters();
             
-            LocalConfiguration conf = LocalConfiguration.getInstance();
+            Configuration conf = Configuration.getInstance();
             TransactionManagerRegistry txr = new TransactionManagerRegistry(conf);
             try {
                 txr.registerTransactionManager(name, txm, prop);

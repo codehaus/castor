@@ -23,10 +23,10 @@ import junit.framework.TestSuite;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
 import org.castor.transactionmanager.TransactionManagerAcquireException;
 import org.castor.transactionmanager.TransactionManagerRegistry;
-
-import org.exolab.castor.util.LocalConfiguration;
+import org.castor.util.Configuration;
 
 /**
  * @author <a href="mailto:ralf DOT joachim AT syscon-world DOT de">Ralf Joachim</a>
@@ -55,7 +55,7 @@ public final class TestTransactionManagerRegistry extends TestCase {
         assertEquals("org.castor.transactionmanager.InitializeAtRegistration",
                      TransactionManagerRegistry.PROPERTY_INIT_AT_REGISTRATION);
         
-        LocalConfiguration config = LocalConfiguration.getInstance();
+        Configuration config = Configuration.getInstance();
         String memF = config.getProperty(
                 "org.castor.transactionmanager.Factories", null);
         String memI = config.getProperty(
