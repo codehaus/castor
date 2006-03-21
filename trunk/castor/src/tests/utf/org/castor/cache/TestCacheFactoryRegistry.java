@@ -51,6 +51,7 @@ import org.castor.cache.simple.TimeLimited;
 import org.castor.cache.simple.TimeLimitedFactory;
 import org.castor.cache.simple.Unlimited;
 import org.castor.cache.simple.UnlimitedFactory;
+import org.castor.util.Configuration;
 
 import org.exolab.castor.util.LocalConfiguration;
 
@@ -84,7 +85,7 @@ public final class TestCacheFactoryRegistry extends TestCase {
 
         assertEquals("org.castor.cache.Factories", CacheFactoryRegistry.PROP_FACTORY);
         
-        LocalConfiguration config = LocalConfiguration.getInstance();
+        Configuration config = Configuration.getInstance();
         String memF = config.getProperty(CacheFactoryRegistry.PROP_FACTORY, "");
         
         config.getProperties().remove(CacheFactoryRegistry.PROP_FACTORY);
@@ -109,7 +110,7 @@ public final class TestCacheFactoryRegistry extends TestCase {
     }
 
     public void testGetCacheNames() {
-        LocalConfiguration config = LocalConfiguration.getInstance();
+        Configuration config = Configuration.getInstance();
         Collection col = new CacheFactoryRegistry(config).getCacheNames();
         assertEquals(11, col.size());
         assertTrue(col.contains(CountLimited.TYPE));
@@ -126,7 +127,7 @@ public final class TestCacheFactoryRegistry extends TestCase {
     }
 
     public void testGetCacheFactories() {
-        LocalConfiguration config = LocalConfiguration.getInstance();
+        Configuration config = Configuration.getInstance();
         Collection col = new CacheFactoryRegistry(config).getCacheFactories();
         assertEquals(11, col.size());
         assertTrue(containsInstanceOf(col, CountLimitedFactory.class));
@@ -155,7 +156,7 @@ public final class TestCacheFactoryRegistry extends TestCase {
         Logger logger = Logger.getLogger(CacheFactoryRegistry.class);
         Level level = logger.getLevel();
         
-        LocalConfiguration config = LocalConfiguration.getInstance();
+        Configuration config = Configuration.getInstance();
         _registry = new CacheFactoryRegistry(config);
         
         Cache cache = null;

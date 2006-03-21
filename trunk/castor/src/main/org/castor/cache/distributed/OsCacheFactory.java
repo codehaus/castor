@@ -23,10 +23,10 @@ import java.lang.reflect.Method;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.castor.cache.Cache;
 import org.castor.cache.CacheAcquireException;
 import org.castor.cache.CacheFactory;
-import org.exolab.castor.util.Messages;
 
 /**
  * Implements {@link CacheFactory} for the {@link OsCache} implementation of 
@@ -72,18 +72,15 @@ public final class OsCacheFactory implements CacheFactory {
             try {
                 _cache = loader.loadClass(implementation).newInstance();
             } catch (ClassNotFoundException cnfe) {
-                String msg = Messages.format("jdo.engine.classNotFound",
-                        implementation);
+                String msg = "Cannot find class " + implementation + ".";
                 LOG.error(msg, cnfe);
                 throw new CacheAcquireException(msg, cnfe);
             } catch (IllegalAccessException iae) {
-                String msg = Messages.format("jdo.engine.classIllegalAccess",
-                        implementation);
+                String msg = "Illegal access with class " + implementation + ".";
                 LOG.error(msg, iae);
                 throw new CacheAcquireException(msg, iae);
             } catch (InstantiationException ie) {
-                String msg = Messages.format("jdo.engine.classNotInstantiable",
-                        implementation);
+                String msg = "Cannot create instance of " + implementation + ".";
                 LOG.error(msg, ie);
                 throw new CacheAcquireException(msg, ie);
             }
@@ -95,8 +92,7 @@ public final class OsCacheFactory implements CacheFactory {
             Constructor cst = cls.getConstructor(new Class[] {Object.class});
             cache = (Cache) cst.newInstance(new Object[] {_cache});
         } catch (ClassNotFoundException cnfe) {
-            String msg = Messages.format("jdo.engine.classNotFound",
-                    getCacheClassName());
+            String msg = "Cannot find class " + getCacheClassName() + ".";
             LOG.error(msg, cnfe);
             throw new CacheAcquireException(msg, cnfe);
         } catch (NoSuchMethodException nsme) {
@@ -104,13 +100,11 @@ public final class OsCacheFactory implements CacheFactory {
             LOG.error(msg, nsme);
             throw new CacheAcquireException(msg, nsme);
         } catch (IllegalAccessException iae) {
-            String msg = Messages.format("jdo.engine.classIllegalAccess",
-                    getCacheClassName());
+            String msg = "Illegal access with class " + getCacheClassName() + ".";
             LOG.error(msg, iae);
             throw new CacheAcquireException(msg, iae);
         } catch (InstantiationException ie) {
-            String msg = Messages.format("jdo.engine.classNotInstantiable",
-                    getCacheClassName());
+            String msg = "Cannot create instance of " + getCacheClassName() + ".";
             LOG.error(msg, ie);
             throw new CacheAcquireException(msg, ie);
         } catch (InvocationTargetException ite) {

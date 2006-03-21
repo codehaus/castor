@@ -26,7 +26,7 @@ import java.util.StringTokenizer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.exolab.castor.util.LocalConfiguration;
+import org.castor.util.Configuration;
 
 /**
  * Registry for {@link CacheFactory} implementations obtained from the Castor
@@ -57,12 +57,12 @@ public final class CacheFactoryRegistry {
     //--------------------------------------------------------------------------
 
     /**
-     * Construct an instance of CacheFactoryRegistry that uses given LocalConfiguration
+     * Construct an instance of CacheFactoryRegistry that uses given Configuration
      * to get required configuration properties.
      * 
-     * @param config The LocalConfiguration.
+     * @param config The Configuration.
      */
-    public CacheFactoryRegistry(final LocalConfiguration config) {
+    public CacheFactoryRegistry(final Configuration config) {
         String prop = config.getProperty(PROP_FACTORY, "");
         StringTokenizer tokenizer = new StringTokenizer(prop, ", ");
         ClassLoader loader = CacheFactoryRegistry.class.getClassLoader();
