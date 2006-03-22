@@ -50,6 +50,8 @@ package org.exolab.castor.util;
 
 import java.lang.reflect.Constructor;
 
+import org.xml.sax.SAXException;
+
 /** 
  * The default implementation of ObjectFactory used for 
  * creating class instances
@@ -146,7 +148,10 @@ public class DefaultObjectFactory implements ObjectFactory {
             throw new InstantiationException(err);
         }
         catch(java.lang.reflect.InvocationTargetException ite) {
-            throw new IllegalStateException(ite.getMessage());
+            // storing causal exception using Java 1.4 method
+            IllegalStateException ise = new IllegalStateException(ite.getMessage());
+            ise.initCause(ite.getCause());
+            throw ise;
         }
             
     } //-- createInstance
