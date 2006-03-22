@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+XML:   Fixed bug CASTOR-824 using contribution from Benoit Maisonny [benoit@synclude.com]
+       Improved exception handling in UnmarshallHandler
+       Details: http://jira.codehaus.org/browse/CASTOR-824
+       (Werner - 20060322)
+       
 JDO:   Fixed bug CASTOR-1281 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
        Introduced new org.castor.util.Configuration.
        Details: http://jira.codehaus.org/browse/CASTOR-1281
@@ -27,7 +32,7 @@ XML:   Fixed bug CASTOR-1360 using contribution from Werner Guttmann [werner.gut
        Details: http://jira.codehaus.org/browse/CASTOR-1360
        (Werner - 20060315)
 
-+JDO:   Fixed bug CASTOR-867 using contribution from Gregory Block[gblock@ctoforaday.com]
+JDO:   Fixed bug CASTOR-867 using contribution from Gregory Block[gblock@ctoforaday.com]
        Added cache implementation for large cache sizes.
        Details: http://jira.codehaus.org/browse/CASTOR-867
        (Ralf - 20060315)

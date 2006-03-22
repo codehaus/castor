@@ -2261,7 +2261,11 @@ implements ContentHandler, DocumentHandler, ErrorHandler {
                         String err = "unable to instantiate a new type of: ";
                         err += className(_class);
                         err += "; " + ex.getMessage();
-                        throw new SAXException(err);
+                        //storing causal exception using SAX non-standard method...
+                        SAXException sx = new SAXException(err, ex);
+                        //...and also using Java 1.4 method
+                        sx.initCause(ex);
+                        throw sx;
                     }
                 }
             }
@@ -2480,7 +2484,11 @@ implements ContentHandler, DocumentHandler, ErrorHandler {
         }
         catch(Exception ex) {
             String msg = "unable to instantiate " + type.getName() + "; ";
-            throw new SAXException(msg + ex);
+            // storing causal exception using SAX non-standard method...
+            SAXException sx = new SAXException(msg, ex);
+            //...and also using Java 1.4 method
+            sx.initCause(ex);
+            throw sx;
         }
         return instance;
      } //-- createInstance
