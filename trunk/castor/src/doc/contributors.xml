@@ -923,6 +923,12 @@
   </contributor>
 
   <contributor type="Contributor">
+    <name surname="Valchkov" given="Stoil" />
+    <email>svalchkov@gmail.com</email>
+    <description>Fixed NPE in case of extension of union</description>
+  </contributor>
+
+  <contributor type="Contributor">
     <name surname="van Kann" given="Patrick" />
     <email>patrick.vankann@fortune-cookie.com</email>
     <description>Ported SQL for Castor JDO tests to SQL Server; updates for docs; helping others on the mailing list</description>

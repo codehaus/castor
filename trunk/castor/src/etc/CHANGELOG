@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+XML:   Fixed bug CASTOR-1369 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
+       Fixed NPE in case of extension of union.
+       Details: http://jira.codehaus.org/browse/CASTOR-1369
+       (Ralf - 20060323)
+
 XML:   Fixed bug CASTOR-824 using contribution from Benoit Maisonny [benoit@synclude.com]
        Improved exception handling in UnmarshallHandler
        Details: http://jira.codehaus.org/browse/CASTOR-824

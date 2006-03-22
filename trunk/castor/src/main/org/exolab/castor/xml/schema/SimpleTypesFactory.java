@@ -45,12 +45,10 @@
 
 package org.exolab.castor.xml.schema;
 
-import java.io.FileReader;
 import java.io.PrintWriter;
 import java.io.PrintStream;
 import java.io.InputStream;
 
-import java.util.Enumeration;
 import java.util.Vector;
 import java.util.Hashtable;
 
@@ -322,21 +320,34 @@ public class SimpleTypesFactory {
                 return null;
             }
             ((ListType)result).setItemType( baseType );
-        }
-        else {
+        } else {
             //derive as restriction (only derivation allowed apart from list for simple types)
-            //Find the built in ancestor type
-            SimpleType builtInBase= baseType.getBuiltInBaseType();
-            if (builtInBase == null) {
-               sendToLog( Messages.format("schema.noBuiltInParent",
-                                          internalName) );
-               return null;
-            }
-
-            //creates the instance of a class derived from SimpleType representing the new type.
-	        result= createInstance(schema, builtInBase.getName());
-            if (result == null) {
-                throw new SimpleTypesFactoryException( Messages.message("schema.cantLoadBuiltInTypes") );
+            
+            if (baseType instanceof Union) {
+                //Stoil Valchkov (stoill@mail.bg) - this is my fix for union extension
+                //if we have union - handle it here. it wont be found as buildInBaseType
+                try {
+                    result = new Union(schema);
+                } catch (SchemaException sx) {
+                    //Hmmm... error message is not perfect, but at least is something :)
+                    sendToLog(Messages.format("schema.deriveByListError",
+                                              internalName, baseType.getName()) );
+                    return null;
+                }
+            } else {
+                //Find the built in ancestor type
+                SimpleType builtInBase= baseType.getBuiltInBaseType();
+                if (builtInBase == null) {
+                   sendToLog(Messages.format("schema.noBuiltInParent",
+                                             internalName) );
+                   return null;
+                } else {
+                    //creates the instance of a class derived from SimpleType representing the new type.
+                    result= createInstance(schema, builtInBase.getName());
+                    if (result == null) {
+                        throw new SimpleTypesFactoryException( Messages.message("schema.cantLoadBuiltInTypes") );
+                    }
+                }
             }
         }
 
