@@ -28,6 +28,7 @@
                 <li><font color="lightgrey">How to submit a bug report</font></li>
 	            <li><font color="lightgrey">How to Prepare a Patch</font></li>
 	            <li><font color="lightgrey">How to Contribute a Patch via Jira</font></li>
+                <li><a href="how-to-run-xml-ctf-suite.html">How to run Castor XML's test suite</a></li>
 	        </ul>
 		</section>
         
