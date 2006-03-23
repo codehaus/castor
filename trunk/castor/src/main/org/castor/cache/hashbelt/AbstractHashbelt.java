@@ -50,36 +50,58 @@ import org.castor.util.concurrent.WriterPreferenceReadWriteLock;
  * will drop off of the conveyor belt every 30 seconds, and you want a cache
  * that lasts for 5 minutes, you want 5 / 30 = 6 containers on the belt. Every
  * 30 seconds, another, clean container goes on the front of the conveyor belt,
- * and everything in the last belt gets discarded.</dd>
+ * and everything in the last belt gets discarded. If not specified 10 containers
+ * are used by default.
+ * <br/>
+ * For systems with fine granularity, you are free to use a large number of
+ * containers; but the system is most efficient when the user decides on a
+ * "sweet spot" determining both the number of containers to be managed on the
+ * whole and the optimal number of buckets in those containers for managing. This
+ * is ultimately a performance/accuracy tradeoff with the actual discard-from-cache
+ * time being further from the mark as the rotation time goes up. Also the number
+ * of objects discarded at once when capacity limit is reached depends upon the
+ * number of containers.</dd>
+ * <dt>capacity</dt>
+ * <dd>Maximum capacity of the whole cache. If there are, for example, ten
+ * containers on the belt and the capacity has been set to 1000, each container
+ * will hold a maximum of 1000/10 objects. Therefore if the capacity limit is
+ * reached and the last container gets droped from the belt there are up to 100
+ * objects discarted at once. By default the capacity is set to 0 which causes
+ * capacity limit to be ignored so the cache can hold an undefined number of
+ * objects.</dd>
+ * <dt>ttl</dt>
+ * <dd>The maximum time an object lifes in cache. If the are, for example, ten
+ * containers and ttl is set to 300 seconds (5 minutes), a new container will be
+ * put in front of the belt every 300/10 = 30 seconds while another is dropped at
+ * the end at the same time. Due to the granularity of 30 seconds, everything just
+ * until 5 minutes 30 seconds will also end up in this box. The default value for
+ * ttl is 60 seconds. If ttl is set to 0 which means that objects life in cache
+ * for unlimited time and may only discarded by a capacity limit.</dd>
+ * <dt>monitor</dt>
+ * <dd>The monitor intervall in minutes when hashbelt cache rports the current
+ * number of containers used and objects cached. If set to 0 (default) monitoring
+ * is disabled.</dd>
  * <dt>container-class</dt>
- * <dd></dd>
+ * <dd>The implementation of <b>org.castor.cache.hashbelt.container.Container</b>
+ * interface to be used for all containers of the cache. Castor provides the following
+ * 3 implementations of the Container interface.<br/>
+ * org.castor.cache.hashbelt.container.FastIteratingContainer<br/>
+ * org.castor.cache.hashbelt.container.MapContainer<br/>
+ * org.castor.cache.hashbelt.container.WeakReferenceContainer<br/>
+ * If not specified the MapContainer will be used as default.</dd>
  * <dt>reaper-class</dt>
  * <dd>Specific reapers yield different behaviors. The GC reaper, the default,
  * just dumps the contents to the garbage collector. However, custom
  * implementations may want to actually do something when a bucket drops off the
  * end; see the javadocs on other available reapers to find a reaper strategy
- * that meets your behavior requirements.</dd>
- * <dt>capacity</dt>
- * <dd></dd>
- * <dt>ttl</dt>
- * <dd>How often to move things along the conveyor belt. If there are, for
- * example, six containers on the belt, the first container will become the
- * second after the first instance of rotation time, and so on down to the sixth
- * rotation, when the container will drop off of the end. If the time is 30
- * seconds, 6 containers will cause an object added to the hashbelt to drop
- * off in the last container after 5 minutes; but due to the granularity
- * being set to 30 seconds, everything just until 5 minutes 30 seconds
- * will also end up in this box.
- * <p>
- * For systems with fine granularity, you are free to use a large number of
- * containers, and a small rotation time; but the system is most efficient when
- * the user decides on a "sweet spot" determining both the number of containers
- * to be managed on the whole and the optimal number of buckets in those
- * containers for managing. This is ultimately a performance/accuracy tradeoff
- * with the actual discard-from-cache time being further from the mark as the
- * rotation time goes up.
- * <dt>monitor</dt>
- * <dd></dd>
+ * that meets your behavior requirements. Apart of the default
+ * <b>org.castor.cache.hashbelt.reaper.NullReaper</b> we provide 3 abstract
+ * implementations of <b>org.castor.cahe.hashbelt.reaper.Reaper</b> interface:<br/>
+ * org.castor.cache.hashbelt.reaper.NotifyingReaper<br/>
+ * org.castor.cache.hashbelt.reaper.RefreshingReaper<br/>
+ * org.castor.cache.hashbelt.reaper.ReinsertingReaper<br/>
+ * to be extended by your custom implementation.</dd>
+ * <dl>
  * 
  * @author <a href="mailto:gblock AT ctoforaday DOT com">Gregory Block</a>
  * @author <a href="mailto:ralf DOT joachim AT syscon-world DOT de">Ralf Joachim</a>
