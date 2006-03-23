@@ -25,8 +25,8 @@
 		
 		<section title="Contribution">
 	        <ul>
-                <li><font color="lightgrey">How to submit a bug report</font></li>
-	            <li><font color="lightgrey">How to Prepare a Patch</font></li>
+                <li><a href="how-to-submit-a-bug.html">How to submit a bug report</a></li>
+	            <li><a href="how-to-prepare-a-patch.html">How to prepare a patch</a></li>
 	            <li><font color="lightgrey">How to Contribute a Patch via Jira</font></li>
                 <li><a href="how-to-run-xml-ctf-suite.html">How to run Castor XML's test suite</a></li>
 	        </ul>
