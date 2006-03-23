@@ -23,11 +23,30 @@
                     <date></date>
                 </bug>
 -->
+<!-- 
 	    <release version="CVS">
 	        <description>New and on-going development</description>
     		<date>tbd</date>
     		<managed-by>Werner Guttmann</managed-by>
             <summary>
+            </summary>
+            <bugs>
+            </bugs>
+        </release>
+-->
+	    <release version="1.0M4">
+	        <description>4th milestone release for Castor 1.0</description>
+    		<date>March 23, 2006</date>
+    		<managed-by>Werner Guttmann</managed-by>
+            <summary>
+				<h2>Requirements</h2>
+
+				<h3>Introduced <font color="red">Java 1.4</font> as a dependecy</h3>
+				
+				<p>This is a reminder that we have started to add some features that more or less depend 
+				   on features made available with Java 1.4 (only), such as the JDBC 3.0 API enhancements. As
+				   such, we have made Java 1.4 a key requirement for the upcoming Castor 1.0 release.</p>
+				   
 				<h2>Additions</h2>
                 
 				<h3>Updated/Added to XML Documentation</h3>

@@ -410,7 +410,7 @@
 	    </xsl:if>
       <tr>
         <td>
-          <table width="100%" border="0" cellspacing="1" cellpadding="4" bgcolor="#dddddd">
+          <table width="100%" border="0" cellspacing="1" cellpadding="4" bgcolor="#ededed">
             <tr>
               <td>
                 <span class="bodyBlack">
@@ -426,6 +426,18 @@
 	  <i><xsl:value-of select="@caption"/></i>
     </xsl:if>
     <p/>
+  </xsl:template>
+
+  <xsl:template match="code-panel/comment">
+    <span class="bodyGrey">
+      <font color="#7270c2"><xsl:apply-templates/></font>
+    </span>
+  </xsl:template>
+
+  <xsl:template match="code-panel/highlight">
+    <span class="bodyGrey">
+      <b><xsl:apply-templates/></b>
+    </span>
   </xsl:template>
 
   <xsl:template match="code-block">

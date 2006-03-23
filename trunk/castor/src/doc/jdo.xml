@@ -16,7 +16,7 @@
          If you have been using JDBC in these two environments, you will be readily familiar with
          the two models and the differences between them.</p>
 
-      <section title="Client Application">
+      <section title="Stand-alone application">
 
         <p>Client applications are responsible for defining the JDO configuration, and managing 
            the transaction explicitly. The database is by default configured through a separate
@@ -52,14 +52,12 @@
 			appear in client applications (for brevity, we have ommitted any required exception 
 			handling):</p>
        
-         <code> 
+         <code-panel> 
 JDOManager jdoManager;
 Database db;
  
-<comment>// load the JDO configuration file</comment>
+<comment>// load the JDO configuration file and construct a new JDOManager for the database 'mydb'</comment>
 JDOManager.loadConfiguration("jdo-conf.xml");
- 
-<comment>// Construct a new JDOManager for the database 'mydb'</comment>
 jdoManager = JDOManager.createInstance("mydb");
 
 <comment>// Obtain a new database</comment>
@@ -67,12 +65,14 @@ Database db = jdoManager.getDatabase();
     
 <comment>// Begin a transaction</comment>
 db.begin();
+
 <comment>// Do something</comment>
 . . .
+
 <comment>// Commit the transaction and close the database</comment>
 db.commit();
 db.close();
-         </code> 
+         </code-panel> 
 
 		<p>For an example showing how to set up a database configuration on the fly without
 		the need of a preconfigured XML configuration file) see
@@ -94,7 +94,7 @@ db.close();
         <p>The following code fragment uses JNDI to lookup a database, and uses the JTA 
 		   <tt>UserTransaction</tt> interface to manage the transaction:</p>
            
-		<code>
+		<code-panel>
 InitialContext  ctx;
 UserTransaction ut;
 Database        db;
@@ -111,7 +111,7 @@ ut.begin();
 <comment>// Commit the transaction, close database</comment>
 ut.commit();
 db.close();
-           </code>
+           </code-panel>
 
         <p>If the transaction is managed by the container, a common case with EJB beans and
            in particular entity beans, there is no need to begin/commit the transaction explicitly.
@@ -119,7 +119,8 @@ db.close();
            transaction and executes commit/rollback at the proper time.</p>
 
         <p>The following code snippet relies on the container to manage the transaction</p>
-           <code>
+        
+        <code-panel>
 InitialContext  ctx;
 UserTransaction ut;
 Database        db;
@@ -132,13 +133,13 @@ db = (Database) ctx.lookup( "java:comp/env/jdo/mydb" );
 . . .
 <comment>// Close the database</comment>
 db.close();
-           </code>
+        </code-panel>
 
       </section>
 
     </section>
 
-    <section title="Using A JDO Database">
+    <section title="Using A JDO Database to perform persistence operations">
 
       <section title="Transient And Persistent Objects">
 
@@ -182,7 +183,7 @@ db.close();
 
       </section>
 
-      <section title="OQLQuery">
+      <section title="Running an OQL Query">
 
         <p>OQL queries are used to lookup and query objects from the database. OQL queries are
            similar to SQL queries, but use object names instead of SQL names and do not require
@@ -194,7 +195,7 @@ db.close();
         <p>The following code snippet uses an OQL query to load all the objects in a given group.
            Note that product and group are related objects, the JDBC query involves a join:</p>
            
-           <code>
+           <code-panel>
 OQLQuery     oql;
 QueryResults results;
 
@@ -220,12 +221,13 @@ oql.close();
 <comment>// Explicitly commit transaction</comment>
 db.commit();
 db.close();
-           </code>
+           </code-panel>
 
         <p>The following code snippet uses the previous query to obtain products, mark down
            their price by 25%, and store them back to the database (in this case using
            a client application transaction):</p>
-            <code>
+           
+        <code-panel>
 OQLQuery     oql;
 QueryResults results;
 
@@ -253,7 +255,7 @@ oql.close();
 <comment>// Explicitly commit transaction</comment>
 db.commit();
 db.close();
-           </code>
+        </code-panel>
 
         <p>As illustrated above, a query is executed in three steps. First a query object is
            created from the database using an OQL statement. If there are any parameters, the
@@ -281,7 +283,7 @@ oql = db.getOQLQuery("CALL sp_something($) AS myapp.Product");
 
       </section>
 
-      <section title="Create/remove/update">
+      <section title="Creating a persistent object">
 
         <p>The method <api class="org.exolab.castor.jdo.Database">create(java.lang.Object)</api>
            creates a new object in the database, or in JDO terminology makes a transient
@@ -293,7 +295,13 @@ oql = db.getOQLQuery("CALL sp_something($) AS myapp.Product");
         <p>The following code snippet creates a new product with a group that was previously
            queried:</p>
            
-           <code>
+           <code-panel>
+Database db = ...;
+db.begin();        
+
+<comment>//load product group</comment>
+ProductGroup furnitures = db.load(...);
+
 <comment>// Create the Product object</comment>
 Product prod;
 prod = new Product();
@@ -304,7 +312,13 @@ prod.setGroup(furnitures);
 
 <comment>// Make it persistent</comment>
 db.create(prod);
-           </code>
+
+db.commit();
+        </code-panel>
+        
+      </section>
+
+      <section title="Removing a persistent object">
 
         <p>The method <api class="org.exolab.castor.jdo.Database">remove(java.lang.Object)</api>
            has the reverse effect, deleting a persistent object. Once removed the object is no
@@ -312,6 +326,48 @@ db.create(prod);
            from the database, however, if the transaction rolls back the object will remain in
            the database. An exception is thrown when attempting to remove an object that is not
            persistent.</p>
+           
+        <p>The following code snippet deletes the previously created Product instance:</p>
+
+        <code-panel>
+Database db = ...;
+db.begin();        
+
+<comment>// load the Product instance with sku = 5678</comment>
+Product prod = db.load (Product.class, new Integer(5678);
+
+<comment>// delete the Product instance</comment>
+<highlight>db.create(prod);</highlight>
+
+db.commit();
+        </code-panel>
+        
+      </section>
+        
+      <section title="Updating a persistent object">
+      
+        <p>There's no special method offering on the <api>org.exolab.castor.jdo.Database</api> 
+           to update an existing persistent object. Simply load the object to be updated, change
+           one or more of its properties, and commit the transaction. Castor JDO will automatically
+           figure that that the object in question has changed and will persist these changes
+           to the underlying database.</p>
+
+        <p>The following code snippet loads a previously created Product instance, changes its
+           description property and commits the transaction.</p>
+
+        <code-panel>
+Database db = ...;
+db.begin();        
+
+<comment>// load the Product instance with sku = 5678</comment>
+Product prod = db.load (Product.class, new Integer(5678);
+
+<comment>// change the object properties</comment>
+prod.setDescription("New plastic chair");
+
+<comment>//commit the transaction</comment>
+db.commit();
+        </code-panel>
 
       </section>
 
@@ -328,7 +384,7 @@ db.create(prod);
          which is then used to generate an XML document describing the transfer. An extra step
          (not shown here), uses XSLT to transform the XML document into an HTML page.</p>
 
-      <code>
+      <code-panel>
 Transfer tran;
 Account  from;
 Account  to;
@@ -357,17 +413,18 @@ if (from.getBalance() >= amount) {
 
 <comment>// Produce an XML describing the transfer</comment>
 Marshaller.marshal(trans, outputStream);
-      </code>
+      </code-panel>
 
-      <p>The XML produced by the above code might look like:
-        <code><![CDATA[
+      <p>The XML produced by the above code might look like:</p>
+      
+      <code-panel><![CDATA[
 <?xml version="1.0"?>
 <report>
   <status>Completed</status>
   <account id="1234-5678-90" balance="50"/>
   <transfer amount="49.99"/>
 </report>
-]]></code></p>
+]]></code-panel>
 
     </section>
 

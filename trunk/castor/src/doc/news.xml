@@ -19,6 +19,23 @@
               <span class="newsTitle">Latest Release</span><br/><br/>
               <span class="newsSummary"-->
 
+        <news id="38">
+            <title>Castor 1.0M4 released</title>
+            <author>Werner Guttmann</author>
+            <date>Mar 23 2006</date>
+            <time>23:22:21</time>
+            <summary>
+                I've placed a copy of the Castor 1.0M4 release at the
+                <a href="http://dist.codehaus.org/castor/1.0/">Codehaus</a>.<br/><br/>
+
+                This is the fourth (and last) milestone build for the upcoming 1.0 release. For details about 
+				the features added and the bugs fixed, please have a look at the 
+				<a href="http://castor.codehaus.org/release-notes.html">release notes</a>.
+				
+				Please note that we are imposing a feature/code freeze in preparation for the 
+				final 1.0 release, which is currently scheduled for April 6, 2006.
+            </summary>
+        </news>
         <news id="37">
             <title>Castor 1.0M3 released</title>
             <author>Werner Guttmann</author>
