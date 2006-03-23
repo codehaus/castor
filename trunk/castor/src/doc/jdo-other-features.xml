@@ -55,7 +55,8 @@
 <!ELEMENT cache-type  ( param* )>
 <!ATTLIST cache-type
     type           ( none | count-limited | time-limited | unlimited |
-                     coherence | fkcache | jcache | jcs ) "count-limited"
+                     coherence | fkcache | jcache | jcs | oscache |
+                     fifo | lru ) "count-limited"
     debug          (true|false) "false"
     capacity       NMTOKEN  #IMPLIED>
 
@@ -110,7 +111,7 @@
         <p><b>NOTE:</b> As of release 0.9.6, Castor allows for the addition of user-defined cache 
            implementations. Instructions can be found <a href="jdo-caching.html">here</a></p>
 
-        <p><b>NOTE:</b> As of release 0.9.9, four new cache types have been added to Castor, three
+        <p><b>NOTE:</b> As of release 0.9.9, three new cache types have been added to Castor, three
             of them open source and one commercial.</p>
             
         <ctable>
@@ -129,13 +130,6 @@
                 <td><url href="http://jakarta.apache.org/jcs">JCS</url></td>
                 <td>1.2.5</td>
             </crow>
-<!--
-            <crow>
-                <td>jcache</td>
-                <td><url href="http://jcache.sourceforge.net/">JCache</url></td>
-                <td>???</td>
-            </crow>
--->            
             <crow>
                 <td>fkcache</td>
                 <td><url href="http://jcache.sourceforge.net/">FKCache</url></td>
@@ -150,6 +144,171 @@
         <p>For problems related to the use of performance caches, please consult with the relevant 
            entries in the <a href="jdo-faq.html#Castor and performance caches">JDO F.A.Q.</a>.</p>
         
+        <p><b>NOTE:</b> As of release 1.0, another three new cache types have been added to Castor,
+            one being a distributed open source cache and two new internal cache implementations
+            intended for high volunm and high performance.</p>
+            
+        <ctable>
+            <cheader>
+                <th>name</th>
+                <th>Vendor</th>
+                <th>Version</th>
+            </cheader>
+            <crow>
+                <td>oscache</td>
+                <td><url href="http://www.opensymphony.com/oscache/">OSCache</url></td>
+                <td>2.5</td>
+            </crow>
+            <crow>
+                <td>fifo</td>
+                <td>Castor</td>
+                <td></td>
+            </crow>
+            <crow>
+                <td>lru</td>
+                <td>Castor</td>
+                <td></td>
+            </crow>
+        </ctable>
+        
+        <section title="fifo and lru cache providers">
+
+                <p>The cache types <b>fifo</b> and <b>lru</b> are based on a set of articles in the
+                   O'Reilly Network by William Grosso, to implement a simplified and 1.3-compatible
+                   implementation of a Hashbelt algorithm.</p>
+
+                <p>Hashbelts are simple, in principle. Instead of walking all objects and finding out
+                   when they're supposed to expire, use a "conveyor belt" approach. At any particular
+                   point in time, objects going into the cache go into the front of the conveyor belt.
+                   After a certain amount of time or when the size limit of a container has been
+                   reached, move the conveyor belt - put a new, empty container at the front of the
+                   conveyor belt to catch new objects, and the one that drops off of the end of the
+                   conveyor belt is, by definition, ready for garbage collection.</p>
+
+                <p>As seen in his system, you can use a set of pluggable strategies to implement the
+                   actual hashbelt bits. A container strategy allows you to change out the
+                   implementation of the container itself - from simple hashtable-based
+                   implementations, up through more complex uses of soft referenced or hashset-based
+                   implementations, depending on what you need and what you want it to be used for.
+                   A pluggable "expire behavior" handler allows you to determine what action is taken
+                   on something which drops off of the bottom of the conveyor belt.</p>
+
+				<p>In difference to all other cache types the <b>fifo</b> and <b>lru</b> cache
+                   types offer various configuration options. Both of them have 6 parameters to
+                   configure their behaviour.</p>
+
+                <ctable>
+                    <cheader>
+                        <th align="left">parameter</th>
+                        <th align="left">description</th>
+                    </cheader>
+                    <crow>
+                        <td>containers</td>
+                        <td>The number of containers in the conveyor belt. For example: If a box
+                            will drop off of the conveyor belt every 30 seconds, and you want a cache
+                            that lasts for 5 minutes, you want 5 / 30 = 6 containers on the belt. Every
+                            30 seconds, another, clean container goes on the front of the conveyor belt,
+                            and everything in the last belt gets discarded. If not specified 10 containers
+                            are used by default.
+                            <br/>
+                            For systems with fine granularity, you are free to use a large number of
+                            containers; but the system is most efficient when the user decides on a
+                            "sweet spot" determining both the number of containers to be managed on the
+                            whole and the optimal number of buckets in those containers for managing. This
+                            is ultimately a performance/accuracy tradeoff with the actual discard-from-cache
+                            time being further from the mark as the rotation time goes up. Also the number
+                            of objects discarded at once when capacity limit is reached depends upon the
+                            number of containers.
+                        </td>
+                    </crow>
+                    <crow>
+                        <td>capacity</td>
+                        <td>Maximum capacity of the whole cache. If there are, for example, ten
+                            containers on the belt and the capacity has been set to 1000, each container
+                            will hold a maximum of 1000/10 objects. Therefore if the capacity limit is
+                            reached and the last container gets droped from the belt there are up to 100
+                            objects discarted at once. By default the capacity is set to 0 which causes
+                            capacity limit to be ignored so the cache can hold an undefined number of
+                            objects.
+                        </td>
+                    </crow>
+                    <crow>
+                        <td>ttl</td>
+                        <td>The maximum time an object lifes in cache. If the are, for example, ten
+                            containers and ttl is set to 300 seconds (5 minutes), a new container will be
+                            put in front of the belt every 300/10 = 30 seconds while another is dropped at
+                            the end at the same time. Due to the granularity of 30 seconds, everything just
+                            until 5 minutes 30 seconds will also end up in this box. The default value for
+                            ttl is 60 seconds. If ttl is set to 0 which means that objects life in cache
+                            for unlimited time and may only discarded by a capacity limit.
+                        </td>
+                    </crow>
+                    <crow>
+                        <td>monitor</td>
+                        <td>The monitor intervall in minutes when hashbelt cache rports the current
+                            number of containers used and objects cached. If set to 0 (default) monitoring
+                            is disabled.
+                        </td>
+                    </crow>
+                    <crow>
+                        <td>container-class</td>
+                        <td>The implementation of <b>org.castor.cache.hashbelt.container.Container</b>
+                            interface to be used for all containers of the cache. Castor provides the following
+                            3 implementations of the Container interface.
+                            <ul>
+                                <li>org.castor.cache.hashbelt.container.FastIteratingContainer</li>
+                                <li>org.castor.cache.hashbelt.container.MapContainer</li>
+                                <li>org.castor.cache.hashbelt.container.WeakReferenceContainer</li>
+                            </ul>
+                            If not specified the MapContainer will be used as default.
+                        </td>
+                    </crow>
+                    <crow>
+                        <td>reaper-class</td>
+                        <td>Specific reapers yield different behaviors. The GC reaper, the default,
+                            just dumps the contents to the garbage collector. However, custom
+                            implementations may want to actually do something when a bucket drops off the
+                            end; see the javadocs on other available reapers to find a reaper strategy
+                            that meets your behavior requirements. Apart of the default
+                            <b>org.castor.cache.hashbelt.reaper.NullReaper</b> we provide 3 abstract
+                            implementations of <b>org.castor.cahe.hashbelt.reaper.Reaper</b> interface:
+                            <ul>
+                                <li>org.castor.cache.hashbelt.reaper.NotifyingReaper</li>
+                                <li>org.castor.cache.hashbelt.reaper.RefreshingReaper</li>
+                                <li>org.castor.cache.hashbelt.reaper.ReinsertingReaper</li>
+                            </ul>
+                            to be extended by your custom implementation.
+                        </td>
+                    </crow>
+                </ctable>
+
+                <p>A <b>fifo</b> cache with default values explained above is specified by:
+                   <code-panel><![CDATA[
+<cache-type type="fifo"/>]]></code-panel></p>
+
+                <p>A <b>lru</b> cache with capacity=300 and ttl=300 is defined by:
+                   <code-panel><![CDATA[
+<cache-type type="lru" capacity="300"/>]]></code-panel>
+                   or better by:
+                   <code-panel><![CDATA[
+<cache-type type="lru"/>
+    <param name="capacity" value="300"/>
+    <param name="ttl" value="300"/>
+</cache-type>]]></code-panel></p>
+
+                <p>An example of a customized configuration of a <b>fifo</b> cache is:
+                   <code-panel><![CDATA[
+<cache-type type="fifo"/>
+    <param name="container" value="10"/>
+    <param name="capacity" value="1000"/>
+    <param name="ttl" value="600"/>
+    <param name="monitor" value="5"/>
+    <param name="container-class" value="org.castor.cache.hashbelt.container.WeakReferenceContainer"/>
+    <param name="reaper-class" value="org.castor.cache.hashbelt.reaper.NullReaper"/>
+</cache-type>]]></code-panel></p>
+
+        </section>
+
         <section title="Caching and clustered environments">
     
             <p>All of the cache providers added with release 0.9.9 are distributed caches per se or can be 
@@ -175,8 +334,8 @@
     </class>
 </mapping>]]></code-panel>
     
-                <p>defines that for all objects of type <tt>com.xyz.MyOtherObject</tt> Tangosol's 
-                <i>Coherence</i> cache provider should be used.</p>
+            <p>defines that for all objects of type <tt>com.xyz.MyOtherObject</tt> Tangosol's 
+            <i>Coherence</i> cache provider should be used.</p>
             
         </section>
     
