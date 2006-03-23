@@ -19,7 +19,7 @@ CASTOR_HOME=`cd $DIRNAME/..; pwd`
 BUILD_D=$CASTOR_HOME/build
 LIB_D=$CASTOR_HOME/lib
 
-CLASSPATH=$CLASSPATH:$BUILD_D/classes:$BUILD_D/tests
+CLASSPATH=$CLASSPATH:$BUILD_D/tests:$BUILD_D/classes
 CLASSPATH=`echo $LIB_D/*.jar | tr ' ' ':'`:$CLASSPATH
 CLASSPATH=`echo $LIB_D/tests/*.jar | tr ' ' ':'`:$CLASSPATH
 
