@@ -5,6 +5,11 @@ Version (CVS)
 Version 1.0M4, Mar 23, 2006
 -------------------------------
 
+JDO:   Fixed bug CASTOR-1368 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
+       Extract creation and execution of SQL satements from SQLEngine.
+       Details: http://jira.codehaus.org/browse/CASTOR-1368
+       (Ralf - 20060322)
+
 XML:   Fixed bug CASTOR-1369 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
        Fixed NPE in case of extension of union.
        Details: http://jira.codehaus.org/browse/CASTOR-1369
@@ -40,7 +45,7 @@ XML:   Fixed bug CASTOR-1360 using contribution from Werner Guttmann [werner.gut
        Details: http://jira.codehaus.org/browse/CASTOR-1360
        (Werner - 20060315)
 
-JDO:   Fixed bug CASTOR-867 using contribution from Gregory Block[gblock@ctoforaday.com]
++JDO:   Fixed bug CASTOR-867 using contribution from Gregory Block[gblock@ctoforaday.com]
        Added cache implementation for large cache sizes.
        Details: http://jira.codehaus.org/browse/CASTOR-867
        (Ralf - 20060315)
