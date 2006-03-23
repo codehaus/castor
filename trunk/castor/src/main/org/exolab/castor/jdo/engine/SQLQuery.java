@@ -223,7 +223,7 @@ public final class SQLQuery implements PersistenceQuery {
         empty = true;
         for (int i = 0; i < _engine.getColumnInfoForIdentities().length; i++) {
             tmp = SQLTypeInfos.getValue(_rs, 1+i, _identSqlType[i]);
-            returnId[i] = _engine.idToJava(i, tmp);
+            returnId[i] = _engine.getColumnInfoForIdentities()[i].toJava(tmp);
             if (tmp != null) {
                 empty = false;
             }
@@ -346,11 +346,11 @@ public final class SQLQuery implements PersistenceQuery {
         }
         
         if (_engine.getInfo()[i].getColumnInfo().length == 1) {
-            field = _engine.toJava(i, 0, SQLTypeInfos.getValue(_rs, count, _engine.getInfo()[i].getColumnInfo()[0].getSqlType()));
+            field = _engine.getInfo()[i].getColumnInfo()[0].toJava(SQLTypeInfos.getValue(_rs, count, _engine.getInfo()[i].getColumnInfo()[0].getSqlType()));
             count++;
         } else {
             for (int j = 0; j < _engine.getInfo()[i].getColumnInfo().length; j++) {
-                temp[j] = _engine.toJava(i, j, SQLTypeInfos.getValue(_rs, count, _engine.getInfo()[i].getColumnInfo()[j].getSqlType()));
+                temp[j] = _engine.getInfo()[i].getColumnInfo()[j].toJava(SQLTypeInfos.getValue(_rs, count, _engine.getInfo()[i].getColumnInfo()[j].getSqlType()));
                 count++;
                 if (temp[j] != null) {
                     notNull = true;
@@ -398,7 +398,7 @@ public final class SQLQuery implements PersistenceQuery {
         }
 
         for (int j = 0; j < _engine.getInfo()[i].getColumnInfo().length; j++) {
-            temp[j] = _engine.toJava(i, j, SQLTypeInfos.getValue(_rs, count, _engine.getInfo()[i].getColumnInfo()[j].getSqlType()));
+            temp[j] = _engine.getInfo()[i].getColumnInfo()[j].toJava(SQLTypeInfos.getValue(_rs, count, _engine.getInfo()[i].getColumnInfo()[j].getSqlType()));
             if (temp[j] != null) {
                 notNull = true;
             }

@@ -122,6 +122,26 @@ org.castor.cache.Factories=\
                 </ctable>
             </summary>
             <bugs>
+                <bug id="1368" tool="jira">
+                    <description>
+		                Extract creation and execution of SQL satements from SQLEngine.
+                    </description>
+                    <contributor>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </reporter>
+                    <type>Enh.</type>
+                    <module>JDO</module>
+                    <date>20060322</date>
+                </bug>
                 <bug id="1369" tool="jira">
                     <description>
 		                Fixed NPE in case of extension of union.

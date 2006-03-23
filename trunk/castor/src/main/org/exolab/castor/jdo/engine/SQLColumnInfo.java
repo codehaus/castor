@@ -65,4 +65,20 @@ public final class SQLColumnInfo {
     public TypeConvertor getConvertFrom() { return _convertFrom; }
 
     public String getConvertParam() { return _convertParam; }
+
+    public Object toSQL(final Object object) {
+        if ((object == null) || (_convertFrom == null)) {
+            return object;
+        } else {
+            return _convertFrom.convert(object, _convertParam);
+        }
+    }
+
+    public Object toJava(final Object object) {
+        if ((object == null) || (_convertTo == null)) {
+            return object;
+        } else {
+            return _convertTo.convert(object, _convertParam);
+        }
+    }
 }
