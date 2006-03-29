@@ -67,7 +67,7 @@ public class TestGetJdbcConnection extends CastorTestCase {
      */
     public TestGetJdbcConnection( TestHarness category ) 
     {
-        super( category, "TC202", "JDBC connection" );
+        super( category, "tempTC202", "JDBC connection" );
         _category = (JDOCategory) category;
     }
 

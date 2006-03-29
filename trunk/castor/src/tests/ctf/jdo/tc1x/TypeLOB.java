@@ -46,7 +46,6 @@
 package ctf.jdo.tc1x;
 
 import java.sql.Clob;
-import java.io.InputStream;
 
 public final class TypeLOB {
     public static final int       DEFAULT_ID = 3;
@@ -66,10 +65,8 @@ public final class TypeLOB {
     public void setClob(final String clob) { _clob = clob; }
     public String getClob() { return _clob; }
 
-/*
-    public void setBlob2(final InputStream blob2) { _blob2 = blob2; }
-    public InputStream getBlob2() { return _blob2; }
-*/
+//    public void setBlob2(final InputStream blob2) { _blob2 = blob2; }
+//    public InputStream getBlob2() { return _blob2; }
 
     public void setClob2(final Clob clob2) { _clob2 = clob2; }
     public Clob getClob2() { return _clob2; }

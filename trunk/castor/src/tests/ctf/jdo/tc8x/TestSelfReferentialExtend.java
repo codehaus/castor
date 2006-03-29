@@ -17,15 +17,13 @@
  *
  */
 
-package ctf.jdo.tc7x;
+package ctf.jdo.tc8x;
 
 import java.util.Iterator;
 import java.util.List;
 
 import jdo.JDOCategory;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.QueryResults;
@@ -38,9 +36,6 @@ import harness.TestHarness;
  * database.
  */
 public final class TestSelfReferentialExtend extends CastorTestCase {
-
-    private static final Log LOG = LogFactory.getLog(TestSelfReferentialExtend.class);
-
     private JDOCategory _category;
 
     /**
@@ -48,7 +43,7 @@ public final class TestSelfReferentialExtend extends CastorTestCase {
      * @param category the test suite that this test case belongs
      */
     public TestSelfReferentialExtend(final TestHarness category) {
-        super(category, "TC75", "self-referential relation test with extend hierarchies");
+        super(category, "TC80", "self-referential relation test with extend hierarchies");
         _category = (JDOCategory) category;
     }
 
@@ -91,13 +86,13 @@ public final class TestSelfReferentialExtend extends CastorTestCase {
         assertNotNull(child);
         assertEquals(2, child.getId().intValue());
         assertNotNull(child.getEntities());
-        assertEquals(0,child.getEntities().size());
+        assertEquals(0, child.getEntities().size());
 
         child = (SelfReferentialParent) childrenIterator.next();
         assertNotNull(child);
         assertEquals(3, child.getId().intValue());
         assertNotNull(child.getEntities());
-        assertEquals(0,child.getEntities().size());
+        assertEquals(0, child.getEntities().size());
 
         db.commit();
         db.close();
@@ -111,7 +106,8 @@ public final class TestSelfReferentialExtend extends CastorTestCase {
         Database db = _category.getDatabase();
         db.begin();
         
-        SelfReferentialParent entity = (SelfReferentialParent) db.load(SelfReferentialParent.class, new Integer(1));
+        Object obj = db.load(SelfReferentialParent.class, new Integer(1));
+        SelfReferentialParent entity = (SelfReferentialParent) obj;
 
         assertNotNull(entity);
         assertEquals(new Integer(1), entity.getId());
@@ -146,7 +142,8 @@ public final class TestSelfReferentialExtend extends CastorTestCase {
         Database db = _category.getDatabase();
         db.begin();
         
-        SelfReferentialChild child = (SelfReferentialChild) db.load(SelfReferentialChild.class, new Integer(1));
+        Object obj = db.load(SelfReferentialChild.class, new Integer(1));
+        SelfReferentialChild child = (SelfReferentialChild) obj;
 
         assertNotNull(child);
         assertEquals(new Integer(1), child.getId());

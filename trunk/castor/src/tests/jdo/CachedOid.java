@@ -72,7 +72,7 @@ public class CachedOid extends CastorTestCase
      */
     public CachedOid( TestHarness category ) 
     {
-        super( category, "TC37", "Cached OID with db-locked" );
+        super( category, "tempTC37", "Cached OID with db-locked" );
         _category = (JDOCategory) category;
     }
 

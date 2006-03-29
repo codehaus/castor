@@ -231,42 +231,6 @@ create table tc1x_pks_category (
 
 create unique index tc1x_pks_category_pk on tc1x_pks_category( id );
 
-drop table if exists tc1x_entity1;
-create table tc1x_entity1 (
-  id        int not null PRIMARY KEY,
-  name      varchar(200) not null
-);
-
-insert into tc1x_entity1 (id, name) values (1, 'entity1');
-
-drop table if exists tc1x_child;
-create table tc1x_child (
-  id        int not null PRIMARY KEY,
-  descr     varchar(200) not null
-);
-
-insert into tc1x_child (id, descr) values (1, 'child1');
-
-drop table if exists tc1x_entity_compound;
-create table tc1x_entity_compound (
-  id1       int not null,
-  id2       int not null,
-  name      varchar(200) not null,
-  PRIMARY KEY (id1, id2)
-);
-
-insert into tc1x_entity_compound (id1, id2, name) values (1, 1, 'entityCompound1');
-
-drop table if exists tc1x_child_compound;
-create table tc1x_child_compound (
-  id1       int not null,
-  id2       int not null,
-  descr     varchar(200) not null,
-  PRIMARY KEY (id1, id2)
-);
-
-insert into tc1x_child_compound (id1, id2, descr) values (1, 1, 'childCompound1');
-
 
 -- tc2x TESTS
 
@@ -415,6 +379,94 @@ create table tc2x_seqtable (
 );
 
 create unique index tc2x_seqtable_pk on tc2x_seqtable ( table_name );
+
+
+-- tc3x TESTS
+
+drop table if exists tc3x_entity;
+
+create table tc3x_entity (
+  id      int           not null,
+  value1  varchar(200)  not null,
+  value2  varchar(200)
+);
+
+create unique index tc3x_entity_pk on tc3x_entity ( id );
+
+drop table if exists tc3x_extends;
+
+create table tc3x_extends (
+  id      int          not null,
+  value3  varchar(200) null,
+  value4  varchar(200) null
+);
+
+create unique index tc3x_extends_pk on tc3x_extends ( id );
+
+
+drop table if exists tc3x_call;
+
+create table tc3x_call (
+  id      int          not null,
+  value1  varchar(200) not null,
+  value2  varchar(200) null
+);
+
+create unique index tc3x_call_pk on tc3x_call ( id );
+
+
+drop table if exists tc3x_group;
+
+create table tc3x_group (
+  id      numeric(10,0)  not null,
+  value1  varchar(200)  not null
+);
+
+create unique index tc3x_group_pk on tc3x_group ( id );
+
+drop table if exists tc3x_persistent;
+
+create table tc3x_persistent (
+  id        integer         not null,
+  ctime     datetime        not null,
+  mtime     datetime        null,
+  value1    varchar(200)    not null,
+  parent_id integer         null,
+  group_id  numeric(10,0)   not null
+);
+
+create unique index tc3x_persistent_pk on tc3x_persistent ( id );
+
+
+drop table if exists tc3x_related;
+
+create table tc3x_related (
+  id          integer     not null,
+  persist_id  integer     not null
+);
+
+create unique index tc3x_related_pk on tc3x_related ( id );
+
+drop table if exists tc3x_extends1;
+
+create table tc3x_extends1 (
+  ident   integer         not null,
+  ext     integer         not null
+);
+
+create unique index tc3x_extends1_pk on tc3x_extends1 ( ident );
+
+
+drop table if exists tc3x_extends2;
+
+create table tc3x_extends2 (
+  id      integer         not null,
+  ext     integer         not null
+);
+
+create unique index tc3x_extends2_pk on tc3x_extends2 ( id );
+
+
 
 
 
@@ -573,40 +625,6 @@ create table test_pks_category (
 create unique index test_pks_category_pk on test_pks_category( id );
 
 
-drop table if exists test_table_ex;
-
-create table test_table_ex (
-  id      int          not null,
-  value1  varchar(200) not null,
-  value2  varchar(200) null
-);
-
-create unique index test_table_ex_pk on test_table_ex ( id );
-
-
-drop table if exists test_table_extends;
-
-create table test_table_extends (
-  id      int          not null,
-  value3  varchar(200) null,
-  value4  varchar(200) null
-);
-
-create unique index test_table_extends_pk on test_table_extends ( id );
-
-
-drop table if exists test_group;
-
-create table test_group (
-  id     numeric(10,0)  not null,
-  value1  varchar(200)  not null
-);
-
-create unique index test_group_pk
-   on test_group ( id );
-
-
-
 drop table if exists list_types;
 
 create table list_types (
@@ -623,30 +641,6 @@ create table list_types (
   o_blob  BLOB         null,
   o_bfile MEDIUMBLOB  null
 );
-
-drop table if exists test_persistent;
-
-create table test_persistent (
-  id       integer         not null,
-  ctime    datetime            not null,
-  mtime    datetime            null,
-  value1    varchar(200)    not null,
-  parent_id integer        null,
-  group_id numeric(10,0)   not null
-);
-
-create unique index test_persistent_pk on test_persistent ( id );
-
-
-drop table if exists test_related;
-
-create table test_related (
-  id          integer     not null,
-  persist_id  integer     not null
-);
-
-create unique index test_related_pk on test_related ( id );
-
 
 drop table if exists test_col;
 
@@ -675,26 +669,6 @@ create table test_comp_item (
 );
 
 create unique index test_comp_item_pk on test_comp_item( iid );
-
-
-drop table if exists test_oqlext;
-
-create table test_oqlext (
-  ident   integer         not null,
-  ext     integer         not null
-);
-
-create unique index test_oqlext_pk on test_oqlext( ident );
-
-
-drop table if exists test_oqlext2;
-
-create table test_oqlext2 (
-  id      integer         not null,
-  ext     integer         not null
-);
-
-create unique index test_oqlext2_pk on test_oqlext2( id );
 
 
 drop table if exists test_oqltag;
@@ -827,31 +801,29 @@ insert into trans_child2 (id, descr, entityOneId) values (1, 'description1', 1);
 insert into trans_child2 (id, descr, entityOneId) values (2, 'description2', 1);
 insert into trans_child2 (id, descr, entityOneId) values (3, 'description3', 1);
 
--- tc7x
 
-drop table if exists tc7x_self_refer_parent;
-create table tc7x_self_refer_parent (
+-- tc8x
+
+drop table if exists tc8x_self_refer_parent;
+create table tc8x_self_refer_parent (
   id        int not null primary key,
   fid		int,
   name      varchar(200) not null
 );
 
-insert into tc7x_self_refer_parent (id, fid, name) values (1, null, 'entity1');
-insert into tc7x_self_refer_parent (id, fid, name) values (2, 1, 'entity2');
-insert into tc7x_self_refer_parent (id, fid, name) values (3, 1, 'entity3');
+insert into tc8x_self_refer_parent (id, fid, name) values (1, null, 'entity1');
+insert into tc8x_self_refer_parent (id, fid, name) values (2, 1, 'entity2');
+insert into tc8x_self_refer_parent (id, fid, name) values (3, 1, 'entity3');
 
-drop table if exists tc7x_self_refer_child;
-create table tc7x_self_refer_child (
+drop table if exists tc8x_self_refer_child;
+create table tc8x_self_refer_child (
   id        int not null primary key,
   descr     varchar(200) not null
 );
 
-insert into tc7x_self_refer_child (id, descr) values (1, 'description1');
-insert into tc7x_self_refer_child (id, descr) values (2, 'description2');
-insert into tc7x_self_refer_child (id, descr) values (3, 'description3');
-
-
--- tc8x
+insert into tc8x_self_refer_child (id, descr) values (1, 'description1');
+insert into tc8x_self_refer_child (id, descr) values (2, 'description2');
+insert into tc8x_self_refer_child (id, descr) values (3, 'description3');
 
 DROP TABLE IF EXISTS tc8x_test_depends_ns;
 CREATE TABLE IF NOT EXISTS tc8x_test_depends_ns (
@@ -884,6 +856,42 @@ CREATE TABLE IF NOT EXISTS tc8x_test_master_ns_nokg (
   descrip varchar(50) NOT NULL default '',
   PRIMARY KEY  (id)
 );
+
+drop table if exists tc8x_parent;
+create table tc8x_parent (
+  id        int not null PRIMARY KEY,
+  name      varchar(200) not null
+);
+
+insert into tc8x_parent (id, name) values (1, 'entity1');
+
+drop table if exists tc8x_child;
+create table tc8x_child (
+  id        int not null PRIMARY KEY,
+  descr     varchar(200) not null
+);
+
+insert into tc8x_child (id, descr) values (1, 'child1');
+
+drop table if exists tc8x_parent_compound;
+create table tc8x_parent_compound (
+  id1       int not null,
+  id2       int not null,
+  name      varchar(200) not null,
+  PRIMARY KEY (id1, id2)
+);
+
+insert into tc8x_parent_compound (id1, id2, name) values (1, 1, 'entityCompound1');
+
+drop table if exists tc8x_child_compound;
+create table tc8x_child_compound (
+  id1       int not null,
+  id2       int not null,
+  descr     varchar(200) not null,
+  PRIMARY KEY (id1, id2)
+);
+
+insert into tc8x_child_compound (id1, id2, descr) values (1, 1, 'childCompound1');
 
 
 -- tc9x TESTS

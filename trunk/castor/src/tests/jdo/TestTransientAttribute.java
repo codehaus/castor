@@ -73,7 +73,7 @@ public class TestTransientAttribute extends CastorTestCase {
      */
     public TestTransientAttribute( TestHarness category ) 
     {
-        super( category, "TC84a", "Transient attribute" );
+        super( category, "tempTC84a", "Transient attribute" );
         _category = (JDOCategory) category;
     }
 

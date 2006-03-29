@@ -43,55 +43,42 @@
  * $Id$
  */
 
-package jdo;
+package ctf.jdo.tc3x;
 
-import org.exolab.castor.jdo.TimeStampable;
+public final class CallEntity {
+    public static final String DEFAULT_VALUE = "one";
 
-public class TestPersistRelated implements TimeStampable, java.io.Serializable {
-    /** SerialVersionUID */
-    private static final long serialVersionUID = -6408619974569022386L;
+    private static int _idcount = 0;
 
-    private int        _id;
+    private int    _id;
+    private String _value1;
+    private String _value2;
 
-    private TestPersistent _persistent;
-
-    private long           _timeStamp;
-
-    static final int       DefaultId = 5;
-
-    public TestPersistRelated(final int id) {
-        _id = id;
+    public CallEntity() {
+        _value1 = DEFAULT_VALUE;
+        synchronized (DEFAULT_VALUE) {
+            _id = _idcount;
+            _value2 = String.valueOf(_idcount);
+            _idcount++;
+        }
     }
 
-    public TestPersistRelated() {
-        _id = DefaultId;
-    }
+    public void setId(final int id) { _id = id; }
+    public int getId() { return _id; }
 
-    public void setId(final int id) {
-        _id = id;
-    }
 
-    public int getId() {
-        return _id;
-    }
+    public void setValue1(final String value1) { _value1 = value1; }
+    public String getValue1() { return _value1; }
 
-    public void setPersistent(final TestPersistent persistent) {
-        _persistent = persistent;
-    }
 
-    public TestPersistent getPersistent() {
-        return _persistent;
-    }
+    public void setValue2(final String value2) { _value2 = value2; }
+    public String getValue2() { return _value2; }
 
-    public long jdoGetTimeStamp() {
-        return _timeStamp;
-    }
-
-    public void jdoSetTimeStamp(final long timeStamp) {
-        _timeStamp = timeStamp;
+    public int getIntValue2() {
+        return Integer.valueOf(_value2).intValue();
     }
 
     public String toString() {
-        return _id + " / " + (_persistent==null?0:_persistent.getId());
+        return _id + " / " + _value1 + " / " + _value2;
     }
 }

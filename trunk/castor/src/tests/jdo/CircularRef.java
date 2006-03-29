@@ -66,7 +66,7 @@ public class CircularRef extends CastorTestCase
      */
     public CircularRef(TestHarness category) 
     {
-        super(category, "TC32", "Circular References using key-gen");
+        super(category, "tempTC32", "Circular References using key-gen");
         _category = (JDOCategory) category;
     }
 

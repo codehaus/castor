@@ -42,23 +42,25 @@
  *
  */
 
+package ctf.jdo.tc3x;
 
-package jdo;
+import harness.CastorTestCase;
+import harness.TestHarness;
+import jdo.JDOCategory;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
-import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.jdo.PersistenceException;
-
-import harness.TestHarness;
-import harness.CastorTestCase;
-
+import org.exolab.castor.jdo.QueryResults;
 
 /**
  * Test for OQLResults.absolute().
  */
-public class Absolute extends CastorTestCase {
+public final class TestAbsolute extends CastorTestCase {
+    private static final Log LOG = LogFactory.getLog(TestAbsolute.class);
 
     private Database       _db;
 
@@ -69,15 +71,12 @@ public class Absolute extends CastorTestCase {
      *
      * @param category The test suite of these tests
      */
-    public Absolute( TestHarness category ) {
-
-        super( category, "TC67", "Absolute" );
+    public TestAbsolute(final TestHarness category) {
+        super(category, "TC37", "Absolute");
         _category = (JDOCategory) category;
     }
 
-    public void runTest()
-            throws PersistenceException {
-
+    public void runTest() throws PersistenceException {
         removeRecords();
         createRecords();
         testAbsoluteA();
@@ -85,71 +84,61 @@ public class Absolute extends CastorTestCase {
         testAbsoluteC();
     }
 
-    public void setUp()
-            throws PersistenceException {
-
+    public void setUp() throws PersistenceException {
         _db = _category.getDatabase();
     }
 
-    public void removeRecords()
-            throws PersistenceException {
-
+    public void removeRecords() throws PersistenceException {
         _db.begin();
-        QueryResults enumeration;
-         OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object" );
-        enumeration = oqlquery.execute(true);
+        OQLQuery oqlquery = _db.getOQLQuery(
+                "SELECT object FROM " + Entity.class.getName() + " object");
+        QueryResults enumeration = oqlquery.execute(true);
         while (enumeration.hasMore()) {
             _db.remove(enumeration.next());
         }
         _db.commit();
     }
 
-    public void createRecords()
-            throws PersistenceException {
-
+    public void createRecords() throws PersistenceException {
         _db.begin();
-            for ( int i=0; i<25; i++ ) {
-                TestObject newTRN = new TestObject();
+            for (int i = 0; i < 25; i++) {
+                Entity newTRN = new Entity();
                 newTRN.setId(i);
-                _db.create( newTRN );
+                _db.create(newTRN);
             }
         _db.commit();
     }
 
     /**
-    Very simple test to do a query and call .absolute(x)
-    */
-    public void testAbsoluteA()
-            throws PersistenceException {
-
+     * Very simple test to do a query and call absolute(x)
+     */
+    public void testAbsoluteA() throws PersistenceException {
         _db.begin();
-        QueryResults enumeration;
-        OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object" );
-        enumeration = oqlquery.execute(true);
+        OQLQuery oqlquery = _db.getOQLQuery(
+                "SELECT object FROM " + Entity.class.getName() + " object");
+        QueryResults enumeration = oqlquery.execute(true);
         assertTrue("should have been able to move to 1", enumeration.absolute(1));
-        assertTrue("should have been able to move to 5",enumeration.absolute(5));
-        assertTrue("should have been able to move to 10",enumeration.absolute(10));
-        assertTrue("should have been able to move to 15",enumeration.absolute(15));
-        assertTrue("should have been able to move to 20",enumeration.absolute(20));
-        assertTrue("should have been able to move to 25",enumeration.absolute(25));
+        assertTrue("should have been able to move to 5", enumeration.absolute(5));
+        assertTrue("should have been able to move to 10", enumeration.absolute(10));
+        assertTrue("should have been able to move to 15", enumeration.absolute(15));
+        assertTrue("should have been able to move to 20", enumeration.absolute(20));
+        assertTrue("should have been able to move to 25", enumeration.absolute(25));
         _db.commit();
     }
 
     /**
-    test going through enumeration and calling absolute
-    to simulate the .next(); call
-    */
-    public void testAbsoluteB()
-            throws PersistenceException {
-
+     * Test going through enumeration and calling absolute
+     * to simulate the .next(); call
+     */
+    public void testAbsoluteB() throws PersistenceException {
         _db.begin();
-        QueryResults enumeration;
-        OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object" );
-        enumeration = oqlquery.execute(true);
+        OQLQuery oqlquery = _db.getOQLQuery(
+                "SELECT object FROM " + Entity.class.getName() + " object");
+        QueryResults enumeration = oqlquery.execute(true);
         int next = 1;
         boolean hasMore = true;
-        while (enumeration.hasMore() && hasMore ==true) {
-            stream.println("at: " + next);
+        while (enumeration.hasMore() && hasMore) {
+            LOG.debug("at: " + next);
             hasMore = enumeration.absolute(next);
             next++;
         }
@@ -157,43 +146,39 @@ public class Absolute extends CastorTestCase {
     }
 
     /**
-        both should fail as -50 is less than 0 and 99999 is greater than the 25 objects in the db
-    */
-    public void testAbsoluteC()
-            throws PersistenceException {
-
+     * Both should fail as -50 is less than 0 and 99999 is greater than
+     * the 25 objects in the db
+     */
+    public void testAbsoluteC() throws PersistenceException {
         _db.begin();
-        QueryResults enumeration;
-        OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object" );
-        enumeration = oqlquery.execute(true);
+        OQLQuery oqlquery = _db.getOQLQuery(
+                "SELECT object FROM " + Entity.class.getName() + " object");
+        QueryResults enumeration = oqlquery.execute(true);
         assertFalse("shouldn't be able to move to -50", enumeration.absolute(-50));
-        assertFalse("shouldn't be able to move to 99999",enumeration.absolute(99999));
+        assertFalse("shouldn't be able to move to 99999", enumeration.absolute(99999));
         _db.commit();
     }
 
     /**
-        Should fail with a non scrollable resultset.?
-    */
+     * Should fail with a non scrollable resultset.?
+     */
     public void testAbsoluteD() {
-
         try {
             _db.begin();
-            QueryResults enumeration;
-            OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object" );
-            enumeration = oqlquery.execute(false);
+            OQLQuery oqlquery = _db.getOQLQuery(
+                    "SELECT object FROM " + Entity.class.getName() + " object");
+            QueryResults enumeration = oqlquery.execute(false);
             // following should fail.
             enumeration.absolute(5);
             _db.commit();
-            fail ("Shouldn't reach here, calling absolute on a non-scrollable resultset should fail");
-        } catch (Exception e) {
+            fail("Calling absolute on a non-scrollable resultset should fail");
+        } catch (Exception ex) {
             assertTrue(true);
         }
     }
 
-    public void tearDown()
-            throws PersistenceException {
-
-        if ( _db.isActive() ) _db.rollback();
+    public void tearDown() throws PersistenceException {
+        if (_db.isActive()) { _db.rollback(); }
         _db.close();
     }
 }

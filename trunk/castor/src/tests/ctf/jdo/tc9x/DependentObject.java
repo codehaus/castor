@@ -23,53 +23,49 @@ import org.exolab.castor.jdo.TimeStampable;
 /**
  * @author nstuart
  */
-public class DependentObject implements TimeStampable {
-	
-	private int _id;
+public final class DependentObject implements TimeStampable {
+    private int _id;
+    private String _description;
+    private ExtendedObject _parent;
+    private long _timestamp;
 
-	private String _description;
+    public int getId() {
+        return _id;
+    }
 
-	private ExtendedObject _parent;
+    public void setId(final int id) {
+        _id = id;
+    }
 
-	private long _timestamp;
+    public String getDescription() {
+        return _description;
+    }
 
-	public int getId() {
-		return _id;
-	}
+    public void setDescription(final String description) {
+        _description = description;
+    }
 
-	public void setId(int id) {
-		_id = id;
-	}
+    public ExtendedObject getParent() {
+        return _parent;
+    }
 
-	public String getDescription() {
-		return _description;
-	}
+    public void setParent(final ExtendedObject parent) {
+        _parent = parent;
+    }
 
-	public void setDescription(String description) {
-		_description = description;
-	}
+    public long getTimestamp() {
+        return _timestamp;
+    }
 
-	public ExtendedObject getParent() {
-		return _parent;
-	}
+    public void setTimestamp(final long timestamp) {
+        _timestamp = timestamp;
+    }
 
-	public void setParent(ExtendedObject parent) {
-		_parent = parent;
-	}
+    public long jdoGetTimeStamp() {
+        return getTimestamp();
+    }
 
-	public long getTimestamp() {
-		return _timestamp;
-	}
-
-	public void setTimestamp(long timestamp) {
-		_timestamp = timestamp;
-	}
-
-	public void jdoSetTimeStamp(long timestamp) {
-		setTimestamp(timestamp);
-	}
-
-	public long jdoGetTimeStamp() {
-		return getTimestamp();
-	}
+    public void jdoSetTimeStamp(final long timestamp) {
+        setTimestamp(timestamp);
+    }
 }

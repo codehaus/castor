@@ -43,28 +43,18 @@
  * $Id$
  */
 
-package jdo;
+package ctf.jdo.tc3x;
 
-/**
- * Test object mapping to test_oqlext used for Oql test.
- */
-public class TestOqlExtends2 extends TestPersistent {
+public final class ExtendsEntity2 extends PersistentEntity {
     /** SerialVersionUID */
     private static final long serialVersionUID = -4810221474022258639L;
     
-    private int  _ext;
+    private int _ext;
 
-    public TestOqlExtends2() {
-        super();
-    }
+    public ExtendsEntity2() { super(); }
 
-    public void setExt(final int ext) {
-        _ext = ext;
-    }
-
-    public int getExt() {
-        return _ext;
-    }
+    public void setExt(final int ext) { _ext = ext; }
+    public int getExt() { return _ext; }
 
     public String toString() {
         return super.toString() + " / " + _ext;

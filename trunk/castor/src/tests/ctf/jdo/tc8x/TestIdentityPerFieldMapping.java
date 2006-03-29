@@ -43,35 +43,22 @@
  * $Id$
  */
 
-package ctf.jdo.tc1x;
-
-import java.sql.SQLException;
-import java.text.ParseException;
+package ctf.jdo.tc8x;
 
 import harness.TestHarness;
 import harness.CastorTestCase;
 
 import jdo.JDOCategory;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.jdo.Database;
-import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.persist.spi.Complex;
 
 
 /**
- * JUnit test to test drive specification of class identity through the use of the identity attribute on the 
- * <field> mapping.
+ * JUnit test to test drive specification of class identity through the use of the
+ * identity attribute on the <field> mapping.
  */
 public final class TestIdentityPerFieldMapping extends CastorTestCase {
-    
-    /**
-     * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
-     * Commons Logging</a> instance used for all logging.
-     */
-    private static final Log LOG = LogFactory.getLog(TestIdentityPerFieldMapping.class);
-    
     private JDOCategory _category;
 
     /**
@@ -79,7 +66,8 @@ public final class TestIdentityPerFieldMapping extends CastorTestCase {
      * @param category The test suite of these tests
      */
     public TestIdentityPerFieldMapping(final TestHarness category) {
-        super(category, "TC111", "Identity definition through identity attribute in field mapping");
+        super(category, "TC83",
+                "Identity definition through identity attribute in field mapping");
         _category = (JDOCategory) category;
     }
 
@@ -137,7 +125,8 @@ public final class TestIdentityPerFieldMapping extends CastorTestCase {
         db.begin();
         
         ParentWithCompoundId child = (ParentWithCompoundId) 
-            db.load(ParentWithCompoundId.class, new Complex(new Integer(1), new Integer(1)));
+            db.load(ParentWithCompoundId.class,
+                    new Complex(new Integer(1), new Integer(1)));
 
         assertNotNull(child);
         assertEquals(new Integer(1), child.getId1());
@@ -156,7 +145,8 @@ public final class TestIdentityPerFieldMapping extends CastorTestCase {
         db.begin();
         
         ChildWithCompoundId child = (ChildWithCompoundId) 
-            db.load(ChildWithCompoundId.class, new Complex(new Integer(1), new Integer(1)));
+            db.load(ChildWithCompoundId.class,
+                    new Complex(new Integer(1), new Integer(1)));
 
         assertNotNull(child);
         assertEquals(new Integer(1), child.getId1());

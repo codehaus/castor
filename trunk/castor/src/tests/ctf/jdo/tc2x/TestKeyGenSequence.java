@@ -57,5 +57,7 @@ public final class TestKeyGenSequence extends TestKeyGenGeneric {
 
     public void runTest() throws Exception {
         testOneKeyGen(SequenceObject.class, SequenceExtends.class);
+        testOneKeyGenString(SequenceObjectTypeString.class,
+                SequenceExtendsTypeString.class);
     }
 }

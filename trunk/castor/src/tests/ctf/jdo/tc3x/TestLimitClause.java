@@ -43,81 +43,95 @@
  * $Id$
  */
 
+package ctf.jdo.tc3x;
 
-package jdo;
-
-import org.exolab.castor.jdo.Database;
-import org.exolab.castor.jdo.QueryResults;
-import org.exolab.castor.jdo.OQLQuery;
-import org.exolab.castor.jdo.PersistenceException;
-import org.exolab.castor.jdo.oql.OQLSyntaxException;
-
+import harness.CastorTestCase;
 import harness.TestHarness;
 
-public class TestLimitWithOffsetExtend extends TestLimitClause
-{
-	private static final int OFFSET = 2;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import jdo.JDOCategory;
+
+import org.exolab.castor.jdo.Database;
+import org.exolab.castor.jdo.OQLQuery;
+import org.exolab.castor.jdo.PersistenceException;
+import org.exolab.castor.jdo.QueryResults;
+
+public class TestLimitClause extends CastorTestCase {
+    public static final int LIMIT = 5;
+    
+    private JDOCategory    _category;
+    private Database       _db;
 
     /**
      * Constructor
      *
      * @param category The test suite for these tests
      */
-    public TestLimitWithOffsetExtend( TestHarness category )
-    {
-        super( category, "TC62b", "Test limit clause with offset at extended object" );
+    public TestLimitClause(final TestHarness category) {
+        super(category, "TC32", "Test limit clause");
         _category = (JDOCategory) category;
     }
 
-	public void testLimitWithOffset()
-    throws PersistenceException
-    {
-        TestObject testObject = null;
+    public TestLimitClause(final TestHarness suite, final String name,
+            final String description) {
         
-        Database db = _category.getDatabase(); 
+        super(suite, name, description);
+        _category = (JDOCategory) suite;
+    }
 
-        db.begin();
+    public final Database getDatabase() { return _db; }
+    
+    /**
+     * Get a JDO database
+     */
+    public final void setUp() throws PersistenceException, SQLException {
+        _db = this._category.getDatabase();
+        _db.begin();
 
-        OQLQuery query = db.getOQLQuery("select t from jdo.TestObject t order by id limit $1 offset $2");
+        Connection connection = _db.getJdbcConnection();
+        Statement statement = connection.createStatement();
+        statement.executeUpdate("DELETE FROM tc3x_entity");
+        statement.close();
 
+        _db.commit();
+
+        _db.begin();
+        for (int i = 1; i < 16; i++) {
+            Entity object = new Entity();
+            object.setId(i);
+            object.setValue1("val1" + i);
+            object.setValue2("val2" + i);
+            _db.create (object);
+        }
+        _db.commit();
+    }
+
+    public final void tearDown() throws PersistenceException {
+        if (_db.isActive()) { _db.rollback(); }
+        _db.close();
+    }
+
+    public final void testLimit() throws PersistenceException {
+        _db.begin();
+        OQLQuery query = _db.getOQLQuery(
+                "select t from " + Entity.class.getName() + " t order by id limit $1");
         query.bind(LIMIT);
-        query.bind(OFFSET);
-
         QueryResults results = query.execute();
-        assertNotNull (results);
-        /*size() not available using an Oracle DB
-        assertEquals (LIMIT, results.size()); */
-        for (int i = 1 + OFFSET; i <= OFFSET+LIMIT; i++) {
-            testObject = (TestObject) results.next();
+        assertNotNull(results);
+        // size() not available using an Oracle DB assertEquals (LIMIT, results.size());
+        for (int i = 1; i <= LIMIT; i++) {
+            Entity testObject = (Entity) results.next();
             assertEquals(i, testObject.getId());
         }
         assertTrue(!results.hasMore());
 
-    	db.commit();
+        _db.commit();
     }
 
-	public void testOffsetWithoutLimit()
-		throws PersistenceException
-    {
-		
-		Database db = _category.getDatabase();
-		
-        db.begin();
-        try {
-			db.getOQLQuery("select t from jdo.TestObject t offset $1");
-		} catch (OQLSyntaxException e) {
-			assertEquals ("org.exolab.castor.jdo.oql.OQLSyntaxException", e.getClass().getName());
-			return;
-		}
-		finally {
-	    	db.commit();
-		}
+    public void runTest() throws Exception {
+        testLimit();
     }
-	
-	public void runTest() throws Exception {
-        super.runTest();
-		testLimitWithOffset();
-		testOffsetWithoutLimit();
-	}
-
 }

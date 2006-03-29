@@ -43,83 +43,35 @@
  * $Id$
  */
 
+package ctf.jdo.tc3x;
 
-package jdo;
+import org.exolab.castor.jdo.TimeStampable;
 
+public final class RelatedEntity implements TimeStampable, java.io.Serializable {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -6408619974569022386L;
 
-/**
- * Test object mapping to test_table used to conduct all the tests.
- */
-public class TestObject
-{
+    public static final int     DEFAULT_ID = 5;
 
+    private int                 _id;
+    private PersistentEntity    _persistent;
+    private long                _timeStamp;
 
-    private int    _id;
+    public RelatedEntity() { this(DEFAULT_ID); }
+    public RelatedEntity(final int id) { _id = id; }
 
+    public void setId(final int id) { _id = id; }
+    public int getId() { return _id; }
 
-    private String _value1;
-
-
-    private String _value2;
-
-
-    public static final int       DefaultId = 3;
-
-
-    public static final String    DefaultValue1 = "one";
-
-
-    public static final String    DefaultValue2 = "two";
-
-
-    public TestObject()
-    {
-        _id = DefaultId;
-        _value1 = DefaultValue1;
-        _value2 = DefaultValue2;
+    public void setPersistent(final PersistentEntity persistent) {
+        _persistent = persistent;
     }
+    public PersistentEntity getPersistent() { return _persistent; }
 
+    public long jdoGetTimeStamp() { return _timeStamp; }
+    public void jdoSetTimeStamp(final long timeStamp) { _timeStamp = timeStamp; }
 
-    public void setId( int id )
-    {
-        _id = id;
+    public String toString() {
+        return _id + " / " + ((_persistent == null) ? 0 : _persistent.getId());
     }
-
-
-    public int getId()
-    {
-        return _id;
-    }
-
-
-    public void setValue1( String value1 )
-    {
-        _value1 = value1;
-    }
-
-
-    public String getValue1()
-    {
-        return _value1;
-    }
-
-
-    public void setValue2( String value2 )
-    {
-        _value2 = value2;
-    }
-
-
-    public String getValue2()
-    {
-        return _value2;
-    }
-
-
-    public String toString()
-    {
-        return _id + " / " + _value1 + " / " + _value2;
-    }
-
-
 }

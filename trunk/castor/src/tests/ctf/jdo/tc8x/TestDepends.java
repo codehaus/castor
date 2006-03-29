@@ -52,57 +52,57 @@ public final class TestDepends extends CastorTestCase {
 
     
     public void testDepends() throws Exception {
-        Database _db = null;
+        Database db = null;
         MasterObject master = new MasterObject();
         master.setDescrip("This is the descrip.");
-        _db = _category.getDatabase();
-        _db.begin();
-        _db.create(master);
-        _db.commit();
+        db = _category.getDatabase();
+        db.begin();
+        db.create(master);
+        db.commit();
 
         assertTrue(master.getId() != 0);
 
         //THIS Part Works!
-        _db.begin();
+        db.begin();
         DependentObject depends = new DependentObject();
         depends.setDescrip("Description");
         master.setDepends(depends);
-        _db.update(master);
-        _db.commit();
+        db.update(master);
+        db.commit();
 
         assertTrue(master.getId() != 0);
         int masterId = master.getId();
 
-        _db.begin();
-        master = (MasterObject) _db.load(MasterObject.class, new Integer(masterId));
+        db.begin();
+        master = (MasterObject) db.load(MasterObject.class, new Integer(masterId));
         assertNotNull(master.getDepends());
         master.setDepends(null);
-        _db.commit();
+        db.commit();
 
-        _db.begin();
-        master = (MasterObject) _db.load(MasterObject.class, new Integer(masterId));
+        db.begin();
+        master = (MasterObject) db.load(MasterObject.class, new Integer(masterId));
         assertNull(master.getDepends());
-        _db.commit();
+        db.commit();
 
         //THIS part doesn't!
-        _db.begin();
-        master = (MasterObject) _db.load(MasterObject.class, new Integer(masterId));
+        db.begin();
+        master = (MasterObject) db.load(MasterObject.class, new Integer(masterId));
         depends = new DependentObject();
         depends.setDescrip("Description");
         master.setDepends(depends);
-        _db.commit();
+        db.commit();
 
-        _db.begin();
-        master = (MasterObject) _db.load(MasterObject.class, new Integer(masterId));
+        db.begin();
+        master = (MasterObject) db.load(MasterObject.class, new Integer(masterId));
         assertNotNull(master.getDepends());
-        _db.commit();
+        db.commit();
 
-        _db.begin();
-        master = (MasterObject) _db.load(MasterObject.class, new Integer(
+        db.begin();
+        master = (MasterObject) db.load(MasterObject.class, new Integer(
                 masterId));
         assertNotNull(master);
-        _db.remove(master);
-        _db.commit();
+        db.remove(master);
+        db.commit();
     }
     
 }

@@ -43,43 +43,31 @@
  * $Id$
  */
 
-package jdo;
+package ctf.jdo.tc3x;
 
-import java.util.Collection;
-import java.util.ArrayList;
+public final class ExtendsEntity extends Entity {
+    public static final int DEFAULT_ID = 4;
+    public static final String DEFAULT_VALUE_3 = "three";
+    public static final String DEFAULT_VALUE_4 = "four";
 
-/**
- * Test object mapping to test_oqlext used for Oql test.
- */
-public class TestOqlExtends extends TestPersistent {
-    /** SerialVersionUID */
-    private static final long serialVersionUID = -5458281563382200756L;
+    private String _value3;
+    private String _value4;
 
-    private int  _ext;
-
-    private Collection _list = new ArrayList();
-
-    public TestOqlExtends() {
+    public ExtendsEntity() {
         super();
+        setId(DEFAULT_ID);
+        _value3 = DEFAULT_VALUE_3;
+        _value4 = DEFAULT_VALUE_4;
     }
 
-    public void setExt(final int ext) {
-        _ext = ext;
-    }
+    public void setValue3(final String value3) { _value3 = value3; }
+    public String getValue3() { return _value3; }
 
-    public int getExt() {
-        return _ext;
-    }
+    public void setValue4(final String value4) { _value4 = value4; }
+    public String getValue4() { return _value4; }
 
-    public Collection getList() {
-        return _list;
-    }
-    
-    public void setList(Collection list) {
-        _list = list;
-    }
-    
     public String toString() {
-        return super.toString() + " / " + _ext;
+        return getId() + " / " + getValue1() + " / " 
+                + getValue2() + "/" + getValue3() + "/" + getValue4();
     }
 }

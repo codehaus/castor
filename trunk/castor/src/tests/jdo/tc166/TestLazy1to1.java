@@ -24,7 +24,7 @@ public class TestLazy1to1 extends CastorTestCase {
     private Database        _wrapper;
 
     public TestLazy1to1( TestHarness category ) {
-        super( category, "TC166", "TestLazy1to1" );
+        super( category, "tempTC166", "TestLazy1to1" );
         _category = (JDOCategory) category;
     }
 

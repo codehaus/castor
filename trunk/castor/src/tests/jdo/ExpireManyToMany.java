@@ -94,7 +94,7 @@ public class ExpireManyToMany extends CastorTestCase {
      * Constructor
      */
     public ExpireManyToMany(TestHarness category) {
-        super( category, "TC71", "Expire Many-To-Many" );
+        super( category, "tempTC71", "Expire Many-To-Many" );
         _category = (JDOCategory) category;
     }
 

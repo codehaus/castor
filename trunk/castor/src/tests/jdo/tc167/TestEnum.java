@@ -12,7 +12,7 @@ public class TestEnum extends CastorTestCase  {
     private JDOCategory     _category;
 
     public TestEnum( TestHarness category ) {
-        super( category, "TC167", "TestEnum" );
+        super( category, "tempTC167", "TestEnum" );
         _category = (JDOCategory) category;
     }
 

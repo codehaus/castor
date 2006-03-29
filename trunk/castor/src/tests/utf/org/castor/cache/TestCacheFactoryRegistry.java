@@ -53,8 +53,6 @@ import org.castor.cache.simple.Unlimited;
 import org.castor.cache.simple.UnlimitedFactory;
 import org.castor.util.Configuration;
 
-import org.exolab.castor.util.LocalConfiguration;
-
 /**
  * @author <a href="mailto:werner DOT guttmann AT gmx DOT net">Werner Guttmann</a>
  * @author <a href="mailto:ralf DOT joachim AT syscon-world DOT de">Ralf Joachim</a>

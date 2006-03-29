@@ -42,27 +42,19 @@
  *
  */
 
+package ctf.jdo.tc3x;
 
-package jdo;
-
+import harness.CastorTestCase;
+import harness.TestHarness;
+import jdo.JDOCategory;
 
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
-import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.jdo.PersistenceException;
+import org.exolab.castor.jdo.QueryResults;
 
-import harness.TestHarness;
-import harness.CastorTestCase;
-
-
-/**
- * Test for many-to-many relationship. A many to many relationship
- * is stored in a relational database as a separated table.
- */
-public class Size extends CastorTestCase 
-{
-
-    protected Database       _db;
+public class TestSize extends CastorTestCase {
+    private Database       _db;
 
     private JDOCategory    _category;
 
@@ -71,20 +63,21 @@ public class Size extends CastorTestCase
      *
      * @param category The test suite of these tests
      */
-    public Size( TestHarness category ) 
-    {
-        super( category, "TC66", "Size" );
+    public TestSize(final TestHarness category) {
+        super(category, "TC35", "Size");
         _category = (JDOCategory) category;
     }
 
-    public Size( TestHarness category, String name, String description ) 
-    {
-        super( category, name, description );
+    public TestSize(final TestHarness category, final String name,
+            final String description) {
+        
+        super(category, name, description);
         _category = (JDOCategory) category;
     }
+    
+    public final Database getDatabase() { return _db; }
 
-    public void runTest() throws PersistenceException 
-    {
+    public final void runTest() throws PersistenceException {
         removeRecords();
         createRecords();
         testSizeA();
@@ -93,48 +86,40 @@ public class Size extends CastorTestCase
         testSizeD();
     }
 
-    public void setUp() throws PersistenceException 
-    {
+    public final void setUp() throws PersistenceException {
         _db = _category.getDatabase();
     }
-    public void removeRecords() throws PersistenceException 
-    {
+    
+    public final void removeRecords() throws PersistenceException {
         _db.begin();
-        QueryResults enumeration;
-//        OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
-        OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object" );
-        enumeration = oqlquery.execute(true);
-        while (enumeration.hasMore())
-        {
+        OQLQuery oqlquery = _db.getOQLQuery(
+                "SELECT object FROM " + Entity.class.getName() + " object");
+        QueryResults enumeration = oqlquery.execute(true);
+        while (enumeration.hasMore()) {
             _db.remove(enumeration.next());
         }
         _db.commit();
-
     }
-    public void createRecords() throws PersistenceException 
-    {
+    
+    public final void createRecords() throws PersistenceException {
         _db.begin();
-        for ( int i=0; i<25; i++ ) 
-        {
-//            TestRaceNone newTRN = new TestRaceNone();
-            TestObject newTRN = new TestObject();
+        for (int i = 0; i < 25; i++) {
+            Entity newTRN = new Entity();
             newTRN.setId(i);
-            _db.create( newTRN );
+            _db.create(newTRN);
         }
         _db.commit();       
     }
 
     /**
-     * Very simple test to do a query and call .size()
+     * Very simple test to do a query and call size()
      */
-    public void testSizeA() throws PersistenceException 
-    {
+    public final void testSizeA() throws PersistenceException {
         _db.begin();
-        QueryResults enumeration;
-//         OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
-         OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object" );
-        enumeration = oqlquery.execute(true);
-        assertTrue ("size should be > 0",enumeration.size() > 0);
+        OQLQuery oqlquery = _db.getOQLQuery(
+                "SELECT object FROM " + Entity.class.getName() + " object");
+        QueryResults enumeration = oqlquery.execute(true);
+        assertTrue("size should be > 0", enumeration.size() > 0);
         _db.commit();
     }
 
@@ -143,15 +128,12 @@ public class Size extends CastorTestCase
      * implemention because it internally moves the cursor and then 
      * moves it back.
      */
-    public void testSizeB() throws PersistenceException 
-    {
+    public final void testSizeB() throws PersistenceException {
         _db.begin();
-        QueryResults enumeration;
-//        OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
-        OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object" );
-        enumeration = oqlquery.execute(true);
-        while (enumeration.hasMore())
-        {
+        OQLQuery oqlquery = _db.getOQLQuery(
+                "SELECT object FROM " + Entity.class.getName() + " object");
+        QueryResults enumeration = oqlquery.execute(true);
+        while (enumeration.hasMore()) {
             enumeration.next();
             assertTrue("size should be > 0", enumeration.size() > 0);
             assertEquals("size should be ==25", enumeration.size(), 25);
@@ -162,19 +144,16 @@ public class Size extends CastorTestCase
     /**
      * Does size return the right results?
      */
-    public void testSizeC() throws PersistenceException 
-    {
+    public final void testSizeC() throws PersistenceException {
         _db.begin();
-        QueryResults enumeration;
-//        OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
-        OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object" );
-        enumeration = oqlquery.execute(true);
+        OQLQuery oqlquery = _db.getOQLQuery(
+                "SELECT object FROM " + Entity.class.getName() + " object");
+        QueryResults enumeration = oqlquery.execute(true);
         int expectedSize = enumeration.size();
         int realSize = 0;
-        while (enumeration.hasMore())
-        {
+        while (enumeration.hasMore()) {
             enumeration.next();
-            realSize ++;
+            realSize++;
         }
         _db.commit();
         assertEquals("realsize didn't equal expectedsize", realSize, expectedSize);
@@ -183,29 +162,22 @@ public class Size extends CastorTestCase
     /**
      * Should fail with a non scrollable resultset.
      */
-    public void testSizeD() 
-    {
-        try
-        {
+    public void testSizeD() {
+        try {
             _db.begin();
-//            OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
-            OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object" );
-            QueryResults enumeration = oqlquery.execute(false);
+            OQLQuery oqlquery = _db.getOQLQuery(
+                    "SELECT object FROM " + Entity.class.getName() + " object");
+            oqlquery.execute(false);
             _db.commit();
             // This test fails when executed against PostgreSQL. 
-            fail ("Calling size() on a non-scrollable ResultSet should fail (unless using PostgreSQL).");
-        }
-        catch (Exception e)
-        {
+            fail ("Calling size() on a non-scrollable ResultSet should fail.");
+        } catch (Exception ex) {
             assertTrue(true);
         }
-    
     }    
     
-    public void tearDown() throws PersistenceException 
-    {
-        if ( _db.isActive() ) _db.rollback();
+    public final void tearDown() throws PersistenceException {
+        if (_db.isActive()) { _db.rollback(); }
         _db.close();
     }
 }
-

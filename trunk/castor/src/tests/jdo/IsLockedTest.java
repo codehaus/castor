@@ -41,7 +41,7 @@ public class IsLockedTest extends CastorTestCase {
     private JDOCategory    _category;
 
     public IsLockedTest ( TestHarness category ) {
-        super( category, "TC247", "Test the use of Database.isLocked()" );
+        super( category, "tempTC247", "Test the use of Database.isLocked()" );
         _category = (JDOCategory) category;
     }
 

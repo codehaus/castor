@@ -43,19 +43,27 @@
  * $Id$
  */
 
-package ctf.jdo.tc2x;
+package ctf.jdo.tc3x;
 
-import harness.TestHarness;
+import java.util.ArrayList;
+import java.util.Collection;
 
-/**
- * Test for SEQUENCE key generator.
- */
-public final class TestKeyGenSequenceString extends TestKeyGenGeneric {
-    public TestKeyGenSequenceString(final TestHarness category) {
-        super(category, "TC21a", "Key generator: SEQUENCE for non-numeric values");
-    }
+public class ExtendsEntity1 extends PersistentEntity {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -5458281563382200756L;
 
-    public void runTest() throws Exception {
-        testOneKeyGenString(SequenceObjectTypeString.class, SequenceExtendsTypeString.class);
+    private int  _ext;
+    private Collection _list = new ArrayList();
+
+    public ExtendsEntity1() { super(); }
+
+    public final void setExt(final int ext) { _ext = ext; }
+    public final int getExt() { return _ext; }
+
+    public final Collection getList() { return _list; }
+    public final void setList(final Collection list) { _list = list; }
+    
+    public String toString() {
+        return super.toString() + " / " + _ext;
     }
 }

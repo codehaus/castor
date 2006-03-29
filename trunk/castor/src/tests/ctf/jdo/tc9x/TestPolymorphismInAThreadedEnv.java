@@ -31,10 +31,10 @@ import org.exolab.castor.jdo.Database;
  * Tests that modification to read only objects are not persist in the 
  * database.
  */
-public final class TestPolymorphismInAThreadedEnvironment extends CastorTestCase {
+public final class TestPolymorphismInAThreadedEnv extends CastorTestCase {
 
     private static final Log LOG = 
-        LogFactory.getLog(TestPolymorphismInAThreadedEnvironment.class);
+        LogFactory.getLog(TestPolymorphismInAThreadedEnv.class);
     
     private static final int REPS =  100;
 
@@ -44,7 +44,7 @@ public final class TestPolymorphismInAThreadedEnvironment extends CastorTestCase
      * Constructor
      * @param category the test suite that this test case belongs
      */
-    public TestPolymorphismInAThreadedEnvironment(final TestHarness category) {
+    public TestPolymorphismInAThreadedEnv(final TestHarness category) {
         super(category, "TC98", "Polymorphism tests in a threaded environment");
         _category = (JDOCategory) category;
     }
@@ -96,10 +96,9 @@ public final class TestPolymorphismInAThreadedEnvironment extends CastorTestCase
         Database db = _category.getDatabase();
         db.begin();
         Container container = null;
-        Derived derived = null;
         try {
             container = (Container) db.load(Container.class, "200");
-            derived = (Derived) db.load(Derived.class, "100");
+            db.load(Derived.class, "100");
             db.commit();
         } catch (Exception ex) {
             db.rollback();

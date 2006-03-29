@@ -19,14 +19,11 @@
 
 package ctf.jdo.tc8x;
 
-import jdo.JDOCategory;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.jdo.Database;
 
 import harness.CastorTestCase;
 import harness.TestHarness;
+import jdo.JDOCategory;
 
 /**
  * Tests that modification to read only objects are not persist in the 
@@ -34,9 +31,6 @@ import harness.TestHarness;
  * @author nstuart
  */
 public final class TestDependsNoKeyGen extends CastorTestCase {
-
-    private static final Log LOG = LogFactory.getLog(TestDependsNoKeyGen.class);
-
     private JDOCategory _category;
 
     /**
@@ -57,66 +51,66 @@ public final class TestDependsNoKeyGen extends CastorTestCase {
     }
 
     public void testDepends() throws Exception {
-        Database _db = null;
+        Database db = null;
         MasterObjectNoKeyGen master = new MasterObjectNoKeyGen();
         master.setId(100);
         master.setDescrip("This is the descrip.");
-        _db = _category.getDatabase();
-        _db.begin();
-        _db.create(master);
-        _db.commit();
+        db = _category.getDatabase();
+        db.begin();
+        db.create(master);
+        db.commit();
 
         assertTrue(master.getId() != 0);
         assertEquals(100, master.getId());
 
         //THIS Part Works!
-        _db.begin();
+        db.begin();
         DependentObjectNoKeyGen depends = new DependentObjectNoKeyGen();
         depends.setId(101);
         depends.setDescrip("Description");
         master.setDepends(depends);
-        _db.update(master);
-        _db.commit();
+        db.update(master);
+        db.commit();
 
         assertTrue(master.getId() != 0);
         assertEquals(100, master.getId());
         int masterId = master.getId();
 
-        _db.begin();
-        master = (MasterObjectNoKeyGen) _db.load(MasterObjectNoKeyGen.class, new Integer(
+        db.begin();
+        master = (MasterObjectNoKeyGen) db.load(MasterObjectNoKeyGen.class, new Integer(
                 masterId));
         assertNotNull(master.getDepends());
         master.setDepends(null);
-        _db.commit();
+        db.commit();
 
-        _db.begin();
-        master = (MasterObjectNoKeyGen) _db.load(MasterObjectNoKeyGen.class, new Integer(
+        db.begin();
+        master = (MasterObjectNoKeyGen) db.load(MasterObjectNoKeyGen.class, new Integer(
                 masterId));
         assertNull(master.getDepends());
-        _db.commit();
+        db.commit();
 
         //THIS part doesn't!
-        _db.begin();
-        master = (MasterObjectNoKeyGen) _db.load(MasterObjectNoKeyGen.class, new Integer(
+        db.begin();
+        master = (MasterObjectNoKeyGen) db.load(MasterObjectNoKeyGen.class, new Integer(
                 masterId));
         depends = new DependentObjectNoKeyGen();
         depends.setId(102);
         depends.setDescrip("Description");
         master.setDepends(depends);
-        _db.commit();
+        db.commit();
 
-        _db.begin();
-        master = (MasterObjectNoKeyGen) _db.load(MasterObjectNoKeyGen.class, new Integer(
+        db.begin();
+        master = (MasterObjectNoKeyGen) db.load(MasterObjectNoKeyGen.class, new Integer(
                 masterId));
         assertNotNull(master.getDepends());
-        _db.commit();
+        db.commit();
 
-        _db.begin();
-        master = (MasterObjectNoKeyGen) _db.load(MasterObjectNoKeyGen.class, new Integer(
+        db.begin();
+        master = (MasterObjectNoKeyGen) db.load(MasterObjectNoKeyGen.class, new Integer(
                 masterId));
         assertNotNull(master);
-        _db.remove(master);
-        _db.commit();
+        db.remove(master);
+        db.commit();
 }
     
 }
