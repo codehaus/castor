@@ -129,7 +129,7 @@ public final class TestTypeLOB extends CastorTestCase {
         TypeLOB       types;
         Enumeration   enumeration;
         int           len;
-        byte[]        bbuf = new byte[BLOB_VALUE.length + 1];
+//        byte[]        bbuf = new byte[BLOB_VALUE.length + 1];
         char[]        cbuf = new char[CLOB_VALUE.length() + 1];
 
         LOG.info("Testing BLOB and CLOB fields");
@@ -162,22 +162,20 @@ public final class TestTypeLOB extends CastorTestCase {
                 LOG.error("CLOB value was not set");
                 fail("CLOB value was not set");
             }
-            /*
-            if (types.getBlob2() == null) {
-                LOG.error("InputStream value was not set");
-                fail("InputStream value was not set");
-            } else {
-                len = types.getBlob2().read(bbuf);
-                if (len <= 0) {
-                    LOG.error("InputStream has zero length");
-                    fail("InputStream has zero length");
-                }
-                if (!BLOB_STRING.equals(new String(bbuf, 0, len))) {
-                    LOG.error("InputStream value is wrong");
-                    fail("InputStream value mismatched!");
-                }
-            }
-            */
+//            if (types.getBlob2() == null) {
+//                LOG.error("InputStream value was not set");
+//                fail("InputStream value was not set");
+//            } else {
+//                len = types.getBlob2().read(bbuf);
+//                if (len <= 0) {
+//                    LOG.error("InputStream has zero length");
+//                    fail("InputStream has zero length");
+//                }
+//                if (!BLOB_STRING.equals(new String(bbuf, 0, len))) {
+//                    LOG.error("InputStream value is wrong");
+//                    fail("InputStream value mismatched!");
+//                }
+//            }
             if (types.getClob2() == null) {
                 LOG.error("Clob value was not set");
                 fail("Clob value was not set");

@@ -21,12 +21,9 @@ package ctf.jdo.tc9x;
 import harness.CastorTestCase;
 import harness.TestHarness;
 import jdo.JDOCategory;
-import junit.framework.TestCase;
 
 import org.exolab.castor.jdo.Database;
-import org.exolab.castor.jdo.JDOManager;
 import org.exolab.castor.jdo.PersistenceException;
-import org.exolab.castor.mapping.MappingException;
 
 /**
  * Castor CTF test case to test polymorphistic operations in the context of
@@ -34,8 +31,7 @@ import org.exolab.castor.mapping.MappingException;
  * 
  * @author <a href=""mailto:nstuart">Nick Stuart</a>
  */
-public class TestPolymorphismDependendObjects extends CastorTestCase {
-	
+public final class TestPolymorphismDependendObjects extends CastorTestCase {
     private JDOCategory _category;
 
     /**
@@ -51,53 +47,53 @@ public class TestPolymorphismDependendObjects extends CastorTestCase {
      * @see junit.framework.TestCase#runTest()
      */
     public void runTest() throws Exception {
-    	testLoad();
+        testLoad();
     }
 
-	public void testLoad() {
-		try {
-			Database db = _category.getDatabase();
-			db.begin();
-			try {
-				ExtendedObject obj = (ExtendedObject) db.load(BaseObject.class,
-						new Integer(1));
-				db.commit();
-				assertNotNull(obj);
-				assertNotNull(obj.getDependent());
-				db.close();
+    public void testLoad() {
+        try {
+            Database db = _category.getDatabase();
+            db.begin();
+            try {
+                ExtendedObject obj = (ExtendedObject) db.load(BaseObject.class,
+                        new Integer(1));
+                db.commit();
+                assertNotNull(obj);
+                assertNotNull(obj.getDependent());
+                db.close();
 
-			} catch (ClassCastException e) {
-				db.rollback();
-				db.close();
-				fail();
-			}
-		} catch (PersistenceException e) {
-			e.printStackTrace();
-			fail();
-		}
-	}
+            } catch (ClassCastException e) {
+                db.rollback();
+                db.close();
+                fail();
+            }
+        } catch (PersistenceException e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
 
-	 public void testSave() {
-		Database db = null;
-		try {
-			db = _category.getDatabase();
-			db.begin();
-			try {
-				ExtendedObject obj1 = (ExtendedObject) db.load(
-						ExtendedObject.class, new Integer(1));
-				obj1.setDescription2(obj1.getDescription2() + " - 1");
-				db.commit();
-				db.close();
+     public void testSave() {
+        Database db = null;
+        try {
+            db = _category.getDatabase();
+            db.begin();
+            try {
+                ExtendedObject obj1 = (ExtendedObject) db.load(
+                        ExtendedObject.class, new Integer(1));
+                obj1.setDescription2(obj1.getDescription2() + " - 1");
+                db.commit();
+                db.close();
 
-			} catch (ClassCastException e) {
-				e.printStackTrace();
-				db.rollback();
-				db.close();
-				fail();
-			}
-		} catch (PersistenceException e) {
-			e.printStackTrace();
-			fail();
-		}
-	}
+            } catch (ClassCastException e) {
+                e.printStackTrace();
+                db.rollback();
+                db.close();
+                fail();
+            }
+        } catch (PersistenceException e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
 }

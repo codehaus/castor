@@ -45,7 +45,6 @@
 
 package ctf.jdo.tc0x;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 
 import harness.CastorTestCase;

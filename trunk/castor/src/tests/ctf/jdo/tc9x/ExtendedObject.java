@@ -22,25 +22,24 @@ package ctf.jdo.tc9x;
 /**
  * @author nstuart
  */
-public class ExtendedObject extends BaseObject {
-	
-	private String _description2;
+public final class ExtendedObject extends BaseObject {
+    private String _description2;
 
-	private DependentObject dependent;
+    private DependentObject _dependent;
 
-	public String getDescription2() {
-		return _description2;
-	}
+    public String getDescription2() {
+        return _description2;
+    }
 
-	public void setDescription2(String description2) {
-		_description2 = description2;
-	}
+    public void setDescription2(final String description2) {
+        _description2 = description2;
+    }
 
-	public DependentObject getDependent() {
-		return dependent;
-	}
+    public DependentObject getDependent() {
+        return _dependent;
+    }
 
-	public void setDependent(DependentObject dependent) {
-		this.dependent = dependent;
-	}
+    public void setDependent(final DependentObject dependent) {
+        _dependent = dependent;
+    }
 }

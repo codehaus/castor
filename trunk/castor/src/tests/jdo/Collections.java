@@ -71,7 +71,7 @@ public class Collections extends CastorTestCase {
     private JDOCategory    _category;
 
     public Collections( TestHarness category ) {
-        super( category, "TC128", "Collections" );
+        super( category, "tempTC128", "Collections" );
         _category = (JDOCategory) category;
     }
 

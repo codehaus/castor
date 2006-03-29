@@ -100,7 +100,7 @@ public class ExpireLazyEmployee extends CastorTestCase {
      * @param category A {@link TestHarness} instance.
      */
     public ExpireLazyEmployee(TestHarness category) {
-        super( category, "TC72", "Expire Lazy Employee" );
+        super( category, "tempTC72", "Expire Lazy Employee" );
         _category = (JDOCategory) category;
     }
 

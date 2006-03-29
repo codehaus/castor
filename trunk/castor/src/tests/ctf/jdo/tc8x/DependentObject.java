@@ -25,48 +25,41 @@ import org.exolab.castor.jdo.TimeStampable;
  * Dependent object for test case in the ctf.jdo.tc8x package
  * @author nstuart
  */
-public class DependentObject implements TimeStampable{
+public final class DependentObject implements TimeStampable {
+    private int _id;
+    private String _descrip;
+    private MasterObject _master;
+    private long _timestamp;
     
-    private int id;
-    private String descrip;
-    private MasterObject master;
-    
-    private long timestamp;
-    
-    /** Creates a new instance of Dependent */
-    public DependentObject() {
-    }
-
     public int getId() {
-        return id;
+        return _id;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setId(final int id) {
+        _id = id;
     }
 
     public String getDescrip() {
-        return descrip;
+        return _descrip;
     }
 
-    public void setDescrip(String descrip) {
-        this.descrip = descrip;
+    public void setDescrip(final String descrip) {
+        _descrip = descrip;
     }
 
     public MasterObject getMaster() {
-        return master;
+        return _master;
     }
 
-    public void setMaster(MasterObject master) {
-        this.master = master;
-    }
-
-    public void jdoSetTimeStamp(long timestamp) {
-        this.timestamp = timestamp;
+    public void setMaster(final MasterObject master) {
+        _master = master;
     }
 
     public long jdoGetTimeStamp() {
-        return timestamp;
+        return _timestamp;
     }
     
+    public void jdoSetTimeStamp(final long timestamp) {
+        _timestamp = timestamp;
+    }
 }

@@ -4,7 +4,7 @@
   <include href="../ctf/jdo/tc0x/mapping.xml"/>
   <include href="../ctf/jdo/tc1x/mapping.xml"/>
   <include href="../ctf/jdo/tc2x/mapping.xml"/>
-  <include href="../ctf/jdo/tc7x/mapping.xml"/>
+  <include href="../ctf/jdo/tc3x/mapping.xml"/>
   <include href="../ctf/jdo/tc8x/mapping.xml"/>
   <include href="../ctf/jdo/tc9x/mapping.xml"/>
   <include href="tc166/mapping.xml"/>
@@ -203,8 +203,6 @@
     </field>
   </class>
 
-
-  <!-- Test Multiple primary Keys -->
   <class name="jdo.TestLimit" access="shared" identity="id">
     <description>Table used for concurrency and performance testing</description>
     <map-to table="test_table" />
@@ -219,116 +217,6 @@
     </field>
   </class>
   
-  <class name="jdo.TestObject" access="shared" identity="id">
-    <description>Table used for concurrency and performance testing</description>
-    <map-to table="test_table" />
-    <field name="id" type="integer">
-      <sql name="id" type="integer" />
-    </field>
-    <field name="value1" type="string" required="true">
-      <sql name="value1" type="varchar"/>
-    </field>
-    <field name="value2" type="string">
-      <sql name="value2" type="varchar" dirty="ignore"/>
-    </field>
-  </class>
-  
-  <class name="jdo.TestObjectExtends" access="shared" extends="jdo.TestObject">
-    <description>Table used for cache testing</description>
-    <map-to table="test_table_extends" />
-    <field name="value3" type="string">
-      <sql name="value3" type="varchar"/>
-    </field>
-    <field name="value4" type="string">
-      <sql name="value4" type="varchar" dirty="ignore"/>
-    </field>
-  </class>
-
-  <class name="jdo.TestObjectEx" access="shared" identity="id">
-    <description>Table used for cache testing</description>
-    <map-to table="test_table_ex" />
-    <field name="id" type="integer">
-      <sql name="id" type="integer" />
-    </field>
-    <field name="value1" type="string" required="true">
-      <sql name="value1" type="varchar"/>
-    </field>
-    <field name="value2" type="string">
-      <sql name="value2" type="varchar" dirty="ignore"/>
-    </field>
-  </class>
-
-  <class name="jdo.TestGroup" access="shared" identity="id">
-    <description>Test groups table</description>
-    <map-to table="test_group" />
-    <field name="id" type="integer">
-      <sql name="id" type="numeric" />
-    </field>
-    <field name="value1" type="string"  required="true">
-      <sql name="value1" type="varchar" />
-    </field>
-  </class>
-
-  <class name="jdo.TestPersistent" access="shared" identity="id">
-    <description>Test Persistent interface handling</description>
-    <map-to table="test_persistent" />
-    <field name="id" type="integer">
-      <sql name="id" type="integer"/>
-    </field>
-    <field name="creationTime" type="java.util.Date" required="true">
-      <sql name="ctime" type="timestamp" />
-    </field>
-    <field name="modificationTime" type="java.util.Date" required="false">
-      <sql name="mtime" type="timestamp" dirty="ignore" />
-    </field>
-    <field name="value1" type="string"  required="true">
-      <sql name="value1" type="varchar" />
-    </field>
-    <field name="parentId" type="integer" required="false">
-      <sql name="parent_id" type="integer" dirty="ignore" />
-    </field>
-    <field name="group" type="jdo.TestGroup" required="true">
-      <sql name="group_id" />
-    </field>
-    <field name="related" type="jdo.TestPersistRelated" required="false">
-      <sql many-key="persist_id" />
-    </field>
-  </class>
-
-  <class name="jdo.TestPersistRelated" access="shared" identity="id" key-generator="MAX">
-    <description>Test Persistent interface handling</description>
-    <map-to table="test_related" />
-    <field name="id" type="integer">
-      <sql name="id" type="integer"/>
-    </field>
-    <field name="persistent" type="jdo.TestPersistent">
-      <sql name="persist_id" />
-    </field>
-  </class>
-
-  <class name="jdo.TestOqlExtends" extends="jdo.TestPersistent">
-    <description>Test Persistent interface handling</description>
-    <map-to table="test_oqlext" />
-    <field name="id" type="integer">
-      <sql name="ident"/>
-    </field>
-    <field name="ext" type="integer" required="true">
-      <sql name="ext"/>
-    </field>
-    <field name="list" type="jdo.TestOqlExtends2" collection="collection"
-           lazy="false">
-      <sql many-table="test_oqltag" name="id2" many-key="id1"/>
-    </field>
-  </class>
-
-  <class name="jdo.TestOqlExtends2" extends="jdo.TestPersistent">
-    <description>Test Persistent interface handling</description>
-    <map-to table="test_oqlext2" />
-    <field name="ext" type="integer" required="true">
-      <sql name="ext"/>
-    </field>
-  </class>
-
   <class name="jdo.TestCol" identity="id">
     <description>Table used for testing different collection types support</description>
     <cache-type type="none" />

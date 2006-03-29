@@ -24,52 +24,48 @@ import org.exolab.castor.jdo.TimeStampable;
  * @author nstuart
  */
 public class BaseObject implements TimeStampable {
-	
-	private int _id;
+    private int _id;
+    private String _description;
+    private boolean _saved;
+    private long _timestamp;
 
-	private String _description;
+    public final int getId() {
+        return _id;
+    }
 
-	private boolean _saved;
+    public final void setId(final int id) {
+        _id = id;
+    }
 
-	private long _timestamp;
+    public final String getDescription() {
+        return _description;
+    }
 
-	public int getId() {
-		return _id;
-	}
+    public final void setDescription(final String description) {
+        _description = description;
+    }
 
-	public void setId(int id) {
-		_id = id;
-	}
+    public final boolean isSaved() {
+        return _saved;
+    }
 
-	public String getDescription() {
-		return _description;
-	}
+    public final void setSaved(final boolean saved) {
+        _saved = saved;
+    }
 
-	public void setDescription(String description) {
-		_description = description;
-	}
+    public final long getTimestamp() {
+        return _timestamp;
+    }
 
-	public boolean isSaved() {
-		return _saved;
-	}
+    public final void setTimestamp(final long timestamp) {
+        _timestamp = timestamp;
+    }
 
-	public void setSaved(boolean saved) {
-		_saved = saved;
-	}
+    public final void jdoSetTimeStamp(final long timestamp) {
+        setTimestamp(timestamp);
+    }
 
-	public long getTimestamp() {
-		return _timestamp;
-	}
-
-	public void setTimestamp(long timestamp) {
-		_timestamp = timestamp;
-	}
-
-	public void jdoSetTimeStamp(long timestamp) {
-		setTimestamp(timestamp);
-	}
-
-	public long jdoGetTimeStamp() {
-		return getTimestamp();
-	}
+    public final long jdoGetTimeStamp() {
+        return getTimestamp();
+    }
 }

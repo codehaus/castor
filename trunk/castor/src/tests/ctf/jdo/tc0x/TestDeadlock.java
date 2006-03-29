@@ -274,7 +274,6 @@ public final class TestDeadlock extends CastorTestCase {
 
         public void run() {
             Sample   object;
-            long         start;
 
             try {
                 _db.begin();
@@ -353,7 +352,6 @@ public final class TestDeadlock extends CastorTestCase {
 
         public void run() {
             Sample   object;
-            Database     db = null;
 
             try {
                 _db.begin(); 

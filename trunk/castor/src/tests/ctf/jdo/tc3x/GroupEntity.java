@@ -43,81 +43,27 @@
  * $Id$
  */
 
+package ctf.jdo.tc3x;
 
-package jdo;
+public final class GroupEntity {
+    public static final int       DEFAULT_ID = 4;
+    public static final String    DEFAULT_VALUE = "group";
 
-import org.exolab.castor.jdo.Database;
-import org.exolab.castor.jdo.QueryResults;
-import org.exolab.castor.jdo.OQLQuery;
-import org.exolab.castor.jdo.PersistenceException;
-import org.exolab.castor.jdo.oql.OQLSyntaxException;
+    private int        _id;
+    private String     _value;
 
-import harness.TestHarness;
-
-public class TestLimitWithOffsetClause extends TestLimitClause
-{
-	private static final int OFFSET = 2;
-
-    /**
-     * Constructor
-     *
-     * @param category The test suite for these tests
-     */
-    public TestLimitWithOffsetClause( TestHarness category )
-    {
-        super( category, "TC62a", "Test limit clause with offset" );
-        _category = (JDOCategory) category;
+    public GroupEntity() {
+        _id = DEFAULT_ID;
+        _value = DEFAULT_VALUE;
     }
 
-	public void testLimitWithOffset()
-    throws PersistenceException
-    {
-        TestLimit testObject = null;
-        
-        Database db = _category.getDatabase(); 
+    public void setId(final int id) { _id = id; }
+    public int getId() { return _id; }
 
-        db.begin();
+    public void setValue1(final String value) { _value = value; }
+    public String getValue1() { return _value; }
 
-        OQLQuery query = db.getOQLQuery("select t from jdo.TestLimit t order by id limit $1 offset $2");
-
-        query.bind(LIMIT);
-        query.bind(OFFSET);
-
-        QueryResults results = query.execute();
-        assertNotNull (results);
-        /*size() not available using an Oracle DB
-        assertEquals (LIMIT, results.size()); */
-        for (int i = 1 + OFFSET; i <= OFFSET+LIMIT; i++) {
-            testObject = (TestLimit) results.next();
-            assertEquals(i, testObject.getId());
-        }
-        assertTrue(!results.hasMore());
-
-    	db.commit();
+    public String toString() {
+        return _id + " / " + _value;
     }
-
-	public void testOffsetWithoutLimit()
-		throws PersistenceException
-    {
-		
-		Database db = _category.getDatabase();
-		
-        db.begin();
-        try {
-			db.getOQLQuery("select t from jdo.TestLimit t offset $1");
-		} catch (OQLSyntaxException e) {
-			assertEquals ("org.exolab.castor.jdo.oql.OQLSyntaxException", e.getClass().getName());
-			return;
-		}
-		finally {
-	    	db.commit();
-		}
-    }
-	
-	public void runTest() throws Exception {
-		super.runTest();
-		testLimitWithOffset();
-		testOffsetWithoutLimit();
-	}
-
 }

@@ -43,63 +43,66 @@
  * $Id$
  */
 
+package ctf.jdo.tc3x;
 
-package jdo;
+import harness.TestHarness;
 
+import org.exolab.castor.jdo.OQLQuery;
+import org.exolab.castor.jdo.PersistenceException;
+import org.exolab.castor.jdo.QueryResults;
+import org.exolab.castor.jdo.oql.OQLSyntaxException;
 
-/**
- * Test object mapping to test_table used to conduct all the tests.
- */
-public class TestObjectExtends extends TestObject
-{
+public final class TestLimitWithOffsetExtend extends TestLimitClause {
+    private static final int OFFSET = 2;
 
-    static final int       DefaultId = 4;
-
-
-    static final String    DefaultValue3 = "three";
-
-
-    static final String    DefaultValue4 = "four";
-
-
-    private String _value3;
-
-
-    private String _value4;
-
-
-    public TestObjectExtends() {
-        super();
-        setId( DefaultId );
-        _value3 = DefaultValue3;
-        _value4 = DefaultValue4;
+    /**
+     * Constructor
+     *
+     * @param category The test suite for these tests
+     */
+    public TestLimitWithOffsetExtend(final TestHarness category) {
+        super(category, "TC34", "Test limit clause with offset at extended object");
     }
 
+    public void testLimitWithOffset() throws PersistenceException {
+        getDatabase().begin();
 
-    public void setValue3( String value3 ) {
-        _value3 = value3;
+        OQLQuery query = getDatabase().getOQLQuery("select t from "
+                + Entity.class.getName() + " t order by id limit $1 offset $2");
+
+        query.bind(LIMIT);
+        query.bind(OFFSET);
+
+        QueryResults results = query.execute();
+        assertNotNull (results);
+        // size() not available using an Oracle DB assertEquals (LIMIT, results.size());
+        for (int i = 1 + OFFSET; i <= OFFSET + LIMIT; i++) {
+            Entity testObject = (Entity) results.next();
+            assertEquals(i, testObject.getId());
+        }
+        assertTrue(!results.hasMore());
+
+        getDatabase().commit();
     }
 
+    public void testOffsetWithoutLimit() throws PersistenceException {
+        getDatabase().begin();
 
-    public String getValue3() {
-        return _value3;
+        try {
+            getDatabase().getOQLQuery(
+                    "select t from " + Entity.class.getName() + " t offset $1");
+        } catch (OQLSyntaxException ex) {
+            assertEquals("org.exolab.castor.jdo.oql.OQLSyntaxException",
+                    ex.getClass().getName());
+            return;
+        } finally {
+            getDatabase().commit();
+        }
     }
 
-
-    public void setValue4( String value4 ) {
-        _value4 = value4;
+    public void runTest() throws Exception {
+        super.runTest();
+        testLimitWithOffset();
+        testOffsetWithoutLimit();
     }
-
-
-    public String getValue4() {
-        return _value4;
-    }
-
-
-    public String toString() {
-        return getId() + " / " + getValue1() + " / " 
-                + getValue2() + "/" + getValue3() + "/" + getValue4();
-    }
-
-
 }

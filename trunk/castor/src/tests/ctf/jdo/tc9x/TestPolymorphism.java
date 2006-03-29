@@ -544,8 +544,8 @@ public final class TestPolymorphism extends CastorTestCase {
         Database database = _category.getDatabase();
         
         database.begin();
-        OQLQuery query = database.getOQLQuery("SELECT count(laptop.id) FROM " 
-        		+ Laptop.class.getName() + " laptop WHERE laptop.resolution = $1");
+        OQLQuery query = database.getOQLQuery("SELECT count(laptop.id) FROM "
+                + Laptop.class.getName() + " laptop WHERE laptop.resolution = $1");
         query.bind("1024");
         QueryResults results = query.execute();
         
@@ -559,8 +559,8 @@ public final class TestPolymorphism extends CastorTestCase {
             } else if (obj instanceof BigDecimal) {
                 count = new Long(((BigDecimal) obj).longValue());
             }
-        	assertNotNull (count);
-        	assertEquals (1, count.intValue());
+            assertNotNull(count);
+            assertEquals(1, count.intValue());
         }
         
         database.commit();
@@ -572,13 +572,13 @@ public final class TestPolymorphism extends CastorTestCase {
 //        
 //        database.begin();
 //        OQLQuery query = database.getOQLQuery("SELECT count(laptop.id) FROM " 
-//        		+ Laptop.class.getName() + " laptop WHERE laptop.resolution = '1024'");
+//                + Laptop.class.getName() + " laptop WHERE laptop.resolution = '1024'");
 //        QueryResults results = query.execute();
 //        
 //        if (results.hasMore()) {
-//        	Long count = (Long) results.next();
-//        	assertNotNull (count);
-//        	assertEquals (1, count.intValue());
+//            Long count = (Long) results.next();
+//            assertNotNull(count);
+//            assertEquals(1, count.intValue());
 //        }
 //
 //        database.commit();

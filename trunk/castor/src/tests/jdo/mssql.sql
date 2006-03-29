@@ -282,54 +282,6 @@ go
 grant all on tc1x_pks_category to test
 go
 
-drop table tc1x_entity1
-go
-create table tc1x_entity1 (
-  id        int not null PRIMARY KEY,
-  name      varchar(200) not null
-)
-go
-
-insert into tc1x_entity1 (id, name) values (1, 'entity1')
-go
-
-drop table tc1x_child
-go
-create table tc1x_child (
-  id        int not null PRIMARY KEY,
-  descr     varchar(200) not null
-)
-go
-
-insert into tc1x_child (id, descr) values (1, 'child1')
-go
-
-drop table tc1x_entity_compound
-go
-create table tc1x_entity_compound (
-  id1       int not null,
-  id2       int not null,
-  name      varchar(200) not null,
-  PRIMARY KEY (id1, id2)
-)
-go
-
-insert into tc1x_entity_compound (id1, id2, name) values (1, 1, 'entityCompound1')
-go
-
-drop table tc1x_child_compound
-go
-create table tc1x_child_compound (
-  id1       int not null,
-  id2       int not null,
-  descr     varchar(200) not null,
-  PRIMARY KEY (id1, id2)
-)
-go
-
-insert into tc1x_child_compound (id1, id2, descr) values (1, 1, 'childCompound1')
-go
-
 
 -- tc2x TESTS
 
@@ -533,10 +485,121 @@ grant all on tc2x_seqtable to test
 go
 
 
+-- tc3x TESTS
 
+drop table tc3x_entity
+go
+create table tc3x_entity (
+  id      int          not null,
+  value1  varchar(200) not null,
+  value2  varchar(200) null
+)
+go
+create unique index tc3x_entity_pk on tc3x_entity ( id )
+go
+grant all on tc3x_entity to test
+go
 
+drop table tc3x_extends
+go
+create table tc3x_extends (
+  id      int          not null,
+  value3  varchar(200) null,
+  value4  varchar(200) null
+)
+go
+create unique index tc3x_extends_pk on tc3x_extends ( id )
+go
+grant all on tc3x_extends to test
+go
 
+drop table tc3x_call
+go
+create table tc3x_call (
+  id      int          not null,
+  value1  varchar(200) not null,
+  value2  varchar(200) null
+)
+go
+create unique index tc3x_call_pk on tc3x_call ( id )
+go
+grant all on tc3x_call to test
+go
 
+drop table tc3x_group
+go
+create table tc3x_group (
+  id      numeric(10,0)  not null,
+  value1  varchar(200)   not null
+)
+go
+create unique index tc3x_group_pk on tc3x_group ( id )
+go
+grant all on tc3x_group to test
+go
+
+drop table tc3x_persistent
+go
+create table tc3x_persistent (
+  id         integer         not null,
+  ctime      datetime        not null,
+  mtime      datetime        null,
+  value1     varchar(200)    not null,
+  parent_id  integer         null,
+  group_id   numeric(10,0)   not null
+)
+go
+create unique index tc3x_persistent_pk on tc3x_persistent ( id )
+go
+grant all on tc3x_persistent to test
+go
+
+drop table tc3x_related
+go
+create table tc3x_related (
+  id          integer     not null,
+  persist_id  integer     not null
+)
+go
+create unique index tc3x_related_pk on tc3x_related ( id )
+go
+grant all on tc3x_related to test
+go
+
+drop table tc3x_extends1
+go
+create table tc3x_extends1 (
+  ident   integer         not null,
+  ext     integer         not null
+)
+go
+create unique index tc3x_extends1_pk on tc3x_extends1 ( ident )
+go
+grant all on tc3x_extends1 to test
+go
+
+drop table if exists tc3x_extends2;
+go
+create table tc3x_extends2 (
+  id      integer         not null,
+  ext     integer         not null
+);
+go
+create unique index tc3x_extends2_pk on tc3x_extends2 ( id );
+go
+grant all on tc3x_extends2 to test
+go
+
+-- The test stored procedure on TransactSQL
+drop procedure proc_check_permissions
+go
+create procedure proc_check_permissions @userName varchar(200),
+                                        @groupName varchar(200) AS
+    SELECT id, value1, value2 FROM tc3x_entity WHERE value1 = @userName
+    SELECT id, value1, value2 FROM tc3x_entity WHERE value2 = @groupName
+go
+sp_procxmode proc_check_permissions, "anymode"
+go
 
 
 
@@ -785,87 +848,6 @@ grant all on test_rel_payroll to test
 go
 -- end for test_relations
 
--- test_table_extends
-drop table test_table_extends
-go
-create table test_table_extends (
-  id      int          not null,
-  value3  varchar(200) null,
-  value4  varchar(200) null
-)
-go
-create unique index test_table_extends_pk on test_table_extends ( id )
-go
-grant all on test_table_extends to test
-go
-
--- test_table_ex
-drop table test_table_ex
-go
-create table test_table_ex (
-  id      int          not null,
-  value1  varchar(200) not null,
-  value2  varchar(200) null
-)
-go
-create unique index test_table_ex_pk on test_table_ex ( id )
-go
-grant all on test_table_ex to test
-go
-
--- test_group
-drop table test_group
-go
-create table test_group (
-  id     numeric(10,0)  not null,
-  value1  varchar(200)   not null
-)
-go
-create unique index test_group_pk on test_group ( id )
-go
-grant all on test_group to test
-go
-
-drop table test_persistent
-go
-create table test_persistent (
-  id         integer         not null,
-  ctime      datetime        not null,
-  mtime      datetime        null,
-  value1     varchar(200)    not null,
-  parent_id  integer         null,
-  group_id   numeric(10,0)   not null
-)
-go
-create unique index test_persistent_pk on test_persistent ( id )
-go
-grant all on test_persistent to test
-go
-
-drop table test_related
-go
-create table test_related (
-  id          integer     not null,
-  persist_id  integer     not null
-)
-go
-create unique index test_related_pk on test_related ( id )
-go
-grant all on test_related to test
-go
-
-
--- The test stored procedure on TransactSQL
-drop procedure proc_check_permissions
-go
-create procedure proc_check_permissions @userName varchar(200),
-                                        @groupName varchar(200) AS
-    SELECT id, value1, value2 FROM test_table WHERE value1 = @userName
-    SELECT id, value1, value2 FROM test_table WHERE value2 = @groupName
-go
-sp_procxmode proc_check_permissions, "anymode"
-go
-
 -- test_col
 drop table test_col
 go
@@ -925,31 +907,6 @@ go
 grant all on list_types to test
 go
 
-drop table test_oqlext
-go
-create table test_oqlext (
-  ident   integer         not null,
-  ext     integer         not null
-)
-go
-create unique index test_oqlext_pk on test_oqlext( ident )
-go
-grant all on test_oqlext to test
-go
-
-
-drop table if exists test_oqlext2;
-go
-
-create table test_oqlext2 (
-  id      integer         not null,
-  ext     integer         not null
-);
-go
-
-create unique index test_oqlext2_pk on test_oqlext2( id );
-go
-
 drop table if exists test_oqltag;
 go
 
@@ -963,9 +920,6 @@ create index test_oqltag_fk1 on test_oqltag( id1 );
 go
 
 create index test_oqltag_fk2 on test_oqltag( id2 );
-go
-
-grant all on test_oqlext2 to test
 go
 
 grant all on test_oqltag to test
@@ -1058,40 +1012,38 @@ go
 insert into trans_child2 (id, descr, entityOneId) values (3, 'description3', 1)
 go
 
--- tc7x
+-- tc8x
 
-drop table tc7x_self_refer_parent
+drop table tc8x_self_refer_parent
 go
-create table tc7x_self_refer_parent (
+create table tc8x_self_refer_parent (
   id        int not null,
   fid		int,
   name      varchar(200) not null
 )
 go
 
-insert into tc7x_self_refer_parent (id, fid, name) values (1, null, 'entity1')
+insert into tc8x_self_refer_parent (id, fid, name) values (1, null, 'entity1')
 go
-insert into tc7x_self_refer_parent (id, fid, name) values (2, 1, 'entity2')
+insert into tc8x_self_refer_parent (id, fid, name) values (2, 1, 'entity2')
 go
-insert into tc7x_self_refer_parent (id, fid, name) values (3, 1, 'entity3')
+insert into tc8x_self_refer_parent (id, fid, name) values (3, 1, 'entity3')
 go
 
-drop table tc7x_self_refer_child
+drop table tc8x_self_refer_child
 go
-create table tc7x_self_refer_child (
+create table tc8x_self_refer_child (
   id        int not null,
   descr     varchar(200) not null
 )
 go
 
-insert into tc7x_self_refer_child (id, descr) values (1, 'description1')
+insert into tc8x_self_refer_child (id, descr) values (1, 'description1')
 go
-insert into tc7x_self_refer_child (id, descr) values (2, 'description2')
+insert into tc8x_self_refer_child (id, descr) values (2, 'description2')
 go
-insert into tc7x_self_refer_child (id, descr) values (3, 'description3')
+insert into tc8x_self_refer_child (id, descr) values (3, 'description3')
 go
-
--- tc8x
 
 DROP TABLE tc8x_test_depends_ns
 go
@@ -1131,6 +1083,54 @@ CREATE TABLE tc8x_test_master_ns_nokg (
   descrip varchar(50) NOT NULL default '',
   PRIMARY KEY  (id)
 )
+go
+
+drop table tc8x_parent
+go
+create table tc8x_parent (
+  id        int not null PRIMARY KEY,
+  name      varchar(200) not null
+)
+go
+
+insert into tc8x_parent (id, name) values (1, 'entity1')
+go
+
+drop table tc8x_child
+go
+create table tc8x_child (
+  id        int not null PRIMARY KEY,
+  descr     varchar(200) not null
+)
+go
+
+insert into tc8x_child (id, descr) values (1, 'child1')
+go
+
+drop table tc8x_parent_compound
+go
+create table tc8x_parent_compound (
+  id1       int not null,
+  id2       int not null,
+  name      varchar(200) not null,
+  PRIMARY KEY (id1, id2)
+)
+go
+
+insert into tc8x_parent_compound (id1, id2, name) values (1, 1, 'entityCompound1')
+go
+
+drop table tc8x_child_compound
+go
+create table tc8x_child_compound (
+  id1       int not null,
+  id2       int not null,
+  descr     varchar(200) not null,
+  PRIMARY KEY (id1, id2)
+)
+go
+
+insert into tc8x_child_compound (id1, id2, descr) values (1, 1, 'childCompound1')
 go
 
 

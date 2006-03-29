@@ -75,7 +75,7 @@ public class ManyToMany extends CastorTestCase {
      * @param category The test suite of these tests
      */
     public ManyToMany( TestHarness category ) {
-        super( category, "TC123", "ManyToMany" );
+        super( category, "tempTC123", "ManyToMany" );
         _category = (JDOCategory) category;
     }
 

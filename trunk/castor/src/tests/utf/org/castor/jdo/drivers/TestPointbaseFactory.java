@@ -25,8 +25,7 @@ import junit.framework.TestCase;
 /**
  * UTF test case for {@see org.castor.jdo.drivers.PointbaseFactory}.
  */
-public class TestPointbaseFactory extends TestCase
-{
+public final class TestPointbaseFactory extends TestCase {
     /**
      * Tests whether the factory name returned equals "pointbase"
      * @throws Exception

@@ -285,7 +285,7 @@ public final class TestConcurrent extends CastorTestCase {
                         "UPDATE tc0x_sample SET value1='" + JDO_VALUE
                         + "' WHERE id=" + Sample.DEFAULT_ID);
             } catch (ObjectModifiedException ex) {
-            	_db.rollback();
+                _db.rollback();
                 LOG.error("Error: ObjectModifiedException thrown");
                 fail("ObjectModifiedException not thrown");
             }
@@ -350,9 +350,7 @@ public final class TestConcurrent extends CastorTestCase {
             _db.commit();
             LOG.debug("OK: ObjectModifiedException not thrown");
         } catch (ObjectModifiedException ex) {
-        	if (_db.isActive()) {
-        		_db.rollback();
-        	}
+            if (_db.isActive()) { _db.rollback(); }
             LOG.error("Error: ObjectModifiedException thrown", ex);
             fail("ObjectModifiedException thrown");
         }

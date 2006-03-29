@@ -162,7 +162,6 @@ public final class TestTypeConversion extends CastorTestCase {
 
     private void testConversion() throws PersistenceException {
         TypeConversion      types;
-        Enumeration         enumeration;
 
         // This one tests that bind performs type conversion
         LOG.info("Testing date/time conversion");

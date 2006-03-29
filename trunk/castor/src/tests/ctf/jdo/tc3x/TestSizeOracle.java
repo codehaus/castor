@@ -42,52 +42,35 @@
  *
  */
 
-
-package jdo;
-
-
-import org.exolab.castor.jdo.OQLQuery;
-import org.exolab.castor.jdo.QueryResults;
+package ctf.jdo.tc3x;
 
 import harness.TestHarness;
 
+import org.exolab.castor.jdo.OQLQuery;
 
-/**
- * Test for many-to-many relationship. A many to many relationship
- * is stored in a relational database as a separated table.
- */
-public class SizeOracle extends Size 
-{
-	/**
-	 * Constructor
-	 *
-	 * @param category The test suite of these tests
-	 */
-	public SizeOracle( TestHarness category ) 
-	{
-		super( category, "TC66a", "SizeOracle" );
-	}
-	
-	/**
-	 * Should fail with a non scrollable resultset.
-	 */
-	public void testSizeD() 
-	{
-		try
-		{
-			_db.begin();
-//            OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
-			OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object" );
-			QueryResults results = oqlquery.execute(false);
-			_db.commit();
-			assertTrue(true);
-		}
-		catch (Exception e)
-		{
-			// This test fails when executed against PostgreSQL. 
-			fail ("Calling size() on a non-scrollable ResultSet should fail (unless using PostgreSQL).");
-		}
-		
-	}    
-	
+public final class TestSizeOracle extends TestSize {
+    /**
+     * Constructor
+     *
+     * @param category The test suite of these tests
+     */
+    public TestSizeOracle(final TestHarness category) {
+        super(category, "TC36", "SizeOracle");
+    }
+    
+    /**
+     * Shouldn't fail with a non scrollable resultset.
+     */
+    public void testSizeD() {
+        try {
+            getDatabase().begin();
+            OQLQuery oqlquery = getDatabase().getOQLQuery(
+                    "SELECT object FROM " + Entity.class.getName() + " object");
+            oqlquery.execute(false);
+            getDatabase().commit();
+            assertTrue(true);
+        } catch (Exception ex) {
+            fail("Calling size() on a non-scrollable ResultSet shouldn't fail.");
+        }
+    }    
 }

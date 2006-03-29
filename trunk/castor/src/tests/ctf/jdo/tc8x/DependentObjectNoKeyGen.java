@@ -25,48 +25,41 @@ import org.exolab.castor.jdo.TimeStampable;
  * Dependent object for a CTF JUnit test that tests a depend relation.
  * @author nstuart
  */
-public class DependentObjectNoKeyGen implements TimeStampable{
+public final class DependentObjectNoKeyGen implements TimeStampable {
+    private int _id;
+    private String _descrip;
+    private MasterObjectNoKeyGen _master;
+    private long _timestamp;
     
-    private int id;
-    private String descrip;
-    private MasterObjectNoKeyGen master;
-    
-    private long timestamp;
-    
-    /** Creates a new instance of Dependent */
-    public DependentObjectNoKeyGen() {
-    }
-
     public int getId() {
-        return id;
+        return _id;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setId(final int id) {
+        _id = id;
     }
 
     public String getDescrip() {
-        return descrip;
+        return _descrip;
     }
 
-    public void setDescrip(String descrip) {
-        this.descrip = descrip;
+    public void setDescrip(final String descrip) {
+        _descrip = descrip;
     }
 
     public MasterObjectNoKeyGen getMaster() {
-        return master;
+        return _master;
     }
 
-    public void setMaster(MasterObjectNoKeyGen master) {
-        this.master = master;
-    }
-
-    public void jdoSetTimeStamp(long timestamp) {
-        this.timestamp = timestamp;
+    public void setMaster(final MasterObjectNoKeyGen master) {
+        _master = master;
     }
 
     public long jdoGetTimeStamp() {
-        return timestamp;
+        return _timestamp;
     }
     
+    public void jdoSetTimeStamp(final long timestamp) {
+        _timestamp = timestamp;
+    }
 }

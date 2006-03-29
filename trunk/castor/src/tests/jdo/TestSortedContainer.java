@@ -25,7 +25,7 @@ public class TestSortedContainer extends CastorTestCase {
     private JDOCategory _category;
 
     public TestSortedContainer(TestHarness category) {
-        super(category, "TC128a", "Test sorted collections");
+        super(category, "tempTC128a", "Test sorted collections");
         _category = (JDOCategory) category;
     }
 
