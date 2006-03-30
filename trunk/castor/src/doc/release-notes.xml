@@ -42,6 +42,27 @@
             <summary>
             </summary>
             <bugs>
+                <bug id="1039" tool="jira">
+                    <description>
+		                Fixed Castor being unable to find FieldDescriptor when using
+                        auto-naming with location.
+                    </description>
+                    <contributor>
+                        <name>Andrew May</name>
+                        <email>amay@ingenta.com</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Daniel Dyer</name>
+                        <email>danielwdyer@dsl.pipex.com</email>
+                    </reporter>
+                    <type>Bug</type>
+                    <module>XML</module>
+                    <date>20060330</date>
+                </bug>
                 <bug id="1346" tool="jira">
                     <description>
 		                Fixed notifyPropertyChangeListeners not being called when

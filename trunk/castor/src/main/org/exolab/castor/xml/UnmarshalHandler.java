@@ -1811,7 +1811,9 @@ implements ContentHandler, DocumentHandler, ErrorHandler {
                of the xml element in the mapping file. This logic might
                not be completely necessary, and perhaps we should remove it.
             */
-            if ((descriptor == null) && (count == 0) && (!targetState.wrapper)) {
+            // handle multiple level locations (where count > 0) (CASTOR-1039)
+            // if ((descriptor == null) && (count == 0) && (!targetState.wrapper)) {
+            if ((descriptor == null) && (!targetState.wrapper)) {
                 MarshalFramework.InheritanceMatch[] matches = null;
                 try {
                     matches = searchInheritance(name, namespace, classDesc, _cdResolver);
@@ -1827,7 +1829,11 @@ implements ContentHandler, DocumentHandler, ErrorHandler {
                 }
                 /* */
                 
-                isWrapper = (isWrapper || hasFieldsAtLocation(name, classDesc));
+                // handle multiple level locations (where count > 0) (CASTOR-1039)
+                // isWrapper = (isWrapper || hasFieldsAtLocation(name, classDesc));
+                String tmpLocation = name;
+                if (count > 0) { tmpLocation = path + "/" + name; }
+                isWrapper = (isWrapper || hasFieldsAtLocation(tmpLocation, classDesc));
             }
             else if (descriptor != null) {
                 String tmpPath = descriptor.getLocationPath();
