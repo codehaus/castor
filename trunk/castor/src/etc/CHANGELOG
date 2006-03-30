@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+XML:   Fixed bug CASTOR-1039 using contribution from Andrew May [amay@ingenta.com]
+       Fixed Castor being unable to find FieldDescriptor when using auto-naming with location.
+       Details: http://jira.codehaus.org/browse/CASTOR-1039
+       (Ralf - 20060330)
+
 XML:   Fixed bug CASTOR-1346 using contribution from Barbara Prechtl [bprechtl@nortel.com]
        Fixed notifyPropertyChangeListeners not being called when bound properties is set true.
        Details: http://jira.codehaus.org/browse/CASTOR-1346

@@ -612,6 +612,12 @@
   </contributor>
 
   <contributor type="Contributor">
+    <name surname="May" given="Andrew"/>
+    <email>amay@ingenta.com</email>
+    <description>Fixed Castor being unable to find FieldDescriptor when using auto-naming with location.</description>
+  </contributor>
+
+  <contributor type="Contributor">
      <name surname="McKinley" given="Will"/>
      <email>willowmck@yahoo.com</email>
      <description>
