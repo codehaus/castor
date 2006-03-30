@@ -302,7 +302,8 @@ public class SourceGenerator
         
         load();
         
-        _sourceFactory = new SourceFactory(this, _infoFactory);
+        // do this later (CASTOR-1346)
+        // _sourceFactory = new SourceFactory(this, _infoFactory);
         _descSourceFactory = new DescriptorSourceFactory(this);
         _mappingSourceFactory = new MappingFileSourceFactory(this);
         
@@ -323,7 +324,12 @@ public class SourceGenerator
     public void generateSource(Schema schema, String packageName) 
         throws IOException
     {
-        
+        // by this time the properties have been set. if the sourceFactory
+        // is null then create one using this for configuration. if this is
+        // done before reading in the configuration there is a problem (CASTOR-1346)
+        if (_sourceFactory == null)
+                _sourceFactory = new SourceFactory(this, _infoFactory);
+ 
         if (schema == null) {
             String err = "The argument 'schema' must not be null.";
             throw new IllegalArgumentException(err);
