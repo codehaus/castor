@@ -42,6 +42,26 @@
             <summary>
             </summary>
             <bugs>
+                <bug id="1340" tool="jira">
+                    <description>
+		                Fixed unmarshaller error with generated code when using groups.
+                    </description>
+                    <contributor>
+                        <name>Barbara Prechtl</name>
+                        <email>bprechtl@nortel.com</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Barbara Prechtl</name>
+                        <email>bprechtl@nortel.com</email>
+                    </reporter>
+                    <type>Bug</type>
+                    <module>XML</module>
+                    <date>20060330</date>
+                </bug>
                 <bug id="1164" tool="jira">
                     <description>
 		                Refactored CTF-JDO tests into subdirectories (part 3).

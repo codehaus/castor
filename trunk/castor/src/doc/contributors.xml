@@ -713,6 +713,12 @@
   </contributor>
 
   <contributor type="Contributor">
+    <name surname="Prechtl" given="Barbara"/>
+    <email>bprechtl@nortel.com</email>
+    <description>Fixed unmarshaller error with generated code when using groups.</description>
+  </contributor>
+
+  <contributor type="Contributor">
     <name surname="Purnhagen" given="Ralf" />
     <email>purnhar@gmx.net</email>
     <description>A patch to JDO which fixed a ClassNotFoundException ocurring in a multiple ClassLoader environment</description>

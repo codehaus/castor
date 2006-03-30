@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+XML:   Fixed bug CASTOR-1340 using contribution from Barbara Prechtl [bprechtl@nortel.com]
+       Fixed unMarshaller error with generated code when using groups.
+       Details: http://jira.codehaus.org/browse/CASTOR-1340
+       (Ralf - 20060330)
+
 JDO:   Fixed bug CASTOR-1164 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
        Refactored CTF-JDO tests into subdirectories (part 3).
        Details: http://jira.codehaus.org/browse/CASTOR-1164
