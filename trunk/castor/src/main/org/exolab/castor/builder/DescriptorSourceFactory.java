@@ -571,9 +571,10 @@ public class DescriptorSourceFactory {
 		jsc.add("return ");
         
         boolean isAbstract = false;
-        
-        if (member.getDeclaringClassInfo() != null)
-		    isAbstract = member.getDeclaringClassInfo().isAbstract();
+
+        // Commented out according to CASTOR-1340
+        // if (member.getDeclaringClassInfo() != null)
+		//     isAbstract = member.getDeclaringClassInfo().isAbstract();
         
         if (!isAbstract && xsType.getJType() instanceof JClass) {
         	isAbstract = ((JClass)xsType.getJType()).getModifiers().isAbstract();
