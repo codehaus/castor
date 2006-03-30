@@ -192,6 +192,9 @@ public class SourceFactory {
         else
             this.infoFactory = infoFactory;
         
+        // set the config into the info factory (CASTOR-1346)
+        infoFactory.setBoundProperties(config.boundPropertiesEnabled());
+
         this.memberFactory = new MemberFactory(config, infoFactory);
         _typeConversion = new TypeConversion(_config);
     } //-- SourceFactory

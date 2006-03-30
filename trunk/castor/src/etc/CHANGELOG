@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+XML:   Fixed bug CASTOR-1346 using contribution from Barbara Prechtl [bprechtl@nortel.com]
+       Fixed notifyPropertyChangeListeners not being called when bound properties is set true.
+       Details: http://jira.codehaus.org/browse/CASTOR-1346
+       (Ralf - 20060330)
+
 XML:   Fixed bug CASTOR-1340 using contribution from Barbara Prechtl [bprechtl@nortel.com]
        Fixed unMarshaller error with generated code when using groups.
        Details: http://jira.codehaus.org/browse/CASTOR-1340
