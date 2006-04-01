@@ -27,6 +27,7 @@
                     contribute in one way or the other to the project.</li>
                 <li>Added HOW-TO document on fetching XML dependencies from JAR files</li>
                 <li>Added HOW-TO document on using identities and references in XML</li>
+                <li>Added HOW-TO document on unmarshalling raw XML segments into arbitrary types</li>
             </ul>    
             
         </section>

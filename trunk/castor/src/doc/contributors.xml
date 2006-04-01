@@ -1231,6 +1231,12 @@
   </contributor>
 
   <contributor type="Documentor">
+    <name surname="Secoske" given="Matt"/>
+    <email>secoskem@gmail.com</email>
+    <description>HOW-TO Unmarshal raw XML segments into arbitrary types.</description>
+  </contributor>
+
+  <contributor type="Documentor">
     <name surname="Suez" given="Eitan"/>
     <email>eitan@uptodata.com</email>
     <description>

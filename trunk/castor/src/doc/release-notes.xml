@@ -42,6 +42,26 @@
             <summary>
             </summary>
             <bugs>
+                <bug id="1376" tool="jira">
+                    <description>
+		                Added HOW-TO Unmarshal raw XML segments into arbitrary types.
+                    </description>
+                    <contributor>
+                        <name>Matt Secoske</name>
+                        <email>secoskem@gmail.com</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Matt Secoske</name>
+                        <email>secoskem@gmail.com</email>
+                    </reporter>
+                    <type>Enh.</type>
+                    <module>XML</module>
+                    <date>20060401</date>
+                </bug>
                 <bug id="1039" tool="jira">
                     <description>
 		                Fixed Castor being unable to find FieldDescriptor when using
