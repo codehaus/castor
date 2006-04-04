@@ -1380,31 +1380,39 @@ public abstract class AbstractTransactionContext implements TransactionContext {
         // un-delete object first
         _tracker.unmarkAllDeleted();
 
-        // Clean the transaction locks with regards to the
-        // database engine
+        // Clean the transaction locks with regards to the database engine.
         Collection readWriteObjects = _tracker.getReadWriteObjects();
-        Iterator it = readWriteObjects.iterator();
-        while (it.hasNext()) {
-            Object object = it.next();
-            LockEngine engine = _tracker.getLockEngineForObject(object);
-            ClassMolder molder = _tracker.getMolderForObject(object);
-            OID oid = _tracker.getOIDForObject(object);
+        OID oid = null;
+        try {
+            Iterator it = readWriteObjects.iterator();
+            // First revert all objects
+            while (it.hasNext()) {
+                Object object = it.next();
+                LockEngine engine = _tracker.getLockEngineForObject(object);
+                oid = _tracker.getOIDForObject(object);
+                if (!_tracker.isCreating(object)) {
+                    engine.revertObject(this, oid, object);
+                }
+            }
 
-            try {
-                if (_tracker.isCreating(object)) {
-                    // nothing to do
-                } else if (_tracker.isCreated(object)) {
-                    // Object has been created in this transaction,
-                    // it no longer exists, forget about it in the engine.
-                    engine.revertObject(this, oid, object);
-                    engine.forgetObject(this, oid);
-                } else {
-                    // Object has been queried (possibly) deleted in this
-                    // transaction and release the lock.
-                    // if ( entry.updateCacheNeeded || entry.updatePersistNeeded
-                    // )
-                    engine.revertObject(this, oid, object);
-                    engine.releaseLock(this, oid);
+            // then forget object or release lock on them
+            it = readWriteObjects.iterator();
+            while (it.hasNext()) {
+                Object object = it.next();
+                LockEngine engine = _tracker.getLockEngineForObject(object);
+                ClassMolder molder = _tracker.getMolderForObject(object);
+                oid = _tracker.getOIDForObject(object);
+
+                if (!_tracker.isCreating(object)) {
+                    if (_tracker.isCreated(object)) {
+                        // Object has been created in this transaction,
+                        // it no longer exists, forget about it in the engine.
+                        engine.forgetObject(this, oid);
+                    } else {
+                        // Object has been queried (possibly) deleted in this
+                        // transaction and release the lock.
+                        engine.releaseLock(this, oid);
+                    }
                 }
 
                 if (_callback != null) {
@@ -1412,11 +1420,10 @@ public abstract class AbstractTransactionContext implements TransactionContext {
                 } else if (molder.getCallback() != null) {
                     molder.getCallback().releasing(object, false);
                 }
-            } catch (Exception except) {
-                // Don't thow exceptions during a rollback. Just report them.
-                LOG.error("Caught exception while rolling back object with OID "
-                        + oid, except);
             }
+        } catch (Exception except) {
+            // Don't thow exceptions during a rollback. Just report them.
+            LOG.error("Caught exception at rollback of object with OID " + oid, except);
         }
 
         // Forget about all the objects in this transaction,

@@ -2,10 +2,6 @@ package xml.template;
 
 import junit.framework.TestCase;
 
-import org.exolab.castor.jdo.Database;
-import org.exolab.castor.jdo.JDOManager;
-import org.exolab.castor.jdo.OQLQuery;
-import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.xml.Unmarshaller;
 import org.xml.sax.InputSource;

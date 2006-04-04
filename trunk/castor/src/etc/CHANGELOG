@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-972 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
+       Fixed lock conflict in TransactionContext.rollback when using dbLocked.
+       Details: http://jira.codehaus.org/browse/CASTOR-972
+       (Ralf - 20060404)
+
 XML:   Fixed bug CASTOR-1376 using contribution from Matt Secoske [secoskem@gmail.com]
        Added HOW-TO Unmarshal raw XML segments into arbitrary types.
        Details: http://jira.codehaus.org/browse/CASTOR-1376

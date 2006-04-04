@@ -18,6 +18,10 @@
         </layout>
     </appender>
     
+    <category name="org.castor.cache">
+      <priority value="warn" />
+    </category>
+
     <category name="org.exolab.castor.jdo">
       <priority value="warn" />
     </category>
