@@ -19,6 +19,19 @@
               <span class="newsTitle">Latest Release</span><br/><br/>
               <span class="newsSummary"-->
 
+        <news id="39">
+            <title>Castor 1.0 (final) released</title>
+            <author>Werner Guttmann</author>
+            <date>Apr 06 2006</date>
+            <time>23:22:21</time>
+            <summary>
+                I've placed a copy of the final Castor 1.0 release at the
+                <a href="http://dist.codehaus.org/castor/1.0/">Codehaus</a>.<br/><br/>
+
+                For details about features added and bugs fixed, please have a look at the 
+				<a href="release-notes.html">release notes</a>.
+            </summary>
+        </news>
         <news id="38">
             <title>Castor 1.0M4 released</title>
             <author>Werner Guttmann</author>
