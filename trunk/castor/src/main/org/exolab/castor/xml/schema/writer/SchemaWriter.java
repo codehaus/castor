@@ -252,8 +252,17 @@ public class SchemaWriter {
         String ELEM_APPINFO = schemaPrefix + APPINFO;
         while (enumeration.hasMoreElements()) {
             AppInfo app = (AppInfo) enumeration.nextElement();
+            
             String source = app.getSource();
-            if (source != null)
+            String sourceName = _atts.getName(0);
+            boolean isSourceIsNull = (sourceName == null);
+            boolean isSourceExists = false;
+            
+            if (!isSourceIsNull)
+            {
+                isSourceExists = sourceName.equals(SchemaNames.SOURCE_ATTR);
+            }
+            if (source != null && !isSourceExists)
                 _atts.addAttribute(SchemaNames.SOURCE_ATTR, CDATA,source);
 
             _handler.startElement(ELEM_APPINFO, _atts);
@@ -280,8 +289,18 @@ public class SchemaWriter {
         while (enumeration.hasMoreElements()) {
             Documentation doc = (Documentation) enumeration.nextElement();
             String source = doc.getSource();
-            if (source != null)
+            String sourceName = _atts.getName(0);
+            boolean isSourceIsNull = (sourceName == null);
+            boolean isSourceExists = false;
+            
+            if (!isSourceIsNull)
+            {
+                isSourceExists = sourceName.equals(SchemaNames.SOURCE_ATTR);
+            }
+            if (source != null && !isSourceExists)
+            {
                 _atts.addAttribute(SchemaNames.SOURCE_ATTR, CDATA,source);
+            }
 
             _handler.startElement(ELEM_DOCUMENTATION, _atts);
             Enumeration anyNodes = doc.getObjects();

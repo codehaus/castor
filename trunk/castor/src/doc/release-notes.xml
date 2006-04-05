@@ -42,6 +42,26 @@
             <summary>
             </summary>
             <bugs>
+                <bug id="1371" tool="jira">
+                    <description>
+		                Fixed problem in SchemaWriter related to annotations.
+                    </description>
+                    <contributor>
+                        <name>Hristo Ganev</name>
+                        <email>h.b.ganev@gmail.com</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Hristo Ganev</name>
+                        <email>h.b.ganev@gmail.com</email>
+                    </reporter>
+                    <type>Bug</type>
+                    <module>XML</module>
+                    <date>20060405</date>
+                </bug>
                 <bug id="972" tool="jira">
                     <description>
 		                Fixed lock conflict in TransactionContext.rollback when using dbLocked.
