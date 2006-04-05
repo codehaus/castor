@@ -37,9 +37,17 @@
 
 	    <release version="1.0">
 	        <description>New and on-going development</description>
-    		<date>tbd</date>
+    		<date>April 6, 2006</date>
     		<managed-by>Werner Guttmann</managed-by>
             <summary>
+				<h2>Requirements</h2>
+
+				<h3>Introduced <font color="red">Java 1.4</font> as a dependecy</h3>
+				
+				<p>This is a reminder that we have started to add some features that more or less depend 
+				   on features made available with Java 1.4 (only), such as the JDBC 3.0 API enhancements. As
+				   such, we have made Java 1.4 a key requirement for the upcoming Castor 1.0 release.</p>
+				   
             </summary>
             <bugs>
                 <bug id="1371" tool="jira">

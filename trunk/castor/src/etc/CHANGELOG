@@ -2,6 +2,9 @@
 Version (CVS)
 -------------
 
+Version 1.0, Apr 6, 2006
+-------------------------------
+
 XML:   Fixed bug CASTOR-1371 using contribution from Hristo Ganev [h.b.ganev@gmail.com]
        Fixed problem in SchemaWriter related to annotations.
        Details: http://jira.codehaus.org/browse/CASTOR-1371
