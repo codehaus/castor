@@ -225,11 +225,10 @@
            <crow><td><b>ldapjdk.jar</b></td><td>Mozilla Directory SDK (DSML/MDS)</td></crow>
            <crow><td>ldapsp.jar</td><td>JNDI LDAP service provider from Mozilla</td></crow>
            <crow><td><b>log4j-1.2.8.jar</b></td><td>Log4J</td></crow>
-           <crow><td>postgresql-6.3.jar</td><td>PostgreSQL 6.3 driver with DataSource
-                                              support (used in default example)</td></crow>
            <crow><td>servlet.jar</td><td>Used by the Servlet examples</td></crow>
            <crow><td><b>xerces-J_1.4.0.jar</b></td><td>Xerces XML library</td></crow>
            <crow><td>adaptx-0.9.13.jar</td><td>XSL(T) processor, used for building documentation</td></crow>
+           <crow><td>derby-10.1.2.1.jar</td><td>Apache Derby JDBC driver (used in default example)</td></crow>
          </ctable>
          
          <p>and optionally</p>
