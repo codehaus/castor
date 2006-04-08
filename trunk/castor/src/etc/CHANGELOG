@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1385 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
+       Removed dependecy of JDO on org.exolab.castor.util.LocalConfiguration.
+       Details: http://jira.codehaus.org/browse/CASTOR-1385
+       (Ralf - 20060408)
+
 All:   Fixed bug CASTOR-1381 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
        Removed org.exolab.castor.util.Logger.
        Details: http://jira.codehaus.org/browse/CASTOR-1381

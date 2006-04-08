@@ -33,11 +33,11 @@ import org.apache.commons.logging.LogFactory;
 
 import org.castor.util.Base64Decoder;
 import org.castor.util.Base64Encoder;
+import org.castor.util.Configuration;
 
 import org.exolab.castor.jdo.engine.ClobImpl;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.TypeConvertor;
-import org.exolab.castor.util.LocalConfiguration;
 
 /**
  * @author <a href="mailto:arkin AT intalio DOT com">Assaf Arkin</a>
@@ -187,14 +187,8 @@ public final class SQLTypeConverters {
      */
     private static int getLobBufferSize() {
         if (_lobBufferSize == -1) {
-            LocalConfiguration config = LocalConfiguration.getInstance();
-            String property = config.getProperty(LOB_PROPERTY, "");
-            try {
-                _lobBufferSize = Integer.parseInt(property.trim());
-            } catch (NumberFormatException ex) {
-                // eat the exception and just use the old size
-                _lobBufferSize = DEFAULT_LOB_SIZE;
-            }
+            Configuration config = Configuration.getInstance();
+            _lobBufferSize = config.getProperty(LOB_PROPERTY, DEFAULT_LOB_SIZE);
             if (LOG.isDebugEnabled()) { LOG.debug("Using lobSize: " + _lobBufferSize); }
         }
         return _lobBufferSize;

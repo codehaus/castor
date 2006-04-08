@@ -49,11 +49,12 @@ package org.exolab.castor.persist;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.StringTokenizer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.exolab.castor.util.LocalConfiguration;
+
+import org.castor.util.Configuration;
+
 import org.exolab.castor.util.Messages;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 
@@ -125,32 +126,23 @@ public class PersistenceFactoryRegistry
 
 
     /**
-     * Load the factories from the properties file, if not
-     * loaded before.
+     * Load the factories from the properties file, if not loaded before.
      */
-    private static synchronized void load()
-    {
+    private static synchronized void load() {
         if ( _factories == null ) {
-            String             prop;
-            StringTokenizer    tokenizer;
-            PersistenceFactory factory;
-            Class              cls;
-            
             _factories = new Hashtable();
-            prop = LocalConfiguration.getInstance().getProperty( FactoriesProperty, "" );
-            tokenizer = new StringTokenizer( prop, ", " );
-            while ( tokenizer.hasMoreTokens() ) {
-                prop = tokenizer.nextToken();
+
+            Configuration config = Configuration.getInstance();
+            String[] props = config.getProperty(FactoriesProperty);
+            ClassLoader ldr = PersistenceFactoryRegistry.class.getClassLoader();
+            for (int i = 0; i < props.length; i++) {
                 try {
-                    cls = PersistenceFactoryRegistry.class.getClassLoader().loadClass( prop );
-                    factory = (PersistenceFactory) cls.newInstance();
-                    _factories.put( factory.getFactoryName(), factory );
+                    Object factory = ldr.loadClass(props[i]).newInstance();
+                    _factories.put(((PersistenceFactory) factory).getFactoryName(), factory);
                 } catch ( Exception except ) {
-                    LOG.error( Messages.format( "persist.missingPersistenceFactory", prop ) );
+                    LOG.error(Messages.format("persist.missingPersistenceFactory", props[i]));
                 }
             }
         }
     }
-
-
 }

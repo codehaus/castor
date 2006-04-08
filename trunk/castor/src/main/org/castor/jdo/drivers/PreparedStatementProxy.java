@@ -45,7 +45,7 @@ import java.util.StringTokenizer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.exolab.castor.util.LocalConfiguration;
+import org.castor.util.Configuration;
 
 /**
  * Proxy class for JDBC PreparedStatement class, to allow information gathering
@@ -59,6 +59,16 @@ public final class PreparedStatementProxy implements PreparedStatement {
 
     /** Commons logger. */
     private static final Log LOG = LogFactory.getLog(PreparedStatementProxy.class);
+    
+    /**
+     * Property specifying whether JDBC proxy classes should be used 
+     * <pre>
+     * org.exolab.castor.persist.useProxies
+     * </pre>
+     * @since 1.0.1
+     */
+    public static final String PROPERTY_USE_JDBC_PROXIES =
+        "org.exolab.castor.persist.useProxies";
     
     /** Has property of LocalConfiguration been read? */
     private static boolean _isConfigured = false;
@@ -94,9 +104,8 @@ public final class PreparedStatementProxy implements PreparedStatement {
             final Connection connection) {
         
         if (!_isConfigured) {
-            String propertyValue = LocalConfiguration.getInstance().getProperty(
-                    "org.exolab.castor.persist.useProxies", "true");
-            _useProxies = Boolean.valueOf(propertyValue).booleanValue();
+            _useProxies = Configuration.getInstance().getProperty(
+                    PROPERTY_USE_JDBC_PROXIES, true);
             _isConfigured = true;
         }
 
