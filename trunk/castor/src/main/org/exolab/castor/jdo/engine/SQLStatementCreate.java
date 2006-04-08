@@ -32,6 +32,7 @@ import org.apache.commons.logging.LogFactory;
 import org.castor.jdo.engine.ConnectionFactory;
 import org.castor.jdo.engine.DatabaseRegistry;
 import org.castor.jdo.engine.SQLTypeInfos;
+import org.castor.util.ConfigKeys;
 import org.castor.util.Configuration;
 
 import org.exolab.castor.jdo.Database;
@@ -47,16 +48,6 @@ public final class SQLStatementCreate {
     /** The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
      *  Commons Logging</a> instance used for all logging. */
     private static final Log LOG = LogFactory.getLog(SQLStatementCreate.class);
-    
-    /**
-     * Property specifying whether JDBC 3.0-specific features should be used, 
-     * such ase.g. the use of Statement.getGeneratedKeys() 
-     * <pre>
-     * org.castor.jdo.use.jdbc30
-     * </pre>
-     * @since 1.0M3
-     */
-    public static final String PROPERTY_USE_JDBC30 = "org.castor.jdo.use.jdbc30";
     
     private final SQLEngine _engine;
     
@@ -94,7 +85,8 @@ public final class SQLStatementCreate {
             }
         }
 
-        _useJDBC30 = Configuration.getInstance().getProperty(PROPERTY_USE_JDBC30, false);
+        Configuration config = Configuration.getInstance();
+        _useJDBC30 = config.getProperty(ConfigKeys.USE_JDBC30, false);
         
         _lookupStatement = new SQLStatementLookup(engine, factory);
         

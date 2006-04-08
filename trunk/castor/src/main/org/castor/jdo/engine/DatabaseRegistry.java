@@ -27,6 +27,7 @@ import org.apache.commons.logging.LogFactory;
 import org.castor.jdo.conf.Database;
 import org.castor.jdo.conf.DatabaseChoice;
 import org.castor.jdo.conf.JdoConf;
+import org.castor.util.ConfigKeys;
 import org.castor.util.Configuration;
 
 import org.exolab.castor.mapping.Mapping;
@@ -55,10 +56,6 @@ public final class DatabaseRegistry {
         "NOTE: JDO configuration syntax has changed with castor 0.9.6, "
       + "please see http://castor.codehaus.org/release-notes.html for details";
   
-    /** Property telling if database should be initialized when loading. */
-    private static final String INITIALIZE_AT_LOAD = 
-        "org.exolab.castor.jdo.DatabaseInitializeAtLoad";
-    
     /** The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
      *  Commons Logging</a> instance used for all logging. */
     private static final Log LOG = LogFactory.getLog(DatabaseRegistry.class);
@@ -159,7 +156,7 @@ public final class DatabaseRegistry {
         // Do we need to initialize database now or should we
         // wait until we want to use it.
         Configuration cfg = Configuration.getInstance();
-        boolean init = cfg.getProperty(INITIALIZE_AT_LOAD, true);
+        boolean init = cfg.getProperty(ConfigKeys.INITIALIZE_AT_LOAD, true);
         
         // Load the JDO configuration file from the specified input source.
         // databases = JDOConfLoader.getDatabases(baseURI, resolver);

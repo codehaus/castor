@@ -33,6 +33,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.castor.util.Base64Decoder;
 import org.castor.util.Base64Encoder;
+import org.castor.util.ConfigKeys;
 import org.castor.util.Configuration;
 
 import org.exolab.castor.jdo.engine.ClobImpl;
@@ -110,9 +111,6 @@ public final class SQLTypeConverters {
     /** Default pattern to convert Double and Date. */
     private static final String DECIMAL_PATTERN = "#################0";
     
-    /** Property name of LOB buffer size in castor.properties. */
-    private static final String LOB_PROPERTY = "org.exolab.castor.jdo.lobBufferSize";
-    
     /** Default value of LOB buffer size if property could not been loaded. */
     private static final int DEFAULT_LOB_SIZE = 256;
 
@@ -188,7 +186,8 @@ public final class SQLTypeConverters {
     private static int getLobBufferSize() {
         if (_lobBufferSize == -1) {
             Configuration config = Configuration.getInstance();
-            _lobBufferSize = config.getProperty(LOB_PROPERTY, DEFAULT_LOB_SIZE);
+            _lobBufferSize = config.getProperty(
+                    ConfigKeys.LOB_BUFFER_SIZE, DEFAULT_LOB_SIZE);
             if (LOG.isDebugEnabled()) { LOG.debug("Using lobSize: " + _lobBufferSize); }
         }
         return _lobBufferSize;

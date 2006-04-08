@@ -28,6 +28,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.castor.util.ConfigKeys;
 import org.castor.util.Configuration;
 
 /**
@@ -42,16 +43,6 @@ public final class ConnectionProxy implements java.sql.Connection {
 
     /** Jakarta Common Log instance. */
     private static final Log LOG = LogFactory.getLog(ConnectionProxy.class);
-    
-    /**
-     * Property specifying whether JDBC proxy classes should be used 
-     * <pre>
-     * org.exolab.castor.persist.useProxies
-     * </pre>
-     * @since 1.0.1
-     */
-    public static final String PROPERTY_USE_JDBC_PROXIES =
-        "org.exolab.castor.persist.useProxies";
     
     /** Default calling location, equals 'unknwon'. */
     private static final String DEFAULT_CALLED_BY = "unknown";
@@ -89,7 +80,7 @@ public final class ConnectionProxy implements java.sql.Connection {
         
         if (!_isConfigured) {
             _useProxies = Configuration.getInstance().getProperty(
-                    PROPERTY_USE_JDBC_PROXIES, true);
+                    ConfigKeys.USE_JDBC_PROXIES, true);
             _isConfigured = true;
         }
         

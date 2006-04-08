@@ -26,6 +26,7 @@ import org.castor.transactionmanager.TransactionManagerAcquireException;
 import org.castor.transactionmanager.TransactionManagerFactory;
 import org.castor.transactionmanager.TransactionManagerFactoryRegistry;
 
+import org.castor.util.ConfigKeys;
 import org.castor.util.Configuration;
 
 /**
@@ -53,11 +54,11 @@ public final class TestTransactionManagerFactoryRegistry extends TestCase {
         if (DISABLE_LOGGING) { logger.setLevel(Level.FATAL); }
 
         assertEquals("org.castor.transactionmanager.Factories",
-                TransactionManagerFactoryRegistry.PROPERTY_TRANSACTION_MANAGER_FACTORY);
+                ConfigKeys.TRANSACTION_MANAGER_FACTORIES);
         
         Configuration config = Configuration.getInstance();
-        String mem = config.getProperty("org.castor.transactionmanager.Factories", null);
-        config.getProperties().put("org.castor.transactionmanager.Factories",
+        String mem = config.getProperty(ConfigKeys.TRANSACTION_MANAGER_FACTORIES, null);
+        config.getProperties().put(ConfigKeys.TRANSACTION_MANAGER_FACTORIES,
                 "org.castor.transactionmanager.LocalTransactionManagerFactory, "
                 + TransactionManagerFactoryDummy.class.getName() + ", "
                 + "UnknownTransactionManagerFactory");
@@ -86,7 +87,7 @@ public final class TestTransactionManagerFactoryRegistry extends TestCase {
             fail("Unexpected TransactionManagerAcquireException.");
         }
         
-        config.getProperties().put("org.castor.transactionmanager.Factories", mem);
+        config.getProperties().put(ConfigKeys.TRANSACTION_MANAGER_FACTORIES, mem);
 
         logger.setLevel(level);
     }

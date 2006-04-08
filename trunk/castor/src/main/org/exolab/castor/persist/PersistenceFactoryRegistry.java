@@ -53,6 +53,7 @@ import java.util.Hashtable;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.castor.util.ConfigKeys;
 import org.castor.util.Configuration;
 
 import org.exolab.castor.util.Messages;
@@ -73,14 +74,6 @@ public class PersistenceFactoryRegistry
      *  Logging </a> instance used for all logging. */
     private static final Log LOG = LogFactory.getLog(PersistenceFactoryRegistry.class);
     
-    /**
-     * Property listing all the available persistence
-     * factories. (<tt>org.exolab.castor.jdo.engines</tt>).
-     */
-    private static final String FactoriesProperty = 
-        "org.exolab.castor.jdo.engines";
-
-
     /**
      * Association between factory name and object.
      */
@@ -133,7 +126,7 @@ public class PersistenceFactoryRegistry
             _factories = new Hashtable();
 
             Configuration config = Configuration.getInstance();
-            String[] props = config.getProperty(FactoriesProperty);
+            String[] props = config.getProperty(ConfigKeys.PERSISTENCE_FACTORIES);
             ClassLoader ldr = PersistenceFactoryRegistry.class.getClassLoader();
             for (int i = 0; i < props.length; i++) {
                 try {
