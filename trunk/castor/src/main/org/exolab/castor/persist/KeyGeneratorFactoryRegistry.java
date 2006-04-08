@@ -49,11 +49,12 @@ package org.exolab.castor.persist;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.StringTokenizer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.exolab.castor.util.LocalConfiguration;
+
+import org.castor.util.Configuration;
+
 import org.exolab.castor.util.Messages;
 import org.exolab.castor.persist.spi.KeyGeneratorFactory;
 
@@ -125,32 +126,23 @@ public final class KeyGeneratorFactoryRegistry
 
 
     /**
-     * Load the key generators from the properties file, if not
-     * loaded before.
+     * Load the key generators from the properties file, if not loaded before.
      */
-    private static synchronized void load()
-    {
-        if ( _factories == null ) {
-            String             prop;
-            StringTokenizer    tokenizer;
-            KeyGeneratorFactory factory;
-            Class              cls;
-            
+    private static synchronized void load() {
+        if (_factories == null) {
             _factories = new Hashtable();
-            prop = LocalConfiguration.getInstance().getProperty( KeyGeneratorFactoriesProperty, "" );
-            tokenizer = new StringTokenizer( prop, ", " );
-            while ( tokenizer.hasMoreTokens() ) {
-                prop = tokenizer.nextToken();
+            
+            Configuration config = Configuration.getInstance();
+            String[] props = config.getProperty(KeyGeneratorFactoriesProperty);
+            ClassLoader ldr = KeyGeneratorFactoryRegistry.class.getClassLoader();
+            for (int i = 0; i < props.length; i++) {
                 try {
-                    cls = KeyGeneratorFactoryRegistry.class.getClassLoader().loadClass( prop );
-                    factory = (KeyGeneratorFactory) cls.newInstance();
-                    _factories.put( factory.getName(), factory );
-                } catch ( Exception except ) {
-                    LOG.error( Messages.format( "persist.missingKeyGeneratorFactory", prop ) );
+                    Object factory = ldr.loadClass(props[i]).newInstance();
+                    _factories.put(((KeyGeneratorFactory) factory).getName(), factory);
+                } catch (Exception except) {
+                    LOG.error(Messages.format("persist.missingKeyGeneratorFactory", props[i]));
                 }
             }
         }
     }
-
-
 }

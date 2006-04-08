@@ -32,8 +32,9 @@ import java.util.TimeZone;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.castor.util.Configuration;
+
 import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.util.LocalConfiguration;
 
 /**
  * Utility class to translate SQL type by integer value or name into corresponding
@@ -124,7 +125,7 @@ public final class SQLTypeInfos {
     
     static {
         String name = "org.exolab.castor.jdo.defaultTimeZone";
-        String zone = LocalConfiguration.getInstance().getProperty(name, "");
+        String zone = Configuration.getInstance().getProperty(name, "");
         if (zone.length() == 0) {
             TIME_ZONE = TimeZone.getDefault();
         } else {

@@ -42,6 +42,26 @@
             <summary>
             </summary>
             <bugs>
+                <bug id="1385" tool="jira">
+                    <description>
+		                Removed dependecy of JDO on org.exolab.castor.util.LocalConfiguration.
+                    </description>
+                    <contributor>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </reporter>
+                    <type>Enh.</type>
+                    <module>JDO</module>
+                    <date>20060408</date>
+                </bug>
                 <bug id="1381" tool="jira">
                     <description>
 		                Removed org.exolab.castor.util.Logger.

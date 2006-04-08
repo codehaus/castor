@@ -54,11 +54,12 @@ import harness.TestHarness;
 
 import jdo.JDOCategory;
 
+import org.castor.util.Configuration;
+
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.QueryResults;
-import org.exolab.castor.util.LocalConfiguration;
 
 public final class TestSynchronizable extends CastorTestCase {
     /**
@@ -90,7 +91,7 @@ public final class TestSynchronizable extends CastorTestCase {
      * Get a JDO database
      */
     public void setUp() throws PersistenceException, SQLException {
-        LocalConfiguration config = LocalConfiguration.getInstance();
+        Configuration config = Configuration.getInstance();
         Properties props = config.getProperties();
         _oldProperty = (String) props.setProperty(
                 TX_SYNCHRONIZABLE_PROPERTY, 
@@ -167,7 +168,7 @@ public final class TestSynchronizable extends CastorTestCase {
         _synchronizables.clear();
         _db.close();
         
-        LocalConfiguration config = LocalConfiguration.getInstance();
+        Configuration config = Configuration.getInstance();
         Properties props = config.getProperties();
         if (_oldProperty != null) {
             props.setProperty(TX_SYNCHRONIZABLE_PROPERTY, _oldProperty);

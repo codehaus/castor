@@ -18,7 +18,6 @@ package org.exolab.castor.jdo.engine;
 import java.util.ArrayList;
 import java.sql.Connection;
 import java.util.Iterator;
-import java.util.StringTokenizer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,6 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import org.castor.jdo.engine.AbstractConnectionFactory;
 import org.castor.jdo.engine.DatabaseRegistry;
 import org.castor.jdo.util.ClassLoadingUtils;
+import org.castor.util.Configuration;
 
 import org.castor.persist.ProposedObject;
 import org.castor.persist.TransactionContext;
@@ -35,7 +35,6 @@ import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.persist.*;
 import org.exolab.castor.persist.spi.CallbackInterceptor;
 import org.exolab.castor.persist.spi.InstanceFactory;
-import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.util.Messages;
 
 /**
@@ -498,29 +497,23 @@ public abstract class AbstractDatabaseImpl
      * Load the {@link TxSynchronizable} implementations from the 
      * properties file, if not loaded before.
      */
-    protected void loadSynchronizables()
-    {
-    	if ( _synchronizables == null ) {
+    protected void loadSynchronizables() {
+    	if (_synchronizables == null) {
     		_synchronizables = new ArrayList();
     		
-    		String syncName = LocalConfiguration.getInstance().getProperty(TxSynchronizableProperty, "");
-            StringTokenizer tokenizer = new StringTokenizer(syncName, ", ");
-    		while (tokenizer.hasMoreTokens()) {
-                syncName = tokenizer.nextToken();
+            Configuration config = Configuration.getInstance();
+            String[] props = config.getProperty(TxSynchronizableProperty);
+            for (int i = 0; i < props.length; i++) {
                 try {
-                    Class cls = null;
-                    cls = ClassLoadingUtils.loadClass(_classLoader, syncName);
+                    Class cls = ClassLoadingUtils.loadClass(_classLoader, props[i]);
                     TxSynchronizable sync = (TxSynchronizable) cls.newInstance();
-                    if (sync != null)
-                        _synchronizables.add(sync);
+                    if (sync != null) { _synchronizables.add(sync); }
                 } catch (Exception except) {
-                    _log.warn(Messages.format("jdo.missingTxSynchronizable", syncName));
+                    _log.warn(Messages.format("jdo.missingTxSynchronizable", props[i]));
                 }
             }
     		
-    		if (_synchronizables.size() == 0) {
-                _synchronizables = null;
-            }
+    		if (_synchronizables.size() == 0) { _synchronizables = null; }
     	}
     }
     
@@ -541,8 +534,7 @@ public abstract class AbstractDatabaseImpl
      * Unregister the {@link TxSynchronizable} implementations at the
      * TransactionContect after commit() or rollback().
      */
-    protected void unregisterSynchronizables()
-    {
+    protected void unregisterSynchronizables() {
         if (_synchronizables != null  && _synchronizables.size() > 0) {
             Iterator iter = _synchronizables.iterator();
             while (iter.hasNext()) {
@@ -551,4 +543,4 @@ public abstract class AbstractDatabaseImpl
         }
     }
 }  
-                                
+                               
