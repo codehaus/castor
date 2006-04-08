@@ -20,7 +20,6 @@ import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
 import org.exolab.castor.mapping.xml.MappingRoot;
-import org.exolab.castor.util.Logger;
 import org.exolab.castor.xml.Marshaller;
 
 /**
@@ -47,8 +46,6 @@ public class Test
 
     private JDOManager _jdo;
     
-    private static PrintWriter writer = new Logger( System.out ).setPrefix( DATABASE_NAME );
-    
     public static void main( String[] args )
     {
         try
@@ -59,8 +56,7 @@ public class Test
         }
         catch (Exception except)
         {
-            LOG.error(except);
-            except.printStackTrace(writer);
+            LOG.error(except, except);
         }
     }
 
@@ -405,7 +401,7 @@ public class Test
 
         Marshaller     marshaller;
 
-        marshaller = new Marshaller( writer );
+        marshaller = new Marshaller( new PrintWriter(System.out) );
         marshaller.setMapping( _mapping );
 
         db.begin();

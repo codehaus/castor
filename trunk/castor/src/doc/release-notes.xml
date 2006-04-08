@@ -35,6 +35,35 @@
         </release>
 -->
 
+	    <release version="CVS">
+	        <description>New and on-going development</description>
+    		<date>tbd</date>
+    		<managed-by>Werner Guttmann</managed-by>
+            <summary>
+            </summary>
+            <bugs>
+                <bug id="1381" tool="jira">
+                    <description>
+		                Removed org.exolab.castor.util.Logger.
+                    </description>
+                    <contributor>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </reporter>
+                    <type>Enh.</type>
+                    <module>All</module>
+                    <date>20060415</date>
+                </bug>
+            </bugs>
+        </release>
 	    <release version="1.0">
 	        <description>New and on-going development</description>
     		<date>April 6, 2006</date>

@@ -305,10 +305,10 @@ public final class LocalConfiguration extends Configuration {
                 return saxParser.getParser();
             }
             catch(ParserConfigurationException pcx) {
-                Logger.getSystemLogger().println( Messages.format( "conf.configurationError", pcx ) );
+                _log.error( Messages.format( "conf.configurationError", pcx ) );
             }
             catch(org.xml.sax.SAXException sx) {
-                Logger.getSystemLogger().println( Messages.format( "conf.configurationError", sx ) );
+                _log.error( Messages.format( "conf.configurationError", sx ) );
             }
             
         }
@@ -348,7 +348,7 @@ public final class LocalConfiguration extends Configuration {
                 }
             } 
             catch ( SAXException except ) {
-                Logger.getSystemLogger().println( Messages.format( "conf.configurationError", except ) );
+                _log.error( Messages.format( "conf.configurationError", except ) );
             }
         }
         return parser;
@@ -411,10 +411,10 @@ public final class LocalConfiguration extends Configuration {
                 reader = saxParser.getXMLReader();
             }
             catch(ParserConfigurationException pcx) {
-                Logger.getSystemLogger().println( Messages.format( "conf.configurationError", pcx ) );
+                _log.error( Messages.format( "conf.configurationError", pcx ) );
             }
             catch(org.xml.sax.SAXException sx) {
-                Logger.getSystemLogger().println( Messages.format( "conf.configurationError", sx ) );
+                _log.error( Messages.format( "conf.configurationError", sx ) );
             }
             
         }
@@ -454,7 +454,7 @@ public final class LocalConfiguration extends Configuration {
             }
         } 
         catch ( SAXException except ) {
-            Logger.getSystemLogger().println( Messages.format( "conf.configurationError", except ) );
+            _log.error( Messages.format( "conf.configurationError", except ) );
         }
         return reader;
         

@@ -45,12 +45,16 @@
 
 package dtx;
 
-import java.io.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.dtx.*;
-import org.exolab.castor.util.Logger;
 
 public class Test {
 
+    /** The <a href="http://jakarta.apache.org/commons/logging/">Jakarta Commons
+     *  Logging </a> instance used for all logging. */
+    private static final Log LOG = LogFactory.getLog(Test.class);
+    
     static String DATABASE = "database.xml";
     static String SCHEMA = "product.xsd";
     static int MAX_ID = 10;
@@ -67,37 +71,32 @@ public class Test {
     public void run() {
 
 	try {
-	    PrintWriter writer = new Logger(System.err).setPrefix("dtxtest");
-
 	    DTXEngine engine = new DTXEngine();
 
-	    engine.setLogWriter(writer);
-
 	    String schemaURL = getClass().getResource(SCHEMA).toString();
-	    writer.println("Schema URL: " + schemaURL);
+	    LOG.info("Schema URL: " + schemaURL);
 	    engine.setSchema(schemaURL);
 	    String dbURL = getClass().getResource(DATABASE).toString();
-	    writer.println("DB URL: " + dbURL);
+        LOG.info("DB URL: " + dbURL);
 	    engine.setDatabase(dbURL);
 
-	    writer.println("Setting document handler...");
+        LOG.info("Setting document handler...");
 
 	    engine.setDocumentHandler(new DemoHandler());
 
-	    writer.println("Preparing query...");
+        LOG.info("Preparing query...");
 
 	    DTXQuery qry = engine.prepareQuery("SELECT p FROM myapp.Product p " +
 					       "WHERE p.id = $1 ");
 
-	    writer.println("Beginning bind-and-execute loop.");
+        LOG.info("Beginning bind-and-execute loop.");
 
 	    for (int i = 0; i < MAX_ID; i++) {
-
-		writer.println("Binding id " + i);
-		qry.bind(1, i);
-		writer.println("Executing for id " + i);
-		qry.execute();
-		writer.println("Done executing " + i);
+            LOG.info("Binding id " + i);
+            qry.bind(1, i);
+            LOG.info("Executing for id " + i);
+            qry.execute();
+            LOG.info("Done executing " + i);
 	    }
 
 	    DTXQuery multiQuery = engine.prepareQuery("SELECT p FROM myapp.Product p " +

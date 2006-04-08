@@ -47,6 +47,8 @@ package org.exolab.castor.util;
 
 import java.text.*;
 import java.util.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * I18N message formatting class. A static factory for obtaining
@@ -63,8 +65,10 @@ import java.util.*;
  */
 public class Messages
 {
-
-
+    /** The <a href="http://jakarta.apache.org/commons/logging/">Jakarta Commons
+     *  Logging </a> instance used for all logging. */
+    private static final Log LOG = LogFactory.getLog(Messages.class);
+    
     /**
      * The name of the resource holding all the messages in the English
      * language. Resources for other languages and locales use the same
@@ -97,7 +101,6 @@ public class Messages
     {
         return format( message, new Object[] { arg1 } );
     }
-
     /**
      * Format the named message using two argument and return the
      * full message text.
@@ -190,7 +193,7 @@ public class Messages
                 _messages = ResourceBundle.getBundle( ResourceName, locale ); 
         } catch ( Exception except ) {
             _messages = new EmptyResourceBundle();
-            Logger.getSystemLogger().println( "Failed to locate messages resource " +
+            LOG.error( "Failed to locate messages resource " +
                                               ResourceName );
         }
         _formats = new Hashtable();

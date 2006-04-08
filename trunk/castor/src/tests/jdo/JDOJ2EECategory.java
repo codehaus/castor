@@ -55,7 +55,6 @@ import org.exolab.castor.jdo.JDO;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.util.Logger;
 import org.exolab.castor.util.Messages;
 
 import java.net.URL;
@@ -203,11 +202,6 @@ public class JDOJ2EECategory extends TestHarness {
 		_jdo.setAutoStore( true );
 		_jdo.setDatabasePooling( true );
 		_jdo.setClassLoader(Thread.currentThread().getContextClassLoader());
-		
-		if ( verbose ) {
-			_jdo.setLogWriter( Logger.getSystemLogger() );
-		}
-		
 	}
 	
 	/*

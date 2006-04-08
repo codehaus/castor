@@ -77,7 +77,6 @@ public class DTXEngine {
 
     protected DocumentHandler _handler = null;
     protected String _databaseURL = null;
-    protected PrintWriter _logWriter = Logger.getSystemLogger();
     protected Database _database = null;
     protected String _schemaURL = null;
     protected Schema _schema = null;
@@ -142,10 +141,6 @@ public class DTXEngine {
 
 	unm.setEntityResolver( new DTDResolver() );
 
-	if ( _logWriter != null ) {
-	    unm.setLogWriter( _logWriter );
-	}
-
 	try {
 	    _database = (Database) unm.unmarshal(new InputSource((new URL(databaseURL)).openStream()));
 	} catch (Exception except) {
@@ -170,10 +165,6 @@ public class DTXEngine {
 
 	Unmarshaller munm = new Unmarshaller( MappingRoot.class );
 
-	if ( _logWriter != null ) {
-	    munm.setLogWriter( _logWriter );
-	}
-
  	Mapping mappings[] = _database.getMapping();
 
 	for ( int i = 0 ; i < mappings.length ; ++i ) {
@@ -184,26 +175,11 @@ public class DTXEngine {
 
 		for (int j = 0; j < classMaps.length; j++) {
 		    _classMappings.put(classMaps[j].getName(), classMaps[j]);
-		    if (_logWriter != null) {
-			_logWriter.println("Got class: " + classMaps[j].getName());
-		    }
 		}
 	    } catch (Exception e) {
 		throw new DTXException(e);
 	    }
  	}
-    }
-
-    /**
-     * Sets the log writer for this DTX engine. Individual
-     * queries will use this writer by default, but it can be
-     * overwritten on a per-query basis.
-     *
-     * @param logWriter A PrintWriter to use for logging.
-     */
-
-    public void setLogWriter(PrintWriter logWriter) {
-	_logWriter = logWriter;
     }
 
     /**
@@ -233,7 +209,6 @@ public class DTXEngine {
 	DTXQuery qry = new DTXQuery();
 	qry.setEngine(this);
 	qry.setHandler(_handler);
-	qry.setLogWriter(_logWriter);
 	qry.prepare(oql);
 
 	return qry;
