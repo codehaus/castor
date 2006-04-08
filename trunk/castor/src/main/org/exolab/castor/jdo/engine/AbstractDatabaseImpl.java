@@ -25,6 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import org.castor.jdo.engine.AbstractConnectionFactory;
 import org.castor.jdo.engine.DatabaseRegistry;
 import org.castor.jdo.util.ClassLoadingUtils;
+import org.castor.util.ConfigKeys;
 import org.castor.util.Configuration;
 
 import org.castor.persist.ProposedObject;
@@ -48,13 +49,6 @@ import org.exolab.castor.util.Messages;
 public abstract class AbstractDatabaseImpl
     implements Database
 {
-    /**
-     * Property listing all the available {@link TxSynchronizable}
-     * implementations (<tt>org.exolab.castor.persit.TxSynchronizable</tt>).
-     */
-    private static final String TxSynchronizableProperty = 
-        "org.exolab.castor.persist.TxSynchronizable";
-
     /**
      * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
      * Commons Logging</a> instance used for all logging.
@@ -502,7 +496,7 @@ public abstract class AbstractDatabaseImpl
     		_synchronizables = new ArrayList();
     		
             Configuration config = Configuration.getInstance();
-            String[] props = config.getProperty(TxSynchronizableProperty);
+            String[] props = config.getProperty(ConfigKeys.TX_SYNCHRONIZABLE);
             for (int i = 0; i < props.length; i++) {
                 try {
                     Class cls = ClassLoadingUtils.loadClass(_classLoader, props[i]);

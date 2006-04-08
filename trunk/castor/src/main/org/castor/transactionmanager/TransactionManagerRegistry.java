@@ -24,6 +24,7 @@ import javax.transaction.TransactionManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.castor.util.ConfigKeys;
 import org.castor.util.Configuration;
 
 /**
@@ -39,10 +40,6 @@ public final class TransactionManagerRegistry {
     /** The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
      *  Commons Logging</a> instance used for all logging. */
     private static final Log LOG = LogFactory.getLog(TransactionManagerRegistry.class);
-    
-    /** Property telling if TransactionManager should be initialized at registration. */
-    public static final String PROPERTY_INIT_AT_REGISTRATION = 
-        "org.castor.transactionmanager.InitializeAtRegistration";
     
     /** Registry to get TransactionManagerFactory's from. */
     private TransactionManagerFactoryRegistry _registry;
@@ -135,8 +132,8 @@ public final class TransactionManagerRegistry {
     public TransactionManagerRegistry(final Configuration config) {
         _registry = new TransactionManagerFactoryRegistry(config);
 
-        String property = config.getProperty(PROPERTY_INIT_AT_REGISTRATION, "false");
-        _initializationAtRegistration = Boolean.valueOf(property).booleanValue();
+        _initializationAtRegistration = config.getProperty(
+                ConfigKeys.TRANSACTION_MANAGER_INIT, false);
     }
 
     //--------------------------------------------------------------------------

@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 
 import org.castor.transactionmanager.TransactionManagerAcquireException;
 import org.castor.transactionmanager.TransactionManagerRegistry;
+import org.castor.util.ConfigKeys;
 import org.castor.util.Configuration;
 
 /**
@@ -53,18 +54,14 @@ public final class TestTransactionManagerRegistry extends TestCase {
         if (DISABLE_LOGGING) { logger.setLevel(Level.FATAL); }
 
         assertEquals("org.castor.transactionmanager.InitializeAtRegistration",
-                     TransactionManagerRegistry.PROPERTY_INIT_AT_REGISTRATION);
+                ConfigKeys.TRANSACTION_MANAGER_INIT);
         
         Configuration config = Configuration.getInstance();
-        String memF = config.getProperty(
-                "org.castor.transactionmanager.Factories", null);
-        String memI = config.getProperty(
-                "org.castor.transactionmanager.InitializeAtRegistration", null);
-        config.getProperties().put(
-                "org.castor.transactionmanager.Factories",
+        String memF = config.getProperty(ConfigKeys.TRANSACTION_MANAGER_FACTORIES, null);
+        String memI = config.getProperty(ConfigKeys.TRANSACTION_MANAGER_INIT, null);
+        config.getProperties().put(ConfigKeys.TRANSACTION_MANAGER_FACTORIES,
                 TransactionManagerFactoryDummy.class.getName());
-        config.getProperties().put(
-                "org.castor.transactionmanager.InitializeAtRegistration",
+        config.getProperties().put(ConfigKeys.TRANSACTION_MANAGER_INIT,
                 Boolean.toString(false));
         
         TransactionManagerRegistry tmr = new TransactionManagerRegistry(config);
@@ -140,10 +137,8 @@ public final class TestTransactionManagerRegistry extends TestCase {
         managers = tmr.getTransactionManagerNames();
         assertEquals(0, managers.length);
         
-        config.getProperties().put(
-                "org.castor.transactionmanager.InitializeAtRegistration", memI);
-        config.getProperties().put(
-                "org.castor.transactionmanager.Factories", memF);
+        config.getProperties().put(ConfigKeys.TRANSACTION_MANAGER_INIT, memI);
+        config.getProperties().put(ConfigKeys.TRANSACTION_MANAGER_FACTORIES, memF);
 
         logger.setLevel(level);
     }

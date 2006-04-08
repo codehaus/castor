@@ -53,6 +53,7 @@ import java.util.Hashtable;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.castor.util.ConfigKeys;
 import org.castor.util.Configuration;
 
 import org.exolab.castor.util.Messages;
@@ -73,14 +74,6 @@ public final class KeyGeneratorFactoryRegistry
      *  Logging </a> instance used for all logging. */
     private static final Log LOG = LogFactory.getLog(KeyGeneratorFactoryRegistry.class);
     
-    /**
-     * Property listing all the available key genence
-     * factories. (<tt>org.exolab.castor.jdo.keyGeneratorFactories</tt>).
-     */
-    private static final String KeyGeneratorFactoriesProperty = 
-        "org.exolab.castor.jdo.keyGeneratorFactories";
-
-
     /**
      * Association between key genarator name and KeyGeneratorFactory.
      */
@@ -133,7 +126,7 @@ public final class KeyGeneratorFactoryRegistry
             _factories = new Hashtable();
             
             Configuration config = Configuration.getInstance();
-            String[] props = config.getProperty(KeyGeneratorFactoriesProperty);
+            String[] props = config.getProperty(ConfigKeys.KEYGENERATOR_FACTORIES);
             ClassLoader ldr = KeyGeneratorFactoryRegistry.class.getClassLoader();
             for (int i = 0; i < props.length; i++) {
                 try {

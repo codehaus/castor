@@ -9,7 +9,6 @@ import org.exolab.castor.jdo.JDO;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.QueryResults;
-import org.exolab.castor.util.Logger;
 
 import soak.model.*;
 
@@ -77,7 +76,6 @@ public abstract class Test extends Thread {
 
     public void setUp() throws Exception {
         JDO jdo = new JDO();
-        jdo.setLogWriter( new Logger( System.out ).setPrefix( "test" ) );
         jdo.setConfiguration(DATABASE_FILE);
         jdo.setDatabaseName( "test" );
         db = jdo.getDatabase();

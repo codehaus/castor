@@ -26,6 +26,7 @@ import java.util.StringTokenizer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.castor.util.ConfigKeys;
 import org.castor.util.Configuration;
 
 /**
@@ -47,10 +48,6 @@ public final class CacheFactoryRegistry {
     /** Name of the proxy class. */
     private static final String PROXY_CLASSNAME = DebuggingCacheProxy.class.getName();
     
-    /** Property listing all available {@link Cache} implementations 
-     *  (<tt>org.castor.cache.Factories</tt>). */
-    public static final String PROP_FACTORY = "org.castor.cache.Factories";
-
     /** Association between {@link Cache} name and factory implementation. */
     private Hashtable  _cacheFactories = new Hashtable();
     
@@ -63,7 +60,7 @@ public final class CacheFactoryRegistry {
      * @param config The Configuration.
      */
     public CacheFactoryRegistry(final Configuration config) {
-        String prop = config.getProperty(PROP_FACTORY, "");
+        String prop = config.getProperty(ConfigKeys.CACHE_FACTORIES, "");
         StringTokenizer tokenizer = new StringTokenizer(prop, ", ");
         ClassLoader loader = CacheFactoryRegistry.class.getClassLoader();
         while (tokenizer.hasMoreTokens()) {

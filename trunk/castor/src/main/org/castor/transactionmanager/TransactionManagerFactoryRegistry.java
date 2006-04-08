@@ -22,6 +22,7 @@ import java.util.StringTokenizer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.castor.util.ConfigKeys;
 import org.castor.util.Configuration;
 
 /**
@@ -42,11 +43,6 @@ public final class TransactionManagerFactoryRegistry {
     private static final Log LOG = LogFactory.getLog(
             TransactionManagerFactoryRegistry.class);
 
-    /** Property listing all the available {@link TransactionManagerFactory}
-     *  implementations (<tt>org.castor.transaction.TransactionManagerFactories</tt>). */
-    public static final String PROPERTY_TRANSACTION_MANAGER_FACTORY = 
-        "org.castor.transactionmanager.Factories";
-    
     /** Association between name of {@link TransactionManager} implementation and 
      *  TransactionManagerFactory instance. */
     private Map _factories = new HashMap();
@@ -61,7 +57,7 @@ public final class TransactionManagerFactoryRegistry {
      * @param config The LocalConfiguration.
      */
     public TransactionManagerFactoryRegistry(final Configuration config) {
-        String prop = config.getProperty(PROPERTY_TRANSACTION_MANAGER_FACTORY, "");
+        String prop = config.getProperty(ConfigKeys.TRANSACTION_MANAGER_FACTORIES, "");
         StringTokenizer tokenizer = new StringTokenizer(prop, ", ");
         ClassLoader loader = TransactionManagerFactoryRegistry.class.getClassLoader();
         while (tokenizer.hasMoreTokens()) {

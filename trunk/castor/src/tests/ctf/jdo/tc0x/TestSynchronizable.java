@@ -54,6 +54,7 @@ import harness.TestHarness;
 
 import jdo.JDOCategory;
 
+import org.castor.util.ConfigKeys;
 import org.castor.util.Configuration;
 
 import org.exolab.castor.jdo.Database;
@@ -62,13 +63,6 @@ import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.QueryResults;
 
 public final class TestSynchronizable extends CastorTestCase {
-    /**
-     * Property listing all the available {@link TxSynchronizable}
-     * implementations (<tt>org.exolab.castor.persit.TxSynchronizable</tt>).
-     */
-    private static final String TX_SYNCHRONIZABLE_PROPERTY = 
-        "org.exolab.castor.persist.TxSynchronizable";
-
     public static ArrayList     _synchronizables = new ArrayList();
 
     private JDOCategory         _category;
@@ -94,7 +88,7 @@ public final class TestSynchronizable extends CastorTestCase {
         Configuration config = Configuration.getInstance();
         Properties props = config.getProperties();
         _oldProperty = (String) props.setProperty(
-                TX_SYNCHRONIZABLE_PROPERTY, 
+                ConfigKeys.TX_SYNCHRONIZABLE, 
                 SynchronizableImpl.class.getName());
 
         _db = _category.getDatabase();
@@ -171,9 +165,9 @@ public final class TestSynchronizable extends CastorTestCase {
         Configuration config = Configuration.getInstance();
         Properties props = config.getProperties();
         if (_oldProperty != null) {
-            props.setProperty(TX_SYNCHRONIZABLE_PROPERTY, _oldProperty);
+            props.setProperty(ConfigKeys.TX_SYNCHRONIZABLE, _oldProperty);
         } else {
-            props.remove(TX_SYNCHRONIZABLE_PROPERTY);
+            props.remove(ConfigKeys.TX_SYNCHRONIZABLE);
         }
     }
 }

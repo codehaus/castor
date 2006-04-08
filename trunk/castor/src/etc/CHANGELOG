@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1386 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
+       Extracted all keys of JDO properties into org.castor.util.ConfigKeys.
+       Details: http://jira.codehaus.org/browse/CASTOR-1386
+       (Ralf - 20060408)
+
 JDO:   Fixed bug CASTOR-1385 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
        Removed dependecy of JDO on org.exolab.castor.util.LocalConfiguration.
        Details: http://jira.codehaus.org/browse/CASTOR-1385
