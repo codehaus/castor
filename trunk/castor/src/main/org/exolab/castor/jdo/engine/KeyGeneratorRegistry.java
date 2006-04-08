@@ -54,7 +54,6 @@ import org.exolab.castor.persist.KeyGeneratorFactoryRegistry;
 import org.exolab.castor.persist.spi.KeyGenerator;
 import org.exolab.castor.persist.spi.KeyGeneratorFactory;
 import org.exolab.castor.persist.spi.PersistenceFactory;
-import org.exolab.castor.util.Logger;
 import org.exolab.castor.util.Messages;
 
 import java.util.Hashtable;
@@ -121,7 +120,7 @@ final class KeyGeneratorRegistry
                  * Don't throw exception here, just notify and continue without
                  * key generator
                  */
-                Logger.getSystemLogger().println( Messages.format(
+                _log.warn( Messages.format(
                         "mapping.noKeyGen", desc.getKeyGeneratorFactoryName() ) );
                 return null;
             }

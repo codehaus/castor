@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+All:   Fixed bug CASTOR-1381 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
+       Removed org.exolab.castor.util.Logger.
+       Details: http://jira.codehaus.org/browse/CASTOR-1381
+       (Ralf - 20060415)
+
 Version 1.0, Apr 6, 2006
 -------------------------------
 

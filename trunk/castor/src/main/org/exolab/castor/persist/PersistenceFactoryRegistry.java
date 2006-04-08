@@ -50,8 +50,10 @@ package org.exolab.castor.persist;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.StringTokenizer;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.util.LocalConfiguration;
-import org.exolab.castor.util.Logger;
 import org.exolab.castor.util.Messages;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 
@@ -66,8 +68,10 @@ import org.exolab.castor.persist.spi.PersistenceFactory;
  */
 public class PersistenceFactoryRegistry
 {
-
-
+    /** The <a href="http://jakarta.apache.org/commons/logging/">Jakarta Commons
+     *  Logging </a> instance used for all logging. */
+    private static final Log LOG = LogFactory.getLog(PersistenceFactoryRegistry.class);
+    
     /**
      * Property listing all the available persistence
      * factories. (<tt>org.exolab.castor.jdo.engines</tt>).
@@ -142,7 +146,7 @@ public class PersistenceFactoryRegistry
                     factory = (PersistenceFactory) cls.newInstance();
                     _factories.put( factory.getFactoryName(), factory );
                 } catch ( Exception except ) {
-                    Logger.getSystemLogger().println( Messages.format( "persist.missingPersistenceFactory", prop ) );
+                    LOG.error( Messages.format( "persist.missingPersistenceFactory", prop ) );
                 }
             }
         }
