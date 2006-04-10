@@ -63,6 +63,7 @@ import org.castor.persist.ProposedObject;
 import org.castor.persist.TransactionContext;
 import org.castor.persist.cache.CacheEntry;
 import org.castor.util.Configuration;
+import org.castor.util.Messages;
 
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.LockNotGrantedException;
@@ -77,7 +78,6 @@ import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.loader.MappingLoader;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceFactory;
-import org.exolab.castor.util.Messages;
 
 /**
  * LockEngine is a gateway for all the <tt>ClassMolder</tt>s of a persistence 

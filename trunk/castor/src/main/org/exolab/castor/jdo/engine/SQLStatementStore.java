@@ -26,13 +26,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.castor.jdo.engine.SQLTypeInfos;
+import org.castor.util.Messages;
 import org.exolab.castor.jdo.ObjectDeletedException;
 import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.persist.spi.Complex;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.persist.spi.QueryExpression;
-import org.exolab.castor.util.Messages;
 
 public final class SQLStatementStore {
     /** The <a href="http://jakarta.apache.org/commons/logging/">Jakarta

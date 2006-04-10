@@ -55,9 +55,9 @@ import java.util.TooManyListenersException;
 import org.xml.sax.SAXException;
 import org.xml.sax.Parser;
 import org.xml.sax.InputSource;
+import org.castor.util.Messages;
 import org.exolab.castor.util.Configuration;
 import org.exolab.castor.util.LocalConfiguration;
-import org.exolab.castor.util.Messages;
 
 
 /**

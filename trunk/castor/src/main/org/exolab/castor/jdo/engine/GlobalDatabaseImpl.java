@@ -21,6 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.castor.persist.GlobalTransactionContext;
+import org.castor.util.Messages;
 import org.exolab.castor.jdo.DatabaseNotFoundException;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
@@ -28,7 +29,6 @@ import org.exolab.castor.jdo.TransactionAbortedException;
 import org.exolab.castor.jdo.TransactionNotInProgressException;
 import org.exolab.castor.persist.spi.CallbackInterceptor;
 import org.exolab.castor.persist.spi.InstanceFactory;
-import org.exolab.castor.util.Messages;
 
 import javax.transaction.Status;
 import javax.transaction.Synchronization;

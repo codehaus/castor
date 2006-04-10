@@ -75,11 +75,11 @@ import java.text.DecimalFormat;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
+import org.castor.util.Messages;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.persist.spi.KeyGenerator;
 import org.exolab.castor.persist.spi.PersistenceFactory;
-import org.exolab.castor.util.Messages;
 
 /**
  * UUID key generator.

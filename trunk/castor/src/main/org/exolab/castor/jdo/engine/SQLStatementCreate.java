@@ -34,6 +34,7 @@ import org.castor.jdo.engine.DatabaseRegistry;
 import org.castor.jdo.engine.SQLTypeInfos;
 import org.castor.util.ConfigKeys;
 import org.castor.util.Configuration;
+import org.castor.util.Messages;
 
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.DuplicateIdentityException;
@@ -42,7 +43,6 @@ import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.persist.spi.Complex;
 import org.exolab.castor.persist.spi.KeyGenerator;
 import org.exolab.castor.persist.spi.PersistenceFactory;
-import org.exolab.castor.util.Messages;
 
 public final class SQLStatementCreate {
     /** The <a href="http://jakarta.apache.org/commons/logging/">Jakarta

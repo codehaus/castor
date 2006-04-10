@@ -26,12 +26,12 @@ import java.util.Set;
 
 import org.castor.util.IdentityMap;
 import org.castor.util.IdentitySet;
+import org.castor.util.Messages;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.persist.ClassMolder;
 import org.exolab.castor.persist.LazyCGLIB;
 import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.OID;
-import org.exolab.castor.util.Messages;
 
 /**
  * A transaction records all objects accessed during the lifetime

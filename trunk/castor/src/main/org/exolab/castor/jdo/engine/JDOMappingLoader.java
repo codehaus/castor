@@ -47,6 +47,7 @@ package org.exolab.castor.jdo.engine;
 import org.castor.jdo.engine.SQLTypeInfos;
 import org.castor.jdo.engine.SQLTypeConverters;
 import org.castor.jdo.engine.SQLTypeConverters.Convertor;
+import org.castor.util.Messages;
 import org.exolab.castor.mapping.*;
 import org.exolab.castor.mapping.loader.CollectionHandlers;
 import org.exolab.castor.mapping.loader.FieldDescriptorImpl;
@@ -57,7 +58,6 @@ import org.exolab.castor.mapping.loader.TypeInfo;
 import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.mapping.xml.*;
 import org.exolab.castor.mapping.xml.types.SqlDirtyType;
-import org.exolab.castor.util.Messages;
 
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;

@@ -62,6 +62,7 @@ import org.castor.persist.UpdateAndRemovedFlags;
 import org.castor.persist.UpdateFlags;
 import org.castor.persist.resolver.ResolverFactory;
 import org.castor.persist.resolver.ResolverStrategy;
+import org.castor.util.Messages;
 import org.exolab.castor.jdo.DuplicateIdentityException;
 import org.exolab.castor.jdo.ObjectDeletedException;
 import org.exolab.castor.jdo.ObjectModifiedException;
@@ -85,7 +86,6 @@ import org.exolab.castor.mapping.xml.FieldMapping;
 import org.exolab.castor.persist.spi.CallbackInterceptor;
 import org.exolab.castor.persist.spi.Complex;
 import org.exolab.castor.persist.spi.Persistence;
-import org.exolab.castor.util.Messages;
 
 
 /**

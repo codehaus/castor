@@ -58,6 +58,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.castor.util.Messages;
 
 import org.exolab.castor.xml.NodeType;
 import org.exolab.castor.xml.OutputFormat;
@@ -65,7 +66,6 @@ import org.exolab.castor.xml.Serializer;
 import org.exolab.castor.xml.XMLNaming;
 import org.exolab.castor.xml.XMLSerializerFactory;
 import org.exolab.castor.xml.util.DefaultNaming;
-import org.exolab.castor.util.Messages;
 
 import org.xml.sax.DocumentHandler;
 import org.xml.sax.Parser;

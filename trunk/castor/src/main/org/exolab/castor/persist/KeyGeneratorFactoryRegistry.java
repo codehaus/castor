@@ -55,8 +55,8 @@ import org.apache.commons.logging.LogFactory;
 
 import org.castor.util.ConfigKeys;
 import org.castor.util.Configuration;
+import org.castor.util.Messages;
 
-import org.exolab.castor.util.Messages;
 import org.exolab.castor.persist.spi.KeyGeneratorFactory;
 
 

@@ -72,6 +72,7 @@ import org.castor.jdo.engine.AbstractConnectionFactory;
 import org.castor.jdo.engine.ConnectionFactory;
 import org.castor.jdo.engine.DatabaseRegistry;
 import org.castor.transactionmanager.LocalTransactionManager;
+import org.castor.util.Messages;
 
 import org.exolab.castor.jdo.engine.GlobalDatabaseImpl;
 import org.exolab.castor.jdo.engine.LocalDatabaseImpl;
@@ -81,7 +82,6 @@ import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.spi.CallbackInterceptor;
 import org.exolab.castor.persist.spi.InstanceFactory;
-import org.exolab.castor.util.Messages;
 
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;

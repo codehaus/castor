@@ -52,8 +52,8 @@ import java.io.InputStream;
 import java.util.Vector;
 import java.util.Hashtable;
 
+import org.castor.util.Messages;
 import org.exolab.castor.util.LocalConfiguration;
-import org.exolab.castor.util.Messages;
 import org.exolab.castor.mapping.Mapping;
 
 import org.exolab.castor.xml.Unmarshaller;

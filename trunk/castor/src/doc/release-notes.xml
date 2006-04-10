@@ -42,6 +42,26 @@
             <summary>
             </summary>
             <bugs>
+                <bug id="1389" tool="jira">
+                    <description>
+		                Replaced org.exolab.castor.util.Messages by org.castor.util.Messages.
+                    </description>
+                    <contributor>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </reporter>
+                    <type>Enh.</type>
+                    <module>All</module>
+                    <date>20060411</date>
+                </bug>
                 <bug id="1387" tool="jira">
                     <description>
 		                Removed postgreSQL JAR from Eclipse templates

@@ -27,6 +27,7 @@ import org.castor.jdo.engine.DatabaseRegistry;
 import org.castor.jdo.util.ClassLoadingUtils;
 import org.castor.util.ConfigKeys;
 import org.castor.util.Configuration;
+import org.castor.util.Messages;
 
 import org.castor.persist.ProposedObject;
 import org.castor.persist.TransactionContext;
@@ -36,7 +37,6 @@ import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.persist.*;
 import org.exolab.castor.persist.spi.CallbackInterceptor;
 import org.exolab.castor.persist.spi.InstanceFactory;
-import org.exolab.castor.util.Messages;
 
 /**
  * An implementation of the JDO database supporting explicit transaction

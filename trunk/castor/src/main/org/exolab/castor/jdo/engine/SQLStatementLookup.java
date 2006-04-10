@@ -23,6 +23,7 @@ import java.sql.SQLException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.castor.util.Messages;
 
 import org.exolab.castor.jdo.DuplicateIdentityException;
 import org.exolab.castor.jdo.PersistenceException;
@@ -31,7 +32,6 @@ import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.persist.spi.Complex;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.persist.spi.QueryExpression;
-import org.exolab.castor.util.Messages;
 
 public final class SQLStatementLookup {
     /** The <a href="http://jakarta.apache.org/commons/logging/">Jakarta

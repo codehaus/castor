@@ -51,6 +51,7 @@ import javax.transaction.Status;
 
 import org.castor.persist.ProposedObject;
 import org.castor.persist.TransactionContext;
+import org.castor.util.Messages;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.TransactionNotInProgressException;
 import org.exolab.castor.jdo.PersistenceException;
@@ -58,7 +59,6 @@ import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.persist.spi.PersistenceQuery;
-import org.exolab.castor.util.Messages;
 
 
 /**

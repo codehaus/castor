@@ -53,6 +53,7 @@ package org.exolab.castor.xml;
 
 //-- castor imports
 import org.castor.util.Base64Encoder;
+import org.castor.util.Messages;
 import org.exolab.castor.mapping.CollectionHandler;
 import org.exolab.castor.mapping.MapItem;
 import org.exolab.castor.mapping.Mapping;
@@ -71,7 +72,6 @@ import org.exolab.castor.xml.util.*;
 import org.exolab.castor.util.Configuration;
 import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.util.List;
-import org.exolab.castor.util.Messages;
 import org.exolab.castor.util.Stack;
 
 //-- misc xml related imports

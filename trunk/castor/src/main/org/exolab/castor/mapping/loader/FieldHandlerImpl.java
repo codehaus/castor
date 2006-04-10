@@ -52,6 +52,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.InvocationTargetException;
+
+import org.castor.util.Messages;
 import org.exolab.castor.mapping.AbstractFieldHandler;
 import org.exolab.castor.mapping.ExtendedFieldHandler;
 import org.exolab.castor.mapping.FieldHandler;
@@ -59,7 +61,6 @@ import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.mapping.CollectionHandler;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.MappingRuntimeException;
-import org.exolab.castor.util.Messages;
 
 
 /**

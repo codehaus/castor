@@ -21,10 +21,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.castor.persist.LocalTransactionContext;
+import org.castor.util.Messages;
 import org.exolab.castor.jdo.*;
 import org.exolab.castor.persist.spi.CallbackInterceptor;
 import org.exolab.castor.persist.spi.InstanceFactory;
-import org.exolab.castor.util.Messages;
 
 /**
  * An implementation of the JDO {@see Database} interface supporting explicit local 

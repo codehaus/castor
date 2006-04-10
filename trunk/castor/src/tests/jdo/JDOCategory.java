@@ -52,12 +52,12 @@ import java.sql.SQLException;
 
 import org.castor.jdo.engine.ConnectionFactory;
 import org.castor.jdo.engine.DatabaseRegistry;
+import org.castor.util.Messages;
 
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.JDO;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.util.Messages;
 
 import harness.TestHarness;
 
