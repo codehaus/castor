@@ -58,13 +58,13 @@ import java.util.SortedSet;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.castor.jdo.util.ClassLoadingUtils;
+import org.castor.util.Messages;
 import org.exolab.castor.jdo.DataObjectAccessException;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.mapping.xml.FieldMapping;
 import org.exolab.castor.mapping.xml.types.SqlDirtyType;
-import org.exolab.castor.util.Messages;
 
 
 /**

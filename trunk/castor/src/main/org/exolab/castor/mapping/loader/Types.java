@@ -54,8 +54,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Vector;
 
+import org.castor.util.Messages;
 import org.exolab.castor.types.Duration;
-import org.exolab.castor.util.Messages;
 
 
 /**

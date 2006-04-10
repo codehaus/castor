@@ -53,12 +53,12 @@ import java.util.Vector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.castor.util.Messages;
 import org.exolab.castor.jdo.engine.JDBCSyntax;
 import org.exolab.castor.jdo.oql.SyntaxNotSupportedException;
 import org.exolab.castor.jdo.DbMetaInfo;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.persist.spi.QueryExpression;
-import org.exolab.castor.util.Messages;
 
 
 /**

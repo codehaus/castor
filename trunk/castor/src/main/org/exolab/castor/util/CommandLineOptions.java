@@ -27,6 +27,8 @@ import java.util.Hashtable;
 import java.util.Properties;
 import java.util.Vector;
 
+import org.castor.util.Messages;
+
 /**
  * A utility class for generating command line options
  *

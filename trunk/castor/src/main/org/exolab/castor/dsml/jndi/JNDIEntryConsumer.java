@@ -59,8 +59,8 @@ import javax.naming.directory.BasicAttributes;
 import javax.naming.directory.SearchResult;
 
 import org.castor.util.Base64Decoder;
+import org.castor.util.Messages;
 import org.exolab.castor.dsml.XML;
-import org.exolab.castor.util.Messages;
 
 
 /**

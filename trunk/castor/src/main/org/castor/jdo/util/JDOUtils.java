@@ -22,11 +22,11 @@ import java.sql.Statement;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.castor.util.Messages;
 
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.TransactionNotInProgressException;
-import org.exolab.castor.util.Messages;
 
 /**
  * Common static methods for Castor JDO

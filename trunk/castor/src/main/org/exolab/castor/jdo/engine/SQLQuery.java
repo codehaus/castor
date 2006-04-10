@@ -30,6 +30,7 @@ import org.apache.commons.logging.LogFactory;
 import org.castor.jdo.engine.CounterRef;
 import org.castor.jdo.engine.SQLTypeInfos;
 import org.castor.persist.ProposedObject;
+import org.castor.util.Messages;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.MappingException;
@@ -37,7 +38,6 @@ import org.exolab.castor.persist.spi.Complex;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.persist.spi.PersistenceQuery;
-import org.exolab.castor.util.Messages;
 import org.exolab.castor.util.SqlBindParser;
 
 /**

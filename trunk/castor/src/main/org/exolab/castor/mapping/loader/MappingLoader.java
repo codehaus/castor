@@ -62,6 +62,7 @@ import java.util.List;
 import java.util.Vector;
 import java.util.Enumeration;
 
+import org.castor.util.Messages;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.CollectionHandler;
 import org.exolab.castor.mapping.ExtendedFieldHandler;
@@ -76,7 +77,6 @@ import org.exolab.castor.mapping.xml.ClassChoice;
 import org.exolab.castor.mapping.xml.MappingRoot;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
-import org.exolab.castor.util.Messages;
 
 
 /**

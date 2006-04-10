@@ -54,6 +54,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.castor.jdo.engine.SQLTypeInfos;
 import org.castor.persist.ProposedObject;
+import org.castor.util.Messages;
 
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.PersistenceException;
@@ -62,7 +63,6 @@ import org.exolab.castor.jdo.engine.JDBCSyntax;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.persist.spi.Complex;
 import org.exolab.castor.persist.spi.PersistenceQuery;
-import org.exolab.castor.util.Messages;
 
 /**
  * PersistenceQuery implementation for use with PostgreSQL stored functions

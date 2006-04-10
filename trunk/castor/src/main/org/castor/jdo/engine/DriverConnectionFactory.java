@@ -28,9 +28,9 @@ import org.castor.jdo.conf.Driver;
 import org.castor.jdo.conf.JdoConf;
 import org.castor.jdo.conf.Param;
 import org.castor.jdo.drivers.ConnectionProxy;
+import org.castor.util.Messages;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.util.Messages;
 
 /**
  * @author <a href="mailto:werner DOT guttmann AT gmx DOT net">Werner Guttmann</a>

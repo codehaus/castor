@@ -73,12 +73,12 @@ import org.exolab.castor.jdo.engine.GlobalDatabaseImpl;
 import org.exolab.castor.jdo.engine.LocalDatabaseImpl;
 import org.exolab.castor.jdo.engine.TxDatabaseMap;
 import org.castor.transactionmanager.LocalTransactionManager;
+import org.castor.util.Messages;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.persist.OutputLogInterceptor;
 import org.exolab.castor.persist.spi.CallbackInterceptor;
 import org.exolab.castor.persist.spi.InstanceFactory;
 import org.exolab.castor.persist.spi.LogInterceptor;
-import org.exolab.castor.util.Messages;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 

@@ -55,6 +55,7 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+import org.castor.util.Messages;
 import org.exolab.castor.mapping.loader.MappingLoader;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.Include;
@@ -62,7 +63,6 @@ import org.exolab.castor.mapping.xml.KeyGeneratorDef;
 import org.exolab.castor.mapping.xml.MappingRoot;
 import org.exolab.castor.net.util.URIUtils;
 import org.exolab.castor.util.DTDResolver;
-import org.exolab.castor.util.Messages;
 import org.exolab.castor.xml.UnmarshalListener;
 import org.exolab.castor.xml.Unmarshaller;
 import org.xml.sax.EntityResolver;

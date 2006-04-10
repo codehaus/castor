@@ -24,6 +24,7 @@ import javax.transaction.Status;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.castor.util.Messages;
 
 import org.exolab.castor.jdo.ClassNotPersistenceCapableException;
 import org.exolab.castor.jdo.Database;
@@ -45,7 +46,6 @@ import org.exolab.castor.persist.TxSynchronizable;
 import org.exolab.castor.persist.spi.CallbackInterceptor;
 import org.exolab.castor.persist.spi.InstanceFactory;
 import org.exolab.castor.persist.spi.PersistenceQuery;
-import org.exolab.castor.util.Messages;
 
 /**
  * A transaction context is required in order to perform operations against the

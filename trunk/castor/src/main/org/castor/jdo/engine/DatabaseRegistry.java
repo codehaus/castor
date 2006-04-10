@@ -29,11 +29,11 @@ import org.castor.jdo.conf.DatabaseChoice;
 import org.castor.jdo.conf.JdoConf;
 import org.castor.util.ConfigKeys;
 import org.castor.util.Configuration;
+import org.castor.util.Messages;
 
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.util.DTDResolver;
-import org.exolab.castor.util.Messages;
 import org.exolab.castor.xml.MarshalException;
 import org.exolab.castor.xml.Unmarshaller;
 import org.exolab.castor.xml.ValidationException;

@@ -63,8 +63,8 @@ import org.xml.sax.XMLReader;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.castor.util.Messages;
 
-import org.exolab.castor.util.Messages;
 import org.exolab.castor.xml.NodeType;
 import org.exolab.castor.xml.OutputFormat;
 import org.exolab.castor.xml.Serializer;

@@ -47,6 +47,7 @@ package org.exolab.castor.jdo.engine;
 import org.castor.jdo.engine.SQLTypeConverters;
 import org.castor.jdo.util.ClassLoadingUtils;
 import org.castor.persist.TransactionContext;
+import org.castor.util.Messages;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.DbMetaInfo;
 import org.exolab.castor.jdo.OQLQuery;
@@ -69,7 +70,6 @@ import org.exolab.castor.persist.ClassMolder;
 import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.spi.QueryExpression;
-import org.exolab.castor.util.Messages;
 
 import java.util.Enumeration;
 import java.util.Hashtable;

@@ -49,13 +49,13 @@ import java.util.Properties;
 import org.castor.cache.Cache;
 import org.castor.cache.simple.CountLimited;
 import org.castor.cache.simple.TimeLimited;
+import org.castor.util.Messages;
 import org.exolab.castor.jdo.TimeStampable;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.loader.ClassDescriptorImpl;
 import org.exolab.castor.mapping.xml.CacheTypeMapping;
 import org.exolab.castor.mapping.xml.Param;
-import org.exolab.castor.util.Messages;
 
 /**
  * JDO class descriptors. Extends {@link ClassDescriptor} to include the

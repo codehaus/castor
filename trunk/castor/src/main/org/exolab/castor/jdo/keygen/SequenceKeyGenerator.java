@@ -61,6 +61,7 @@ import java.util.StringTokenizer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.castor.jdo.util.JDOUtils;
+import org.castor.util.Messages;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.drivers.DB2Factory;
 import org.exolab.castor.jdo.drivers.InterbaseFactory;
@@ -69,7 +70,6 @@ import org.exolab.castor.jdo.drivers.PostgreSQLFactory;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.persist.spi.KeyGenerator;
 import org.exolab.castor.persist.spi.PersistenceFactory;
-import org.exolab.castor.util.Messages;
 
 /**
  * SEQUENCE key generator.

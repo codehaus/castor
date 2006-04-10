@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+All:   Fixed bug CASTOR-1389 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
+       Replaced org.exolab.castor.util.Messages by org.castor.util.Messages.
+       Details: http://jira.codehaus.org/browse/CASTOR-1389
+       (Ralf - 20060411)
+
 All:   Fixed bug CASTOR-1387 using contribution from Henk van Voorthujsen [voorth@xs4all.nl]
        Removed postgreSQL JAR from Eclipse templates.
        Details: http://jira.codehaus.org/browse/CASTOR-1387

@@ -29,6 +29,7 @@ import org.castor.jdo.util.JDOConfAdapter;
 import org.castor.transactionmanager.TransactionManagerAcquireException;
 import org.castor.transactionmanager.TransactionManagerRegistry;
 import org.castor.util.Configuration;
+import org.castor.util.Messages;
 
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.MappingException;
@@ -36,7 +37,6 @@ import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.PersistenceEngineFactory;
 import org.exolab.castor.persist.PersistenceFactoryRegistry;
 import org.exolab.castor.persist.spi.PersistenceFactory;
-import org.exolab.castor.util.Messages;
 
 /**
  * @author <a href="mailto:werner DOT guttmann AT gmx DOT net">Werner Guttmann</a>
