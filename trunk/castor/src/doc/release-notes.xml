@@ -42,6 +42,26 @@
             <summary>
             </summary>
             <bugs>
+                <bug id="1387" tool="jira">
+                    <description>
+		                Removed postgreSQL JAR from Eclipse templates
+                    </description>
+                    <contributor>
+                        <name>Henk van Voorthujsen</name>
+                        <email></email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Henk van Voorthujsen</name>
+                        <email></email>
+                    </reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20060410</date>
+                </bug>
                 <bug id="1386" tool="jira">
                     <description>
 		                Extracted all keys of JDO properties into org.castor.util.ConfigKeys.

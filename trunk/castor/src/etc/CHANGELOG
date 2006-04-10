@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+All:   Fixed bug CASTOR-1387 using contribution from Henk van Voorthujsen [voorth@xs4all.nl]
+       Removed postgreSQL JAR from Eclipse templates.
+       Details: http://jira.codehaus.org/browse/CASTOR-1387
+       (Ralf - 20060410)
+
 JDO:   Fixed bug CASTOR-1386 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
        Extracted all keys of JDO properties into org.castor.util.ConfigKeys.
        Details: http://jira.codehaus.org/browse/CASTOR-1386
