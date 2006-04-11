@@ -17,7 +17,7 @@
  */
 package org.castor.persist.resolver;
 
-import org.castor.persist.ProposedObject;
+import org.castor.persist.ProposedEntity;
 import org.castor.persist.TransactionContext;
 import org.castor.persist.UpdateAndRemovedFlags;
 import org.castor.persist.UpdateFlags;
@@ -176,11 +176,10 @@ public interface ResolverStrategy {
      * @param oid  the object identity of the desired object
      * @param proposedObject Object holder storing information about assumed and actual object instances
      * @param suggestedAccessMode the acessMode for the object
-     * @param field The field value as returned by the SQLEngine
      * @exception PersistenceException If it is not possible to successfully complete this method.
      */
-    void load(TransactionContext tx, OID oid, ProposedObject proposedObject, 
-            AccessMode suggestedAccessMode, Object field)
+    void load(TransactionContext tx, OID oid, ProposedEntity proposedObject, 
+            AccessMode suggestedAccessMode)
     throws PersistenceException;
 
 

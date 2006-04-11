@@ -44,24 +44,19 @@
  */
 package org.exolab.castor.jdo.drivers;
 
-import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.castor.jdo.engine.SQLTypeInfos;
-import org.castor.persist.ProposedObject;
-import org.castor.util.Messages;
-
-import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.QueryException;
 import org.exolab.castor.mapping.AccessMode;
-import org.exolab.castor.persist.spi.Complex;
-import org.exolab.castor.persist.spi.PersistenceQuery;
+import org.exolab.castor.persist.spi.AbstractCallQuery;
+import org.castor.util.Messages;
 
 /**
  * PersistenceQuery implementation for use with CallableStatements that
@@ -70,7 +65,8 @@ import org.exolab.castor.persist.spi.PersistenceQuery;
  * @author <a href="on@ibis.odessa.ua">Oleg Nitz</a>
  * @version $Revision$ $Date$
  */
-final class ReturnedRSCallQuery implements PersistenceQuery
+final class ReturnedRSCallQuery 
+extends AbstractCallQuery
 {
 
     /**
@@ -79,96 +75,33 @@ final class ReturnedRSCallQuery implements PersistenceQuery
      */
     private static Log _log = LogFactory.getFactory().getInstance(ReturnedRSCallQuery.class);
     
-    private CallableStatement _stmt;
-
-
-    private ResultSet         _rs;
-
-
-    private final Class     _javaClass;
-
-
-    private final Class[]   _types;
-
-
-    private final Object[]  _values;
-
-
-    private final String    _call;
-
-
-    private Object         _lastIdentity;
-
-
-    private int[]          _sqlTypes;
-
-
+    /**
+     * Creates an instance of this clas.
+     * @param call The SQL CALL statement to execute
+     * @param types Java types of the parameters
+     * @param javaClass Class type of the result
+     * @param fields ???
+     * @param sqlTypes SQL types of the parameters
+     */
     ReturnedRSCallQuery( String call, Class[] types, Class javaClass,
                          String[] fields, int[] sqlTypes )
     {
-        _call = "{ ? = call " + call + "}";
-        _types = types;
-        _javaClass = javaClass;
-        _sqlTypes = sqlTypes;
-        _values = new Object[ _types.length ];
+        super (call, types, javaClass, sqlTypes);
     }
 
-    public boolean absolute(int row)
-      throws PersistenceException
-    {
-      return false;
-    }
-
-    public int size()
-      throws PersistenceException
-    {
-      return 0;
-    }
-
-    public int getParameterCount()
-    {
-        return _types.length;
-    }
-
-
-    public Class getParameterType( int index )
-        throws ArrayIndexOutOfBoundsException
-    {
-        return _types[ index ];
-    }
-
-
-    public void setParameter( int index, Object value )
-        throws ArrayIndexOutOfBoundsException, IllegalArgumentException
-    {
-        _values[ index ] = value;
-    }
-
-
-    public Class getResultType()
-    {
-        return _javaClass;
-    }
-
-    public void execute( Object conn, AccessMode accessMode, boolean scrollable)
-      throws QueryException, PersistenceException
-    {
-      execute(conn, accessMode);
-    }
-
-    private void execute( Object conn, AccessMode accessMode )
+    protected void execute( Object conn, AccessMode accessMode )
         throws QueryException, PersistenceException
     {
         _lastIdentity = null;
         try {
             _stmt = ( (Connection) conn ).prepareCall( _call );
-            _stmt.registerOutParameter(1, -10); // -10 == OracleTypes.CURSOR
+            ((CallableStatement) _stmt).registerOutParameter(1, -10); // -10 == OracleTypes.CURSOR
             for ( int i = 0 ; i < _values.length ; ++i ) {
                 _stmt.setObject( i + 2, _values[ i ] );
                 _values[ i ] = null;
             }
             _stmt.execute();
-            _rs = (ResultSet) _stmt.getObject(1);
+            _rs = (ResultSet) ((CallableStatement) _stmt).getObject(1);
         } catch ( SQLException except ) {
             if ( _stmt != null ) {
                 try {
@@ -181,69 +114,8 @@ final class ReturnedRSCallQuery implements PersistenceQuery
         }
     }
 
-
-    public Object nextIdentity(Object identity) throws PersistenceException
-    {
-        try {
-            if ( _lastIdentity == null ) {
-                if ( ! _rs.next() )
-                    return null;
-                _lastIdentity = SQLTypeInfos.getValue( _rs, 1, _sqlTypes[ 0 ] );
-                return new Complex( _lastIdentity );
-            }
-
-            while ( _lastIdentity.equals( identity ) ) {
-                if ( ! _rs.next() ) {
-                    _lastIdentity = null;
-                    return null;
-                }
-                _lastIdentity = SQLTypeInfos.getValue( _rs, 1, _sqlTypes[ 0 ] );
-            }
-            return new Complex( _lastIdentity );
-        } catch ( SQLException except ) {
-            _lastIdentity = null;
-            throw new PersistenceException( Messages.format( "persist.nested", except ) );
-        }
-    }
-
-
-    public void close()
-    {
-        if ( _rs != null ) {
-            try {
-                _rs.close();
-            } catch ( SQLException except ) {               
-                _log.warn (Messages.message ("persist.rsClosingFailed"), except);
-            }
-            _rs = null;
-        }
-        if ( _stmt != null ) {
-            try {
-                _stmt.close();
-            } catch ( SQLException except ) {
-                _log.warn (Messages.message ("persist.stClosingFailed"), except);
-            }
-            _stmt = null;
-        }
-    }
-
-
-    public Object fetch(ProposedObject proposedObject, Object identity)
-    throws ObjectNotFoundException, PersistenceException {
-        Object[] fields = proposedObject.getFields();
-        try {
-            // Load all the fields of the object including one-one relations
-            // index 0 belongs to the identity
-            for ( int i = 1 ; i < _sqlTypes.length ; ++i  ) 
-                fields[ i - 1 ] = SQLTypeInfos.getValue( _rs, i + 1, _sqlTypes[ i ] );
-            if ( _rs.next() ) 
-                _lastIdentity = SQLTypeInfos.getValue( _rs, 1, _sqlTypes[ 0 ] );
-            else
-                _lastIdentity = null;
-        } catch ( SQLException except ) {
-            throw new PersistenceException( Messages.format( "persist.nested", except ) );
-        }
-        return null;
+    protected boolean nextRow() throws SQLException {
+        return _rs.next();
     }
 
 }

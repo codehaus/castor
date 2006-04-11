@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.castor.persist.ProposedObject;
+import org.castor.persist.ProposedEntity;
 import org.castor.persist.TransactionContext;
 import org.castor.persist.UpdateFlags;
 import org.castor.persist.proxy.RelationCollection;
@@ -44,11 +44,14 @@ public final class OneToManyRelationResolver extends ManyRelationResolver {
      * Creates an instance of OneToMany
      * @param classMolder
      * @param fieldMolder
+     * @param fieldIndex Field index within all fields of parent class molder.
      * @param debug
      */
     public OneToManyRelationResolver(final ClassMolder classMolder,
-            final FieldMolder fieldMolder, final boolean debug) {
-        super(classMolder, fieldMolder, debug);
+            final FieldMolder fieldMolder, 
+            final int fieldIndex,
+            final boolean debug) {
+        super(classMolder, fieldMolder, fieldIndex, debug);
     }
     
     /**
@@ -349,7 +352,7 @@ public final class OneToManyRelationResolver extends ManyRelationResolver {
                             // load all the dependent object in cache for
                             // modification
                             // check at commit time.
-                            ProposedObject proposedValue = new ProposedObject();
+                            ProposedEntity proposedValue = new ProposedEntity();
                             tx
                                     .load(oid.getLockEngine(),
                                             fieldClassMolder, v.get(j),
@@ -395,7 +398,7 @@ public final class OneToManyRelationResolver extends ManyRelationResolver {
                         // load all the dependent object in cache for
                         // modification
                         // check at commit time.
-                        ProposedObject proposedValue = new ProposedObject();
+                        ProposedEntity proposedValue = new ProposedEntity();
                         tx.load(oid.getLockEngine(), fieldClassMolder,
                                 v.get(j), proposedValue, suggestedAccessMode);
                     }

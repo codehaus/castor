@@ -20,7 +20,7 @@ package org.castor.persist.resolver;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.castor.persist.ProposedObject;
+import org.castor.persist.ProposedEntity;
 import org.castor.persist.TransactionContext;
 import org.castor.persist.UpdateAndRemovedFlags;
 import org.castor.persist.UpdateFlags;
@@ -54,16 +54,22 @@ public abstract class ManyRelationResolver implements ResolverStrategy {
      */
     protected FieldMolder _fieldMolder;
     
+    private int _fieldIndex;
+    
     /** 
      * Creates an instance of ManyRelationResolver
      * @param classMolder Associated {@link ClassMolder}
      * @param fieldMolder Associated {@link FieldMolder}
+     * @param fieldIndex Field index within all fields of parent class molder.
      * @param debug ???
      */
     public ManyRelationResolver(final ClassMolder classMolder,
-            final FieldMolder fieldMolder, final boolean debug) {
+            final FieldMolder fieldMolder, 
+            final int fieldIndex,
+            final boolean debug) {
         _classMolder = classMolder;
         _fieldMolder = fieldMolder;
+        _fieldIndex = fieldIndex;
     }
     
     /**
@@ -222,8 +228,8 @@ public abstract class ManyRelationResolver implements ResolverStrategy {
      * @see org.castor.persist.resolver.ResolverStrategy#load(org.castor.persist.TransactionContext, org.exolab.castor.persist.OID, org.castor.persist.ProposedObject, org.exolab.castor.mapping.AccessMode, java.lang.Object)
      */
     public final void load(final TransactionContext tx, final OID oid,
-            final ProposedObject proposedObject,
-            final AccessMode suggestedAccessMode, final Object field)
+            final ProposedEntity proposedObject,
+            final AccessMode suggestedAccessMode)
     throws PersistenceException {
         // field is one-to-many and many-to-many type. All the related
         // object will be loaded and put in a Collection. And, the
@@ -235,7 +241,7 @@ public abstract class ManyRelationResolver implements ResolverStrategy {
             // lazy loading is not specified, load all objects into
             // the collection and set the Collection as the data object
             // field.
-            ArrayList v = (ArrayList) field;
+            ArrayList v = (ArrayList) proposedObject.getField(_fieldIndex);
             if (v != null) {
                 // simple array type support
                 Class collectionType = _fieldMolder.getCollectionType();
@@ -244,18 +250,18 @@ public abstract class ManyRelationResolver implements ResolverStrategy {
                             .newInstance(collectionType.getComponentType(), v
                                     .size());
                     for (int j = 0, l = v.size(); j < l; j++) {
-                        ProposedObject proposedValue = new ProposedObject();
+                        ProposedEntity proposedValue = new ProposedEntity();
                         value[j] = tx.load(oid.getLockEngine(),
                                 fieldClassMolder, v.get(j), proposedValue,
                                 suggestedAccessMode);
                     }
-                    _fieldMolder.setValue(proposedObject.getObject(), value, tx
+                    _fieldMolder.setValue(proposedObject.getEntity(), value, tx
                             .getClassLoader());
                 } else {
                     CollectionProxy cp = CollectionProxy.create(_fieldMolder,
-                            proposedObject.getObject(), tx.getClassLoader());
+                            proposedObject.getEntity(), tx.getClassLoader());
                     for (int j = 0, l = v.size(); j < l; j++) {
-                        ProposedObject proposedValue = new ProposedObject();
+                        ProposedEntity proposedValue = new ProposedEntity();
                         cp.add(v.get(j), tx.load(oid.getLockEngine(),
                                 fieldClassMolder, v.get(j), proposedValue,
                                 suggestedAccessMode));
@@ -263,17 +269,17 @@ public abstract class ManyRelationResolver implements ResolverStrategy {
                     cp.close();
                 }
             } else {
-                _fieldMolder.setValue(proposedObject.getObject(), null, tx
+                _fieldMolder.setValue(proposedObject.getEntity(), null, tx
                         .getClassLoader());
             }
         } else {
             // lazy loading is specified. Related object will not be loaded.
             // A lazy collection with all the identity of the related object
             // will constructed and set as the data object's field.
-            ArrayList list = (ArrayList) field;
+            ArrayList list = (ArrayList) proposedObject.getField(_fieldIndex);
             RelationCollection relcol = new RelationCollection(tx, oid,
                     fieldEngine, fieldClassMolder, suggestedAccessMode, list);
-            _fieldMolder.setValue(proposedObject.getObject(), relcol, tx
+            _fieldMolder.setValue(proposedObject.getEntity(), relcol, tx
                     .getClassLoader());
         }
     }

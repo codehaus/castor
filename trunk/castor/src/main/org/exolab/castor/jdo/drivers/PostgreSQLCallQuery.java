@@ -53,7 +53,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.castor.jdo.engine.SQLTypeInfos;
-import org.castor.persist.ProposedObject;
+import org.castor.persist.ProposedEntity;
 import org.castor.util.Messages;
 
 import org.exolab.castor.jdo.ObjectNotFoundException;
@@ -248,20 +248,22 @@ final class PostgreSQLCallQuery implements PersistenceQuery
     }
 
 
-    public Object fetch(ProposedObject proposedObject, Object identity)
-    throws ObjectNotFoundException, PersistenceException {
-        Object[] fields = proposedObject.getFields();
+    public Object fetch(ProposedEntity proposedObject, Object identity)
+            throws ObjectNotFoundException, PersistenceException {
         try {
             // Load all the fields of the object including one-one relations
             // index 0 belongs to the identity
-            for ( int i = 1 ; i < _sqlTypes.length ; ++i  ) 
-                fields[ i - 1 ] = SQLTypeInfos.getValue( _rs, i + 1, _sqlTypes[ i ] );
-            if ( _rs.next() ) 
-                _lastIdentity = SQLTypeInfos.getValue( _rs, 1, _sqlTypes[ 0 ] );
-            else
+            for (int i = 1; i < _sqlTypes.length; ++i) {
+                proposedObject.setField(SQLTypeInfos.getValue(_rs, i + 1, _sqlTypes[i]), i - 1);
+            }
+            if (_rs.next()) {
+                _lastIdentity = SQLTypeInfos.getValue(_rs, 1, _sqlTypes[0]);
+            } else {
                 _lastIdentity = null;
-        } catch ( SQLException except ) {
-            throw new PersistenceException( Messages.format( "persist.nested", except ) );
+            }
+        } catch (SQLException except) {
+            throw new PersistenceException(Messages.format("persist.nested",
+                    except));
         }
         return null;
     }

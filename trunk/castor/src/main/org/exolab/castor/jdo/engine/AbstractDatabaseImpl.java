@@ -29,7 +29,7 @@ import org.castor.util.ConfigKeys;
 import org.castor.util.Configuration;
 import org.castor.util.Messages;
 
-import org.castor.persist.ProposedObject;
+import org.castor.persist.ProposedEntity;
 import org.castor.persist.TransactionContext;
 import org.exolab.castor.jdo.*;
 import org.exolab.castor.mapping.AccessMode;
@@ -287,7 +287,7 @@ public abstract class AbstractDatabaseImpl
         TransactionContext tx = getTransaction();
         PersistenceInfo info = _scope.getPersistenceInfo(type);
 
-        ProposedObject proposedObject = new ProposedObject();
+        ProposedEntity proposedObject = new ProposedEntity();
         return tx.load(info.engine, info.molder, identity, proposedObject, mode);
     }
 

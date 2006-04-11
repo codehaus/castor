@@ -44,7 +44,7 @@
  */
 package org.exolab.castor.persist.spi;
 
-import org.castor.persist.ProposedObject;
+import org.castor.persist.ProposedEntity;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.ObjectNotFoundException;
@@ -141,7 +141,7 @@ public interface PersistenceQuery {
      *         persistent storage or any other persistence error occured.
      * @see Persistence#load
      */
-    public Object fetch(ProposedObject proposedObject, Object identity)
+    public Object fetch(ProposedEntity proposedObject, Object identity)
     throws PersistenceException;
 
     /**

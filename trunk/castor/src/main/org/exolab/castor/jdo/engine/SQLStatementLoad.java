@@ -34,7 +34,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.castor.jdo.engine.SQLTypeInfos;
 import org.castor.jdo.util.JDOUtils;
-import org.castor.persist.ProposedObject;
+import org.castor.persist.ProposedEntity;
 import org.castor.util.Messages;
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.PersistenceException;
@@ -252,13 +252,12 @@ public final class SQLStatementLoad {
     }
 
     public Object executeStatement(final Object conn, final Object identity,
-                                   final ProposedObject proposedObject,
+                                   final ProposedEntity proposedObject,
                                    final AccessMode accessMode)
     throws PersistenceException {
         PreparedStatement stmt  = null;
         ResultSet         rs    = null;
 
-        Object[] values = proposedObject.getFields();
         SQLColumnInfo[] ids = _engine.getColumnInfoForIdentities();
         SQLFieldInfo[] fields = _engine.getInfo();
         
@@ -314,11 +313,8 @@ public final class SQLStatementLoad {
                 if ((potentialLeafDescriptor != null)
                         && !potentialLeafDescriptor.getJavaClass().getName().equals(_type)) {
                     
-                    Object[] expandedFields = new Object[potentialLeafDescriptor.getFields().length];
-                    
-                    values = expandedFields;
-                    proposedObject.setFields(expandedFields);
-                    proposedObject.setActualClass(potentialLeafDescriptor.getJavaClass());
+                    proposedObject.initializeFields(potentialLeafDescriptor.getFields().length);
+                    proposedObject.setActualEntityClass(potentialLeafDescriptor.getJavaClass());
                     proposedObject.setExpanded(true);
                 }
 
@@ -351,7 +347,7 @@ public final class SQLStatementLoad {
                 if (!field.isMulti()) {
                     notNull = false;
                     if (columns.length == 1) {
-                        values[i] = columns[0].toJava(SQLTypeInfos.getValue(rs, columnIndex++, columns[0].getSqlType()));
+                        proposedObject.setField(columns[0].toJava(SQLTypeInfos.getValue(rs, columnIndex++, columns[0].getSqlType())), i);
                         fieldIndex++;
                     } else {
                         for (int j = 0; j < columns.length; j++) {
@@ -362,9 +358,9 @@ public final class SQLStatementLoad {
                             }
                         }
                         if (notNull) {
-                            values[i] = new Complex(columns.length, temp);
+                            proposedObject.setField(new Complex(columns.length, temp), i);
                         } else {
-                            values[i] = null;
+                            proposedObject.setField(null, i);
                         }
                     }
                 } else {
@@ -385,7 +381,7 @@ public final class SQLStatementLoad {
                             res.add(new Complex(columns.length, temp));
                         }
                     }
-                    values[i] = res;
+                    proposedObject.setField(res, i);
                 }
                 
                 tableNameOld = tableName;
@@ -407,7 +403,7 @@ public final class SQLStatementLoad {
                     }
                     
                     if (field.isMulti()) {
-                        ArrayList res = (ArrayList) values[i];
+                        ArrayList res = (ArrayList) proposedObject.getField(i);
                         notNull = false;
                         for (int j = 0; j < columns.length; j++) {
                             temp[j] = columns[j].toJava(SQLTypeInfos.getValue(rs, columnIndex, columns[j].getSqlType()));
@@ -434,7 +430,6 @@ public final class SQLStatementLoad {
                     tableNameOld = tableName;
                 }
                 
-                proposedObject.setFields(values);
             }
         } catch (SQLException except) {
             LOG.fatal(Messages.format("jdo.loadFatal", _type, (accessMode == AccessMode.DbLocked) ? _statementLock : _statementNoLock), except);

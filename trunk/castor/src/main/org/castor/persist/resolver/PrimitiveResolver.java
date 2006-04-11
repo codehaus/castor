@@ -17,7 +17,7 @@
  */
 package org.castor.persist.resolver;
 
-import org.castor.persist.ProposedObject;
+import org.castor.persist.ProposedEntity;
 import org.castor.persist.TransactionContext;
 import org.castor.persist.UpdateAndRemovedFlags;
 import org.castor.persist.UpdateFlags;
@@ -42,17 +42,22 @@ import org.exolab.castor.persist.OID;
 public final class PrimitiveResolver implements ResolverStrategy {
 
     private FieldMolder _fieldMolder;
+    private int _fieldIndex;
 
     /**
      * Creates an instance of PrimitiveResolver
      * 
      * @param classMolder Associated {@link ClassMolder}
      * @param fieldMolder Associated {@link FieldMolder}
+     * @param fieldIndex Field index within all fields of parent class molder.
      * @param debug ???
      */
     public PrimitiveResolver(final ClassMolder classMolder,
-            final FieldMolder fieldMolder, final boolean debug) {
+            final FieldMolder fieldMolder, 
+            final int fieldIndex,
+            final boolean debug) {
         this._fieldMolder = fieldMolder;
+        this._fieldIndex = fieldIndex;
     }
 
     /* (non-Javadoc)
@@ -149,14 +154,15 @@ public final class PrimitiveResolver implements ResolverStrategy {
      * #load(org.castor.persist.TransactionContext, org.exolab.castor.persist.OID, org.castor.persist.ProposedObject, org.exolab.castor.mapping.AccessMode, java.lang.Object)
      */
     public void load(final TransactionContext tx, final OID oid,
-            final ProposedObject proposedObject,
-            final AccessMode suggestedAccessMode, final Object field) {
+            final ProposedEntity proposedObject,
+            final AccessMode suggestedAccessMode) {
         // simply set the corresponding Persistent field value into the object
-        if (field != null) {
-            _fieldMolder.setValue(proposedObject.getObject(), field, tx
+        Object fieldValue = proposedObject.getField(_fieldIndex);
+        if (fieldValue != null) {
+            _fieldMolder.setValue(proposedObject.getEntity(), fieldValue, tx
                     .getClassLoader());
         } else {
-            _fieldMolder.setValue(proposedObject.getObject(), null, tx
+            _fieldMolder.setValue(proposedObject.getEntity(), null, tx
                     .getClassLoader());
         }
     }
