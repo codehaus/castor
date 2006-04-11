@@ -68,10 +68,6 @@ public final class SingleProxy implements MethodInterceptor, Serializable {
             final Object identity,
             final Object object,
             final AccessMode accessMode) {
-        if (_log.isDebugEnabled()) {
-            _log.debug("create new SingleProxy -> " + classMolder.getName()
-                    + " with id " + identity);
-        }
         _tx = tx;
         _engine = engine;
         _classMolder = classMolder;
@@ -79,7 +75,12 @@ public final class SingleProxy implements MethodInterceptor, Serializable {
         _identity = identity;
         _object = object;
         _accessMode = accessMode;
-    }
+
+        if (_log.isDebugEnabled()) {
+            _log.debug("Created new SingleProxy for an instance of '" + classMolder.getName()
+                    + "' with id '" + identity + "'");
+        }
+}
     
     /**
      * Factory method to create SingleProxy instance. 
@@ -157,6 +158,14 @@ public final class SingleProxy implements MethodInterceptor, Serializable {
             return _object;
         } else if ("interceptedClass".equals(methodName)) {
             return _clazz;
+        } else if ("interceptedHasMaterialized".equals(methodName)) {
+            return new Boolean(_hasMaterialized);
+        } else if ("interceptedIdentity".equals(methodName)) {
+            return _identity;
+        } else if ("interceptedClassMolder".equals(methodName)) {
+            return _classMolder;
+        } else if ("interceptedLockEngine".equals(methodName)) {
+            return _engine;
         } else if ("interceptedIdentity".equals(methodName)) {
             return _identity;
         } else if ("getClass".equals(methodName)) {

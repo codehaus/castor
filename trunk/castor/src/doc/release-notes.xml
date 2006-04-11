@@ -42,6 +42,26 @@
             <summary>
             </summary>
             <bugs>
+                <bug id="1355" tool="jira">
+                    <description>
+		                Fixed problem related to lazy loading objects part of an 1:1 relation.
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Jon Wilmoth</name>
+                        <email>jonwilmoth@yahoo.com</email>
+                    </reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20060411</date>
+                </bug>
                 <bug id="1379" tool="jira">
                     <description>
 		                Fixed problem related to loading object hierarchies with access mode DB_LOCKED.
