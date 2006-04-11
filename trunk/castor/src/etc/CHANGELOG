@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+All:   Fixed bug CASTOR-1379 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Fixed problem related to loading object hierarchies with access mode DB_LOCKED.
+       Details: http://jira.codehaus.org/browse/CASTOR-1379
+       (Werner - 20060411)
+
 All:   Fixed bug CASTOR-1389 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
        Replaced org.exolab.castor.util.Messages by org.castor.util.Messages.
        Details: http://jira.codehaus.org/browse/CASTOR-1389
@@ -10,7 +15,7 @@ All:   Fixed bug CASTOR-1389 using contribution from Ralf Joachim [ralf.joachim@
 All:   Fixed bug CASTOR-1387 using contribution from Henk van Voorthujsen [voorth@xs4all.nl]
        Removed postgreSQL JAR from Eclipse templates.
        Details: http://jira.codehaus.org/browse/CASTOR-1387
-       (Ralf - 20060410)
+       (Werner - 20060410)
 
 JDO:   Fixed bug CASTOR-1386 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
        Extracted all keys of JDO properties into org.castor.util.ConfigKeys.

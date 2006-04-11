@@ -298,6 +298,13 @@ public final class SQLStatementLoad {
                 throw new ObjectNotFoundException(Messages.format("persist.objectNotFound", _type, identity));
             }
 
+            // if this class is part of an extend relation (hierarchy), let's investigate
+            // what the real class type is vs. the specified one as part of the load statement;
+            // this is done by looking at (the id fields of all) the extending class
+            // desriptors, and by trying to find a (if not the) potential leaf descriptor;
+            // if there's no potential leaf descriptor, let's simply continue; if there's
+            // one, set the actual values in the ProposedEntity instance and return
+            // to indicate that the load shoul dbe re-tried with the correct ClassMolder
             if (_extendingClassDescriptors.size() > 0) {
                 Object[] returnValues = 
                     SQLHelper.calculateNumberOfFields(_extendingClassDescriptors, 
@@ -315,7 +322,11 @@ public final class SQLStatementLoad {
                     proposedObject.setExpanded(true);
                 }
 
-                return null;
+                // make sure that we only return early (as described above), if we actually
+                // found a potential leaf descriptor
+                if (potentialLeafDescriptor != null) {
+                    return null;
+                }
             }
             
             // Load all the fields of the object including one-one relations

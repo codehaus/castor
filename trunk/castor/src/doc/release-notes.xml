@@ -42,6 +42,26 @@
             <summary>
             </summary>
             <bugs>
+                <bug id="1379" tool="jira">
+                    <description>
+		                Fixed problem related to loading object hierarchies with access mode DB_LOCKED.
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20060411</date>
+                </bug>
                 <bug id="1389" tool="jira">
                     <description>
 		                Replaced org.exolab.castor.util.Messages by org.castor.util.Messages.
