@@ -2,7 +2,12 @@
 Version (CVS)
 -------------
 
-All:   Fixed bug CASTOR-1379 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+JDO:   Fixed bug CASTOR-1355 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Fixed problem related to lazy loading objects part of an 1:1 relation.
+       Details: http://jira.codehaus.org/browse/CASTOR-1355
+       (Werner - 20060411)
+
+JDO:   Fixed bug CASTOR-1379 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        Fixed problem related to loading object hierarchies with access mode DB_LOCKED.
        Details: http://jira.codehaus.org/browse/CASTOR-1379
        (Werner - 20060411)

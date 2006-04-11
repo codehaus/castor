@@ -249,7 +249,7 @@ public final class PersistanceCapableRelationResolver implements ResolverStrateg
                 // yip: user're pretty easily to run into cache
                 // integrity problem here, if user forgot to create
                 // "value" explicitly. Let's put error message here
-                if ((value != null) && !tx.isRecorded(value)) {
+                if ((value != null) && !tx.isRecorded(value) && !_fieldMolder.isLazy()) {
                     throw new PersistenceException(
                             "Object, " + object + ", links to another object, " + value
                             + " that is not loaded/updated/created in this transaction");

@@ -24,12 +24,12 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.castor.persist.proxy.LazyCGLIB;
 import org.castor.util.IdentityMap;
 import org.castor.util.IdentitySet;
 import org.castor.util.Messages;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.persist.ClassMolder;
-import org.exolab.castor.persist.LazyCGLIB;
 import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.OID;
 
@@ -238,7 +238,7 @@ public final class ObjectTracker {
      */
     public boolean isTracking(final Object object) {
         Object aObject = supportCGLibObject(object);
-        return (_objectToOID.containsKey(aObject));
+        return _objectToOID.containsKey(aObject);
     }
     
     /**
@@ -503,7 +503,8 @@ public final class ObjectTracker {
             LazyCGLIB cgObject = (LazyCGLIB) object;
             
             // Test for materialization.
-            if (cgObject.interceptedHasMaterialized() == Boolean.TRUE) {
+            boolean hasMaterialized = cgObject.interceptedHasMaterialized().booleanValue();
+            if (hasMaterialized) {
                 // TODO [WG] We still might have an option for some serious optimization
                 // here if the instance has not been materialized yet.
                 Object identity = cgObject.interceptedIdentity();
