@@ -400,12 +400,12 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     /**
      * @see org.castor.persist.TransactionContext#load(
      *      org.exolab.castor.persist.LockEngine, org.exolab.castor.persist.ClassMolder,
-     *      java.lang.Object, org.castor.persist.ProposedObject,
+     *      java.lang.Object, org.castor.persist.ProposedEntity,
      *      org.exolab.castor.mapping.AccessMode)
      */
     public final synchronized Object load(final LockEngine engine,
             final ClassMolder molder, final Object identity,
-            final ProposedObject proposedObject, final AccessMode suggestedAccessMode) 
+            final ProposedEntity proposedObject, final AccessMode suggestedAccessMode) 
     throws PersistenceException {
         return load(engine, molder, identity, proposedObject, suggestedAccessMode, null);
     }
@@ -413,12 +413,12 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     /**
      * @see org.castor.persist.TransactionContext#load(
      *      org.exolab.castor.persist.LockEngine, org.exolab.castor.persist.ClassMolder,
-     *      java.lang.Object, org.castor.persist.ProposedObject,
+     *      java.lang.Object, org.castor.persist.ProposedEntity,
      *      org.exolab.castor.mapping.AccessMode, org.exolab.castor.persist.QueryResults)
      */
     public final synchronized Object load(final LockEngine engine,
             final ClassMolder molder, final Object identity,
-            final ProposedObject proposedObject, final AccessMode suggestedAccessMode, 
+            final ProposedEntity proposedObject, final AccessMode suggestedAccessMode, 
             final QueryResults results)
     throws PersistenceException {
 
@@ -432,11 +432,11 @@ public abstract class AbstractTransactionContext implements TransactionContext {
 
         // Test that the object to be loaded (which we will fill in) is of an
         // appropriate type for our molder.
-        if (proposedObject.getObject() != null
+        if (proposedObject.getEntity() != null
                 && !molder.getJavaClass(_db.getClassLoader()).isAssignableFrom(
-                        proposedObject.getProposedClass())) {
+                        proposedObject.getProposedEntityClass())) {
             throw new PersistenceException(Messages.format("persist.typeMismatch",
-                    molder.getName(), proposedObject.getProposedClass()));
+                    molder.getName(), proposedObject.getProposedEntityClass()));
         }
 
         oid = new OID(engine, molder, identity);
@@ -455,8 +455,8 @@ public abstract class AbstractTransactionContext implements TransactionContext {
             // error is reported.
             
             // TODO [WG]: could read && propsedObject != objectInTransaction
-            if (proposedObject.getObject() != null
-                    && proposedObject.getObject() != objectInTransaction) {
+            if (proposedObject.getEntity() != null
+                    && proposedObject.getEntity() != objectInTransaction) {
                 throw new PersistenceException(Messages.format(
                         "persist.multipleLoad", molder.getName(), identity));
             }
@@ -520,8 +520,8 @@ public abstract class AbstractTransactionContext implements TransactionContext {
         // failure (object no longer exists), hold until a suitable lock is granted
         // (or fail to grant), or report error with the persistence engine.
         try {
-            if (proposedObject.getObject() != null) {
-                objectInTransaction = proposedObject.getObject();
+            if (proposedObject.getEntity() != null) {
+                objectInTransaction = proposedObject.getEntity();
             } else {
                 // ssa, multi classloader feature
                 // ssa, FIXME : No better way to do that ?
@@ -534,9 +534,9 @@ public abstract class AbstractTransactionContext implements TransactionContext {
                             .getClassLoader());
                 }
                 
-                proposedObject.setProposedClass(objectInTransaction.getClass());
-                proposedObject.setActualClass(objectInTransaction.getClass());
-                proposedObject.setObject(objectInTransaction);
+                proposedObject.setProposedEntityClass(objectInTransaction.getClass());
+                proposedObject.setActualEntityClass(objectInTransaction.getClass());
+                proposedObject.setEntity(objectInTransaction);
             }
 
             molder.setIdentity(this, objectInTransaction, identity);
@@ -550,23 +550,15 @@ public abstract class AbstractTransactionContext implements TransactionContext {
                 
                 // Create new OID
                 ClassMolder actualClassMolder = engine.getClassMolder(
-                        proposedObject.getActualClass());
+                        proposedObject.getActualEntityClass());
                 OID actualOID = new OID(engine, actualClassMolder, identity);
-                actualClassMolder.setIdentity(this, proposedObject.getObject(), identity);
+                actualClassMolder.setIdentity(this, proposedObject.getEntity(), identity);
 
                 // Create instance of 'expanded object'
                 Object expandedObject = null;
                 try {
                     expandedObject = actualClassMolder.newInstance(getClassLoader());
-                } catch (InstantiationException e) {
-                    LOG.error("Cannot create instance of " + molder.getName());
-                    throw new PersistenceException(
-                            "Cannot craete instance of " + molder.getName());
-                } catch (IllegalAccessException e) {
-                    LOG.error("Cannot create instance of " + molder.getName());
-                    throw new PersistenceException(
-                            "Cannot craete instance of " + molder.getName());
-                } catch (ClassNotFoundException e) {
+                } catch (Exception e) {
                     LOG.error("Cannot create instance of " + molder.getName());
                     throw new PersistenceException(
                             "Cannot craete instance of " + molder.getName());
@@ -575,18 +567,15 @@ public abstract class AbstractTransactionContext implements TransactionContext {
                 // Add new OID to ObjectTracker
                 _tracker.trackObject(engine, molder, actualOID, expandedObject);
                 
-                ProposedObject proposedExpanded = new ProposedObject();
-                proposedExpanded.setProposedClass(proposedObject.getActualClass());
-                proposedExpanded.setActualClass(proposedObject.getActualClass());
-                proposedExpanded.setObject(expandedObject);
-                proposedExpanded.setFields(proposedObject.getFields());
+                ProposedEntity proposedExpanded = new ProposedEntity(proposedObject);
+                proposedExpanded.setEntity(expandedObject);
                 proposedExpanded.setObjectLockObjectToBeIgnored(true);
 
                 // reload 'expanded object' using correct ClassMolder
                 engine.load(this, actualOID, proposedExpanded,
                         suggestedAccessMode, _lockTimeout, results);
 
-                objectInTransaction = proposedExpanded.getObject();
+                objectInTransaction = proposedExpanded.getEntity();
             } else {
                 // rehash the object entry, because oid might have changed!
                 _tracker.trackOIDChange(objectInTransaction, engine, oid, newoid);

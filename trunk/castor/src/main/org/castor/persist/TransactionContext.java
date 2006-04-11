@@ -206,7 +206,7 @@ public interface TransactionContext {
      *         reported by the persistence engine.
      */
     Object load(final LockEngine engine, final ClassMolder molder, final Object identity,
-            final ProposedObject proposedObject, final AccessMode suggestedAccessMode) 
+            final ProposedEntity proposedObject, final AccessMode suggestedAccessMode) 
     throws PersistenceException;
 
     /**
@@ -230,7 +230,7 @@ public interface TransactionContext {
      *         reported by the persistence engine.
      */
     Object load(final LockEngine engine, final ClassMolder molder, final Object identity,
-            final ProposedObject proposedObject, final AccessMode suggestedAccessMode, 
+            final ProposedEntity proposedObject, final AccessMode suggestedAccessMode, 
             final QueryResults results)
     throws PersistenceException;
 

@@ -56,7 +56,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.castor.jdo.util.ClassLoadingUtils;
-import org.castor.persist.ProposedObject;
+import org.castor.persist.ProposedEntity;
 import org.castor.persist.TransactionContext;
 import org.castor.persist.UpdateAndRemovedFlags;
 import org.castor.persist.UpdateFlags;
@@ -387,7 +387,8 @@ public class ClassMolder
                         
             //            try {
             // create RelationResolver instance
-            _resolvers[fieldMolderNumber] = ResolverFactory.createRelationResolver (_fhs[fieldMolderNumber], this, _debug);
+            _resolvers[fieldMolderNumber] = 
+                ResolverFactory.createRelationResolver (_fhs[fieldMolderNumber], this, fieldMolderNumber, _debug);
             //            } catch (PersistenceException e) {
             //                throw new MappingException ("Unable to create Resolver instance", e);
             //            }
@@ -493,76 +494,96 @@ public class ClassMolder
      * @return the object stamp for the object in the persistent storage
      */
     public Object load(TransactionContext tx, OID oid, DepositBox locker,
-            ProposedObject proposedObject, AccessMode suggestedAccessMode)
+            ProposedEntity proposedObject, AccessMode suggestedAccessMode)
     throws ObjectNotFoundException, PersistenceException {
         return load(tx, oid, locker, proposedObject, suggestedAccessMode, null);
     }
 
     private Object loadFields(TransactionContext tx, OID oid, DepositBox locker,
-            ProposedObject proposedObject, AccessMode suggestedAccessMode, QueryResults results)
+            ProposedEntity proposedObject, AccessMode suggestedAccessMode, QueryResults results)
     throws ObjectNotFoundException, PersistenceException {
                    
         Connection conn;
-        Object[] fields = null;
         Object stamp = null;
-        AccessMode accessMode = getAccessMode( suggestedAccessMode );
+        AccessMode accessMode = getAccessMode(suggestedAccessMode);
+
+        // set the field values to 'null' anyhow; if we don't find
+        // in the cache later on, this indicates that the field values 
+        // should be loaded from the persistence storage
+        proposedObject.setFields(null);
+        
+        // try to load the field values from the cache, except when being told
+        // to ignore them
+        if (!proposedObject.isObjectLockObjectToBeIgnored()) {
+            Object[] cachedFieldValues = (Object[]) locker.getObject(tx);
+            if (_log.isDebugEnabled()) {
+                StringBuffer buffer = new StringBuffer(80);
+                buffer.append("Field values loaded from cache: ");
+                if (cachedFieldValues != null) {
+                    buffer.append("[");
+                    for (int i = 0; i < cachedFieldValues.length; i++) {
+                        buffer.append(cachedFieldValues[i]);
+                        if (i > 0) {
+                            buffer.append (",");
+                        }
+                    }
+                    buffer.append("]");
+                } else {
+                    buffer.append("null");
+                }
+            }
+            proposedObject.setFields(cachedFieldValues);
+        }
 
         // load the fields from the persistent storage if the cache is empty
-        // and the accessMode is readOnly.
-        
-        // do not look at ObjectLock's field values if being told to ignore them
-        if (!proposedObject.isObjectLockObjectToBeIgnored()) {
-        	fields = (Object[]) locker.getObject( tx );
-        }
-        
-        proposedObject.setFields(fields);
-        if ( fields == null || accessMode == AccessMode.DbLocked ) {
-            fields = new Object[_fhs.length];
-            proposedObject.setFields(fields);
-            if( results != null ) {
-                stamp = results.getQuery().fetch(proposedObject, oid.getIdentity());
-                fields = proposedObject.getFields();
+        // or the access mode is DBLOCKED (thus guaranteeing that a lock at the
+        // database level will be created)
+        if (!proposedObject.isFieldsSet() || accessMode == AccessMode.DbLocked) {
+            proposedObject.initializeFields(_fhs.length);
+            if (results != null) {
+                stamp = results.getQuery().fetch(proposedObject,
+                        oid.getIdentity());
             } else {
                 conn = (Connection) tx.getConnection(oid.getLockEngine());
-                stamp = _persistence.load(conn, proposedObject, oid.getIdentity(), accessMode);
-                fields = proposedObject.getFields();
+                stamp = _persistence.load(conn, proposedObject, oid
+                        .getIdentity(), accessMode);
             }
-            
+
             if (proposedObject.isExpanded()) {
-               if (_log.isDebugEnabled()) {
-                   StringBuffer sb = new StringBuffer();
-                   sb.append("Actual object has been expanded from ");
-                   sb.append(proposedObject.getProposedClass());
-                   sb.append(" to ");
-                   sb.append(proposedObject.getActualClass());
-                   sb.append(", with the field values to set as follows:\n");
-                   for (int i = 0; i < fields.length; i++) {
-                       sb.append("field ");
-                       sb.append(i + 1);
-                       sb.append(": ");
-                       sb.append(fields[i]);
-                       sb.append('\n');
-                   }
-                   _log.debug(sb);
-               }
+                if (_log.isDebugEnabled()) {
+                    StringBuffer sb = new StringBuffer();
+                    sb.append("Actual object has been expanded from ");
+                    sb.append(proposedObject.getProposedEntityClass());
+                    sb.append(" to ");
+                    sb.append(proposedObject.getActualEntityClass());
+                    sb.append(", with the field values to set as follows:\n");
+                    for (int i = 0; i < proposedObject.getNumberOfFields(); i++) {
+                        sb.append("field ");
+                        sb.append(i + 1);
+                        sb.append(": ");
+                        sb.append(proposedObject.getField(i));
+                        sb.append('\n');
+                    }
+                    _log.debug(sb);
+                }
             }
+
+            oid.setDbLock(accessMode == AccessMode.DbLocked);
             
-            oid.setDbLock( accessMode == AccessMode.DbLocked );
-            locker.setObject(tx, fields );
-            
+            // store (new) field values to cache
+            locker.setObject(tx, proposedObject.getFields());
+
         }
         
         proposedObject.setActualClassMolder(this);
-
         
         return stamp;
     }
 
     public Object load(TransactionContext tx, OID oid, DepositBox locker,
-            ProposedObject proposedObject, AccessMode suggestedAccessMode, QueryResults results)
+            ProposedEntity proposedObject, AccessMode suggestedAccessMode, QueryResults results)
     throws ObjectNotFoundException, PersistenceException {
         
-        Object[] fields;
         Object ids;
         Object stamp = null;
         int fieldType;
@@ -581,16 +602,14 @@ public class ClassMolder
             return stamp;
         }
         
-        fields = proposedObject.getFields();
-                        
         // set the timeStamp of the data object to locker's timestamp
-        if (proposedObject.getObject() instanceof TimeStampable) {
-            ((TimeStampable) proposedObject.getObject()).jdoSetTimeStamp(locker.getTimeStamp());
+        if (proposedObject.getEntity() instanceof TimeStampable) {
+            ((TimeStampable) proposedObject.getEntity()).jdoSetTimeStamp(locker.getTimeStamp());
         }
 
         // set the identities into the target object
         ids = oid.getIdentity();
-        setIdentity(tx, proposedObject.getObject(), ids);
+        setIdentity(tx, proposedObject.getEntity(), ids);
 
         // iterates thur all the field of the object and bind all field.
         for ( int i = 0; i < _fhs.length; i++ ) {
@@ -601,7 +620,7 @@ public class ClassMolder
             case FieldMolder.PERSISTANCECAPABLE:
             case FieldMolder.ONE_TO_MANY:
             case FieldMolder.MANY_TO_MANY:
-            	_resolvers[i].load(tx, oid, proposedObject, accessMode, fields[i]);
+            	_resolvers[i].load(tx, oid, proposedObject, accessMode);
             	break;
             default:
                 throw new PersistenceException("Unexpected field type!");
@@ -854,15 +873,15 @@ public class ClassMolder
                 fields = new Object[_fhs.length];
                 Connection conn = tx.getConnection(oid.getLockEngine());
                 
-                ProposedObject proposedObject = new ProposedObject();
-                proposedObject.setProposedClass(object.getClass());
-                proposedObject.setObject(object);
+                ProposedEntity proposedObject = new ProposedEntity();
+                proposedObject.setProposedEntityClass(object.getClass());
+                proposedObject.setEntity(object);
                 proposedObject.setFields(fields);
                 _persistence.load(conn, proposedObject, oid.getIdentity(), accessMode);
                 fields = proposedObject.getFields();
                 
                 oid.setDbLock( accessMode == AccessMode.DbLocked );
-                locker.setObject( tx, fields );
+                locker.setObject(tx, proposedObject.getFields());
             }
 
             // load the original field into the transaction. so, store will
@@ -1529,7 +1548,7 @@ public class ClassMolder
     public void resetResolvers () {
     	if (!resolversHaveBeenReset) {
     		for (int i = 0; i < _fhs.length; i++) {
-    			_resolvers[i] = ResolverFactory.createRelationResolver (_fhs[i], this, _debug);
+    			_resolvers[i] = ResolverFactory.createRelationResolver (_fhs[i], this, i, _debug);
     		}
     		
     		resolversHaveBeenReset = true;

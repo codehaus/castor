@@ -24,7 +24,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OptionalDataException;
 
-import org.castor.persist.ProposedObject;
+import org.castor.persist.ProposedEntity;
 import org.castor.persist.TransactionContext;
 import org.castor.persist.UpdateAndRemovedFlags;
 import org.castor.persist.UpdateFlags;
@@ -47,16 +47,21 @@ public final class SerializableResolver implements ResolverStrategy {
      * Associated {@link FieldMolder}.
      */
     private FieldMolder _fieldMolder;
+    private int _fieldIndex;
     
     /** 
      * Creates an instance of SerializableResolver.
      * @param classMolder Associated {@link ClassMolder}
      * @param fieldMolder Associated {@link FieldMolder}
+     * @param fieldIndex Field index within all fields of parent class molder.
      * @param debug ???
      */
     public SerializableResolver(final ClassMolder classMolder,
-            final FieldMolder fieldMolder, final boolean debug) {
+            final FieldMolder fieldMolder, 
+            final int fieldIndex,
+            final boolean debug) {
         this._fieldMolder = fieldMolder;
+        this._fieldIndex = fieldIndex;
     }
     
     /**
@@ -261,26 +266,25 @@ public final class SerializableResolver implements ResolverStrategy {
     /**
      * @see org.castor.persist.resolver.ResolverStrategy
      *      #load(org.castor.persist.TransactionContext,
-     *      org.exolab.castor.persist.OID, ProposedObject, org.exolab.castor.mapping.AccessMode,
-     *      org.exolab.castor.persist.QueryResults)
+     *      org.exolab.castor.persist.OID, ProposedEntity, org.exolab.castor.mapping.AccessMode)
      */
     public void load(final TransactionContext tx, final OID oid,
-            final ProposedObject proposedObject,
-            final AccessMode suggestedAccessMode, final Object field)
+            final ProposedEntity proposedObject,
+            final AccessMode suggestedAccessMode)
     throws PersistenceException {
         // deserialize byte[] into java object
         try {
-            byte[] bytes = (byte[]) field;
+            byte[] bytes = (byte[]) proposedObject.getField(_fieldIndex);
             if (bytes != null) {
                 // The following code can be updated, after Blob-->InputStream
                 // to enhance performance.
                 ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
                 ObjectInputStream os = new ObjectInputStream(bis);
                 Object object = os.readObject();
-                _fieldMolder.setValue(proposedObject.getObject(), object, tx
+                _fieldMolder.setValue(proposedObject.getEntity(), object, tx
                         .getClassLoader());
             } else {
-                _fieldMolder.setValue(proposedObject.getObject(), null, tx
+                _fieldMolder.setValue(proposedObject.getEntity(), null, tx
                         .getClassLoader());
             }
         } catch (OptionalDataException e) {

@@ -18,30 +18,36 @@ package org.castor.persist;
 import org.exolab.castor.persist.ClassMolder;
 
 /**
- * Holding structure for information about the class instance being loaded by internal 
- * classes, revealing what class was suggested, what class actually got loaded, etc.
+ * Holding structure for information about an entity class instance.
+ * 
+ * This contains amongst others ...
+ * <ul>
+ *    <li>the suggested class</li>
+ *    <li>the actually loaded class (if expansion took place)</li>
+ *    <li>the field values (in form of an object array) of the entity</li>
+ *  </ul>
  *  
  * @author <a href="mailto:werner DOT guttmann AT gmx DOT net">Werner Guttmann</a>
  * @version $Revision$ $Date$
  * @since 0.9.9
  */
-public final class ProposedObject {
+public final class ProposedEntity {
     //--------------------------------------------------------------------------
 
     /** The fields of the object in question. */
     private Object[]    _fields = null;
 
     /** The object. */
-    private Object      _object = null;
+    private Object      _entity = null;
 
     /** True if the proposed class has been expanded. */
     private boolean     _isExpanded = false;
 
     /** The proposed class. */
-    private Class       _proposedClass = null;
+    private Class       _proposedEntityClass = null;
 
     /** The actualClass. */
-    private Class       _actualClass = null;
+    private Class       _actualEntityClass = null;
 
     /** The actual ClassMolder. */
     private ClassMolder _actualClassMolder = null;
@@ -52,6 +58,28 @@ public final class ProposedObject {
     //--------------------------------------------------------------------------
 
     /**
+     * Creates an default instance.
+     */
+    public ProposedEntity () {}
+
+    /**
+     * Creates an instance of this class based upon the values passed in.
+     * @param proposedEntity The entity instance to be copied.
+     */
+    public ProposedEntity (ProposedEntity proposedEntity) {
+        setFields(proposedEntity.getFields());
+        setProposedEntityClass(proposedEntity.getProposedEntityClass());
+        setActualClassMolder(proposedEntity.getActualClassMolder());
+    }
+    /**
+     * Initialize field values to the specified number.
+     * @param numberOfFields Number of the field values to be created.
+     */
+    public void initializeFields(final int numberOfFields) {
+        _fields = new Object[numberOfFields];
+    }
+    
+    /**
      * Returns the fields of the object in question.
      * 
      * @return Returns the fields.
@@ -60,6 +88,31 @@ public final class ProposedObject {
         return _fields;
     }
 
+    /**
+     * Returns the specified field value of the object in question.
+     * @param index Index of the field to be returned.
+     * @return Returns the specified field value.
+     */
+    public Object getField(final int index) {
+        return _fields[index];
+    }
+
+    /**
+     * Indicates whether the fields are set, i.e. not null.
+     * @return True if fields are set, i.e. not null(.
+     */
+    public boolean isFieldsSet() {
+        return (_fields != null);
+    }
+    
+    /**
+     * Indicates the number of field values set for this entity.
+     * @return Number of field values set.
+     */
+    public int getNumberOfFields() {
+        return _fields.length;
+    }
+    
     /**
      * Sets the fields of the object in question.
      * 
@@ -70,12 +123,21 @@ public final class ProposedObject {
     }
 
     /**
+     * Sets the specified field of the object in question.
+     * 
+     * @param fields The field value to set.
+     * @param index Specifies which field to set.
+     */
+    public void setField(final Object field, final int index) {
+        _fields[index] = field;
+    }
+    /**
      * Returns the object.
      * 
      * @return The object.
      */
-    public Object getObject() {
-        return _object;
+    public Object getEntity() {
+        return _entity;
     }
 
     /**
@@ -83,8 +145,8 @@ public final class ProposedObject {
      * 
      * @param object The object to set.
      */
-    public void setObject(final Object object) {
-        _object = object;
+    public void setEntity(final Object entity) {
+        _entity = entity;
     }
 
     /**
@@ -110,8 +172,8 @@ public final class ProposedObject {
      * 
      * @return The proposedClass.
      */
-    public Class getProposedClass() {
-        return _proposedClass;
+    public Class getProposedEntityClass() {
+        return _proposedEntityClass;
     }
 
     /**
@@ -119,8 +181,8 @@ public final class ProposedObject {
      * 
      * @param proposedClass The proposedClass to set.
      */
-    public void setProposedClass(final Class proposedClass) {
-        _proposedClass = proposedClass;
+    public void setProposedEntityClass(final Class proposedClass) {
+        _proposedEntityClass = proposedClass;
     }
 
     /**
@@ -128,8 +190,8 @@ public final class ProposedObject {
      * 
      * @return The actualClass.
      */
-    public Class getActualClass() {
-        return _actualClass;
+    public Class getActualEntityClass() {
+        return _actualEntityClass;
     }
 
     /**
@@ -137,8 +199,8 @@ public final class ProposedObject {
      * 
      * @param actualClass The actualClass to set.
      */
-    public void setActualClass(final Class actualClass) {
-        _actualClass = actualClass;
+    public void setActualEntityClass(final Class actualClass) {
+        _actualEntityClass = actualClass;
     }
 
     /**
@@ -165,9 +227,9 @@ public final class ProposedObject {
     public String toString() {
         StringBuffer buffer = new StringBuffer();
         buffer.append("<");
-        buffer.append("proposedClass=" + _proposedClass);
-        buffer.append("; actualClass=" + _actualClass);
-        buffer.append("; object=" + _object);
+        buffer.append("proposedEntityClass=" + _proposedEntityClass);
+        buffer.append("; actualEntityClass=" + _actualEntityClass);
+        buffer.append("; entity=" + _entity);
         buffer.append("; actual classmolder=" + _actualClassMolder + "; ");
         if (_fields != null) {
             for (int i = 0; i < _fields.length; i++) {

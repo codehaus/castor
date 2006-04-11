@@ -59,7 +59,7 @@ import org.castor.cache.CacheAcquireException;
 import org.castor.cache.CacheFactory;
 import org.castor.cache.CacheFactoryRegistry;
 import org.castor.jdo.engine.ConnectionFactory;
-import org.castor.persist.ProposedObject;
+import org.castor.persist.ProposedEntity;
 import org.castor.persist.TransactionContext;
 import org.castor.persist.cache.CacheEntry;
 import org.castor.util.Configuration;
@@ -340,13 +340,13 @@ public final class LockEngine {
      *  persistent capable
      * @throws ObjectDeletedWaitingForLockException The object has been deleted, but is waiting for a lock.
      */
-    public OID load(TransactionContext tx, OID oid, ProposedObject proposedObject, AccessMode suggestedAccessMode, int timeout)
+    public OID load(TransactionContext tx, OID oid, ProposedEntity proposedObject, AccessMode suggestedAccessMode, int timeout)
     throws ObjectNotFoundException, LockNotGrantedException, PersistenceException,
     ClassNotPersistenceCapableException, ObjectDeletedWaitingForLockException {
         return load(tx, oid, proposedObject, suggestedAccessMode, timeout, null);
     }
 
-    public OID load(TransactionContext tx, OID oid, ProposedObject proposedObject, AccessMode suggestedAccessMode, int timeout, QueryResults results)
+    public OID load(TransactionContext tx, OID oid, ProposedEntity proposedObject, AccessMode suggestedAccessMode, int timeout, QueryResults results)
             throws ObjectNotFoundException, LockNotGrantedException, PersistenceException,
             ClassNotPersistenceCapableException, ObjectDeletedWaitingForLockException {
 
@@ -401,7 +401,7 @@ public final class LockEngine {
 
             if (_log.isDebugEnabled()) {
                 if (proposedObject.isExpanded()) {
-                    _log.debug(Messages.format("jdo.loading.with.id", proposedObject.getActualClass(), oid.getIdentity()));
+                    _log.debug(Messages.format("jdo.loading.with.id", proposedObject.getActualEntityClass(), oid.getIdentity()));
                 } else {
                     _log.debug(Messages.format("jdo.loading.with.id", typeInfo.molder.getName(), oid.getIdentity()));
                 }

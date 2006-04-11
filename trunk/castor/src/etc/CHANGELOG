@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1370 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Refactored ProposedObject (and renamed it to ProposedEntity).
+       Details: http://jira.codehaus.org/browse/CASTOR-1370
+       (Werner - 20060411)
+       
 JDO:   Fixed bug CASTOR-1355 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        Fixed problem related to lazy loading objects part of an 1:1 relation.
        Details: http://jira.codehaus.org/browse/CASTOR-1355

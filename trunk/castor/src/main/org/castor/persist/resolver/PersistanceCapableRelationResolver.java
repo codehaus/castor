@@ -19,7 +19,7 @@ package org.castor.persist.resolver;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.castor.persist.ProposedObject;
+import org.castor.persist.ProposedEntity;
 import org.castor.persist.TransactionContext;
 import org.castor.persist.UpdateAndRemovedFlags;
 import org.castor.persist.UpdateFlags;
@@ -51,6 +51,8 @@ public final class PersistanceCapableRelationResolver implements ResolverStrateg
      * Field molder for the field to be resolved.
      */
     private FieldMolder _fieldMolder;
+    
+    private int _fieldIndex;
    
     /**
      * Indicates whether debug mode is active
@@ -62,12 +64,16 @@ public final class PersistanceCapableRelationResolver implements ResolverStrateg
      * Creates an instance of this resolver class.
      * @param classMolder Enclosing class molder.
      * @param fieldMolder Field Molder
+     * @param fieldIndex Field index within all fields of parent class molder.
      * @param debug True if debug mode is on.
      */
     public PersistanceCapableRelationResolver (final ClassMolder classMolder,
-            final FieldMolder fieldMolder, final boolean debug) {
+            final FieldMolder fieldMolder, 
+            final int fieldIndex,
+            final boolean debug) {
         _classMolder = classMolder;
         _fieldMolder = fieldMolder;
+        _fieldIndex = fieldIndex;
         _debug = debug;
     }
     
@@ -294,7 +300,7 @@ public final class PersistanceCapableRelationResolver implements ResolverStrateg
             // load the cached dependent object from the data store.
             // The loaded will be compared with the new one
             if (field != null) {
-                ProposedObject proposedValue = new ProposedObject ();
+                ProposedEntity proposedValue = new ProposedEntity ();
                 tx.load(fieldEngine, fieldClassMolder, field, proposedValue, suggestedAccessMode);
             }
         } else if (tx.isAutoStore()) {
@@ -303,7 +309,7 @@ public final class PersistanceCapableRelationResolver implements ResolverStrateg
             }
 
             if (field != null) {
-                ProposedObject proposedValue = new ProposedObject ();
+                ProposedEntity proposedValue = new ProposedEntity ();
                 tx.load(fieldEngine, fieldClassMolder, field, proposedValue, suggestedAccessMode);
             }
         }
@@ -399,7 +405,7 @@ public final class PersistanceCapableRelationResolver implements ResolverStrateg
     /* (non-Javadoc)
      * @see org.castor.persist.resolver.ResolverStrategy#load(org.castor.persist.TransactionContext, org.exolab.castor.persist.OID, org.castor.persist.ProposedObject, org.exolab.castor.mapping.AccessMode, java.lang.Object)
      */
-    public void load(final TransactionContext tx, final OID oid, final ProposedObject proposedObject, final AccessMode suggestedAccessMode, final Object field)
+    public void load(final TransactionContext tx, final OID oid, final ProposedEntity proposedObject, final AccessMode suggestedAccessMode)
     throws PersistenceException {
         // field is not primitive type. Related object will be loaded
         // thru the transaction in action if needed.
@@ -407,24 +413,25 @@ public final class PersistanceCapableRelationResolver implements ResolverStrateg
         ClassMolder fieldClassMolder = _fieldMolder.getFieldClassMolder();
         LockEngine fieldEngine = _fieldMolder.getFieldLockEngine();
 
-        if (field != null) {
+        Object fieldValue = proposedObject.getField(_fieldIndex);
+        if (fieldValue != null) {
             // use the corresponding Persistent fields as the identity,
             // and we ask transactionContext in action to load it.
             Object temp;
             try {
                 // should I use lazy loading for this object?
                 if (_fieldMolder.isLazy()) {
-                    temp = SingleProxy.getProxy(tx, fieldEngine, fieldClassMolder, field, null, suggestedAccessMode);
+                    temp = SingleProxy.getProxy(tx, fieldEngine, fieldClassMolder, fieldValue, null, suggestedAccessMode);
                 } else {
-                    ProposedObject proposedTemp = new ProposedObject();
-                    temp = tx.load(fieldEngine, fieldClassMolder, field, proposedTemp, suggestedAccessMode);
+                    ProposedEntity proposedTemp = new ProposedEntity();
+                    temp = tx.load(fieldEngine, fieldClassMolder, fieldValue, proposedTemp, suggestedAccessMode);
                 }
             } catch (ObjectNotFoundException ex) {
                 temp = null;
             }
-            _fieldMolder.setValue(proposedObject.getObject(), temp, tx.getClassLoader());
+            _fieldMolder.setValue(proposedObject.getEntity(), temp, tx.getClassLoader());
         } else {
-            _fieldMolder.setValue(proposedObject.getObject(), null, tx.getClassLoader());
+            _fieldMolder.setValue(proposedObject.getEntity(), null, tx.getClassLoader());
         }
     }
 

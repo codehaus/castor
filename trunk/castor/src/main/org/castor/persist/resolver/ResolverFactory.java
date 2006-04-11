@@ -43,6 +43,7 @@ public final class ResolverFactory {
      */
     public static ResolverStrategy createRelationResolver (final FieldMolder fieldMolder, 
             final ClassMolder classMolder, 
+            final int fieldIndex,
             final boolean debug) 
         /* throws PersistenceException */ {
         
@@ -51,22 +52,22 @@ public final class ResolverFactory {
         int fieldType = fieldMolder.getFieldType();
         switch (fieldType) {
         case FieldMolder.PRIMITIVE:
-            relationResolver = new PrimitiveResolver (classMolder, fieldMolder, debug);
+            relationResolver = new PrimitiveResolver (classMolder, fieldMolder, fieldIndex, debug);
             break;
         case FieldMolder.SERIALIZABLE:
-            relationResolver = new SerializableResolver (classMolder, fieldMolder, debug);
+            relationResolver = new SerializableResolver (classMolder, fieldMolder, fieldIndex, debug);
             break;
         case FieldMolder.PERSISTANCECAPABLE:
             relationResolver = 
-                new PersistanceCapableRelationResolver (classMolder, fieldMolder, debug);
+                new PersistanceCapableRelationResolver (classMolder, fieldMolder, fieldIndex, debug);
             break;
         case FieldMolder.ONE_TO_MANY:
             relationResolver = 
-                new OneToManyRelationResolver (classMolder, fieldMolder, debug);
+                new OneToManyRelationResolver (classMolder, fieldMolder, fieldIndex, debug);
             break;
         case FieldMolder.MANY_TO_MANY:
             relationResolver = 
-                new ManyToManyRelationResolver (classMolder, fieldMolder, debug);
+                new ManyToManyRelationResolver (classMolder, fieldMolder, fieldIndex, debug);
             break;
         default:
 //            throw new PersistenceException ("Invalid field type '" 

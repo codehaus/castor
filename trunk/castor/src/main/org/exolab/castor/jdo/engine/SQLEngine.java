@@ -23,7 +23,7 @@ import java.util.Vector;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.castor.persist.ProposedObject;
+import org.castor.persist.ProposedEntity;
 import org.castor.util.Messages;
 
 import org.exolab.castor.jdo.Database;
@@ -345,7 +345,7 @@ public final class SQLEngine implements Persistence {
      * @throws ObjectNotFoundException The object was not found in persistent storage
      * @throws PersistenceException A persistence error occured
      */
-    public Object load(final Object conn, final ProposedObject proposedObject,
+    public Object load(final Object conn, final ProposedEntity proposedObject,
                        final Object identity, final AccessMode accessMode)
     throws PersistenceException {
         return _loadStatement.executeStatement(conn, identity, proposedObject, accessMode);

@@ -49,7 +49,7 @@ package org.exolab.castor.persist;
 
 import javax.transaction.Status;
 
-import org.castor.persist.ProposedObject;
+import org.castor.persist.ProposedEntity;
 import org.castor.persist.TransactionContext;
 import org.castor.util.Messages;
 import org.exolab.castor.jdo.Database;
@@ -215,10 +215,10 @@ public final class QueryResults {
         handler = _engine.getClassMolder(_query.getResultType());
 
         // load the object thur the transaction of the query
-        ProposedObject proposedValue = new ProposedObject();
-        proposedValue.setProposedClass(_query.getResultType());
+        ProposedEntity proposedValue = new ProposedEntity();
+        proposedValue.setProposedEntityClass(_query.getResultType());
         object = _tx.load(_engine, handler, _lastIdentity, proposedValue, _accessMode, this);
-        if (proposedValue.isExpanded()) { object = proposedValue.getObject(); }
+        if (proposedValue.isExpanded()) { object = proposedValue.getEntity(); }
         
         return object;
 

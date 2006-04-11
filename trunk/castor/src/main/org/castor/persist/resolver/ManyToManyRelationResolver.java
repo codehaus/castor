@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.castor.persist.ProposedObject;
+import org.castor.persist.ProposedEntity;
 import org.castor.persist.TransactionContext;
 import org.castor.persist.UpdateFlags;
 import org.castor.persist.proxy.RelationCollection;
@@ -46,11 +46,14 @@ public final class ManyToManyRelationResolver extends ManyRelationResolver {
      * Creates an instance of ManyToManyRelationResolver
      * @param classMolder Associated ClassMolder.
      * @param fieldMolder Associated FieldMolder.
+     * @param fieldIndex Field index within all fields of parent class molder.
      * @param debug ???
      */
     public ManyToManyRelationResolver(final ClassMolder classMolder,
-            final FieldMolder fieldMolder, final boolean debug) {
-        super(classMolder, fieldMolder, debug);
+            final FieldMolder fieldMolder, 
+            final int fieldIndex, 
+            final boolean debug) {
+        super(classMolder, fieldMolder, fieldIndex, debug);
     }
     
     /**
@@ -161,7 +164,7 @@ public final class ManyToManyRelationResolver extends ManyRelationResolver {
                 if (!tx.isDeletedByOID(new OID(fieldEngine, fieldClassMolder,
                         id))) {
 
-                    ProposedObject proposedValue = new ProposedObject();
+                    ProposedEntity proposedValue = new ProposedEntity();
                     Object reldel = tx.load(fieldEngine, fieldClassMolder, id,
                             proposedValue, null);
                     if (reldel != null && tx.isPersistent(reldel)) {
@@ -319,7 +322,7 @@ public final class ManyToManyRelationResolver extends ManyRelationResolver {
                         // load all the dependent object in cache for
                         // modification
                         // check at commit time.
-                        ProposedObject proposedValue = new ProposedObject();
+                        ProposedEntity proposedValue = new ProposedEntity();
                         tx.load(oid.getLockEngine(), fieldClassMolder,
                                 v.get(j), proposedValue, suggestedAccessMode);
                     }

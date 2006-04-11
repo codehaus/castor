@@ -23,7 +23,7 @@ import java.lang.reflect.Method;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.castor.persist.ProposedObject;
+import org.castor.persist.ProposedEntity;
 import org.castor.persist.TransactionContext;
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.PersistenceException;
@@ -222,9 +222,9 @@ public final class SingleProxy implements MethodInterceptor, Serializable {
             _log.debug("load object " + _classMolder.getName() + " with id "
                     + _identity);
         }
-        ProposedObject proposedValue = new ProposedObject();
-        proposedValue.setProposedClass(_clazz);
-        proposedValue.setObject(_object);
+        ProposedEntity proposedValue = new ProposedEntity();
+        proposedValue.setProposedEntityClass(_clazz);
+        proposedValue.setEntity(_object);
         instance = _tx.load(_engine, _classMolder, _identity, proposedValue,
                 _accessMode);
         _hasMaterialized = true;

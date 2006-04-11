@@ -29,7 +29,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.castor.jdo.engine.CounterRef;
 import org.castor.jdo.engine.SQLTypeInfos;
-import org.castor.persist.ProposedObject;
+import org.castor.persist.ProposedEntity;
 import org.castor.util.Messages;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.mapping.AccessMode;
@@ -482,17 +482,14 @@ public final class SQLQuery implements PersistenceQuery {
     }
 
     /**
-     * @see org.exolab.castor.persist.spi.PersistenceQuery#fetch(org.exolab.castor.persist.ProposedObject, java.lang.Object)
+     * @see org.exolab.castor.persist.spi.PersistenceQuery#fetch(org.exolab.castor.persist.ProposedEntity, java.lang.Object)
      */
-    public Object fetch(final ProposedObject proposedObject, final Object identity)
-    throws PersistenceException {
-        Object[] fields = proposedObject.getFields();
-        
+    public Object fetch(final ProposedEntity proposedObject,
+            final Object identity) throws PersistenceException {
         // Fill the given fields[] with the "cached" stuff from our _fields[] .
         for (int i = 0; i < _fields.length; i++) {
-            fields[i] = _fields[i];
+            proposedObject.setField(_fields[i], i);
         }
-        
         return null;
     }
 

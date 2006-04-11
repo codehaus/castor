@@ -27,7 +27,7 @@ import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
 import java.lang.reflect.Array;
 
-import org.castor.persist.ProposedObject;
+import org.castor.persist.ProposedEntity;
 import org.castor.persist.TransactionContext;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.persist.ClassMolder;
@@ -268,7 +268,7 @@ public final class RelationCollection implements Collection, Lazy, TxSynchroniza
             }
 
             try {
-                ProposedObject proposedValue = new ProposedObject();
+                ProposedEntity proposedValue = new ProposedEntity();
                 o = _parent._tx.load(_parent._engine, _parent._molder, ids,
                         proposedValue, null);
                 _parent._loaded.put(ids, o);
