@@ -127,6 +127,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#addBatch()
      */
     public void addBatch() throws SQLException {
@@ -134,6 +135,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#addBatch(java.lang.String)
      */
     public void addBatch(final String arg0) throws SQLException {
@@ -142,6 +144,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#cancel()
      */
     public void cancel() throws SQLException {
@@ -149,6 +152,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#clearBatch()
      */
     public void clearBatch() throws SQLException {
@@ -157,6 +161,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see PreparedStatement#clearParameters()
      */
     public void clearParameters() throws SQLException {
@@ -165,6 +170,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#clearWarnings()
      */
     public void clearWarnings() throws SQLException {
@@ -172,6 +178,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#close()
      */
     public void close() throws SQLException {
@@ -179,6 +186,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.lang.Object#equals(java.lang.Object)
      */
     public boolean equals(final Object arg0) {
@@ -186,6 +194,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#execute()
      */
     public boolean execute() throws SQLException {
@@ -193,6 +202,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#execute(java.lang.String)
      */
     public boolean execute(final String arg0) throws SQLException {
@@ -201,6 +211,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#execute(java.lang.String, int)
      */
     public boolean execute(final String arg0, final int arg1) throws SQLException {
@@ -209,6 +220,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#execute(java.lang.String, int[])
      */
     public boolean execute(final String arg0, final int[] arg1) throws SQLException {
@@ -217,6 +229,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#execute(java.lang.String, java.lang.String[])
      */
     public boolean execute(final String arg0, final String[] arg1) throws SQLException {
@@ -225,6 +238,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#executeBatch()
      */
     public int[] executeBatch() throws SQLException {
@@ -232,6 +246,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#executeQuery()
      */
     public ResultSet executeQuery() throws SQLException {
@@ -239,6 +254,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#executeQuery(java.lang.String)
      */
     public ResultSet executeQuery(final String arg0) throws SQLException {
@@ -247,6 +263,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#executeUpdate()
      */
     public int executeUpdate() throws SQLException {
@@ -254,6 +271,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#executeUpdate(java.lang.String)
      */
     public int executeUpdate(final String arg0) throws SQLException {
@@ -262,6 +280,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#executeUpdate(java.lang.String, int)
      */
     public int executeUpdate(final String arg0, final int arg1) throws SQLException {
@@ -270,6 +289,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#executeUpdate(java.lang.String, int[])
      */
     public int executeUpdate(final String arg0, final int[] arg1) throws SQLException {
@@ -278,6 +298,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#executeUpdate(java.lang.String, java.lang.String[])
      */
     public int executeUpdate(final String arg0, final String[] arg1) throws SQLException {
@@ -286,6 +307,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#getConnection()
      */
     public Connection getConnection() throws SQLException {
@@ -294,6 +316,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#getFetchDirection()
      */
     public int getFetchDirection() throws SQLException {
@@ -301,6 +324,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#getFetchSize()
      */
     public int getFetchSize() throws SQLException {
@@ -308,6 +332,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#getGeneratedKeys()
      */
     public ResultSet getGeneratedKeys() throws SQLException {
@@ -315,6 +340,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#getMaxFieldSize()
      */
     public int getMaxFieldSize() throws SQLException {
@@ -322,6 +348,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#getMaxRows()
      */
     public int getMaxRows() throws SQLException {
@@ -329,6 +356,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#getMetaData()
      */
     public ResultSetMetaData getMetaData() throws SQLException {
@@ -336,6 +364,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#getMoreResults()
      */
     public boolean getMoreResults() throws SQLException {
@@ -343,6 +372,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#getMoreResults(int)
      */
     public boolean getMoreResults(final int arg0) throws SQLException {
@@ -350,6 +380,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#getParameterMetaData()
      */
     public ParameterMetaData getParameterMetaData() throws SQLException {
@@ -357,6 +388,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#getQueryTimeout()
      */
     public int getQueryTimeout() throws SQLException {
@@ -364,6 +396,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#getResultSet()
      */
     public ResultSet getResultSet() throws SQLException {
@@ -371,6 +404,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#getResultSetConcurrency()
      */
     public int getResultSetConcurrency() throws SQLException {
@@ -378,6 +412,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#getResultSetHoldability()
      */
     public int getResultSetHoldability() throws SQLException {
@@ -385,6 +420,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#getResultSetType()
      */
     public int getResultSetType() throws SQLException {
@@ -392,6 +428,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#getUpdateCount()
      */
     public int getUpdateCount() throws SQLException {
@@ -399,6 +436,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#getWarnings()
      */
     public SQLWarning getWarnings() throws SQLException {
@@ -406,6 +444,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
@@ -413,6 +452,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setArray(int, java.sql.Array)
      */
     public void setArray(final int arg0, final Array arg1) throws SQLException {
@@ -421,6 +461,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setAsciiStream(int, java.io.InputStream, int)
      */
     public void setAsciiStream(final int arg0, final InputStream arg1, final int arg2)
@@ -429,6 +470,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setBigDecimal(int, java.math.BigDecimal)
      */
     public void setBigDecimal(final int arg0, final BigDecimal arg1)
@@ -438,6 +480,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setBinaryStream(int, java.io.InputStream, int)
      */
     public void setBinaryStream(final int arg0, final InputStream arg1, final int arg2)
@@ -447,6 +490,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setBlob(int, java.sql.Blob)
      */
     public void setBlob(final int arg0, final Blob arg1) throws SQLException {
@@ -455,6 +499,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setBoolean(int, boolean)
      */
     public void setBoolean(final int arg0, final boolean arg1) throws SQLException {
@@ -463,6 +508,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setByte(int, byte)
      */
     public void setByte(final int arg0, final byte arg1) throws SQLException {
@@ -471,6 +517,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setBytes(int, byte[])
      */
     public void setBytes(final int arg0, final byte[] arg1) throws SQLException {
@@ -479,6 +526,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setCharacterStream(int, java.io.Reader, int)
      */
     public void setCharacterStream(final int arg0, final Reader arg1, final int arg2)
@@ -488,6 +536,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setClob(int, java.sql.Clob)
      */
     public void setClob(final int arg0, final Clob arg1) throws SQLException {
@@ -496,6 +545,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#setCursorName(java.lang.String)
      */
     public void setCursorName(final String arg0) throws SQLException {
@@ -503,6 +553,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setDate(int, java.sql.Date)
      */
     public void setDate(final int arg0, final Date arg1) throws SQLException {
@@ -511,6 +562,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setDate(int, java.sql.Date, java.util.Calendar)
      */
     public void setDate(final int arg0, final Date arg1, final Calendar arg2)
@@ -520,6 +572,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setDouble(int, double)
      */
     public void setDouble(final int arg0, final double arg1) throws SQLException {
@@ -528,6 +581,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#setEscapeProcessing(boolean)
      */
     public void setEscapeProcessing(final boolean arg0) throws SQLException {
@@ -535,6 +589,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#setFetchDirection(int)
      */
     public void setFetchDirection(final int arg0) throws SQLException {
@@ -542,6 +597,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#setFetchSize(int)
      */
     public void setFetchSize(final int arg0) throws SQLException {
@@ -549,6 +605,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setFloat(int, float)
      */
     public void setFloat(final int arg0, final float arg1) throws SQLException {
@@ -557,6 +614,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setInt(int, int)
      */
     public void setInt(final int arg0, final int arg1) throws SQLException {
@@ -565,6 +623,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setLong(int, long)
      */
     public void setLong(final int arg0, final long arg1) throws SQLException {
@@ -573,6 +632,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#setMaxFieldSize(int)
      */
     public void setMaxFieldSize(final int arg0) throws SQLException {
@@ -580,6 +640,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#setMaxRows(int)
      */
     public void setMaxRows(final int arg0) throws SQLException {
@@ -587,6 +648,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setNull(int, int)
      */
     public void setNull(final int arg0, final int arg1) throws SQLException {
@@ -595,6 +657,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setNull(int, int, java.lang.String)
      */
     public void setNull(final int arg0, final int arg1, final String arg2)
@@ -604,6 +667,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setObject(int, java.lang.Object)
      */
     public void setObject(final int arg0, final Object arg1) throws SQLException {
@@ -612,6 +676,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setObject(int, java.lang.Object, int)
      */
     public void setObject(final int arg0, final Object arg1, final int arg2)
@@ -621,6 +686,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setObject(int, java.lang.Object, int, int)
      */
     public void setObject(final int arg0, final Object arg1,
@@ -631,6 +697,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#setQueryTimeout(int)
      */
     public void setQueryTimeout(final int arg0) throws SQLException {
@@ -638,6 +705,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setRef(int, java.sql.Ref)
      */
     public void setRef(final int arg0, final Ref arg1) throws SQLException {
@@ -645,6 +713,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setShort(int, short)
      */
     public void setShort(final int arg0, final short arg1) throws SQLException {
@@ -653,6 +722,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setString(int, java.lang.String)
      */
     public void setString(final int arg0, final String arg1) throws SQLException {
@@ -661,6 +731,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setTime(int, java.sql.Time)
      */
     public void setTime(final int arg0, final Time arg1) throws SQLException {
@@ -669,6 +740,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setTime(int, java.sql.Time, java.util.Calendar)
      */
     public void setTime(final int arg0, final Time arg1, final Calendar arg2)
@@ -678,6 +750,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setTimestamp(int, java.sql.Timestamp)
      */
     public void setTimestamp(final int arg0, final Timestamp arg1) throws SQLException {
@@ -686,6 +759,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement
      *      #setTimestamp(int, java.sql.Timestamp, java.util.Calendar)
      */
@@ -696,6 +770,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @deprecated
      * @see java.sql.PreparedStatement#setUnicodeStream(int, java.io.InputStream, int)
      */
@@ -705,6 +780,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setURL(int, java.net.URL)
      */
     public void setURL(final int arg0, final URL arg1) throws SQLException {
@@ -713,6 +789,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.lang.Object#toString()
      */
     public String toString() {
@@ -741,6 +818,7 @@ public final class CallableStatementProxy implements CallableStatement {
     // CallableStatement interface
     
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#registerOutParameter(int, int)
      */
     public void registerOutParameter(final int parameterIndex, final int sqlType)
@@ -749,6 +827,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#registerOutParameter(int, int, int)
      */
     public void registerOutParameter(final int parameterIndex, 
@@ -758,6 +837,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#wasNull()
      */
     public boolean wasNull() throws SQLException {
@@ -765,6 +845,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getString(int)
      */
     public String getString(final int parameterIndex) throws SQLException {
@@ -772,6 +853,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getBoolean(int)
      */
     public boolean getBoolean(final int parameterIndex) throws SQLException {
@@ -779,6 +861,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getByte(int)
      */
     public byte getByte(final int parameterIndex) throws SQLException {
@@ -786,6 +869,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getShort(int)
      */
     public short getShort(final int parameterIndex) throws SQLException {
@@ -793,6 +877,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getInt(int)
      */
     public int getInt(final int parameterIndex) throws SQLException {
@@ -800,6 +885,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getLong(int)
      */
     public long getLong(final int parameterIndex) throws SQLException {
@@ -807,6 +893,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getFloat(int)
      */
     public float getFloat(final int parameterIndex) throws SQLException {
@@ -814,6 +901,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getDouble(int)
      */
     public double getDouble(final int parameterIndex) throws SQLException {
@@ -821,6 +909,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @deprecated
      * @see java.sql.CallableStatement#getBigDecimal(int, int)
      */
@@ -830,6 +919,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getBytes(int)
      */
     public byte[] getBytes(final int parameterIndex) throws SQLException {
@@ -837,6 +927,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getDate(int)
      */
     public Date getDate(final int parameterIndex) throws SQLException {
@@ -844,6 +935,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getTime(int)
      */
     public Time getTime(final int parameterIndex) throws SQLException {
@@ -851,6 +943,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getTimestamp(int)
      */
     public Timestamp getTimestamp(final int parameterIndex) throws SQLException {
@@ -861,6 +954,7 @@ public final class CallableStatementProxy implements CallableStatement {
     // Advanced features
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getObject(int)
      */
     public Object getObject(final int parameterIndex) throws SQLException {
@@ -871,6 +965,7 @@ public final class CallableStatementProxy implements CallableStatement {
     // JDBC 2.0
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getBigDecimal(int)
      */
     public BigDecimal getBigDecimal(final int parameterIndex) throws SQLException {
@@ -878,6 +973,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getObject(int, java.util.Map)
      */
     public Object getObject(final int i, final Map map) throws SQLException {
@@ -885,6 +981,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getRef(int)
      */
     public Ref getRef(final int i) throws SQLException {
@@ -892,6 +989,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getBlob(int)
      */
     public Blob getBlob(final int i) throws SQLException {
@@ -899,6 +997,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getClob(int)
      */
     public Clob getClob(final int i) throws SQLException {
@@ -906,6 +1005,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getArray(int)
      */
     public Array getArray(final int i) throws SQLException {
@@ -913,6 +1013,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getDate(int, java.util.Calendar)
      */
     public Date getDate(final int parameterIndex, final Calendar cal)
@@ -921,6 +1022,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getTime(int, java.util.Calendar)
      */
     public Time getTime(final int parameterIndex, final Calendar cal)
@@ -929,6 +1031,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getTimestamp(int, java.util.Calendar)
      */
     public Timestamp getTimestamp(final int parameterIndex, final Calendar cal)
@@ -937,6 +1040,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#registerOutParameter(int, int, java.lang.String)
      */
     public void registerOutParameter(final int paramIndex,
@@ -948,6 +1052,7 @@ public final class CallableStatementProxy implements CallableStatement {
     //--------------------------JDBC 3.0-----------------------------
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#registerOutParameter(java.lang.String, int)
      */
     public void registerOutParameter(final String parameterName, final int sqlType)
@@ -956,6 +1061,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#registerOutParameter(java.lang.String, int, int)
      */
     public void registerOutParameter(final String parameterName,
@@ -964,6 +1070,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement
      *      #registerOutParameter(java.lang.String, int, java.lang.String)
      */
@@ -973,6 +1080,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getURL(int)
      */
     public URL getURL(final int parameterIndex) throws SQLException {
@@ -980,6 +1088,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#setURL(java.lang.String, java.net.URL)
      */
     public void setURL(final String parameterName, final URL val) throws SQLException {
@@ -987,6 +1096,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#setNull(java.lang.String, int)
      */
     public void setNull(final String parameterName, final int sqlType)
@@ -995,6 +1105,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#setBoolean(java.lang.String, boolean)
      */
     public void setBoolean(final String parameterName, final boolean x)
@@ -1003,6 +1114,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#setByte(java.lang.String, byte)
      */
     public void setByte(final String parameterName, final byte x)
@@ -1011,6 +1123,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#setShort(java.lang.String, short)
      */
     public void setShort(final String parameterName, final short x)
@@ -1019,6 +1132,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#setInt(java.lang.String, int)
      */
     public void setInt(final String parameterName, final int x)
@@ -1027,6 +1141,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#setLong(java.lang.String, long)
      */
     public void setLong(final String parameterName, final long x)
@@ -1035,6 +1150,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#setFloat(java.lang.String, float)
      */
     public void setFloat(final String parameterName, final float x)
@@ -1043,6 +1159,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#setDouble(java.lang.String, double)
      */
     public void setDouble(final String parameterName, final double x)
@@ -1051,6 +1168,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement
      *      #setBigDecimal(java.lang.String, java.math.BigDecimal)
      */
@@ -1060,6 +1178,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#setString(java.lang.String, java.lang.String)
      */
     public void setString(final String parameterName, final String x)
@@ -1068,6 +1187,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#setBytes(java.lang.String, byte[])
      */
     public void setBytes(final String parameterName, final byte[] x)
@@ -1076,6 +1196,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#setDate(java.lang.String, java.sql.Date)
      */
     public void setDate(final String parameterName, final Date x)
@@ -1084,6 +1205,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#setTime(java.lang.String, java.sql.Time)
      */
     public void setTime(final String parameterName, final Time x) throws SQLException {
@@ -1091,6 +1213,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#setTimestamp(java.lang.String, java.sql.Timestamp)
      */
     public void setTimestamp(final String parameterName, final Timestamp x)
@@ -1099,6 +1222,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement
      *      #setAsciiStream(java.lang.String, java.io.InputStream, int)
      */
@@ -1109,6 +1233,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement
      *      #setBinaryStream(java.lang.String, java.io.InputStream, int)
      */
@@ -1119,6 +1244,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement
      *      #setObject(java.lang.String, java.lang.Object, int, int)
      */
@@ -1129,6 +1255,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#setObject(java.lang.String, java.lang.Object, int)
      */
     public void setObject(final String parameterName,
@@ -1138,6 +1265,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#setObject(java.lang.String, java.lang.Object)
      */
     public void setObject(final String parameterName, final Object x)
@@ -1146,6 +1274,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement
      *      #setCharacterStream(java.lang.String, java.io.Reader, int)
      */
@@ -1156,6 +1285,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement
      *      #setDate(java.lang.String, java.sql.Date, java.util.Calendar)
      */
@@ -1165,6 +1295,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement
      *      #setTime(java.lang.String, java.sql.Time, java.util.Calendar)
      */
@@ -1174,6 +1305,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement
      *      #setTimestamp(java.lang.String, java.sql.Timestamp, java.util.Calendar)
      */
@@ -1184,6 +1316,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#setNull(java.lang.String, int, java.lang.String)
      */
     public void setNull(final String parameterName,
@@ -1193,6 +1326,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getString(java.lang.String)
      */
     public String getString(final String parameterName) throws SQLException {
@@ -1200,6 +1334,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getBoolean(java.lang.String)
      */
     public boolean getBoolean(final String parameterName) throws SQLException {
@@ -1207,6 +1342,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getByte(java.lang.String)
      */
     public byte getByte(final String parameterName) throws SQLException {
@@ -1214,6 +1350,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getShort(java.lang.String)
      */
     public short getShort(final String parameterName) throws SQLException {
@@ -1221,6 +1358,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getInt(java.lang.String)
      */
     public int getInt(final String parameterName) throws SQLException {
@@ -1228,6 +1366,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getLong(java.lang.String)
      */
     public long getLong(final String parameterName) throws SQLException {
@@ -1235,6 +1374,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getFloat(java.lang.String)
      */
     public float getFloat(final String parameterName) throws SQLException {
@@ -1242,6 +1382,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getDouble(java.lang.String)
      */
     public double getDouble(final String parameterName) throws SQLException {
@@ -1249,6 +1390,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getBytes(java.lang.String)
      */
     public byte[] getBytes(final String parameterName) throws SQLException {
@@ -1256,6 +1398,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getDate(java.lang.String)
      */
     public Date getDate(final String parameterName) throws SQLException {
@@ -1263,6 +1406,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getTime(java.lang.String)
      */
     public Time getTime(final String parameterName) throws SQLException {
@@ -1270,6 +1414,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getTimestamp(java.lang.String)
      */
     public Timestamp getTimestamp(final String parameterName) throws SQLException {
@@ -1277,6 +1422,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getObject(java.lang.String)
      */
     public Object getObject(final String parameterName) throws SQLException {
@@ -1284,6 +1430,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getBigDecimal(java.lang.String)
      */
     public BigDecimal getBigDecimal(final String parameterName) throws SQLException {
@@ -1291,6 +1438,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getObject(java.lang.String, java.util.Map)
      */
     public Object getObject(final String parameterName, final Map map)
@@ -1299,6 +1447,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getRef(java.lang.String)
      */
     public Ref getRef(final String parameterName) throws SQLException {
@@ -1306,6 +1455,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getBlob(java.lang.String)
      */
     public Blob getBlob(final String parameterName) throws SQLException {
@@ -1313,6 +1463,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getClob(java.lang.String)
      */
     public Clob getClob(final String parameterName) throws SQLException {
@@ -1320,6 +1471,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getArray(java.lang.String)
      */
     public Array getArray(final String parameterName) throws SQLException {
@@ -1327,6 +1479,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getDate(java.lang.String, java.util.Calendar)
      */
     public Date getDate(final String parameterName, final Calendar cal)
@@ -1335,6 +1488,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getTime(java.lang.String, java.util.Calendar)
      */
     public Time getTime(final String parameterName, final Calendar cal)
@@ -1343,6 +1497,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getTimestamp(java.lang.String, java.util.Calendar)
      */
     public Timestamp getTimestamp(final String parameterName, final Calendar cal)
@@ -1351,6 +1506,7 @@ public final class CallableStatementProxy implements CallableStatement {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.CallableStatement#getURL(java.lang.String)
      */
     public URL getURL(final String parameterName) throws SQLException {

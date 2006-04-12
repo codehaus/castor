@@ -36,6 +36,7 @@ public abstract class AbstractCacheFactory implements CacheFactory {
     private static final Log LOG = LogFactory.getLog(AbstractCacheFactory.class);
     
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.CacheFactory#getCache(java.lang.ClassLoader)
      */
     public final Cache getCache(final ClassLoader classLoader)
@@ -56,6 +57,7 @@ public abstract class AbstractCacheFactory implements CacheFactory {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.CacheFactory#shutdown()
      */
     public void shutdown() { }

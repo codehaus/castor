@@ -29,11 +29,13 @@ import org.castor.cache.AbstractCacheFactory;
  */
 public final class LRUHashbeltFactory extends AbstractCacheFactory {
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.CacheFactory#getCacheType()
      */
     public String getCacheType() { return LRUHashbelt.TYPE; }
     
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.CacheFactory#getCacheClassName()
      */
     public String getCacheClassName() { return LRUHashbelt.class.getName(); }

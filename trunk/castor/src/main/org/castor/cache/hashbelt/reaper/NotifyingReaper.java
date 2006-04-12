@@ -35,6 +35,7 @@ import org.castor.cache.hashbelt.container.Container;
  */
 public abstract class NotifyingReaper extends AbstractReaper {
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.hashbelt.reaper.Reaper#
      *      handleExpiredContainer(org.castor.cache.hashbelt.container.Container)
      */

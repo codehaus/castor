@@ -208,6 +208,7 @@ public final class DataSourceConnectionFactory extends AbstractConnectionFactory
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.jdo.engine.AbstractConnectionFactory#initializeFactory()
      */
     protected void initializeFactory() throws MappingException {
@@ -222,6 +223,7 @@ public final class DataSourceConnectionFactory extends AbstractConnectionFactory
     //--------------------------------------------------------------------------
 
     /**
+     * {@inheritDoc}
      * @see org.castor.jdo.engine.ConnectionFactory#createConnection()
      */
     public Connection createConnection () throws SQLException {

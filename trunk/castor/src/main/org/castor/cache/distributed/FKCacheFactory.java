@@ -31,11 +31,13 @@ import org.castor.cache.AbstractCacheFactory;
  */
 public final class FKCacheFactory extends AbstractCacheFactory {
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.CacheFactory#getCacheType()
      */
     public String getCacheType() { return FKCache.TYPE; }
     
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.CacheFactory#getCacheClassName()
      */
     public String getCacheClassName() { return FKCache.class.getName(); }

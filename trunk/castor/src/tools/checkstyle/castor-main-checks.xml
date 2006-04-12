@@ -3,7 +3,7 @@
 	This configuration file was written by the eclipse-cs plugin configuration editor
 -->
 <!--
-Checkstyle-Configuration: Castor test checks
+Checkstyle-Configuration: Castor source checks (strict)
 Description:
 none
 -->
@@ -24,7 +24,7 @@ none
         <module name="UpperEll"/>
         <module name="AvoidNestedBlocks"/>
         <module name="EmptyBlock">
-            <property name="tokens" value="LITERAL_DO, LITERAL_ELSE, LITERAL_FINALLY, LITERAL_IF, LITERAL_FOR, LITERAL_TRY, LITERAL_WHILE, STATIC_INIT"/>
+            <property name="tokens" value="LITERAL_CATCH, LITERAL_DO, LITERAL_ELSE, LITERAL_FINALLY, LITERAL_IF, LITERAL_FOR, LITERAL_TRY, LITERAL_WHILE, STATIC_INIT"/>
         </module>
         <module name="LeftCurly"/>
         <module name="NeedBraces"/>
@@ -38,10 +38,7 @@ none
         <module name="HiddenField"/>
         <module name="IllegalInstantiation"/>
         <module name="InnerAssignment"/>
-        <module name="MagicNumber">
-            <property name="severity" value="ignore"/>
-            <property name="tokens" value="NUM_DOUBLE, NUM_FLOAT, NUM_INT, NUM_LONG"/>
-        </module>
+        <module name="MagicNumber"/>
         <module name="MissingSwitchDefault"/>
         <module name="RedundantThrows"/>
         <module name="SimplifyBooleanExpression"/>
@@ -59,17 +56,9 @@ none
         <module name="IllegalImport"/>
         <module name="RedundantImport"/>
         <module name="UnusedImports"/>
-        <module name="JavadocMethod">
-            <property name="severity" value="ignore"/>
-            <property name="tokens" value="METHOD_DEF, CTOR_DEF"/>
-        </module>
-        <module name="JavadocType">
-            <property name="severity" value="ignore"/>
-            <property name="tokens" value="CLASS_DEF, INTERFACE_DEF"/>
-        </module>
-        <module name="JavadocVariable">
-            <property name="severity" value="ignore"/>
-        </module>
+        <module name="JavadocMethod"/>
+        <module name="JavadocType"/>
+        <module name="JavadocVariable"/>
         <module name="ConstantName"/>
         <module name="LocalFinalVariableName"/>
         <module name="LocalVariableName"/>

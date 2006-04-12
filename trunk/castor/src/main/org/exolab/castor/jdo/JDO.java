@@ -507,11 +507,12 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
     }
 
     /**
-     * Indicates if jdo Database pooling is enable or not.
+     * Indicates if jdo database pooling is enable or not.
      * <p>
      * <b>Experimental</b> maybe removed in the further release
      * 
      * @see #setDatabasePooling(boolean)
+     * @return <code>true</code> if database pooling is enable.
      */ 
     public boolean getDatabasePooling() {
         return _txDbPool != null;
@@ -713,6 +714,7 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
     }
 
     /**
+     * {@inheritDoc}
      * Creates an instance of JDO from a JNDI reference.
      *  
      * @see javax.naming.spi.ObjectFactory

@@ -26,9 +26,9 @@ import org.exolab.castor.persist.spi.PersistenceFactory;
  * @since 1.0M2
  */
 public final class PointbaseQueryExpression extends JDBCQueryExpression {
-
     /**
      * Craetes an instance of this class.
+     * 
      * @param factory PersistenceFactory instance
      */
     public PointbaseQueryExpression(final PersistenceFactory factory) {
@@ -36,7 +36,7 @@ public final class PointbaseQueryExpression extends JDBCQueryExpression {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      * @see org.exolab.castor.persist.spi.QueryExpression#getStatement(boolean)
      */
     public String getStatement(final boolean lock) {

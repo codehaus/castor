@@ -809,6 +809,7 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
     }
     
     /**
+     * {@inheritDoc}
      * @see    javax.naming.spi.ObjectFactory
      */
     public Object getObjectInstance(final Object refObj, final Name name,

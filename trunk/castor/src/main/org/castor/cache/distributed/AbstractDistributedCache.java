@@ -61,16 +61,19 @@ public abstract class AbstractDistributedCache extends AbstractBaseCache {
     // query operations of map interface
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#size()
      */
     public final int size() { return _cache.size(); }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#isEmpty()
      */
     public final boolean isEmpty() { return _cache.isEmpty(); }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#containsKey(java.lang.Object)
      */
     public final boolean containsKey(final Object key) {
@@ -78,6 +81,7 @@ public abstract class AbstractDistributedCache extends AbstractBaseCache {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#containsValue(java.lang.Object)
      */
     public final boolean containsValue(final Object value) {
@@ -85,6 +89,7 @@ public abstract class AbstractDistributedCache extends AbstractBaseCache {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.util.Map#get(java.lang.Object)
      */
     public final Object get(final Object key) {
@@ -95,6 +100,7 @@ public abstract class AbstractDistributedCache extends AbstractBaseCache {
     // modification operations of map interface
     
     /**
+     * {@inheritDoc}
      * @see java.util.Map#put(java.lang.Object, java.lang.Object)
      */
     public final Object put(final Object key, final Object value) {
@@ -102,6 +108,7 @@ public abstract class AbstractDistributedCache extends AbstractBaseCache {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#remove(java.lang.Object)
      */
     public final Object remove(final Object key) {
@@ -112,11 +119,13 @@ public abstract class AbstractDistributedCache extends AbstractBaseCache {
     // bulk operations of map interface
     
     /**
+     * {@inheritDoc}
      * @see java.util.Map#putAll(java.util.Map)
      */
     public final void putAll(final Map map) { _cache.putAll(map); }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#clear()
      */
     public final void clear() { _cache.clear(); }
@@ -125,6 +134,7 @@ public abstract class AbstractDistributedCache extends AbstractBaseCache {
     // view operations of map interface
     
     /**
+     * {@inheritDoc}
      * @see java.util.Map#keySet()
      */
     public final Set keySet() {
@@ -132,6 +142,7 @@ public abstract class AbstractDistributedCache extends AbstractBaseCache {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.util.Map#values()
      */
     public final Collection values() {
@@ -139,6 +150,7 @@ public abstract class AbstractDistributedCache extends AbstractBaseCache {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#entrySet()
      */
     public final Set entrySet() {

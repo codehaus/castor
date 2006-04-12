@@ -41,6 +41,7 @@ public final class LRUHashbelt extends AbstractHashbelt {
     // getters/setters for cache configuration
 
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.Cache#getType()
      */
     public String getType() { return TYPE; }
@@ -49,6 +50,7 @@ public final class LRUHashbelt extends AbstractHashbelt {
     // query operations of map interface
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#get(java.lang.Object)
      */
     public Object get(final Object key) {
@@ -78,6 +80,7 @@ public final class LRUHashbelt extends AbstractHashbelt {
     // modification operations of map interface
     
     /**
+     * {@inheritDoc}
      * @see java.util.Map#put(java.lang.Object, java.lang.Object)
      */
     public Object put(final Object key, final Object value) {
@@ -104,6 +107,7 @@ public final class LRUHashbelt extends AbstractHashbelt {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#remove(java.lang.Object)
      */
     public Object remove(final Object key) {
@@ -132,6 +136,7 @@ public final class LRUHashbelt extends AbstractHashbelt {
     // bulk operations of map interface
     
     /**
+     * {@inheritDoc}
      * @see java.util.Map#putAll(java.util.Map)
      */
     public void putAll(final Map map) {

@@ -38,6 +38,7 @@ public abstract class AbstractBaseCache implements Cache {
     // operations for life-cycle management of cache
     
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.Cache#initialize(java.util.Map)
      */
     public void initialize(final Properties params) throws CacheAcquireException {
@@ -46,6 +47,7 @@ public abstract class AbstractBaseCache implements Cache {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.Cache#close()
      */
     public void close() { }
@@ -54,6 +56,7 @@ public abstract class AbstractBaseCache implements Cache {
     // getters/setters for cache configuration
 
     /**
+     * {@inheritDoc}
      * @see Cache#getName()
      */
     public final String getName() { return _cacheName; }
@@ -62,11 +65,13 @@ public abstract class AbstractBaseCache implements Cache {
     // additional operations of cache interface
     
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.Cache#expire(java.lang.Object)
      */
     public final void expire(final Object key) { remove(key); }
     
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.Cache#expireAll()
      */
     public final void expireAll() { clear(); }

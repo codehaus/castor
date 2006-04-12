@@ -46,6 +46,7 @@ public final class OsCacheFactory implements CacheFactory {
     private Object _cache = null;
     
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.CacheFactory#getCache(java.lang.ClassLoader)
      */
     public Cache getCache(final ClassLoader classLoader)
@@ -117,16 +118,19 @@ public final class OsCacheFactory implements CacheFactory {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.CacheFactory#getCacheType()
      */
     public String getCacheType() { return OsCache.TYPE; }
     
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.CacheFactory#getCacheClassName()
      */
     public String getCacheClassName() { return OsCache.class.getName(); }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.CacheFactory#shutdown()
      */
     public void shutdown() {

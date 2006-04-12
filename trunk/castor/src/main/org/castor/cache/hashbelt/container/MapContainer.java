@@ -49,16 +49,19 @@ public final class MapContainer extends ConcurrentHashMap implements Container {
     // additional operations of container interface
 
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.hashbelt.container.Container#updateTimestamp()
      */
     public void updateTimestamp() { _timestamp = System.currentTimeMillis(); }
     
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.hashbelt.container.Container#getTimestamp()
      */
     public long getTimestamp() { return _timestamp; }
     
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.hashbelt.container.Container#keyIterator()
      */
     public Iterator keyIterator() {
@@ -66,6 +69,7 @@ public final class MapContainer extends ConcurrentHashMap implements Container {
     }
     
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.hashbelt.container.Container#valueIterator()
      */
     public Iterator valueIterator() {

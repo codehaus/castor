@@ -38,6 +38,7 @@ import org.castor.cache.hashbelt.container.Container;
  */
 public abstract class ReinsertingReaper extends AbstractReaper {
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.hashbelt.reaper.Reaper#
      *      handleExpiredContainer(org.castor.cache.hashbelt.container.Container)
      */

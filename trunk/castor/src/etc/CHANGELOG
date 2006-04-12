@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+All:   Fixed bug CASTOR-1391 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
+       Upgrad checkstyle configuration from version 3.5 to 4.1.0beta3.
+       Details: http://jira.codehaus.org/browse/CASTOR-1391
+       (Ralf - 20060412)
+
 JDO:   Fixed bug CASTOR-1370 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        Refactored ProposedObject (and renamed it to ProposedEntity).
        Details: http://jira.codehaus.org/browse/CASTOR-1370
