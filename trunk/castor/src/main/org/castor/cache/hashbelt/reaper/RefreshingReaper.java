@@ -43,6 +43,7 @@ public abstract class RefreshingReaper extends AbstractReaper {
     private static final Log LOG = LogFactory.getLog(RefreshingReaper.class);
 
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.hashbelt.reaper.Reaper#
      *      handleExpiredContainer(org.castor.cache.hashbelt.container.Container)
      */

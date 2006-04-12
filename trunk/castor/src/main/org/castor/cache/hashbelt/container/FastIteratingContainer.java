@@ -61,16 +61,19 @@ public final class FastIteratingContainer implements Container {
     // additional operations of container interface
     
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.hashbelt.container.Container#updateTimestamp()
      */
     public void updateTimestamp() { _timestamp = System.currentTimeMillis(); }
     
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.hashbelt.container.Container#getTimestamp()
      */
     public long getTimestamp() { return _timestamp; }
     
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.hashbelt.container.Container#keyIterator()
      */
     public synchronized Iterator keyIterator() {
@@ -78,6 +81,7 @@ public final class FastIteratingContainer implements Container {
     }
     
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.hashbelt.container.Container#valueIterator()
      */
     public synchronized Iterator valueIterator() {
@@ -88,6 +92,7 @@ public final class FastIteratingContainer implements Container {
     // query operations of map interface
     
     /**
+     * {@inheritDoc}
      * @see java.util.Map#size()
      */
     public int size() {
@@ -95,6 +100,7 @@ public final class FastIteratingContainer implements Container {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.util.Map#isEmpty()
      */
     public boolean isEmpty() {
@@ -102,6 +108,7 @@ public final class FastIteratingContainer implements Container {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#containsKey(java.lang.Object)
      */
     public boolean containsKey(final Object key) {
@@ -109,6 +116,7 @@ public final class FastIteratingContainer implements Container {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#containsValue(java.lang.Object)
      */
     public boolean containsValue(final Object value) {
@@ -116,6 +124,7 @@ public final class FastIteratingContainer implements Container {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#get(java.lang.Object)
      */
     public Object get(final Object key) {
@@ -126,6 +135,7 @@ public final class FastIteratingContainer implements Container {
     // modification operations of map interface
     
     /**
+     * {@inheritDoc}
      * @see java.util.Map#put(java.lang.Object, java.lang.Object)
      */
     public Object put(final Object key, final Object value) {
@@ -146,6 +156,7 @@ public final class FastIteratingContainer implements Container {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.util.Map#remove(java.lang.Object)
      */
     public Object remove(final Object key) {
@@ -163,6 +174,7 @@ public final class FastIteratingContainer implements Container {
     // bulk operations of map interface
     
     /**
+     * {@inheritDoc}
      * @see java.util.Map#putAll(java.util.Map)
      */
     public void putAll(final Map map) {
@@ -177,6 +189,7 @@ public final class FastIteratingContainer implements Container {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#clear()
      */
     public void clear() {
@@ -191,6 +204,7 @@ public final class FastIteratingContainer implements Container {
     // view operations of map interface
     
     /**
+     * {@inheritDoc}
      * @see java.util.Map#keySet()
      */
     public Set keySet() {
@@ -198,6 +212,7 @@ public final class FastIteratingContainer implements Container {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.util.Map#values()
      */
     public Collection values() {
@@ -205,6 +220,7 @@ public final class FastIteratingContainer implements Container {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.util.Map#entrySet()
      */
     public Set entrySet() {

@@ -29,7 +29,7 @@
         <property name="lib" value="lib"/>
         <property name="doc" value="${source}/doc"/>
         <property name="howto" value="${source}/howto"/>
-	    <property name="xml-howto" value="${source}/xml-howto"/>
+        <property name="xml-howto" value="${source}/xml-howto"/>
         <property name="schema" value="${build}/schema"/>
         <property name="tests" value="${build}/tests"/>
         <property name="gen.src" value="${build}/gen-src"/>
@@ -124,8 +124,6 @@
                              (JAR, source, doc, tarball) in the dist directory
             main             Builds the main packages (including debugging info)
             tests            (shorthand for compile.tests)
-            checkstyle.jdo   Check code conventions of Castor JDO packages
-            checkstyle.tests Check code conventions of the test packages
             compile.commons  Compile the Castor COMONS packages
             compile.xml      Compile the Castor XML packages
             compile.jdo      Compile the Castor JDO packages
@@ -144,9 +142,6 @@
             gen.jdo.conf     Use the Source Generator to create the Java classes for jdo-conf.xsd
             gen.mapping      Use the Source Generator to create the Java classes for mapping.xsd
             gen.pvd          Use the Source Generator to create the Java classes for the pvd.xsd
-
-            prepare-eclipse  Put Eclipse project files into place (src/main only).
-            prepare-eclipse-complete  Put Eclipse project files into place.
         -----------------------------------------------------------
         </echo>
     </target>
@@ -193,61 +188,6 @@
         <delete dir="${gen.src}"/>
     </target>
 	
-    <taskdef resource="checkstyletask.properties"
-             classpath="lib/build/checkstyle-all-3.5.jar"/>
-	
-    <target name="checkstyle.jdo" depends="jar"
-	        description="Check coding conventions of Castor JDO packages">
-    	<mkdir dir="${check}"/>
-    	<checkstyle config="src/tools/checkstyle/castor-source-checks.xml"
-    		        maxWarnings="0"
-    	            failOnViolation="false"
-    	            failureProperty="checkstyle.failure"
-                    classpath="${dist}/${archive.name}.jar">
-    		<fileset dir="${main}">
-    			<include name="org/castor/**/*.java"/>
-    			<exclude name="org/castor/persist/TransactionContext.java"/>
-    			<include name="org/exolab/castor/jdo/JDO.java"/>
-    			<include name="org/exolab/castor/jdo/JDOManager.java"/>
-    			<include name="org/exolab/castor/jdo/util/*.java"/>
-    		</fileset>
-    		<formatter type="xml" toFile="${check}/checkstyle.jdo.xml"/>
-        </checkstyle>
-		<antcall target="checkstyle.jdo.results"/>
-    </target>
-
-    <target name="checkstyle.jdo.results" if="checkstyle.failure">
-    	<available file="${check}/checkstyle.jdo.xml" property="checkstyle.executed"/>
-    	<fail message="You need to run the target checkstyle first."
-    	      unless="checkstyle.executed"/>
-		<fail message="Some java files violate checkstyle rules."/>
-    </target>
-
-    <target name="checkstyle.tests" depends="compile.tests,jar"
-	        description="Check code conventions of the test packages">
-    	<mkdir dir="${check}"/>
-    	<checkstyle config="src/tools/checkstyle/castor-test-checks.xml"
-    		        maxWarnings="0"
-    	            failOnViolation="false"
-    	            failureProperty="checkstyle.failure"
-                    classpath="${dist}/${archive.name}.jar">
-    		<fileset dir="${source}/tests">
-    			<include name="ctf/**/*.java"/>
-    			<include name="ptf/**/*.java"/>
-    			<include name="utf/**/*.java"/>
-    		</fileset>
-    		<formatter type="xml" toFile="${check}/checkstyle.tests.xml"/>
-        </checkstyle>
-		<antcall target="checkstyle.tests.results"/>
-    </target>
-
-    <target name="checkstyle.tests.results" if="checkstyle.failure">
-    	<available file="${check}/checkstyle.tests.xml" property="checkstyle.executed"/>
-    	<fail message="You need to run the target checkstyle first."
-    	      unless="checkstyle.executed"/>
-		<fail message="Some java files violate checkstyle rules."/>
-    </target>
-
     <target name="compile"
             description="The default target for compilation; includes debug and deprecation info">
         <antcall target="compile.jdo" />
@@ -837,21 +777,6 @@
             <arg value="-types"/>
             <arg value="j2"/>
         </java>
-    </target>
-
-    <target name="prepare-eclipse-base" description="Copy base Eclipse project files to the root directory">
-        <copy file="${project.eclipse}/project.template" tofile="${basedir}/.project" overwrite="true"/>
-    </target>
-
-    <target name="prepare-eclipse" depends="prepare-eclipse-base"
-                  description="Copy Eclipse project files to the root directory">
-        <copy file="${project.eclipse}/classpath.template" tofile="${basedir}/.classpath" overwrite="true"/>
-    </target>
-
-    <target name="prepare-eclipse-complete" depends="prepare-eclipse-base"
-            description="Copy Eclipse project files to the root directory">
-        <copy file="${project.eclipse}/classpath.template.complete" tofile="${basedir}/.classpath" overwrite="true"/>
-        <copy file="${project.eclipse}/checkstyle.template" tofile="${basedir}/.checkstyle" overwrite="true"/>
     </target>
 
 </project>

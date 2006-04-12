@@ -56,6 +56,7 @@ public final class DebuggingCacheProxy implements Cache {
     // operations for life-cycle management of cache
     
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.Cache#initialize(java.util.Map)
      */
     public void initialize(final Properties params) throws CacheAcquireException {
@@ -65,6 +66,7 @@ public final class DebuggingCacheProxy implements Cache {
     }
     
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.Cache#close()
      */
     public void close() {
@@ -76,11 +78,13 @@ public final class DebuggingCacheProxy implements Cache {
     // getters/setters for cache configuration
 
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.Cache#getType()
      */
     public String getType() { return _cache.getType(); }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.Cache#getName()
      */
     public String getName() { return _cache.getName(); }
@@ -89,6 +93,7 @@ public final class DebuggingCacheProxy implements Cache {
     // additional operations of cache interface
     
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.Cache#expire(java.lang.Object)
      */
     public void expire(final Object key) {
@@ -97,6 +102,7 @@ public final class DebuggingCacheProxy implements Cache {
     }
     
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.Cache#expireAll()
      */
     public void expireAll() {
@@ -108,6 +114,7 @@ public final class DebuggingCacheProxy implements Cache {
     // query operations of map interface
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#size()
      */
     public int size() {
@@ -116,6 +123,7 @@ public final class DebuggingCacheProxy implements Cache {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#isEmpty()
      */
     public boolean isEmpty() {
@@ -124,6 +132,7 @@ public final class DebuggingCacheProxy implements Cache {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#containsKey(java.lang.Object)
      */
     public boolean containsKey(final Object key) {
@@ -132,6 +141,7 @@ public final class DebuggingCacheProxy implements Cache {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#containsValue(java.lang.Object)
      */
     public boolean containsValue(final Object value) {
@@ -140,6 +150,7 @@ public final class DebuggingCacheProxy implements Cache {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#get(java.lang.Object)
      */
     public Object get(final Object key) {
@@ -151,6 +162,7 @@ public final class DebuggingCacheProxy implements Cache {
     // modification operations of map interface
     
     /**
+     * {@inheritDoc}
      * @see java.util.Map#put(java.lang.Object, java.lang.Object)
      */
     public Object put(final Object key, final Object value) {
@@ -159,6 +171,7 @@ public final class DebuggingCacheProxy implements Cache {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#remove(java.lang.Object)
      */
     public Object remove(final Object key) {
@@ -170,6 +183,7 @@ public final class DebuggingCacheProxy implements Cache {
     // bulk operations of map interface
     
     /**
+     * {@inheritDoc}
      * @see java.util.Map#putAll(java.util.Map)
      */
     public void putAll(final Map map) {
@@ -178,6 +192,7 @@ public final class DebuggingCacheProxy implements Cache {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#clear()
      */
     public void clear() {
@@ -189,6 +204,7 @@ public final class DebuggingCacheProxy implements Cache {
     // view operations of map interface
     
     /**
+     * {@inheritDoc}
      * @see java.util.Map#keySet()
      */
     public Set keySet() {
@@ -197,6 +213,7 @@ public final class DebuggingCacheProxy implements Cache {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#values()
      */
     public Collection values() {
@@ -205,6 +222,7 @@ public final class DebuggingCacheProxy implements Cache {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#entrySet()
      */
     public Set entrySet() {

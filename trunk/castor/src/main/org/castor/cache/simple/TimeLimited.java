@@ -84,6 +84,7 @@ public class TimeLimited extends AbstractBaseCache {
     // operations for life-cycle management of cache
     
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.Cache#initialize(java.util.Map)
      */
     public void initialize(final Properties params) throws CacheAcquireException {
@@ -108,6 +109,7 @@ public class TimeLimited extends AbstractBaseCache {
     // getters/setters for cache configuration
 
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.Cache#getType()
      */
     public String getType() { return TYPE; }
@@ -123,16 +125,19 @@ public class TimeLimited extends AbstractBaseCache {
     // query operations of map interface
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#size()
      */
     public synchronized int size() { return _map.size(); }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#isEmpty()
      */
     public synchronized boolean isEmpty() { return _map.isEmpty(); }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#containsKey(java.lang.Object)
      */
     public synchronized boolean containsKey(final Object key) {
@@ -140,6 +145,7 @@ public class TimeLimited extends AbstractBaseCache {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#containsValue(java.lang.Object)
      */
     public synchronized boolean containsValue(final Object value) {
@@ -156,6 +162,7 @@ public class TimeLimited extends AbstractBaseCache {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#get(java.lang.Object)
      */
     public synchronized Object get(final Object key) {
@@ -167,6 +174,7 @@ public class TimeLimited extends AbstractBaseCache {
     // modification operations of map interface
     
     /**
+     * {@inheritDoc}
      * @see java.util.Map#put(java.lang.Object, java.lang.Object)
      */
     public synchronized Object put(final Object key, final Object value) {
@@ -180,6 +188,7 @@ public class TimeLimited extends AbstractBaseCache {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.util.Map#remove(java.lang.Object)
      */
     public synchronized Object remove(final Object key) {
@@ -191,6 +200,7 @@ public class TimeLimited extends AbstractBaseCache {
     // bulk operations of map interface
     
     /**
+     * {@inheritDoc}
      * @see java.util.Map#putAll(java.util.Map)
      */
     public void putAll(final Map map) {
@@ -202,6 +212,7 @@ public class TimeLimited extends AbstractBaseCache {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#clear()
      */
     public synchronized void clear() { _map.clear(); }
@@ -210,6 +221,7 @@ public class TimeLimited extends AbstractBaseCache {
     // view operations of map interface
     
     /**
+     * {@inheritDoc}
      * @see java.util.Map#keySet()
      */
     public synchronized Set keySet() {
@@ -217,6 +229,7 @@ public class TimeLimited extends AbstractBaseCache {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#values()
      */
     public synchronized Collection values() {
@@ -230,6 +243,7 @@ public class TimeLimited extends AbstractBaseCache {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#entrySet()
      */
     public synchronized Set entrySet() {

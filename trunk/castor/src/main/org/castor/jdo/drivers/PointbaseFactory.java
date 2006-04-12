@@ -27,17 +27,16 @@ import org.exolab.castor.persist.spi.QueryExpression;
  * @since 1.0M2
  */
 public final class PointbaseFactory extends GenericFactory {
-
     /**
-     * Returns the factory name for this factory. 
+     * {@inheritDoc}
      * @see org.exolab.castor.persist.spi.PersistenceFactory#getFactoryName()
      */
     public String getFactoryName() {
         return "pointbase";
     }
 
-    /** (non-Javadoc)
-     * @inheritDoc
+    /**
+     * {@inheritDoc}
      * @see org.exolab.castor.persist.spi.PersistenceFactory#getQueryExpression()
      */
     public QueryExpression getQueryExpression() {

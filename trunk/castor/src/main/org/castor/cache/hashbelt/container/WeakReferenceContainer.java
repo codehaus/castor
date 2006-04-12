@@ -57,16 +57,19 @@ public final class WeakReferenceContainer implements Container {
     // additional operations of container interface
     
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.hashbelt.container.Container#updateTimestamp()
      */
     public void updateTimestamp() { _timestamp = System.currentTimeMillis(); }
     
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.hashbelt.container.Container#getTimestamp()
      */
     public long getTimestamp() { return _timestamp; }
     
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.hashbelt.container.Container#keyIterator()
      */
     public synchronized Iterator keyIterator() {
@@ -74,6 +77,7 @@ public final class WeakReferenceContainer implements Container {
     }
     
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.hashbelt.container.Container#valueIterator()
      */
     public Iterator valueIterator() {
@@ -84,6 +88,7 @@ public final class WeakReferenceContainer implements Container {
     // query operations of map interface
     
     /**
+     * {@inheritDoc}
      * @see java.util.Map#size()
      */
     public synchronized int size() {
@@ -91,6 +96,7 @@ public final class WeakReferenceContainer implements Container {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.util.Map#isEmpty()
      */
     public synchronized boolean isEmpty() {
@@ -98,6 +104,7 @@ public final class WeakReferenceContainer implements Container {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#containsKey(java.lang.Object)
      */
     public synchronized boolean containsKey(final Object key) {
@@ -105,6 +112,7 @@ public final class WeakReferenceContainer implements Container {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#containsValue(java.lang.Object)
      */
     public synchronized boolean containsValue(final Object value) {
@@ -126,6 +134,7 @@ public final class WeakReferenceContainer implements Container {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#get(java.lang.Object)
      */
     public synchronized Object get(final Object key) {
@@ -146,6 +155,7 @@ public final class WeakReferenceContainer implements Container {
     // modification operations of map interface
     
     /**
+     * {@inheritDoc}
      * @see java.util.Map#put(java.lang.Object, java.lang.Object)
      */
     public synchronized Object put(final Object key, final Object value) {
@@ -161,6 +171,7 @@ public final class WeakReferenceContainer implements Container {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.util.Map#remove(java.lang.Object)
      */
     public synchronized Object remove(final Object key) {
@@ -179,6 +190,7 @@ public final class WeakReferenceContainer implements Container {
     // bulk operations of map interface
     
     /**
+     * {@inheritDoc}
      * @see java.util.Map#putAll(java.util.Map)
      */
     public synchronized void putAll(final Map map) {
@@ -190,6 +202,7 @@ public final class WeakReferenceContainer implements Container {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#clear()
      */
     public synchronized void clear() {
@@ -200,6 +213,7 @@ public final class WeakReferenceContainer implements Container {
     // view operations of map interface
     
     /**
+     * {@inheritDoc}
      * @see java.util.Map#keySet()
      */
     public synchronized Set keySet() {
@@ -207,6 +221,7 @@ public final class WeakReferenceContainer implements Container {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.util.Map#values()
      */
     public synchronized Collection values() {
@@ -229,6 +244,7 @@ public final class WeakReferenceContainer implements Container {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.util.Map#entrySet()
      */
     public synchronized Set entrySet() {

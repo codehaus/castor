@@ -42,7 +42,26 @@
             <summary>
             </summary>
             <bugs>
-Refactored ProposedObject (and renamed it to ProposedEntity).
+                <bug id="1391" tool="jira">
+                    <description>
+		                Upgrad checkstyle configuration from version 3.5 to 4.1.0beta3.
+                    </description>
+                    <contributor>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </reporter>
+                    <type>Enh.</type>
+                    <module>All</module>
+                    <date>20060412</date>
+                </bug>
                 <bug id="1370" tool="jira">
                     <description>
 		                Refactored ProposedObject (and renamed it to ProposedEntity).

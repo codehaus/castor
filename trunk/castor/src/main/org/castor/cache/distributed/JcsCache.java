@@ -86,6 +86,7 @@ public final class JcsCache extends AbstractBaseCache {
     // operations for life-cycle management of cache
     
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.Cache#initialize(java.util.Map)
      */
     public void initialize(final Properties params) throws CacheAcquireException {
@@ -127,6 +128,7 @@ public final class JcsCache extends AbstractBaseCache {
     // getters/setters for cache configuration
 
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.Cache#getType()
      */
     public String getType() { return TYPE; }
@@ -135,6 +137,7 @@ public final class JcsCache extends AbstractBaseCache {
     // query operations of map interface
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#size()
      */
     public int size() {
@@ -142,6 +145,7 @@ public final class JcsCache extends AbstractBaseCache {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#isEmpty()
      */
     public boolean isEmpty() {
@@ -149,6 +153,7 @@ public final class JcsCache extends AbstractBaseCache {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#containsKey(java.lang.Object)
      */
     public boolean containsKey(final Object key) {
@@ -156,6 +161,7 @@ public final class JcsCache extends AbstractBaseCache {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#containsValue(java.lang.Object)
      */
     public boolean containsValue(final Object value) {
@@ -163,6 +169,7 @@ public final class JcsCache extends AbstractBaseCache {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#get(java.lang.Object)
      */
     public Object get(final Object key) {
@@ -173,6 +180,7 @@ public final class JcsCache extends AbstractBaseCache {
     // modification operations of map interface
     
     /**
+     * {@inheritDoc}
      * @see java.util.Map#put(java.lang.Object, java.lang.Object)
      */
     public Object put(final Object key, final Object value) {
@@ -182,6 +190,7 @@ public final class JcsCache extends AbstractBaseCache {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#remove(java.lang.Object)
      */
     public Object remove(final Object key) {
@@ -194,6 +203,7 @@ public final class JcsCache extends AbstractBaseCache {
     // bulk operations of map interface
     
     /**
+     * {@inheritDoc}
      * @see java.util.Map#putAll(java.util.Map)
      */
     public void putAll(final Map map) {
@@ -205,6 +215,7 @@ public final class JcsCache extends AbstractBaseCache {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#clear()
      */
     public void clear() {
@@ -215,6 +226,7 @@ public final class JcsCache extends AbstractBaseCache {
     // view operations of map interface
     
     /**
+     * {@inheritDoc}
      * @see java.util.Map#keySet()
      */
     public Set keySet() {
@@ -222,6 +234,7 @@ public final class JcsCache extends AbstractBaseCache {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#values()
      */
     public Collection values() {
@@ -229,6 +242,7 @@ public final class JcsCache extends AbstractBaseCache {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#entrySet()
      */
     public Set entrySet() {

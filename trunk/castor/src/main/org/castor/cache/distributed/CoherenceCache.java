@@ -57,6 +57,7 @@ public final class CoherenceCache extends AbstractDistributedCache {
     // operations for life-cycle management of cache
     
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.Cache#initialize(java.util.Map)
      */
     public void initialize(final Properties params) throws CacheAcquireException {
@@ -89,6 +90,7 @@ public final class CoherenceCache extends AbstractDistributedCache {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.Cache#close()
      */
     public void close() {
@@ -108,6 +110,7 @@ public final class CoherenceCache extends AbstractDistributedCache {
     // getters/setters for cache configuration
 
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.Cache#getType()
      */
     public String getType() { return TYPE; }

@@ -40,16 +40,19 @@ public final class CoherenceCacheFactory extends AbstractCacheFactory {
     private static final Log LOG = LogFactory.getLog(CoherenceCacheFactory.class);
 
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.CacheFactory#getCacheType()
      */
     public String getCacheType() { return CoherenceCache.TYPE; }
     
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.CacheFactory#getCacheClassName()
      */
     public String getCacheClassName() { return CoherenceCache.class.getName(); }
     
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.CacheFactory#shutdown()
      */
     public void shutdown() { shutdown(CoherenceCache.IMPLEMENTATION); }

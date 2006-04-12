@@ -208,6 +208,7 @@ public abstract class AbstractHashbelt extends AbstractBaseCache {
     // operations for life-cycle management of cache
     
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.Cache#initialize(java.util.Map)
      */
     public final void initialize(final Properties params)
@@ -299,6 +300,7 @@ public abstract class AbstractHashbelt extends AbstractBaseCache {
     }
     
     /**
+     * {@inheritDoc}
      * @see org.castor.cache.Cache#close()
      */
     public final void close() {
@@ -349,6 +351,7 @@ public abstract class AbstractHashbelt extends AbstractBaseCache {
     // query operations of map interface
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#size()
      */
     public final int size() {
@@ -363,11 +366,13 @@ public abstract class AbstractHashbelt extends AbstractBaseCache {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#isEmpty()
      */
     public final boolean isEmpty() { return (size() == 0); }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#containsKey(java.lang.Object)
      */
     public final boolean containsKey(final Object key) {
@@ -395,6 +400,7 @@ public abstract class AbstractHashbelt extends AbstractBaseCache {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#containsValue(java.lang.Object)
      */
     public final boolean containsValue(final Object value) {
@@ -421,6 +427,7 @@ public abstract class AbstractHashbelt extends AbstractBaseCache {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#clear()
      */
     public final void clear() {
@@ -444,6 +451,7 @@ public abstract class AbstractHashbelt extends AbstractBaseCache {
     // view operations of map interface
     
     /**
+     * {@inheritDoc}
      * @see java.util.Map#keySet()
      */
     public final Set keySet() {
@@ -469,6 +477,7 @@ public abstract class AbstractHashbelt extends AbstractBaseCache {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.util.Map#values()
      */
     public final Collection values() {
@@ -494,6 +503,7 @@ public abstract class AbstractHashbelt extends AbstractBaseCache {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#entrySet()
      */
     public final Set entrySet() {

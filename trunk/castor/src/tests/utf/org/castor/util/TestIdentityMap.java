@@ -218,7 +218,8 @@ public final class TestIdentityMap extends TestCase {
             assertTrue((key == key1) || (key == key2) || (key == key3));
             if (key == key1) { assertEquals(value, "value 1"); }
             if (key == key2) { assertEquals(value, "value 2"); }
-            if (key == key3) { assertEquals(value, "value 3"); }        }
+            if (key == key3) { assertEquals(value, "value 3"); }
+        }
     }
 
     public void testRehash() {

@@ -127,6 +127,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see PreparedStatement#addBatch()
      */
     public void addBatch() throws SQLException {
@@ -134,6 +135,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see PreparedStatement#addBatch(String)
      */
     public void addBatch(final String arg0) throws SQLException {
@@ -142,6 +144,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see PreparedStatement#cancel()
      */
     public void cancel() throws SQLException {
@@ -149,6 +152,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see PreparedStatement#clearBatch()
      */
     public void clearBatch() throws SQLException {
@@ -157,6 +161,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see PreparedStatement#clearParameters()
      */
     public void clearParameters() throws SQLException {
@@ -165,6 +170,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see PreparedStatement#clearWarnings()
      */
     public void clearWarnings() throws SQLException {
@@ -172,6 +178,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see PreparedStatement#close()
      */
     public void close() throws SQLException {
@@ -179,6 +186,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.lang.Object#equals(java.lang.Object)
      */
     public boolean equals(final Object arg0) {
@@ -186,6 +194,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see PreparedStatement#execute()
      */
     public boolean execute() throws SQLException {
@@ -193,6 +202,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#execute(java.lang.String)
      */
     public boolean execute(final String arg0) throws SQLException {
@@ -201,6 +211,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#execute(java.lang.String, int)
      */
     public boolean execute(final String arg0, final int arg1) throws SQLException {
@@ -209,6 +220,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#execute(java.lang.String, int[])
      */
     public boolean execute(final String arg0, final int[] arg1) throws SQLException {
@@ -217,6 +229,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#execute(java.lang.String, java.lang.String[])
      */
     public boolean execute(final String arg0, final String[] arg1) throws SQLException {
@@ -225,6 +238,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#executeBatch()
      */
     public int[] executeBatch() throws SQLException {
@@ -232,6 +246,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#executeQuery()
      */
     public ResultSet executeQuery() throws SQLException {
@@ -239,6 +254,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#executeQuery(java.lang.String)
      */
     public ResultSet executeQuery(final String arg0) throws SQLException {
@@ -247,6 +263,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#executeUpdate()
      */
     public int executeUpdate() throws SQLException {
@@ -254,6 +271,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#executeUpdate(java.lang.String)
      */
     public int executeUpdate(final String arg0) throws SQLException {
@@ -262,6 +280,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#executeUpdate(java.lang.String, int)
      */
     public int executeUpdate(final String arg0, final int arg1)
@@ -271,6 +290,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#executeUpdate(java.lang.String, int[])
      */
     public int executeUpdate(final String arg0, final int[] arg1)
@@ -280,6 +300,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#executeUpdate(java.lang.String, java.lang.String[])
      */
     public int executeUpdate(final String arg0, final String[] arg1)
@@ -289,6 +310,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#getConnection()
      */
     public Connection getConnection() throws SQLException {
@@ -296,6 +318,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#getFetchDirection()
      */
     public int getFetchDirection() throws SQLException {
@@ -303,6 +326,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#getFetchSize()
      */
     public int getFetchSize() throws SQLException {
@@ -310,6 +334,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#getGeneratedKeys()
      */
     public ResultSet getGeneratedKeys() throws SQLException {
@@ -317,6 +342,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#getMaxFieldSize()
      */
     public int getMaxFieldSize() throws SQLException {
@@ -324,6 +350,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#getMaxRows()
      */
     public int getMaxRows() throws SQLException {
@@ -331,6 +358,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#getMetaData()
      */
     public ResultSetMetaData getMetaData() throws SQLException {
@@ -338,6 +366,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#getMoreResults()
      */
     public boolean getMoreResults() throws SQLException {
@@ -345,6 +374,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#getMoreResults(int)
      */
     public boolean getMoreResults(final int arg0) throws SQLException {
@@ -352,6 +382,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#getParameterMetaData()
      */
     public ParameterMetaData getParameterMetaData() throws SQLException {
@@ -359,6 +390,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#getQueryTimeout()
      */
     public int getQueryTimeout() throws SQLException {
@@ -366,6 +398,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#getResultSet()
      */
     public ResultSet getResultSet() throws SQLException {
@@ -373,6 +406,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#getResultSetConcurrency()
      */
     public int getResultSetConcurrency() throws SQLException {
@@ -380,6 +414,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#getResultSetHoldability()
      */
     public int getResultSetHoldability() throws SQLException {
@@ -387,6 +422,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#getResultSetType()
      */
     public int getResultSetType() throws SQLException {
@@ -394,6 +430,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#getUpdateCount()
      */
     public int getUpdateCount() throws SQLException {
@@ -401,6 +438,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#getWarnings()
      */
     public SQLWarning getWarnings() throws SQLException {
@@ -408,6 +446,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
@@ -415,6 +454,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setArray(int, java.sql.Array)
      */
     public void setArray(final int arg0, final Array arg1) throws SQLException {
@@ -423,6 +463,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setAsciiStream(int, java.io.InputStream, int)
      */
     public void setAsciiStream(final int arg0, final InputStream arg1, final int arg2)
@@ -431,6 +472,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setBigDecimal(int, java.math.BigDecimal)
      */
     public void setBigDecimal(final int arg0, final BigDecimal arg1)
@@ -440,6 +482,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setBinaryStream(int, java.io.InputStream, int)
      */
     public void setBinaryStream(final int arg0, final InputStream arg1, final int arg2)
@@ -449,6 +492,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setBlob(int, java.sql.Blob)
      */
     public void setBlob(final int arg0, final Blob arg1) throws SQLException {
@@ -457,6 +501,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setBoolean(int, boolean)
      */
     public void setBoolean(final int arg0, final boolean arg1) throws SQLException {
@@ -465,6 +510,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setByte(int, byte)
      */
     public void setByte(final int arg0, final byte arg1) throws SQLException {
@@ -473,6 +519,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setBytes(int, byte[])
      */
     public void setBytes(final int arg0, final byte[] arg1) throws SQLException {
@@ -481,6 +528,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setCharacterStream(int, java.io.Reader, int)
      */
     public void setCharacterStream(final int arg0, final Reader arg1, final int arg2)
@@ -490,6 +538,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setClob(int, java.sql.Clob)
      */
     public void setClob(final int arg0, final Clob arg1) throws SQLException {
@@ -498,6 +547,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#setCursorName(java.lang.String)
      */
     public void setCursorName(final String arg0) throws SQLException {
@@ -505,6 +555,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setDate(int, java.sql.Date)
      */
     public void setDate(final int arg0, final Date arg1) throws SQLException {
@@ -513,6 +564,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setDate(int, java.sql.Date, java.util.Calendar)
      */
     public void setDate(final int arg0, final Date arg1, final Calendar arg2)
@@ -522,6 +574,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setDouble(int, double)
      */
     public void setDouble(final int arg0, final double arg1) throws SQLException {
@@ -530,6 +583,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#setEscapeProcessing(boolean)
      */
     public void setEscapeProcessing(final boolean arg0) throws SQLException {
@@ -537,6 +591,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#setFetchDirection(int)
      */
     public void setFetchDirection(final int arg0) throws SQLException {
@@ -544,6 +599,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#setFetchSize(int)
      */
     public void setFetchSize(final int arg0) throws SQLException {
@@ -551,6 +607,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setFloat(int, float)
      */
     public void setFloat(final int arg0, final float arg1) throws SQLException {
@@ -559,6 +616,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setInt(int, int)
      */
     public void setInt(final int arg0, final int arg1) throws SQLException {
@@ -567,6 +625,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setLong(int, long)
      */
     public void setLong(final int arg0, final long arg1) throws SQLException {
@@ -575,6 +634,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#setMaxFieldSize(int)
      */
     public void setMaxFieldSize(final int arg0) throws SQLException {
@@ -582,6 +642,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#setMaxRows(int)
      */
     public void setMaxRows(final int arg0) throws SQLException {
@@ -589,6 +650,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setNull(int, int)
      */
     public void setNull(final int arg0, final int arg1) throws SQLException {
@@ -597,6 +659,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setNull(int, int, java.lang.String)
      */
     public void setNull(final int arg0, final int arg1, final String arg2)
@@ -606,6 +669,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setObject(int, java.lang.Object)
      */
     public void setObject(final int arg0, final Object arg1) throws SQLException {
@@ -614,6 +678,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setObject(int, java.lang.Object, int)
      */
     public void setObject(final int arg0, final Object arg1, final int arg2)
@@ -623,6 +688,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setObject(int, java.lang.Object, int, int)
      */
     public void setObject(final int arg0, final Object arg1,
@@ -633,6 +699,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Statement#setQueryTimeout(int)
      */
     public void setQueryTimeout(final int arg0) throws SQLException {
@@ -640,6 +707,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setRef(int, java.sql.Ref)
      */
     public void setRef(final int arg0, final Ref arg1) throws SQLException {
@@ -647,6 +715,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setShort(int, short)
      */
     public void setShort(final int arg0, final short arg1) throws SQLException {
@@ -655,6 +724,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setString(int, java.lang.String)
      */
     public void setString(final int arg0, final String arg1) throws SQLException {
@@ -663,6 +733,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setTime(int, java.sql.Time)
      */
     public void setTime(final int arg0, final Time arg1) throws SQLException {
@@ -671,6 +742,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setTime(int, java.sql.Time, java.util.Calendar)
      */
     public void setTime(final int arg0, final Time arg1, final Calendar arg2)
@@ -680,6 +752,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setTimestamp(int, java.sql.Timestamp)
      */
     public void setTimestamp(final int arg0, final Timestamp arg1)
@@ -689,6 +762,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement
      *      #setTimestamp(int, java.sql.Timestamp, java.util.Calendar)
      */
@@ -699,6 +773,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @deprecated
      * @see java.sql.PreparedStatement#setUnicodeStream(int, java.io.InputStream, int)
      */
@@ -708,6 +783,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.PreparedStatement#setURL(int, java.net.URL)
      */
     public void setURL(final int arg0, final URL arg1) throws SQLException {
@@ -716,6 +792,7 @@ public final class PreparedStatementProxy implements PreparedStatement {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.lang.Object#toString()
      */
     public String toString() {

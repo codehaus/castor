@@ -107,6 +107,7 @@ public final class ConnectionProxy implements java.sql.Connection {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.Connection#clearWarnings()
      */
     public void clearWarnings() throws SQLException {
@@ -114,6 +115,7 @@ public final class ConnectionProxy implements java.sql.Connection {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Connection#close()
      */
     public void close() throws SQLException {
@@ -124,6 +126,7 @@ public final class ConnectionProxy implements java.sql.Connection {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Connection#commit()
      */
     public void commit() throws SQLException {
@@ -134,6 +137,7 @@ public final class ConnectionProxy implements java.sql.Connection {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Connection#createStatement()
      */
     public Statement createStatement() throws SQLException {
@@ -144,6 +148,7 @@ public final class ConnectionProxy implements java.sql.Connection {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Connection#createStatement(int, int)
      */
     public Statement createStatement(final int arg0, final int arg1)
@@ -152,6 +157,7 @@ public final class ConnectionProxy implements java.sql.Connection {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Connection#createStatement(int, int, int)
      */
     public Statement createStatement(final int arg0, final int arg1, final int arg2)
@@ -160,6 +166,7 @@ public final class ConnectionProxy implements java.sql.Connection {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.lang.Object#equals(java.lang.Object)
      */
     public boolean equals(final Object arg0) {
@@ -167,6 +174,7 @@ public final class ConnectionProxy implements java.sql.Connection {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Connection#getAutoCommit()
      */
     public boolean getAutoCommit() throws SQLException {
@@ -174,6 +182,7 @@ public final class ConnectionProxy implements java.sql.Connection {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Connection#getCatalog()
      */
     public String getCatalog() throws SQLException {
@@ -181,30 +190,39 @@ public final class ConnectionProxy implements java.sql.Connection {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.sql.Connection#getHoldability()
      */
     public int getHoldability() throws SQLException {
         return _connection.getHoldability();
     }
+    
     /**
+     * {@inheritDoc}
      * @see java.sql.Connection#getMetaData()
      */
     public DatabaseMetaData getMetaData() throws SQLException {
         return _connection.getMetaData();
     }
+    
     /**
+     * {@inheritDoc}
      * @see java.sql.Connection#getTransactionIsolation()
      */
     public int getTransactionIsolation() throws SQLException {
         return _connection.getTransactionIsolation();
     }
+    
     /**
+     * {@inheritDoc}
      * @see java.sql.Connection#getTypeMap()
      */
     public Map getTypeMap() throws SQLException {
         return _connection.getTypeMap();
     }
+    
     /**
+     * {@inheritDoc}
      * @see java.sql.Connection#getWarnings()
      */
     public SQLWarning getWarnings() throws SQLException {
@@ -212,6 +230,7 @@ public final class ConnectionProxy implements java.sql.Connection {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
@@ -219,6 +238,7 @@ public final class ConnectionProxy implements java.sql.Connection {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Connection#isClosed()
      */
     public boolean isClosed() throws SQLException {
@@ -226,6 +246,7 @@ public final class ConnectionProxy implements java.sql.Connection {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Connection#isReadOnly()
      */
     public boolean isReadOnly() throws SQLException {
@@ -233,6 +254,7 @@ public final class ConnectionProxy implements java.sql.Connection {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Connection#nativeSQL(java.lang.String)
      */
     public String nativeSQL(final String arg0) throws SQLException {
@@ -240,6 +262,7 @@ public final class ConnectionProxy implements java.sql.Connection {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Connection#prepareCall(java.lang.String)
      */
     public CallableStatement prepareCall(final String arg0) throws SQLException {
@@ -248,6 +271,7 @@ public final class ConnectionProxy implements java.sql.Connection {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Connection#prepareCall(java.lang.String, int, int)
      */
     public CallableStatement prepareCall(final String arg0,
@@ -258,6 +282,7 @@ public final class ConnectionProxy implements java.sql.Connection {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Connection#prepareCall(java.lang.String, int, int, int)
      */
     public CallableStatement prepareCall(final String arg0, final int arg1,
@@ -268,6 +293,7 @@ public final class ConnectionProxy implements java.sql.Connection {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Connection#prepareStatement(java.lang.String)
      */
     public PreparedStatement prepareStatement(final String arg0) throws SQLException {
@@ -279,6 +305,7 @@ public final class ConnectionProxy implements java.sql.Connection {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Connection#prepareStatement(java.lang.String, int)
      */
     public PreparedStatement prepareStatement(final String arg0, final int arg1)
@@ -291,6 +318,7 @@ public final class ConnectionProxy implements java.sql.Connection {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Connection#prepareStatement(java.lang.String, int, int)
      */
     public PreparedStatement prepareStatement(final String arg0,
@@ -304,6 +332,7 @@ public final class ConnectionProxy implements java.sql.Connection {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Connection#prepareStatement(java.lang.String, int, int, int)
      */
     public PreparedStatement prepareStatement(final String arg0, final int arg1,
@@ -317,6 +346,7 @@ public final class ConnectionProxy implements java.sql.Connection {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Connection#prepareStatement(java.lang.String, int[])
      */
     public PreparedStatement prepareStatement(final String arg0, final int[] arg1)
@@ -329,6 +359,7 @@ public final class ConnectionProxy implements java.sql.Connection {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Connection#prepareStatement(java.lang.String, java.lang.String[])
      */
     public PreparedStatement prepareStatement(final String arg0, final String[] arg1)
@@ -341,6 +372,7 @@ public final class ConnectionProxy implements java.sql.Connection {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Connection#releaseSavepoint(java.sql.Savepoint)
      */
     public void releaseSavepoint(final Savepoint arg0) throws SQLException {
@@ -348,6 +380,7 @@ public final class ConnectionProxy implements java.sql.Connection {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Connection#rollback()
      */
     public void rollback() throws SQLException {
@@ -358,6 +391,7 @@ public final class ConnectionProxy implements java.sql.Connection {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Connection#rollback(java.sql.Savepoint)
      */
     public void rollback(final Savepoint arg0) throws SQLException {
@@ -365,6 +399,7 @@ public final class ConnectionProxy implements java.sql.Connection {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Connection#setAutoCommit(boolean)
      */
     public void setAutoCommit(final boolean arg0) throws SQLException {
@@ -372,6 +407,7 @@ public final class ConnectionProxy implements java.sql.Connection {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Connection#setCatalog(java.lang.String)
      */
     public void setCatalog(final String arg0) throws SQLException {
@@ -379,6 +415,7 @@ public final class ConnectionProxy implements java.sql.Connection {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Connection#setHoldability(int)
      */
     public void setHoldability(final int arg0) throws SQLException {
@@ -386,6 +423,7 @@ public final class ConnectionProxy implements java.sql.Connection {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Connection#setReadOnly(boolean)
      */
     public void setReadOnly(final boolean arg0) throws SQLException {
@@ -393,6 +431,7 @@ public final class ConnectionProxy implements java.sql.Connection {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Connection#setSavepoint()
      */
     public Savepoint setSavepoint() throws SQLException {
@@ -400,6 +439,7 @@ public final class ConnectionProxy implements java.sql.Connection {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Connection#setSavepoint(java.lang.String)
      */
     public Savepoint setSavepoint(final String arg0) throws SQLException {
@@ -407,6 +447,7 @@ public final class ConnectionProxy implements java.sql.Connection {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Connection#setTransactionIsolation(int)
      */
     public void setTransactionIsolation(final int arg0) throws SQLException {
@@ -414,6 +455,7 @@ public final class ConnectionProxy implements java.sql.Connection {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.sql.Connection#setTypeMap(java.util.Map)
      */
     public void setTypeMap(final Map arg0) throws SQLException {
@@ -421,6 +463,7 @@ public final class ConnectionProxy implements java.sql.Connection {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.lang.Object#toString()
      */
     public String toString() {

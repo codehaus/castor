@@ -86,12 +86,14 @@ public final class SQLTypeConverters {
         public final Class toType() { return _toType; }
         
         /**
+         * {@inheritDoc}
          * @see org.exolab.castor.mapping.TypeConvertor
          *      #convert(java.lang.Object, java.lang.String)
          */
         public abstract Object convert(final Object obj, final String pm);
 
         /**
+         * {@inheritDoc}
          * @see java.lang.Object#toString()
          */
         public final String toString() {
