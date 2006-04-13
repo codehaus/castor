@@ -84,6 +84,7 @@ public final class IdentitySet implements Set {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.util.Collection#clear()
      */
     public void clear() {
@@ -94,16 +95,19 @@ public final class IdentitySet implements Set {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Collection#size()
      */
     public int size() { return _entries; }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Collection#isEmpty()
      */
     public boolean isEmpty() { return (_entries == 0); }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Collection#add(java.lang.Object)
      */
     public boolean add(final Object key) {
@@ -206,6 +210,7 @@ public final class IdentitySet implements Set {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Collection#contains(java.lang.Object)
      */
     public boolean contains(final Object key) {
@@ -222,6 +227,7 @@ public final class IdentitySet implements Set {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Collection#remove(java.lang.Object)
      */
     public boolean remove(final Object key) {
@@ -251,6 +257,7 @@ public final class IdentitySet implements Set {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.util.Collection#iterator()
      */
     public Iterator iterator() {
@@ -258,6 +265,7 @@ public final class IdentitySet implements Set {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.util.Collection#toArray()
      */
     public Object[] toArray() {
@@ -276,6 +284,7 @@ public final class IdentitySet implements Set {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.util.Collection#toArray(java.lang.Object[])
      */
     public Object[] toArray(final Object[] a) {
@@ -305,7 +314,8 @@ public final class IdentitySet implements Set {
      * In contrast with the design contract of the <code>Set</code> interface this method
      * has not been implemented and throws a <code>UnsupportedOperationException</code>.
      * 
-     * @see java.util.MSet#containsAll()
+     * {@inheritDoc}
+     * @see java.util.Set#containsAll()
      */
     public boolean containsAll(final Collection c) {
         throw new UnsupportedOperationException();
@@ -316,6 +326,7 @@ public final class IdentitySet implements Set {
      * it throws a <code>UnsupportedOperationException</code> as defined in the
      * <code>Set</code> interface.
      * 
+     * {@inheritDoc}
      * @see java.util.Set#addAll()
      */
     public boolean addAll(final Collection c) {
@@ -327,6 +338,7 @@ public final class IdentitySet implements Set {
      * it throws a <code>UnsupportedOperationException</code> as defined in the
      * <code>Set</code> interface.
      * 
+     * {@inheritDoc}
      * @see java.util.Set#removeAll()
      */
     public boolean removeAll(final Collection c) {
@@ -338,6 +350,7 @@ public final class IdentitySet implements Set {
      * it throws a <code>UnsupportedOperationException</code> as defined in the
      * <code>Set</code> interface.
      * 
+     * {@inheritDoc}
      * @see java.util.Set#retainAll()
      */
     public boolean retainAll(final Collection c) {
@@ -423,6 +436,7 @@ public final class IdentitySet implements Set {
         }
 
         /**
+         * {@inheritDoc}
          * @see java.util.Iterator#hasNext()
          */
         public boolean hasNext() {
@@ -430,6 +444,7 @@ public final class IdentitySet implements Set {
         }
 
         /**
+         * {@inheritDoc}
          * @see java.util.Iterator#next()
          */
         public Object next() {

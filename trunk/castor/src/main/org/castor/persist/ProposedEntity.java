@@ -60,19 +60,21 @@ public final class ProposedEntity {
     /**
      * Creates an default instance.
      */
-    public ProposedEntity () {}
+    public ProposedEntity () { }
 
     /**
      * Creates an instance of this class based upon the values passed in.
+     * 
      * @param proposedEntity The entity instance to be copied.
      */
-    public ProposedEntity (ProposedEntity proposedEntity) {
+    public ProposedEntity(final ProposedEntity proposedEntity) {
         setFields(proposedEntity.getFields());
         setProposedEntityClass(proposedEntity.getProposedEntityClass());
         setActualClassMolder(proposedEntity.getActualClassMolder());
     }
     /**
      * Initialize field values to the specified number.
+     * 
      * @param numberOfFields Number of the field values to be created.
      */
     public void initializeFields(final int numberOfFields) {
@@ -125,7 +127,7 @@ public final class ProposedEntity {
     /**
      * Sets the specified field of the object in question.
      * 
-     * @param fields The field value to set.
+     * @param field The field value to set.
      * @param index Specifies which field to set.
      */
     public void setField(final Object field, final int index) {
@@ -143,7 +145,7 @@ public final class ProposedEntity {
     /**
      * Sets the object.
      * 
-     * @param object The object to set.
+     * @param entity The object to set.
      */
     public void setEntity(final Object entity) {
         _entity = entity;
@@ -222,6 +224,7 @@ public final class ProposedEntity {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.lang.Object#toString()
      */
     public String toString() {

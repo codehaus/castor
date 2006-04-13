@@ -55,6 +55,7 @@ implements TransactionManagerFactory {
     public abstract String getFactoryMethodName();
     
     /**
+     * {@inheritDoc}
      * @see org.exolab.castor.jdo.transactionmanager.TransactionManagerFactory
      *      #getTransactionManager(org.exolab.castor.jdo.conf.JdoConf)
      */

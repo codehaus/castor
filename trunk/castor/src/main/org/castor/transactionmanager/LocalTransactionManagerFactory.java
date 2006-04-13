@@ -41,11 +41,13 @@ public final class LocalTransactionManagerFactory implements TransactionManagerF
     //--------------------------------------------------------------------------
 
     /**
+     * {@inheritDoc}
      * @see org.castor.transactionmanager.TransactionManagerFactory#getName()
      */
     public String getName() { return NAME; }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.transactionmanager.TransactionManagerFactory
      *      #getTransactionManager(java.util.Properties)
      */

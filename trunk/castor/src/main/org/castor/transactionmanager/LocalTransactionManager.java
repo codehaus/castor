@@ -31,6 +31,7 @@ public final class LocalTransactionManager implements TransactionManager {
     //--------------------------------------------------------------------------
 
     /**
+     * {@inheritDoc}
      * @see javax.transaction.TransactionManager#begin()
      */
     public void begin() throws SystemException {
@@ -38,6 +39,7 @@ public final class LocalTransactionManager implements TransactionManager {
     }
     
     /**
+     * {@inheritDoc}
      * @see javax.transaction.TransactionManager#commit()
      */
     public void commit() throws SystemException {
@@ -45,6 +47,7 @@ public final class LocalTransactionManager implements TransactionManager {
     }
     
     /**
+     * {@inheritDoc}
      * @see javax.transaction.TransactionManager#getStatus()
      */
     public int getStatus() throws SystemException {
@@ -52,6 +55,7 @@ public final class LocalTransactionManager implements TransactionManager {
     }
     
     /**
+     * {@inheritDoc}
      * @see javax.transaction.TransactionManager#getTransaction()
      */
     public Transaction getTransaction() throws SystemException {
@@ -59,6 +63,7 @@ public final class LocalTransactionManager implements TransactionManager {
     }
     
     /**
+     * {@inheritDoc}
      * @see javax.transaction.TransactionManager#resume(javax.transaction.Transaction)
      */
     public void resume(final Transaction arg) throws SystemException {
@@ -66,6 +71,7 @@ public final class LocalTransactionManager implements TransactionManager {
     }
     
     /**
+     * {@inheritDoc}
      * @see javax.transaction.TransactionManager#rollback()
      */
     public void rollback() throws SystemException {
@@ -73,6 +79,7 @@ public final class LocalTransactionManager implements TransactionManager {
     }
     
     /**
+     * {@inheritDoc}
      * @see javax.transaction.TransactionManager#setRollbackOnly()
      */
     public void setRollbackOnly() throws SystemException {
@@ -80,6 +87,7 @@ public final class LocalTransactionManager implements TransactionManager {
     }
     
     /**
+     * {@inheritDoc}
      * @see javax.transaction.TransactionManager#setTransactionTimeout(int)
      */
     public void setTransactionTimeout(final int arg) throws SystemException {
@@ -87,6 +95,7 @@ public final class LocalTransactionManager implements TransactionManager {
     }
     
     /**
+     * {@inheritDoc}
      * @see javax.transaction.TransactionManager#suspend()
      */
     public Transaction suspend() throws SystemException {

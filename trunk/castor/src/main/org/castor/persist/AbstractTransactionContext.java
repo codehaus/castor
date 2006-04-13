@@ -144,6 +144,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#addTxSynchronizable(
      *      org.exolab.castor.persist.TxSynchronizable)
      */
@@ -152,6 +153,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#removeTxSynchronizable(
      *      org.exolab.castor.persist.TxSynchronizable)
      */
@@ -167,8 +169,9 @@ public abstract class AbstractTransactionContext implements TransactionContext {
             TxSynchronizable sync = (TxSynchronizable) _synchronizeList.get(i);
             try {
                 sync.committed(this);
-            } catch (Exception e) {
-                // nothing to do
+            } catch (Exception ex) {
+                String cls = sync.getClass().getName();
+                LOG.warn("Exception at " + cls + ".committed()", ex);
             }
         }
     }
@@ -181,13 +184,15 @@ public abstract class AbstractTransactionContext implements TransactionContext {
             TxSynchronizable sync = (TxSynchronizable) _synchronizeList.get(i);
             try {
                 sync.rolledback(this);
-            } catch (Exception e) {
-                // nothing to do 
+            } catch (Exception ex) {
+                String cls = sync.getClass().getName();
+                LOG.warn("Exception at " + cls + ".rolledback()", ex);
             }
         }
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#setAutoStore(boolean)
      */
     public final void setAutoStore(final boolean autoStore) {
@@ -195,6 +200,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#isAutoStore()
      */
     public final boolean isAutoStore() {
@@ -202,6 +208,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#setCallback(
      *      org.exolab.castor.persist.spi.CallbackInterceptor)
      */
@@ -210,6 +217,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#setInstanceFactory(
      *      org.exolab.castor.persist.spi.InstanceFactory)
      */
@@ -218,6 +226,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#setTransactionTimeout(int)
      */
     public final void setTransactionTimeout(final int timeout) {
@@ -225,6 +234,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#getTransactionTimeout()
      */
     public final int getTransactionTimeout() {
@@ -232,6 +242,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#getLockTimeout()
      */
     public final int getLockTimeout() {
@@ -239,6 +250,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#setLockTimeout(int)
      */
     public final void setLockTimeout(final int timeout) {
@@ -246,6 +258,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#setStatus(int)
      */
     public final void setStatus(final int status) {
@@ -253,6 +266,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#getConnection(
      *      org.exolab.castor.persist.LockEngine)
      */
@@ -306,6 +320,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     protected abstract void rollbackConnections();
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#getConnectionInfo(
      *      org.exolab.castor.persist.LockEngine)
      */
@@ -319,6 +334,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
     
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#fetch(
      *      org.exolab.castor.persist.LockEngine, org.exolab.castor.persist.ClassMolder,
      *      java.lang.Object, org.exolab.castor.mapping.AccessMode)
@@ -398,6 +414,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#load(
      *      org.exolab.castor.persist.LockEngine, org.exolab.castor.persist.ClassMolder,
      *      java.lang.Object, org.castor.persist.ProposedEntity,
@@ -411,6 +428,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#load(
      *      org.exolab.castor.persist.LockEngine, org.exolab.castor.persist.ClassMolder,
      *      java.lang.Object, org.castor.persist.ProposedEntity,
@@ -636,6 +654,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#query(
      *      org.exolab.castor.persist.LockEngine,
      *      org.exolab.castor.persist.spi.PersistenceQuery,
@@ -652,6 +671,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#markCreate(
      *      org.exolab.castor.persist.LockEngine, org.exolab.castor.persist.ClassMolder,
      *      java.lang.Object, org.exolab.castor.persist.OID)
@@ -737,6 +757,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#create(
      *      org.exolab.castor.persist.LockEngine, org.exolab.castor.persist.ClassMolder,
      *      java.lang.Object, org.exolab.castor.persist.OID)
@@ -854,6 +875,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#markUpdate(
      *      org.exolab.castor.persist.LockEngine, org.exolab.castor.persist.ClassMolder,
      *      java.lang.Object, org.exolab.castor.persist.OID)
@@ -942,6 +964,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#update(
      *      org.exolab.castor.persist.LockEngine, org.exolab.castor.persist.ClassMolder,
      *      java.lang.Object, org.exolab.castor.persist.OID)
@@ -956,6 +979,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#delete(java.lang.Object)
      */
     public final synchronized void delete(final Object object)
@@ -1023,6 +1047,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#writeLock(java.lang.Object, int)
      */
     public final synchronized void writeLock(final Object object, final int timeout)
@@ -1063,6 +1088,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#markModified(
      *      java.lang.Object, boolean, boolean)
      */
@@ -1134,6 +1160,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#prepare()
      */
     public final synchronized boolean prepare() throws TransactionAbortedException {
@@ -1274,6 +1301,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#commit()
      */
     public final synchronized void commit() throws TransactionAbortedException {
@@ -1345,6 +1373,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#iterateReadWriteObjectsInTransaction()
      */
     public final Iterator iterateReadWriteObjectsInTransaction() {
@@ -1352,6 +1381,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#rollback()
      */
     public final synchronized void rollback() {
@@ -1423,6 +1453,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#close()
      */
     public final synchronized void close() throws TransactionAbortedException {
@@ -1445,6 +1476,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#isCreated(java.lang.Object)
      */
     public final boolean isCreated(final Object object) {
@@ -1452,6 +1484,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#isUpdateCacheNeeded(java.lang.Object)
      */
     public final boolean isUpdateCacheNeeded(final Object object) {
@@ -1459,6 +1492,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#isUpdatePersistNeeded(java.lang.Object)
      */
     public final boolean isUpdatePersistNeeded(final Object object) {
@@ -1466,6 +1500,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#isPersistent(java.lang.Object)
      */
     public final boolean isPersistent(final Object object) {
@@ -1473,6 +1508,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#isRecorded(java.lang.Object)
      */
     public final boolean isRecorded(final Object object) {
@@ -1480,6 +1516,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#isDepended(
      *      org.exolab.castor.persist.OID, java.lang.Object)
      */
@@ -1498,6 +1535,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#getStatus()
      */
     public final int getStatus() {
@@ -1505,6 +1543,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#isOpen()
      */
     public final boolean isOpen() {
@@ -1513,6 +1552,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#setWaitOnLock(
      *      org.exolab.castor.persist.ObjectLock)
      */
@@ -1521,6 +1561,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#getWaitOnLock()
      */
     public final ObjectLock getWaitOnLock() {
@@ -1528,6 +1569,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#isDeleted(java.lang.Object)
      */
     public final boolean isDeleted(final Object object) {
@@ -1535,6 +1577,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#isDeletedByOID(
      *      org.exolab.castor.persist.OID)
      */
@@ -1548,6 +1591,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#getClassLoader()
      */
     public final ClassLoader getClassLoader() {
@@ -1555,6 +1599,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#expireCache(
      *      org.exolab.castor.persist.LockEngine, org.exolab.castor.persist.ClassMolder,
      *      java.lang.Object)
@@ -1590,6 +1635,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#isCached(
      *      org.exolab.castor.persist.LockEngine, org.exolab.castor.persist.ClassMolder,
      *      java.lang.Class, java.lang.Object)
@@ -1606,6 +1652,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#isReadOnly(java.lang.Object)
      */
     public final boolean isReadOnly(final Object object) {
@@ -1613,6 +1660,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.TransactionContext#getDatabase()
      */
     public final Database getDatabase() {
@@ -1621,12 +1669,14 @@ public abstract class AbstractTransactionContext implements TransactionContext {
     
     /**
      * Returns true if the object given is locked.
+     * 
      * @param cls Class instance of the object to be investigated.
      * @param identity Identity of the object to be investigated. 
      * @param lockEngine Current LcokEngine instance
      * @return True if the object in question is locked.
      */
-    public boolean isLocked(Class cls, Object identity, LockEngine lockEngine) {
+    public final boolean isLocked(final Class cls, final Object identity,
+            final LockEngine lockEngine) {
         OID oid = new OID(lockEngine, lockEngine.getClassMolder(cls), identity);
         return lockEngine.isLocked(cls, oid);
     }
