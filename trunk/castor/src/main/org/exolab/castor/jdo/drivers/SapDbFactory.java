@@ -136,7 +136,7 @@ public final class SapDbFactory
 
         for ( int i = 0; i < knownFunctions.length; ++i )
         {
-            String function = ( String ) knownFunctions[i];
+            String function = knownFunctions[i];
 
             if ( text.equals( function ) )
             {

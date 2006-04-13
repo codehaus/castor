@@ -229,7 +229,7 @@ public abstract class AbstractHashbelt extends AbstractBaseCache {
             Class cls = DEFAULT_CONTAINER_CLASS;
             param = params.getProperty(PARAM_CONTAINER_CLASS);
             if ((param != null) && !"".equals(param)) {
-                cls = Class.forName((String) param);
+                cls = Class.forName(param);
             }
 
             _poolCount = 2 * _containerTarget;
@@ -246,7 +246,7 @@ public abstract class AbstractHashbelt extends AbstractBaseCache {
             Class cls = DEFAULT_REAPER_CLASS;
             param = params.getProperty(PARAM_REAPER_CLASS);
             if ((param != null) && !"".equals(param)) {
-                cls = Class.forName((String) param);
+                cls = Class.forName(param);
             }
 
             _reaper = (AbstractReaper) cls.newInstance();

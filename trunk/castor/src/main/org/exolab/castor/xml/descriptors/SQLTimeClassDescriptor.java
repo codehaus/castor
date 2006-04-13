@@ -125,7 +125,7 @@ public class SQLTimeClassDescriptor
                 }
                 
                 public Object newInstance( Object parent ) {
-                    return new java.sql.Time((long)0);
+                    return new java.sql.Time(0);
                 }
             };
             sqlTimeHandler.setFieldHandler(handler);

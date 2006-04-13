@@ -544,7 +544,7 @@ public class ClassMolder
                 stamp = results.getQuery().fetch(proposedObject,
                         oid.getIdentity());
             } else {
-                conn = (Connection) tx.getConnection(oid.getLockEngine());
+                conn = tx.getConnection(oid.getLockEngine());
                 stamp = _persistence.load(conn, proposedObject, oid
                         .getIdentity(), accessMode);
             }

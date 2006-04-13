@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+All:   Fixed bug CASTOR-1393 using contribution from Henk van Voorthujsen [voorth@xs4all.nl]
+       Fixed compiler warnings: 103 unnecessary casts.
+       Details: http://jira.codehaus.org/browse/CASTOR-1393
+       (Ralf - 20060413)
+
 All:   Fixed bug CASTOR-1391 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
        Upgrad checkstyle configuration from version 3.5 to 4.1.0beta3.
        Details: http://jira.codehaus.org/browse/CASTOR-1391

@@ -363,7 +363,7 @@ public class RedefineUnmarshaller extends ComponentReader
         		error(err);
         	}
         	
-        	String structureName = ((AttributeGroupDecl)group).getName();
+        	String structureName = group.getName();
         	if (structureName == null) {
         		String err = "When redefining an AttributeGroup, the group must have a name.\n";
         		error(err);
@@ -463,7 +463,7 @@ public class RedefineUnmarshaller extends ComponentReader
     		}
     		
     		ModelGroup group = null;
-    		group = (ModelGroup) (((ModelGroupUnmarshaller)_unmarshaller).getGroup());
+    		group = (((ModelGroupUnmarshaller)_unmarshaller).getGroup());
     		
     		String structureName = group.getName();
     		if (structureName == null) {

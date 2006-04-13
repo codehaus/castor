@@ -130,7 +130,7 @@ public class SQLTimestampClassDescriptor
                     }
                     
                     public Object newInstance( Object parent ) {
-                        return new java.sql.Timestamp((long)0);
+                        return new java.sql.Timestamp(0);
                     }
                 }
             );

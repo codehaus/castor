@@ -196,7 +196,7 @@ public class Time extends DateTimeBase {
         if ( isUTC() ) {
             SimpleTimeZone timeZone = new SimpleTimeZone(0,"UTC");
             int offset = 0;
-            offset = (int) ( (this.getZoneMinute() + this.getZoneHour()*60)*60*1000);
+            offset = ( (this.getZoneMinute() + this.getZoneHour()*60)*60*1000);
             offset = isZoneNegative() ? -offset : offset;
             timeZone.setRawOffset(offset);
             timeZone.setID(TimeZone.getAvailableIDs(offset)[0]);

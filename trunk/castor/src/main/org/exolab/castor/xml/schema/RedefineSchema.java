@@ -397,7 +397,7 @@ public class RedefineSchema extends Annotated {
 		{
 			String nsPrefix = name.substring(0,idx);
 			name = name.substring(idx + 1);
-			String ns = (String) _parentSchema.getNamespace(nsPrefix);
+			String ns = _parentSchema.getNamespace(nsPrefix);
 			if (ns == null)  {
 				String err = "addAttributeGroup: ";
 				err += "Namespace prefix not recognized '"+nsPrefix+"'";

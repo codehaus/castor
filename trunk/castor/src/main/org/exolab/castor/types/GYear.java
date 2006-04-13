@@ -96,7 +96,7 @@ public class GYear extends GYearMonth {
     public GYear(int year) {
          short century = (short) (year/100);
          year = year % 100;
-         setCentury((short)century);
+         setCentury(century);
          setYear((short)year);
     }
 
@@ -172,7 +172,7 @@ public class GYear extends GYearMonth {
         if ( isUTC() ) {
             SimpleTimeZone timeZone = new SimpleTimeZone(0,"UTC");
             int offset = 0;
-            offset = (int) ( (this.getZoneMinute() + this.getZoneHour()*60)*60*1000);
+            offset = ( (this.getZoneMinute() + this.getZoneHour()*60)*60*1000);
             offset = isZoneNegative() ? -offset : offset;
             timeZone.setRawOffset(offset);
             timeZone.setID(TimeZone.getAvailableIDs(offset)[0]);

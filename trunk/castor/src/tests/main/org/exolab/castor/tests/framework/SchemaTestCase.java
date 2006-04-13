@@ -168,7 +168,7 @@ public class SchemaTestCase extends XMLTestCase {
 	    Schema schema = null;
 	    try {
            verbose("--> Reading XML Schema: " + url);
-            SchemaReader reader = new SchemaReader((String)url);
+            SchemaReader reader = new SchemaReader(url);
             schema = reader.read();
         } catch (java.io.IOException iox) {
             //Handling the failure feature

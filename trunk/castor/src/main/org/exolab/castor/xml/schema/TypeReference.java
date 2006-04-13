@@ -99,7 +99,7 @@ class TypeReference extends XMLType {
             canonicalName = name.substring(colon + 1);
             nsPrefix = name.substring(0,colon);
         }
-        String ns = (String) schema.getNamespace(nsPrefix);
+        String ns = schema.getNamespace(nsPrefix);
 
         if (schema.getSchemaNamespace().equals(ns)) {
             if (canonicalName.equals(SchemaNames.ANYTYPE)) {

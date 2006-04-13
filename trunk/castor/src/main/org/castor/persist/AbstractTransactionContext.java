@@ -311,7 +311,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
      */
     public final DbMetaInfo getConnectionInfo(final LockEngine engine)
     throws PersistenceException {
-        Connection conn = (Connection) getConnection(engine);
+        Connection conn = getConnection(engine);
         if (_dbInfo == null) {
             _dbInfo = new DbMetaInfo(conn);
         }

@@ -505,7 +505,7 @@ public class OQLQueryImpl
                 case ParseTreeWalker.FUNCTION:
                     try {
                         
-                        java.sql.Connection conn = (java.sql.Connection)((AbstractDatabaseImpl) _database).getTransaction().getConnection(_dbEngine);
+                        java.sql.Connection conn = ((AbstractDatabaseImpl) _database).getTransaction().getConnection(_dbEngine);
                         SimpleQueryExecutor sqe = new SimpleQueryExecutor( _database );
                         _results =  sqe.execute(conn, _expr, _bindValues);
 		            } catch ( QueryException except ) {

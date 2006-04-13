@@ -42,6 +42,26 @@
             <summary>
             </summary>
             <bugs>
+                <bug id="1393" tool="jira">
+                    <description>
+		                Fixed compiler warnings: 103 unnecessary casts.
+                    </description>
+                    <contributor>
+                        <name>Henk van Voorthujsen</name>
+                        <email>voorth@xs4all.nl</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Henk van Voorthujsen</name>
+                        <email>voorth@xs4all.nl</email>
+                    </reporter>
+                    <type>Enh.</type>
+                    <module>All</module>
+                    <date>20060413</date>
+                </bug>
                 <bug id="1391" tool="jira">
                     <description>
 		                Upgrad checkstyle configuration from version 3.5 to 4.1.0beta3.

@@ -182,7 +182,7 @@ public class DateDescriptor extends BaseDescriptor
 
             //-- update current instance of time with new time
             try {
-                Date temp = (Date) Date.parseDate(value.toString()) ;
+                Date temp = Date.parseDate(value.toString()) ;
                 dateTarget.setCentury(temp.getCentury());
                 dateTarget.setYear(temp.getYear());
                 dateTarget.setMonth(temp.getMonth());

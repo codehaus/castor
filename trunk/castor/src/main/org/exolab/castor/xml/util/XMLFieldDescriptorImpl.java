@@ -1153,7 +1153,7 @@ public class XMLFieldDescriptorImpl
         this._validator = validator;
 
         if (_validator != null) {
-            _validator.setDescriptor((XMLFieldDescriptor)this);
+            _validator.setDescriptor(this);
         }
 
     } //-- setValidator

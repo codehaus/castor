@@ -965,7 +965,7 @@ public class XMLClassDescriptorImpl extends Validator
         if (contentDescriptor != null) {
             fields[size-1] = contentDescriptor;
         }
-        return (FieldDescriptor[])fields;
+        return fields;
     } //-- getFields
 
 

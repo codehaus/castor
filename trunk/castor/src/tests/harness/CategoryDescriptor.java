@@ -190,7 +190,7 @@ public class CategoryDescriptor implements org.exolab.castor.xml.XMLClassDescrip
             {
                 try {
                     Category target = (Category) object;
-                    target.setObject( (Object) value);
+                    target.setObject( value);
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
