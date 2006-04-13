@@ -420,4 +420,49 @@ public final class OneToManyRelationResolver extends ManyRelationResolver {
         return field;
     }
 
+    /**
+     * @inheritDoc
+     */
+    public boolean updateWhenNoTimestampSet(
+            final TransactionContext tx, 
+            final OID oid, 
+            final Object object, 
+            final AccessMode suggestedAccessMode) 
+    throws PersistenceException {
+        boolean updateCache = false;
+        // create dependent objects if exists
+        ClassMolder fieldClassMolder = _fieldMolder.getFieldClassMolder();
+        LockEngine fieldEngine = _fieldMolder.getFieldLockEngine();
+        Object o = _fieldMolder.getValue(object, tx.getClassLoader());
+        if (o != null) {
+            Iterator itor = ClassMolderHelper.getIterator(o);
+            while (itor.hasNext()) {
+                Object oo = itor.next();
+                if (_fieldMolder.isDependent()) {
+                    if (!tx.isRecorded(oo)) {
+                        // autoCreated = true;
+                        tx.markCreate(fieldEngine, fieldClassMolder, oo, oid);
+                        if (fieldClassMolder._isKeyGenUsed)
+                            updateCache = true;
+                    } else
+                    // fail-fast principle: if the object depend on another
+                    // object,
+                    // throw exception
+                    if (!tx.isDepended(oid, oo))
+                        throw new PersistenceException(
+                                "Dependent object may not change its master");
+                } else if (tx.isAutoStore()) {
+                    if (!tx.isRecorded(oo)) {
+                        boolean creating = tx.markUpdate(fieldEngine,
+                                fieldClassMolder, oo, null);
+                        if (creating && fieldClassMolder._isKeyGenUsed)
+                            updateCache = true;
+                    }
+                }
+            }
+        }
+        return updateCache;
+    }
+    
+
 }

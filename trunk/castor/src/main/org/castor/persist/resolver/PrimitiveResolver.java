@@ -21,6 +21,7 @@ import org.castor.persist.ProposedEntity;
 import org.castor.persist.TransactionContext;
 import org.castor.persist.UpdateAndRemovedFlags;
 import org.castor.persist.UpdateFlags;
+import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.persist.ClassMolder;
 import org.exolab.castor.persist.ClassMolderHelper;
@@ -182,5 +183,19 @@ public final class PrimitiveResolver implements ResolverStrategy {
             final Object object, final ClassMolder relatedMolder,
             final Object relatedObject) {
         return new UpdateAndRemovedFlags();
+    }
+
+    
+    /**
+     * @inheritDoc
+     */
+    public boolean updateWhenNoTimestampSet(
+            final TransactionContext tx, 
+            final OID oid, 
+            final Object object, 
+            final AccessMode suggestedAccessMode) 
+    throws PersistenceException {
+        // nothing need to be done here for primitive
+        return false;
     }
 }

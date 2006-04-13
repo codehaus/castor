@@ -937,7 +937,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
             throw pe;
         } catch (Exception e) {
             _tracker.untrackObject(object);
-            throw new PersistenceException(Messages.format("persist.nested", e));
+            throw new PersistenceException(Messages.format("persist.nested", e), e);
         }
 
         if (!_tracker.isCreating(object)) {

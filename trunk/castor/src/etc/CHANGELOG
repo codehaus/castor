@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1388 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Refactor ClassMolder.update() to complete transfer to strategy pattern.
+       Details: http://jira.codehaus.org/browse/CASTOR-1388
+       (Werner - 20060413)
+
 All:   Fixed bug CASTOR-1394 using contribution from Henk van Voorthujsen [voorth@xs4all.nl]
        Fixed compiler warnings: 104 instance of instance access to static fields/methods.
        Details: http://jira.codehaus.org/browse/CASTOR-1394
