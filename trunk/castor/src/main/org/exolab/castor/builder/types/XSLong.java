@@ -77,9 +77,9 @@ public final class XSLong extends XSPatternBase {
 		super(XSType.LONG_TYPE);
 		_asWrapper = asWrapper;
 		if (_asWrapper)
-			this.jType = new JClass("java.lang.Long");
+			jType = new JClass("java.lang.Long");
 		else
-			this.jType = JType.Long;
+			jType = JType.Long;
 	} //-- XSLong
 
 	/**
@@ -87,7 +87,7 @@ public final class XSLong extends XSPatternBase {
 	 * @return the JType that this XSType represents
 	**/
 	public JType getJType() {
-		return this.jType;
+		return jType;
 	}
 
 	/**

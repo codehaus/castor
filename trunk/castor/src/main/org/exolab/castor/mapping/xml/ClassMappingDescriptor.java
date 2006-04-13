@@ -117,7 +117,7 @@ public class ClassMappingDescriptor extends org.exolab.castor.xml.util.XMLClassD
             {
                 try {
                     ClassMapping target = (ClassMapping) object;
-                    target.setExtends( (java.lang.Object) value);
+                    target.setExtends( value);
                 }
                 catch (java.lang.Exception ex) {
                     throw new IllegalStateException(ex.toString());
@@ -151,7 +151,7 @@ public class ClassMappingDescriptor extends org.exolab.castor.xml.util.XMLClassD
             {
                 try {
                     ClassMapping target = (ClassMapping) object;
-                    target.setDepends( (java.lang.Object) value);
+                    target.setDepends( value);
                 }
                 catch (java.lang.Exception ex) {
                     throw new IllegalStateException(ex.toString());

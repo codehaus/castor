@@ -42,6 +42,26 @@
             <summary>
             </summary>
             <bugs>
+                <bug id="1394" tool="jira">
+                    <description>
+		                Fixed compiler warnings: 104 instance of instance access to static fields/methods.
+                    </description>
+                    <contributor>
+                        <name>Henk van Voorthujsen</name>
+                        <email>voorth@xs4all.nl</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Henk van Voorthujsen</name>
+                        <email>voorth@xs4all.nl</email>
+                    </reporter>
+                    <type>Enh.</type>
+                    <module>All</module>
+                    <date>20060413</date>
+                </bug>
                 <bug id="1393" tool="jira">
                     <description>
 		                Fixed compiler warnings: 103 unnecessary casts.

@@ -115,12 +115,12 @@ public class ClassInfo extends XMLInfo {
         fieldInfo.setDeclaringClassInfo(this);
 
         switch(fieldInfo.getNodeType()) {
-            case FieldInfo.ATTRIBUTE_TYPE:
+            case XMLInfo.ATTRIBUTE_TYPE:
                 if (_atts == null) _atts = new Vector(3);
                 if (!_atts.contains(fieldInfo))
                     _atts.addElement(fieldInfo);
                 break;
-            case FieldInfo.TEXT_TYPE:
+            case XMLInfo.TEXT_TYPE:
                 _textField = fieldInfo;
                 break;
             default:
@@ -153,17 +153,15 @@ public class ClassInfo extends XMLInfo {
      * @return true if the given FieldInfo is contained within this ClassInfo
     **/
     public boolean contains(FieldInfo fieldInfo) {
-        boolean val = false;
-
         if (fieldInfo == null) return false;
 
         switch(fieldInfo.getNodeType()) {
 
-            case FieldInfo.ATTRIBUTE_TYPE:
+            case XMLInfo.ATTRIBUTE_TYPE:
                 if (_atts != null)
                     return _atts.contains(fieldInfo);
                 break;
-            case FieldInfo.TEXT_TYPE:
+            case XMLInfo.TEXT_TYPE:
                 return (fieldInfo == _textField);
             default:
                 if (_elements != null)

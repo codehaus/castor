@@ -27,6 +27,7 @@ import junit.framework.TestSuite;
 
 import org.castor.cache.Cache;
 import org.castor.cache.CacheAcquireException;
+import org.castor.cache.hashbelt.AbstractHashbelt;
 import org.castor.cache.hashbelt.LRUHashbelt;
 import org.castor.cache.hashbelt.container.MapContainer;
 import org.castor.cache.hashbelt.reaper.NullReaper;
@@ -64,25 +65,25 @@ public final class TestLRUHashbelt extends TestCase {
     
     public void testBasics() {
         assertEquals("lru", LRUHashbelt.TYPE);
-        assertEquals("containers", LRUHashbelt.PARAM_CONTAINERS);
-        assertEquals(10, LRUHashbelt.DEFAULT_CONTAINERS);
-        assertEquals("container-class", LRUHashbelt.PARAM_CONTAINER_CLASS);
-        assertEquals(MapContainer.class, LRUHashbelt.DEFAULT_CONTAINER_CLASS);
-        assertEquals("reaper-class", LRUHashbelt.PARAM_REAPER_CLASS);
-        assertEquals(NullReaper.class, LRUHashbelt.DEFAULT_REAPER_CLASS);
-        assertEquals("capacity", LRUHashbelt.PARAM_CAPACITY);
-        assertEquals(0, LRUHashbelt.DEFAULT_CAPACITY);
-        assertEquals("ttl", LRUHashbelt.PARAM_TTL);
-        assertEquals(60, LRUHashbelt.DEFAULT_TTL);
-        assertEquals("monitor", LRUHashbelt.PARAM_MONITOR);
-        assertEquals(0, LRUHashbelt.DEFAULT_MONITOR);
+        assertEquals("containers", AbstractHashbelt.PARAM_CONTAINERS);
+        assertEquals(10, AbstractHashbelt.DEFAULT_CONTAINERS);
+        assertEquals("container-class", AbstractHashbelt.PARAM_CONTAINER_CLASS);
+        assertEquals(MapContainer.class, AbstractHashbelt.DEFAULT_CONTAINER_CLASS);
+        assertEquals("reaper-class", AbstractHashbelt.PARAM_REAPER_CLASS);
+        assertEquals(NullReaper.class, AbstractHashbelt.DEFAULT_REAPER_CLASS);
+        assertEquals("capacity", AbstractHashbelt.PARAM_CAPACITY);
+        assertEquals(0, AbstractHashbelt.DEFAULT_CAPACITY);
+        assertEquals("ttl", AbstractHashbelt.PARAM_TTL);
+        assertEquals(60, AbstractHashbelt.DEFAULT_TTL);
+        assertEquals("monitor", AbstractHashbelt.PARAM_MONITOR);
+        assertEquals(0, AbstractHashbelt.DEFAULT_MONITOR);
 
         Cache cache = new LRUHashbelt();
         assertTrue(cache instanceof LRUHashbelt);
         assertEquals("lru", cache.getType());
 
         Properties params = new Properties();
-        params.put(LRUHashbelt.PARAM_NAME, "dummy1");
+        params.put(Cache.PARAM_NAME, "dummy1");
         try {
             cache.initialize(params);
         } catch (CacheAcquireException ex) {
@@ -106,7 +107,7 @@ public final class TestLRUHashbelt extends TestCase {
     private Cache initialize() throws CacheAcquireException {
         Cache cache = new LRUHashbelt();
         Properties params = new Properties();
-        params.put(LRUHashbelt.PARAM_NAME, "dummy1");
+        params.put(Cache.PARAM_NAME, "dummy1");
         cache.initialize(params);
 
         assertNull(cache.put("first key", "first value"));

@@ -399,34 +399,34 @@ public class JEnum extends JClass
 			JEnumConstant plus = new JEnumConstant("PLUS");
 			JMethod jMethod = new JMethod(new JType("double"), "eval");
 			jMethod.getModifiers().makePackage();
-			jMethod.addParameter(new JParameter(JClass.Double, "x")); 
-			jMethod.addParameter(new JParameter(JClass.Double, "y"));
+			jMethod.addParameter(new JParameter(JType.Double, "x")); 
+			jMethod.addParameter(new JParameter(JType.Double, "y"));
 			jMethod.setSourceCode("return x + y;");
 			plus.addMethod(jMethod);
 			operation.addConstant(plus);
 			// MINUS
 			JEnumConstant minus = new JEnumConstant("MINUS");
-			jMethod = new JMethod(JClass.Double, "eval");
+			jMethod = new JMethod(JType.Double, "eval");
 			jMethod.getModifiers().makePackage();
-			jMethod.addParameter(new JParameter(JClass.Double, "x"));
-			jMethod.addParameter(new JParameter(JClass.Double, "y"));
+			jMethod.addParameter(new JParameter(JType.Double, "x"));
+			jMethod.addParameter(new JParameter(JType.Double, "y"));
 			jMethod.setSourceCode("return x - y;");
 			minus.addMethod(jMethod);
 			operation.addConstant(minus);
 			// TIMES
 			JEnumConstant times = new JEnumConstant("TIMES");
-			jMethod = new JMethod(JClass.Double, "eval");
+			jMethod = new JMethod(JType.Double, "eval");
 			jMethod.getModifiers().makePackage();
-			jMethod.addParameter(new JParameter(JClass.Double, "x"));
-			jMethod.addParameter(new JParameter(JClass.Double, "y"));
+			jMethod.addParameter(new JParameter(JType.Double, "x"));
+			jMethod.addParameter(new JParameter(JType.Double, "y"));
 			jMethod.setSourceCode("return x * y;");
 			times.addMethod(jMethod);
 			operation.addConstant(times);
 			// Add 
-			jMethod = new JMethod(JClass.Double, "eval");
+			jMethod = new JMethod(JType.Double, "eval");
 			jMethod.getModifiers().makePackage();
-			jMethod.addParameter(new JParameter(JClass.Double, "x"));
-			jMethod.addParameter(new JParameter(JClass.Double, "y"));
+			jMethod.addParameter(new JParameter(JType.Double, "x"));
+			jMethod.addParameter(new JParameter(JType.Double, "y"));
 			jMethod.getModifiers().setAbstract(true);
 			operation.addMethod(jMethod);
 			operation.print(jsw);

@@ -27,6 +27,7 @@ import junit.framework.TestSuite;
 
 import org.castor.cache.Cache;
 import org.castor.cache.CacheAcquireException;
+import org.castor.cache.hashbelt.AbstractHashbelt;
 import org.castor.cache.hashbelt.FIFOHashbelt;
 import org.castor.cache.hashbelt.container.MapContainer;
 import org.castor.cache.hashbelt.reaper.NullReaper;
@@ -64,25 +65,25 @@ public final class TestFIFOHashbelt extends TestCase {
     
     public void testBasics() {
         assertEquals("fifo", FIFOHashbelt.TYPE);
-        assertEquals("containers", FIFOHashbelt.PARAM_CONTAINERS);
-        assertEquals(10, FIFOHashbelt.DEFAULT_CONTAINERS);
-        assertEquals("container-class", FIFOHashbelt.PARAM_CONTAINER_CLASS);
-        assertEquals(MapContainer.class, FIFOHashbelt.DEFAULT_CONTAINER_CLASS);
-        assertEquals("reaper-class", FIFOHashbelt.PARAM_REAPER_CLASS);
-        assertEquals(NullReaper.class, FIFOHashbelt.DEFAULT_REAPER_CLASS);
-        assertEquals("capacity", FIFOHashbelt.PARAM_CAPACITY);
-        assertEquals(0, FIFOHashbelt.DEFAULT_CAPACITY);
-        assertEquals("ttl", FIFOHashbelt.PARAM_TTL);
-        assertEquals(60, FIFOHashbelt.DEFAULT_TTL);
-        assertEquals("monitor", FIFOHashbelt.PARAM_MONITOR);
-        assertEquals(0, FIFOHashbelt.DEFAULT_MONITOR);
+        assertEquals("containers", AbstractHashbelt.PARAM_CONTAINERS);
+        assertEquals(10, AbstractHashbelt.DEFAULT_CONTAINERS);
+        assertEquals("container-class", AbstractHashbelt.PARAM_CONTAINER_CLASS);
+        assertEquals(MapContainer.class, AbstractHashbelt.DEFAULT_CONTAINER_CLASS);
+        assertEquals("reaper-class", AbstractHashbelt.PARAM_REAPER_CLASS);
+        assertEquals(NullReaper.class, AbstractHashbelt.DEFAULT_REAPER_CLASS);
+        assertEquals("capacity", AbstractHashbelt.PARAM_CAPACITY);
+        assertEquals(0, AbstractHashbelt.DEFAULT_CAPACITY);
+        assertEquals("ttl", AbstractHashbelt.PARAM_TTL);
+        assertEquals(60, AbstractHashbelt.DEFAULT_TTL);
+        assertEquals("monitor", AbstractHashbelt.PARAM_MONITOR);
+        assertEquals(0, AbstractHashbelt.DEFAULT_MONITOR);
 
         Cache cache = new FIFOHashbelt();
         assertTrue(cache instanceof FIFOHashbelt);
         assertEquals("fifo", cache.getType());
 
         Properties params = new Properties();
-        params.put(FIFOHashbelt.PARAM_NAME, "dummy1");
+        params.put(Cache.PARAM_NAME, "dummy1");
         try {
             cache.initialize(params);
         } catch (CacheAcquireException ex) {
@@ -106,7 +107,7 @@ public final class TestFIFOHashbelt extends TestCase {
     private Cache initialize() throws CacheAcquireException {
         Cache cache = new FIFOHashbelt();
         Properties params = new Properties();
-        params.put(FIFOHashbelt.PARAM_NAME, "dummy1");
+        params.put(Cache.PARAM_NAME, "dummy1");
         cache.initialize(params);
 
         assertNull(cache.put("first key", "first value"));

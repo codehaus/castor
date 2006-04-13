@@ -80,8 +80,8 @@ public final class XSInt extends XSPatternBase {
         super(XSType.INT_TYPE);
         _asWrapper = asWrapper;
         if (_asWrapper)
-            this.jType = new JClass("java.lang.Integer");
-        else this.jType = JType.Int;
+            jType = new JClass("java.lang.Integer");
+        else jType = JType.Int;
     } //-- XSInt
 
 
@@ -90,7 +90,7 @@ public final class XSInt extends XSPatternBase {
      * @return the JType that this XSType represents
     **/
     public JType getJType() {
-        return this.jType;
+        return jType;
     }
 
     /**
@@ -346,7 +346,7 @@ public final class XSInt extends XSPatternBase {
         if (fixedValue != null) {
             //-- make sure we have a valid value...
             //-- Only if we are not using Object
-            if (this.jType == JType.Int)
+            if (jType == JType.Int)
                 Integer.parseInt(fixedValue);
 
             jsc.add("typeValidator.setFixed(");

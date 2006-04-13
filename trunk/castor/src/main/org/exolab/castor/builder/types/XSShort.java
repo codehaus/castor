@@ -77,9 +77,9 @@ public final class XSShort extends XSPatternBase {
 		super(XSType.SHORT_TYPE);
 		_asWrapper = asWrapper;
 		if (asWrapper)
-			this.jType = new JClass("java.lang.Short");
+			jType = new JClass("java.lang.Short");
 		else
-			this.jType = JType.Short;
+			jType = JType.Short;
 	} //-- XSShort
 
 	/**
@@ -87,7 +87,7 @@ public final class XSShort extends XSPatternBase {
 	 * @return the JType that this XSType represents
 	**/
 	public JType getJType() {
-		return this.jType;
+		return jType;
 	}
 
 	/**

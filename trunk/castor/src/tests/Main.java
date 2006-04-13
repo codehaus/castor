@@ -96,7 +96,7 @@ public class Main extends TestHarness {
      */
     private Main( boolean verbose, boolean printInfo, boolean gui, String testRes, String testFile, String testUrl, String tests ) {
         super(null,"Castor","Root");
-        this.verbose     = verbose;
+        TestHarness.verbose     = verbose;
         this.printInfo   = printInfo;
         this.testBranchs = tests;
         this.testFile    = testFile;

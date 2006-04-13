@@ -80,8 +80,8 @@ public class XSInteger extends XSPatternBase {
         super(XSType.INTEGER_TYPE);
          _asWrapper = asWrapper;
         if (_asWrapper)
-            this.jType = new JClass("java.lang.Integer");
-        else this.jType = JType.Int;
+            jType = new JClass("java.lang.Integer");
+        else jType = JType.Int;
     } //-- XSInteger
 
 
@@ -90,7 +90,7 @@ public class XSInteger extends XSPatternBase {
      * @return the JType that this XSType represents
     **/
     public JType getJType() {
-        return this.jType;
+        return jType;
     }
 
     /**
