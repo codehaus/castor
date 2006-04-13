@@ -162,7 +162,7 @@ public class ConsoleDialog implements Dialog {
                 //-- check ch
                 if (values.indexOf(ch) != -1)
                     return (char)ch;
-                if (ch == (int)'?')
+                if (ch == '?')
                     System.out.println(help);
                 else {
                     System.out.print("invalid input, expecting ");

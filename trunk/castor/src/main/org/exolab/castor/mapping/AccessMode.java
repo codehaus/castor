@@ -199,7 +199,7 @@ public class AccessMode implements Cloneable, Comparable, Serializable {
      * @return Hash code of this object.
      */
     public int hashCode() {
-        return (int) _id;
+        return _id;
     }
 
     /**

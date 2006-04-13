@@ -318,7 +318,7 @@ public abstract class XMLTestCase extends TestCase {
             if (_hasDump) {
                 verbose("----> Dump the object to '" + outputName + "-ref.dump" +"'");
                 FileWriter writer = new FileWriter(new File(_outputRootFile, outputName + "-ref.dump"));
-                writer.write(((CastorTestable)randomizedObject).dumpFields());
+                writer.write(randomizedObject.dumpFields());
                 writer.close();
             }
 

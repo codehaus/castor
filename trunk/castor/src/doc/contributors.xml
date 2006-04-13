@@ -953,6 +953,12 @@
   </contributor>
 
   <contributor type="Contributor">
+    <name surname="van Voorthujsen" given="Henk" />
+    <email>voorth@xs4all.nl</email>
+    <description>Fixed lots of compiler warnings</description>
+  </contributor>
+
+  <contributor type="Contributor">
     <name surname="Verlet" given="Stephane" />
     <email>stephane@mminternet.com</email>
     <description>Patch for High/Low key generator problem in multi DB environement</description>

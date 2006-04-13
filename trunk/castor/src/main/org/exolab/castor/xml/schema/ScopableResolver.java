@@ -101,7 +101,7 @@ public class ScopableResolver implements Resolver {
     public Referable resolve(String id) {
         Referable referable = (Referable) ids.get(id);
         if ((referable == null) && (_resolver != null)) {
-            referable = (Referable)_resolver.resolve(id);
+            referable = _resolver.resolve(id);
         }
         return referable;
     } //-- resolve

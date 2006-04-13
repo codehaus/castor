@@ -225,7 +225,7 @@ public class RandomHelper {
      * @returns a random Castor timeDuration
      */
     public static TimeDuration getRandom(TimeDuration date, Class c) {
-        long randLong = (long)_rand.nextInt();
+        long randLong = _rand.nextInt();
         randLong = (randLong > 0)?randLong : -randLong;
         return new TimeDuration(randLong);
     }

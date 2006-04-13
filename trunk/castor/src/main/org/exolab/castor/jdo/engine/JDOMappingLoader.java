@@ -482,7 +482,7 @@ public class JDOMappingLoader extends MappingLoader {
 
         // if SQL mapping declares transient 
         if ( fieldMap.getSql().getTransient()) {
-        	((FieldDescriptorImpl) fieldDesc).setTransient (true);
+        	fieldDesc.setTransient (true);
         }
         
         sqlName = fieldMap.getSql().getName();
@@ -505,7 +505,7 @@ public class JDOMappingLoader extends MappingLoader {
             sType = new int[] {SQLTypeInfos.javaType2sqlTypeNum(sqlType)};
         }
 
-        return new JDOFieldDescriptor( (FieldDescriptorImpl) fieldDesc, sqlName, sType,
+        return new JDOFieldDescriptor( fieldDesc, sqlName, sType,
             !SqlDirtyType.IGNORE.equals( fieldMap.getSql().getDirty() ),
             fieldMap.getSql().getManyTable(),
             fieldMap.getSql().getManyKey(),

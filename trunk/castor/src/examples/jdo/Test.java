@@ -393,7 +393,7 @@ public class Test
 
         if ( results.hasMore() )
         {
-            LOG.info( "Loaded computer:" + ( Computer ) results.next() );
+            LOG.info( "Loaded computer:" + results.next() );
         }
 
         LOG.info( "End transaction: simple load to test the previous change" );

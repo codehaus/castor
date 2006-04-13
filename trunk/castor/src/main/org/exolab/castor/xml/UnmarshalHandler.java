@@ -3651,7 +3651,7 @@ implements ContentHandler, DocumentHandler, ErrorHandler {
         // float
         else if ((type == Float.TYPE) || (type == Float.class)) {
             if (isNull)
-                primitive = new Float((float)0);
+                primitive = new Float(0);
             else
                 primitive = new Float(value);
         }

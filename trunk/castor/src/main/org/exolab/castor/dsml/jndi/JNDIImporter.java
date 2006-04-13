@@ -118,7 +118,7 @@ public class JNDIImporter
 	} else {
 
 	    try {
-		existing = (Attributes) _ctx.getAttributes( result.getName() );
+		existing = _ctx.getAttributes( result.getName() );
 
 		modifs = new Vector();
 		attrSet = result.getAttributes();

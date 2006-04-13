@@ -45,7 +45,7 @@ public abstract class Test extends Thread {
         while ( testA.isAlive() && testB.isAlive() ) {
             if ( r.available() > 0 )
                 Thread.sleep(100);
-            else if ((ch=r.read()) == -1 || ch == (int)'q')
+            else if ((ch=r.read()) == -1 || ch == 'q')
                 break;
         }
 

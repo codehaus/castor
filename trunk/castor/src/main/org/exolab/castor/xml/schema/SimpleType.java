@@ -242,7 +242,7 @@ public abstract class SimpleType extends XMLType
     public boolean hasFacet(String name) {
         if (name == null) return false;
         for (int i = 0; i < facets.size(); i++) {
-            Facet facet = (Facet) facets.get(i);
+            Facet facet = facets.get(i);
             if (name.equals(facet.getName())) return true;
         }
         return false;
@@ -380,7 +380,7 @@ public abstract class SimpleType extends XMLType
     public boolean removeFacet(String name) {
         if (name == null) return false;
         for (int i = facets.size()-1; i > 0; i--) {
-            Facet facet = (Facet) facets.get(i);
+            Facet facet = facets.get(i);
             if (name.equals(facet.getName())) {
                 facets.remove(i);
                 return true;

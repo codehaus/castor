@@ -105,7 +105,7 @@ class FacetListEnumerator implements Enumeration {
         if (mask == null) return (currentIdx < facets.size());
         else {
             for (; currentIdx < facets.size(); currentIdx++) {
-                Facet facet = (Facet)facets.get(currentIdx);
+                Facet facet = facets.get(currentIdx);
                 if (mask.equals(facet.getName())) return true;
             }
         }
@@ -125,7 +125,7 @@ class FacetListEnumerator implements Enumeration {
         }
         else {
             for (; currentIdx < facets.size(); currentIdx++) {
-                Facet facet = (Facet)facets.get(currentIdx);
+                Facet facet = facets.get(currentIdx);
                 if (mask.equals(facet.getName())) {
                     ++currentIdx;
                     return facet;

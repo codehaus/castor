@@ -607,7 +607,7 @@ public class Duration implements java.io.Serializable {
                                    number = number * 10;
                                 number = number * 10;
                             }
-                            result.setMilli((long)number);
+                            result.setMilli(number);
                             hasNumber = false;
                         }
                         else {

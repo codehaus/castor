@@ -148,7 +148,7 @@ public class SQLTimeFieldHandler extends GeneralizedFieldHandler
     public Object newInstance( Object parent )
         throws IllegalStateException
     {
-        return new java.sql.Time((long)0);
+        return new java.sql.Time(0);
     }
     
     

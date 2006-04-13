@@ -124,7 +124,7 @@ public final class TestTypeConversion extends CastorTestCase {
 
             types.setByteInt((byte) 0);
             types.setShortInt((short) 0);
-            types.setLongInt((long) 0);
+            types.setLongInt(0);
             types.setDoubleInt(0.0);
             types.setFloatInt(0.0f);
 
@@ -137,7 +137,7 @@ public final class TestTypeConversion extends CastorTestCase {
             types.setByteString((byte) 0);
             types.setShortString((short) 0);
             types.setIntString(0);
-            types.setLongString((long) 0);
+            types.setLongString(0);
             types.setBigdecString(new BigDecimal(0));
             types.setFloatString(0.0f);
             types.setDoubleString(0.0d);
@@ -179,7 +179,7 @@ public final class TestTypeConversion extends CastorTestCase {
 
         types.setByteInt((byte) 123);
         types.setShortInt((short) 123);
-        types.setLongInt((long) 123);
+        types.setLongInt(123);
         types.setDoubleInt(123.0);
         types.setFloatInt(123.0f);
 
@@ -192,7 +192,7 @@ public final class TestTypeConversion extends CastorTestCase {
         types.setByteString((byte) 123);
         types.setShortString((short) 123);
         types.setIntString(123);
-        types.setLongString((long) 123);
+        types.setLongString(123);
         types.setBigdecString(new BigDecimal(123));
         types.setFloatString(123.45f);
         types.setDoubleString(123.45);        
@@ -211,7 +211,7 @@ public final class TestTypeConversion extends CastorTestCase {
                 && types.getBoolBigdecMinus()
                 && (types.getByteInt() != (byte) 123)
                 && (types.getShortInt() != (short) 123)
-                && (types.getLongInt() != (long) 123)
+                && (types.getLongInt() != 123)
                 && (types.getDoubleInt() != 123.0d)
                 && (types.getFloatInt() != 123.0)
                 && (types.getByteBigdec() != (byte) 123)
@@ -222,7 +222,7 @@ public final class TestTypeConversion extends CastorTestCase {
                 && (types.getByteString() != (byte) 123)
                 && (types.getShortString() != (short) 123)
                 && (types.getIntString() != 123)
-                && (types.getLongString() != (long) 123)
+                && (types.getLongString() != 123)
                 && (types.getBigdecString() != new BigDecimal(123))
                 && (types.getFloatString() != 123.0)
                 && (types.getDoubleString() != 123.0d)) {

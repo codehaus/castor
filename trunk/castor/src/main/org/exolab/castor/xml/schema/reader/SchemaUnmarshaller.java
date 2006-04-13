@@ -648,7 +648,7 @@ public class SchemaUnmarshaller extends ComponentReader {
         //--<group>
         else if (name.equals(SchemaNames.GROUP)) {
             ModelGroup group = null;
-            group = (ModelGroup) (((ModelGroupUnmarshaller)unmarshaller).getGroup());
+            group = (((ModelGroupUnmarshaller)unmarshaller).getGroup());
             _schema.addModelGroup(group);
         }
         //--<redefine>

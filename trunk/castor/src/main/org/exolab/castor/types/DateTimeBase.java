@@ -585,7 +585,7 @@ public abstract class DateTimeBase
              temp = _century * 100 + _year + sign*duration.getYear() + carry;
              short century = (short) (temp/100);
              temp = temp % 100;
-             this.setCentury((short)century);
+             this.setCentury(century);
              this.setYear((short)temp);
           } catch (OperationNotSupportedException e) {
               //if there is no Year field in the date/time datatypes
@@ -653,7 +653,7 @@ public abstract class DateTimeBase
                      temp = this.getCentury() * 100 + this.getYear() + temp;
                      short century = (short) (temp/100);
                      temp = temp % 100;
-                     this.setCentury((short)century);
+                     this.setCentury(century);
                      this.setYear((short)temp);
                   } catch (OperationNotSupportedException e) {
                       //--if there is no Year field in the date/time datatypes

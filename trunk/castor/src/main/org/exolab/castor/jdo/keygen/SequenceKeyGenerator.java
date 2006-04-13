@@ -196,7 +196,7 @@ public final class SequenceKeyGenerator implements KeyGenerator
         String seqName;
         String table;
 		
-        seqName = MessageFormat.format( _seqName, (Object[]) (new String[] {tableName,primKeyName}));// due to varargs in 1.5, see CASTOR-1097
+        seqName = MessageFormat.format( _seqName, new String[] {tableName,primKeyName});// due to varargs in 1.5, see CASTOR-1097
         table = _factory.quoteName(tableName);
         try {
             if (_factory.getFactoryName().equals(InterbaseFactory.FACTORY_NAME)) {
@@ -320,7 +320,7 @@ public final class SequenceKeyGenerator implements KeyGenerator
     		tableName = buffer2.toString();
         }
 
-		seqName = MessageFormat.format( _seqName, (Object[]) (new String[] {tableName,primKeyName})); // due to varargs in 1.5, see CASTOR-1097
+		seqName = MessageFormat.format( _seqName, new String[] {tableName,primKeyName}); // due to varargs in 1.5, see CASTOR-1097
         nextval = _factory.quoteName(seqName + ".nextval");
         lp1 = insert.indexOf( '(' );
         lp2 = insert.indexOf( '(', lp1 + 1 );

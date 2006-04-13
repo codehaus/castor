@@ -150,7 +150,7 @@ public class SQLTimestampFieldHandler extends GeneralizedFieldHandler
     public Object newInstance( Object parent )
         throws IllegalStateException
     {
-        return new java.sql.Timestamp((long)0);
+        return new java.sql.Timestamp(0);
     }
     
     

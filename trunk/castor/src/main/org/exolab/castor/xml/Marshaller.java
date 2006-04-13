@@ -1237,7 +1237,7 @@ public class Marshaller extends MarshalFramework {
                 nsURI = _namespaces.getNamespaceURI(nsPrefix);
             }
             else if ((nsPrefix == null) && (nsURI != null)) {
-                nsPrefix = (String) _namespaces.getNamespacePrefix(nsURI);
+                nsPrefix = _namespaces.getNamespacePrefix(nsURI);
             }
             //-- declare namespace at this element scope?
             if (nsURI != null) {

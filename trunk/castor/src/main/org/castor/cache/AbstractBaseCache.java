@@ -43,7 +43,7 @@ public abstract class AbstractBaseCache implements Cache {
      */
     public void initialize(final Properties params) throws CacheAcquireException {
         String param = params.getProperty(Cache.PARAM_NAME, Cache.DEFAULT_NAME);
-        _cacheName = (String) param;
+        _cacheName = param;
     }
 
     /**

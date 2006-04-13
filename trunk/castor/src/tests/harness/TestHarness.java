@@ -170,7 +170,7 @@ public class TestHarness extends TestSuite {
 
         Enumeration enumeration = tests();
         while ( enumeration.hasMoreElements() ) {
-            sb.append((TestHarness)enumeration.nextElement()).toString();
+            sb.append(enumeration.nextElement()).toString();
         }
         return sb.toString();
     }

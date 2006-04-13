@@ -101,7 +101,7 @@ public final class SQLHelper {
                 // suggestedNumberOfFields += potentialClassDescriptor.getFields().length;
             } else {
                 FieldDescriptor[] potentialFields = 
-                    (FieldDescriptor[]) potentialClassDescriptor.getFields();
+                    potentialClassDescriptor.getFields();
                 for (int i = 0; i < potentialFields.length; i++) {
                     JDOFieldDescriptor jdoFieldDescriptor = (JDOFieldDescriptor) potentialFields[i];
                     String[] columnNames = jdoFieldDescriptor.getSQLName();

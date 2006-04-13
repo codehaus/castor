@@ -170,7 +170,7 @@ public class AttributeSetImpl
     **/
     public String getValue(String name) {
         if (name == null) return null;
-        Attribute attr = (Attribute)getAttribute(name, "");
+        Attribute attr = getAttribute(name, "");
         if (attr != null) 
             return attr.value;
         return null;
@@ -185,7 +185,7 @@ public class AttributeSetImpl
     **/
     public String getValue(String name, String namespace) {
         if (name == null) return null;
-        Attribute attr = (Attribute)getAttribute(name, namespace);
+        Attribute attr = getAttribute(name, namespace);
         if (attr != null) 
             return attr.value;
         return null;
