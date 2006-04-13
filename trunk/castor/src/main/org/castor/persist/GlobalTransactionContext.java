@@ -55,6 +55,7 @@ public final class GlobalTransactionContext extends AbstractTransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.AbstractTransactionContext
      *      #createConnection(org.exolab.castor.persist.LockEngine)
      */
@@ -72,6 +73,7 @@ public final class GlobalTransactionContext extends AbstractTransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.AbstractTransactionContext#commitConnections()
      */
     protected void commitConnections() throws TransactionAbortedException {
@@ -87,6 +89,7 @@ public final class GlobalTransactionContext extends AbstractTransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.AbstractTransactionContext#rollbackConnections()
      */
     protected void rollbackConnections() {
@@ -105,6 +108,7 @@ public final class GlobalTransactionContext extends AbstractTransactionContext {
     }
 
     /**
+     * {@inheritDoc}
      * @see org.castor.persist.AbstractTransactionContext#closeConnections()
      */
     protected void closeConnections() throws TransactionAbortedException {

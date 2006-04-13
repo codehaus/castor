@@ -531,8 +531,20 @@ public abstract class AbstractHashbelt extends AbstractBaseCache {
     //--------------------------------------------------------------------------
     // protected methods for concrete implementations
     
+    /**
+     * Get reference to the ReadWriteLock of this cache instance.
+     * 
+     * @return ReadWriteLock to synchronize access to cache.
+     */
     protected final ReadWriteLock lock() { return _lock; }
     
+    /**
+     * Get object currently associated with given key from cache. Take care to acquire a
+     * read or write lock before calling this method and release the lock thereafter.
+     * 
+     * @param key The key to return the associated object for.
+     * @return The object associated with given key.
+     */
     protected final Object getObjectFromCache(final Object key) {
         Object result;
         for (int i = 0; i < _containerCount; i++) {
@@ -542,6 +554,16 @@ public abstract class AbstractHashbelt extends AbstractBaseCache {
         return null;
     }
     
+    /**
+     * Put given value with given key in cache. Return the object previously associated
+     * with key. Take care to acquire a write lock before calling this method and release
+     * the lock thereafter.
+     * 
+     * @param key The key to associate the given value with.
+     * @param value The value to associate with given key.
+     * @return The object previously associated with given key. <code>null</code> will
+     *         be returned if no value has been associated with key.
+     */
     protected final Object putObjectIntoCache(final Object key, final Object value) {
         // We first check if a new container have to be created. This is the case
         // if there is none or if we have a capacity limit and the head container
@@ -580,6 +602,14 @@ public abstract class AbstractHashbelt extends AbstractBaseCache {
         return result;
     }
     
+    /**
+     * Remove any available association for given key. Take care to acquire a write lock
+     * before calling this method and release the lock thereafter.
+     * 
+     * @param key The key to remove any previously associate value for.
+     * @return The object previously associated with given key. <code>null</code> will
+     *         be returned if no value has been associated with key.
+     */
     protected final Object removeObjectFromCache(final Object key) {
         Object result;
         for (int i = 0; i < _containerCount; i++) {

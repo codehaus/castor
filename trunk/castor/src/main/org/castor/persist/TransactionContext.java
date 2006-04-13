@@ -545,10 +545,11 @@ public interface TransactionContext {
     
     /**
      * Returns true if the object given is locked.
+     * 
      * @param cls Class instance of the object to be investigated.
      * @param identity Identity of the object to be investigated. 
      * @param lockEngine Current LcokEngine instance
      * @return True if the object in question is locked.
      */
-    public boolean isLocked(Class cls, Object identity, LockEngine lockEngine);
+    boolean isLocked(Class cls, Object identity, LockEngine lockEngine);
 }

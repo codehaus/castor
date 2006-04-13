@@ -43,18 +43,21 @@ extends AbstractTransactionManagerFactory {
     //--------------------------------------------------------------------------
 
     /**
+     * {@inheritDoc}
      * @see org.exolab.castor.jdo.transactionmanager.spi.AbstractTransactionManagerFactory
      *      #getFactoryClassName()
      */
     public String getFactoryClassName() { return FACTORY_CLASS_NAME; }
     
     /**
+     * {@inheritDoc}
      * @see org.exolab.castor.jdo.transactionmanager.spi.AbstractTransactionManagerFactory
      *      #getFactoryMethodName()
      */
     public String getFactoryMethodName() { return FACTORY_METHOD_NAME; }
     
     /**
+     * {@inheritDoc}
      * @see org.exolab.castor.jdo.transactionmanager.TransactionManagerFactory#getName()
      */
     public String getName() { return NAME; }

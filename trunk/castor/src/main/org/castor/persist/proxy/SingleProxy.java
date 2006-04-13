@@ -117,6 +117,7 @@ public final class SingleProxy implements MethodInterceptor, Serializable {
     }
     
     /**
+     * {@inheritDoc}
      * @see net.sf.cglib.proxy.MethodInterceptor #intercept(java.lang.Object,
      *      java.lang.reflect.Method, java.lang.Object[],
      *      net.sf.cglib.proxy.MethodProxy)

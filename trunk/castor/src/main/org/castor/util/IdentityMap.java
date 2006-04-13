@@ -63,6 +63,7 @@ public final class IdentityMap implements Map {
     //--------------------------------------------------------------------------
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#clear()
      */
     public void clear() {
@@ -73,16 +74,19 @@ public final class IdentityMap implements Map {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#size()
      */
     public int size() { return _entries; }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#isEmpty()
      */
     public boolean isEmpty() { return (_entries == 0); }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#put(java.lang.Object, java.lang.Object)
      */
     public Object put(final Object key, final Object value) {
@@ -187,6 +191,7 @@ public final class IdentityMap implements Map {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#containsKey(java.lang.Object)
      */
     public boolean containsKey(final Object key) {
@@ -203,6 +208,7 @@ public final class IdentityMap implements Map {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#get(java.lang.Object)
      */
     public Object get(final Object key) {
@@ -219,6 +225,7 @@ public final class IdentityMap implements Map {
     }
 
     /**
+     * {@inheritDoc}
      * @see java.util.Map#remove(java.lang.Object)
      */
     public Object remove(final Object key) {
@@ -248,6 +255,7 @@ public final class IdentityMap implements Map {
     }
     
     /**
+     * {@inheritDoc}
      * @see java.util.Map#keySet()
      */
     public Set keySet() {
@@ -268,6 +276,7 @@ public final class IdentityMap implements Map {
      * In contrast with the design contract of the <code>Map</code> interface this method
      * has not been implemented and throws a <code>UnsupportedOperationException</code>.
      * 
+     * {@inheritDoc}
      * @see java.util.Map#entrySet()
      */
     public Set entrySet() {
@@ -288,6 +297,7 @@ public final class IdentityMap implements Map {
      * In contrast with the design contract of the <code>Map</code> interface this method
      * has not been implemented and throws a <code>UnsupportedOperationException</code>.
      * 
+     * {@inheritDoc}
      * @see java.util.Map#values()
      */
     public Collection values() {
@@ -298,6 +308,7 @@ public final class IdentityMap implements Map {
      * In contrast with the design contract of the <code>Map</code> interface this method
      * has not been implemented and throws a <code>UnsupportedOperationException</code>.
      * 
+     * {@inheritDoc}
      * @see java.util.Map#containsValue()
      */
     public boolean containsValue(final Object value) {
@@ -309,6 +320,7 @@ public final class IdentityMap implements Map {
      * it throws a <code>UnsupportedOperationException</code> as defined in the
      * <code>Map</code> interface.
      * 
+     * {@inheritDoc}
      * @see java.util.Map#putAll()
      */
     public void putAll(final Map map) {
