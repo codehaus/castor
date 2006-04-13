@@ -209,8 +209,8 @@ public class MappingFileSourceFactory {
         
 		XSType xsType = member.getSchemaType();
 		boolean any = false;
-		boolean isAttribute = (member.getNodeType() == FieldInfo.ATTRIBUTE_TYPE);
-		boolean isText = (member.getNodeType() == FieldInfo.TEXT_TYPE);
+		boolean isAttribute = (member.getNodeType() == XMLInfo.ATTRIBUTE_TYPE);
+		boolean isText = (member.getNodeType() == XMLInfo.TEXT_TYPE);
 
 		//-- a hack, I know, I will change later (kv)
 		if (member.getName().equals("_anyObject"))

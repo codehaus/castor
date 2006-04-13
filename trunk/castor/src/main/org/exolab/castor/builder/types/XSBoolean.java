@@ -71,8 +71,8 @@ public final class XSBoolean extends XSType {
         super(XSType.BOOLEAN_TYPE);
         _asWrapper = asWrapper;
         if (_asWrapper)
-            this.jType = new JClass("java.lang.Boolean");
-        else this.jType = JType.Boolean;
+            jType = new JClass("java.lang.Boolean");
+        else jType = JType.Boolean;
     } //-- XSBoolean
 
 
@@ -81,7 +81,7 @@ public final class XSBoolean extends XSType {
      * @return the JType that this XSType represents
     **/
     public JType getJType() {
-        return this.jType;
+        return jType;
     } //-- getJType
 
     public void setFacets(SimpleType simpleType) {}

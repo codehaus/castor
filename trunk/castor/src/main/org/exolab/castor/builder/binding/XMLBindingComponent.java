@@ -1127,7 +1127,7 @@ public class XMLBindingComponent implements BindingComponent {
      */
     public boolean useWrapper() {
         boolean result = false;
-        if (_type == XMLBindingComponent.MEMBER) {
+        if (_type == BindingComponent.MEMBER) {
             if (_member.hasWrapper())
                result = _member.getWrapper();
         }

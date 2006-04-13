@@ -17,11 +17,7 @@
  */
 package org.exolab.castor.jdo.engine;
 
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -189,7 +185,7 @@ public final class SQLStatementCreate {
             } else {
                 
                 if (_useJDBC30) {
-                    stmt = ((Connection) conn).prepareStatement(_statement, PreparedStatement.RETURN_GENERATED_KEYS);
+                    stmt = ((Connection) conn).prepareStatement(_statement, Statement.RETURN_GENERATED_KEYS);
                 } else {
                     stmt = ((Connection) conn).prepareStatement(_statement);
                 }

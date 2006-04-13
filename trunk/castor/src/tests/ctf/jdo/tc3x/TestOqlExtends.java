@@ -139,7 +139,7 @@ public final class TestOqlExtends extends CastorTestCase {
         _db.create(group2);
         
         ExtendsEntity2 entity2 = new ExtendsEntity2();
-        entity2.setId(ExtendsEntity2.DEFAULT_ID + 20);
+        entity2.setId(PersistentEntity.DEFAULT_ID + 20);
         entity2.setGroup(group2);
         LOG.debug("Creating new object: " + entity2);
         _db.create(entity2);
@@ -148,20 +148,20 @@ public final class TestOqlExtends extends CastorTestCase {
         Thread.sleep(2000);
         
         ExtendsEntity1 entity1 = new ExtendsEntity1();
-        entity1.setId(ExtendsEntity1.DEFAULT_ID + 10);
+        entity1.setId(PersistentEntity.DEFAULT_ID + 10);
         entity1.setGroup(group1);
         entity1.getList().add(entity2);
         LOG.debug("Creating new object: " + entity1);
         _db.create(entity1);
         
         entity2 = new ExtendsEntity2();
-        entity2.setId(ExtendsEntity2.DEFAULT_ID + 21);
+        entity2.setId(PersistentEntity.DEFAULT_ID + 21);
         entity2.setGroup(group2);
         LOG.debug("Creating new object: " + entity2);
         _db.create(entity2);
         
         entity1 = new ExtendsEntity1();
-        entity1.setId(ExtendsEntity1.DEFAULT_ID + 11);
+        entity1.setId(PersistentEntity.DEFAULT_ID + 11);
         entity1.setGroup(group2);
         entity1.getList().add(entity2);
         LOG.debug("Creating new object: " + entity1);

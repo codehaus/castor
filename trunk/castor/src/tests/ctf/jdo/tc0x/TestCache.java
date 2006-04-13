@@ -55,6 +55,7 @@ import harness.TestHarness;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.castor.cache.Cache;
 import org.castor.cache.CacheAcquireException; 
 import org.castor.cache.simple.TimeLimited;
 
@@ -126,7 +127,7 @@ public final class TestCache extends CastorTestCase {
             super();
             
             Properties params = new Properties();
-            params.put(TimeLimited.PARAM_NAME, "dummy");
+            params.put(Cache.PARAM_NAME, "dummy");
             params.put(TimeLimited.PARAM_TTL, new Integer(interval));
             initialize(params);
 

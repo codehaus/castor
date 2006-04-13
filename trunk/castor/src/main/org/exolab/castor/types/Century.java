@@ -76,7 +76,7 @@ public class Century extends TimePeriod {
         super("P100Y");
         //we need to set the time zone to the computer local time zone
         //if we want to use the toDate() method.
-        int temp = SimpleTimeZone.getDefault().getRawOffset();
+        int temp = TimeZone.getDefault().getRawOffset();
         if (temp < 0){
             temp = -temp;
             try {

@@ -80,8 +80,8 @@ public final class XSByte extends XSPatternBase {
         super(XSType.BYTE_TYPE);
         _asWrapper = asWrapper;
         if (_asWrapper)
-             this.jType = new JClass("java.lang.Byte");
-        else this.jType = JType.Byte;
+             jType = new JClass("java.lang.Byte");
+        else jType = JType.Byte;
     } //-- XSByte
 
 
@@ -90,7 +90,7 @@ public final class XSByte extends XSPatternBase {
      * @return the JType that this XSType represents
     **/
     public JType getJType() {
-        return this.jType;
+        return jType;
     }
 
     /**

@@ -81,8 +81,8 @@ public final class XSFloat extends XSPatternBase {
         super(XSType.FLOAT_TYPE);
         _asWrapper = asWrapper;
         if (_asWrapper)
-            this.jType = new JClass("java.lang.Float");
-        else this.jType = JType.Float;
+            jType = new JClass("java.lang.Float");
+        else jType = JType.Float;
     } //-- XSFloat
 
 
@@ -91,7 +91,7 @@ public final class XSFloat extends XSPatternBase {
      * @return the JType that this XSType represents
     **/
     public JType getJType() {
-        return this.jType;
+        return jType;
     }
 
     /**

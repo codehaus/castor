@@ -72,30 +72,30 @@ public final class TestCountLimited extends TestCase {
 
         assertEquals("count-limited", cache.getType());
         assertEquals(30, ((CountLimited) cache).getCapacity());
-        assertEquals(CountLimited.DEFAULT_NAME, cache.getName());
+        assertEquals(Cache.DEFAULT_NAME, cache.getName());
         
         Properties params = new Properties();
-        params.put(CountLimited.PARAM_NAME, "dummy1");
+        params.put(Cache.PARAM_NAME, "dummy1");
         cache.initialize(params);
         assertEquals(30, ((CountLimited) cache).getCapacity());
         assertEquals("dummy1", cache.getName());
         
         params.clear();
-        params.put(CountLimited.PARAM_NAME, "dummy2");
+        params.put(Cache.PARAM_NAME, "dummy2");
         params.put(CountLimited.PARAM_CAPACITY, "-10");
         cache.initialize(params);
         assertEquals(30, ((CountLimited) cache).getCapacity());
         assertEquals("dummy2", cache.getName());
         
         params.clear();
-        params.put(CountLimited.PARAM_NAME, "dummy3");
+        params.put(Cache.PARAM_NAME, "dummy3");
         params.put(CountLimited.PARAM_CAPACITY, "0");
         cache.initialize(params);
         assertEquals(30, ((CountLimited) cache).getCapacity());
         assertEquals("dummy3", cache.getName());
         
         params.clear();
-        params.put(CountLimited.PARAM_NAME, "dummy4");
+        params.put(Cache.PARAM_NAME, "dummy4");
         params.put(CountLimited.PARAM_CAPACITY, "10");
         cache.initialize(params);
         assertEquals(10, ((CountLimited) cache).getCapacity());
@@ -120,7 +120,7 @@ public final class TestCountLimited extends TestCase {
 
         try {
             Properties params = new Properties();
-            params.put(CountLimited.PARAM_NAME, "dummy");
+            params.put(Cache.PARAM_NAME, "dummy");
             params.put(CountLimited.PARAM_CAPACITY, new Integer(10));
             cache.initialize(params);
         } catch (CacheAcquireException ex) {
@@ -285,7 +285,7 @@ public final class TestCountLimited extends TestCase {
 
         try {
             Properties params = new Properties();
-            params.put(CountLimited.PARAM_NAME, "dummy");
+            params.put(Cache.PARAM_NAME, "dummy");
             params.put(CountLimited.PARAM_CAPACITY, "3");
             cache.initialize(params);
         } catch (CacheAcquireException ex) {

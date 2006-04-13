@@ -72,30 +72,30 @@ public final class TestTimeLimited extends TestCase {
 
         assertEquals("time-limited", cache.getType());
         assertEquals(30, ((TimeLimited) cache).getTTL());
-        assertEquals(TimeLimited.DEFAULT_NAME, cache.getName());
+        assertEquals(Cache.DEFAULT_NAME, cache.getName());
         
         Properties params = new Properties();
-        params.put(TimeLimited.PARAM_NAME, "dummy1");
+        params.put(Cache.PARAM_NAME, "dummy1");
         cache.initialize(params);
         assertEquals(30, ((TimeLimited) cache).getTTL());
         assertEquals("dummy1", cache.getName());
         
         params.clear();
-        params.put(TimeLimited.PARAM_NAME, "dummy2");
+        params.put(Cache.PARAM_NAME, "dummy2");
         params.put(TimeLimited.PARAM_TTL, "-10");
         cache.initialize(params);
         assertEquals(30, ((TimeLimited) cache).getTTL());
         assertEquals("dummy2", cache.getName());
         
         params.clear();
-        params.put(TimeLimited.PARAM_NAME, "dummy3");
+        params.put(Cache.PARAM_NAME, "dummy3");
         params.put(TimeLimited.PARAM_TTL, "0");
         cache.initialize(params);
         assertEquals(30, ((TimeLimited) cache).getTTL());
         assertEquals("dummy3", cache.getName());
         
         params.clear();
-        params.put(TimeLimited.PARAM_NAME, "dummy4");
+        params.put(Cache.PARAM_NAME, "dummy4");
         params.put(TimeLimited.PARAM_TTL, "10");
         cache.initialize(params);
         assertEquals(10, ((TimeLimited) cache).getTTL());
@@ -120,7 +120,7 @@ public final class TestTimeLimited extends TestCase {
 
         try {
             Properties params = new Properties();
-            params.put(TimeLimited.PARAM_NAME, "dummy");
+            params.put(Cache.PARAM_NAME, "dummy");
             params.put(TimeLimited.PARAM_TTL, new Integer(10));
             cache.initialize(params);
         } catch (CacheAcquireException ex) {
@@ -285,7 +285,7 @@ public final class TestTimeLimited extends TestCase {
 
         try {
             Properties params = new Properties();
-            params.put(TimeLimited.PARAM_NAME, "dummy");
+            params.put(Cache.PARAM_NAME, "dummy");
             params.put(TimeLimited.PARAM_TTL, "5");
             cache.initialize(params);
         } catch (CacheAcquireException ex) {

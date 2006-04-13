@@ -161,7 +161,7 @@ public class JDOMappingLoader extends MappingLoader {
         // If no SQL information for class, ignore it. JDO only
         // supports JDO class descriptors.
         if ((clsMap.getMapTo() == null) || (clsMap.getMapTo().getTable() == null)) {
-            return JDOMappingLoader.NoDescriptor;
+            return MappingLoader.NoDescriptor;
         }
 
         // See if we have a compiled descriptor.

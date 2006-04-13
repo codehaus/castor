@@ -239,9 +239,9 @@ public class DescriptorSourceFactory {
 		jsc.append(member.getNodeName());
 		jsc.append("\"");
         jsc.append(", nsURI");        
-		if (member.getNodeType() == FieldInfo.ELEMENT_TYPE)
+		if (member.getNodeType() == XMLInfo.ELEMENT_TYPE)
 			jsc.append(", org.exolab.castor.xml.NodeType.Element);");
-		else if (member.getNodeType() == FieldInfo.ATTRIBUTE_TYPE)
+		else if (member.getNodeType() == XMLInfo.ATTRIBUTE_TYPE)
 			jsc.append(", org.exolab.castor.xml.NodeType.Attribute);");
         else {
             jsc.append("org.exolab.castor.xml.NodeType.Text);");
@@ -264,10 +264,10 @@ public class DescriptorSourceFactory {
 
 		XSType xsType = member.getSchemaType();
 		boolean any = false;
-		boolean isElement = (member.getNodeType() == FieldInfo.ELEMENT_TYPE);
+		boolean isElement = (member.getNodeType() == XMLInfo.ELEMENT_TYPE);
 		boolean isAttribute =
-			(member.getNodeType() == FieldInfo.ATTRIBUTE_TYPE);
-		boolean isText = (member.getNodeType() == FieldInfo.TEXT_TYPE);
+			(member.getNodeType() == XMLInfo.ATTRIBUTE_TYPE);
+		boolean isText = (member.getNodeType() == XMLInfo.TEXT_TYPE);
 
 		jsc.add("//-- ");
 		jsc.append(member.getName());
@@ -447,9 +447,9 @@ public class DescriptorSourceFactory {
 		if (member.getName().equals("_anyObject"))
 			any = true;
 		boolean isAttribute =
-			(member.getNodeType() == FieldInfo.ATTRIBUTE_TYPE);
+			(member.getNodeType() == XMLInfo.ATTRIBUTE_TYPE);
 	    boolean isContent = 
-	        (member.getNodeType() == FieldInfo.TEXT_TYPE);
+	        (member.getNodeType() == XMLInfo.TEXT_TYPE);
 	    
 	    if (xsType.getType() == XSType.CLASS)
 			isEnumerated = ((XSClass) xsType).isEnumerated();
