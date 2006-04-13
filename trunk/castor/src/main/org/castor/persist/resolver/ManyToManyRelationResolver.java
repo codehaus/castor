@@ -360,4 +360,35 @@ public final class ManyToManyRelationResolver extends ManyRelationResolver {
         return field;
     }
 
+    /**
+     * @inheritDoc
+     */
+    public boolean updateWhenNoTimestampSet(
+            final TransactionContext tx, 
+            final OID oid, 
+            final Object object, 
+            final AccessMode suggestedAccessMode) 
+    throws PersistenceException {
+        boolean updateCache = false;
+        // create relation if the relation table
+        ClassMolder fieldClassMolder = _fieldMolder.getFieldClassMolder();
+        LockEngine fieldEngine = _fieldMolder.getFieldLockEngine();
+        Object o = _fieldMolder.getValue(object, tx.getClassLoader());
+        if (o != null) {
+            Iterator itor = ClassMolderHelper.getIterator(o);
+            // many-to-many relation is never dependent relation
+            while (itor.hasNext()) {
+                Object oo = itor.next();
+                if (tx.isAutoStore() && !tx.isRecorded(oo)) {
+                    boolean creating = tx.markUpdate(fieldEngine,
+                            fieldClassMolder, oo, null);
+                    if (creating) {
+                        updateCache = true;
+                    }
+                }
+            }
+        }
+        return updateCache;
+    }
+
 }

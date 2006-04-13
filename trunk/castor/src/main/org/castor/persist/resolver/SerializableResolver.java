@@ -322,4 +322,17 @@ public final class SerializableResolver implements ResolverStrategy {
        return new UpdateAndRemovedFlags();
     }
 
+    /**
+     * @inheritDoc
+     */
+    public boolean updateWhenNoTimestampSet(
+            final TransactionContext tx, 
+            final OID oid, 
+            final Object object, 
+            final AccessMode suggestedAccessMode) 
+    throws PersistenceException {
+        // nothing need to be done here for primitive
+        return false;
+    }
+
 }

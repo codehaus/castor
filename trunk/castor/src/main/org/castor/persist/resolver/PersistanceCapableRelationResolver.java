@@ -468,4 +468,70 @@ public final class PersistanceCapableRelationResolver implements ResolverStrateg
         }
         return flags;
     }
+    
+    /**
+     * @inheritDoc
+     */
+    public boolean updateWhenNoTimestampSet(
+            final TransactionContext tx, 
+            final OID oid, 
+            final Object object, 
+            final AccessMode suggestedAccessMode) 
+    throws PersistenceException {
+        boolean updateCache = false;
+        // create dependent object if exists
+        ClassMolder fieldClassMolder = _fieldMolder.getFieldClassMolder();
+        LockEngine fieldEngine = _fieldMolder.getFieldLockEngine();
+        Object o = _fieldMolder.getValue(object, tx.getClassLoader());
+        if (o != null) {
+            if (_fieldMolder.isDependent()) {
+                // creation of dependent object should be delayed to the
+                // preStore state.
+                // otherwise, in the case of keygenerator being used in both
+                // master and dependent object, and if an dependent
+                // object is replaced by another before commit, the
+                // orginial dependent object will not be removed.
+                //
+                // the only disadvantage for that appoarch is that an
+                // OQL Query will not able to include the newly generated
+                // dependent object.
+                if ( !tx.isRecorded( o ) ) {
+                    tx.markCreate( fieldEngine, fieldClassMolder, o, oid );
+                    if ( !_fieldMolder.isStored() && fieldClassMolder._isKeyGenUsed ) {
+                        updateCache = true;
+                    }
+                } else {}
+                    // fail-fast principle: if the object depend on another object,
+                    // throw exception
+                    // if ( !tx.isDepended( oid, o ) )
+                    //    throw new PersistenceException("Dependent object may not change its master. Object: "+o+" new master: "+oid);
+            } else if ( tx.isAutoStore() ) {
+                if ( !tx.isRecorded( o ) ) {
+                    // related object should be created right the way, if autoStore
+                    // is enabled, to obtain a database lock on the row. If both side
+                    // uses keygenerator, the current object will be updated in the
+                    // store state.
+                    boolean creating = tx.markUpdate( fieldEngine, fieldClassMolder, o, null );
+                    // if _fhs[i].isStore is true for this field,
+                    // and if key generator is used
+                    // and if the related object is replaced this object by null
+                    // and if everything else is not modified
+                    // then, objectModifiedException will be thrown
+                    // there are two solutions, first introduce preCreate state,
+                    // and walk the create graph, and create non-store object
+                    // first. However, it doesn't guarantee solution. because
+                    // every object may have field which uses key-generator
+                    // second, we can do another SQLStatement at the very end of
+                    // this method.
+                    // note, one-many and many-many doesn't affected, because
+                    // it is always non-store fields.
+                    if ( creating && !_fieldMolder.isStored() && fieldClassMolder._isKeyGenUsed ) {
+                        updateCache = true;
+                    }
+                }
+            }
+        }
+        return updateCache;
+    }
+    
 }

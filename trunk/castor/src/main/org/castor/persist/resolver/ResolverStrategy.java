@@ -119,7 +119,22 @@ public interface ResolverStrategy {
     void update(TransactionContext tx, OID oid, Object object, 
             AccessMode suggestedAccessMode, Object field)
     throws PersistenceException;
-    
+
+    /**
+     * Update the object which loaded or created in the other transaction to
+     * the persistent storage.
+     *
+     * @param tx Transaction in action
+     * @param oid the object identity of the stored object
+     * @param object the object to be stored
+     * @param suggestedAccessMode Suggested access mode
+     * @return TODO
+     * @exception PersistenceException If it is not possible to successfully complete this method.
+     */
+    boolean updateWhenNoTimestampSet(TransactionContext tx, OID oid, Object object, 
+            AccessMode suggestedAccessMode)
+    throws PersistenceException;
+
     /**
      * Update the dirty checking cache. This method is called after a transaction 
      * completed successfully.
