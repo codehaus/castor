@@ -45,7 +45,6 @@
 
 package org.exolab.castor.xml.schema;
 
-import org.exolab.castor.xml.XMLException;
 
 /**
  * An XML Schema Exception class

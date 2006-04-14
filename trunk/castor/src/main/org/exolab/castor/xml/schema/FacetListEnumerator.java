@@ -45,9 +45,6 @@
 
 package org.exolab.castor.xml.schema;
 
-import org.exolab.castor.xml.*;
-import org.exolab.castor.util.List;
-
 import java.util.Enumeration;
 
 /**

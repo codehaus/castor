@@ -46,13 +46,12 @@
 package org.exolab.castor.xml.handlers;
 
 
-import org.exolab.castor.mapping.CollectionHandler;
-import org.exolab.castor.mapping.GeneralizedFieldHandler;
-import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.mapping.loader.CollectionHandlers;
-
-import java.util.Date;
 import java.sql.Timestamp;
+import java.util.Date;
+
+import org.exolab.castor.mapping.FieldDescriptor;
+import org.exolab.castor.mapping.FieldHandler;
+import org.exolab.castor.mapping.GeneralizedFieldHandler;
 
 /**
  * An implementation of GeneralizedFieldHandler for

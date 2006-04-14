@@ -45,9 +45,6 @@
 
 package org.exolab.castor.xml.schema;
 
-import org.exolab.castor.xml.*;
-import org.exolab.castor.xml.validators.ValidationUtils;
-
 import java.util.Enumeration;
 import java.util.Vector;
 

@@ -44,14 +44,11 @@
  */
 package org.exolab.castor.xml.schema.reader;
 
-import org.exolab.castor.net.URILocation;
-import org.exolab.castor.net.URIException;
-import org.exolab.castor.net.util.URIUtils;
-
-import org.exolab.castor.xml.schema.Schema;
-
-import java.io.IOException;
 import java.io.Reader;
+
+import org.exolab.castor.net.URILocation;
+import org.exolab.castor.net.util.URIUtils;
+import org.exolab.castor.xml.schema.Schema;
 
 
 /**

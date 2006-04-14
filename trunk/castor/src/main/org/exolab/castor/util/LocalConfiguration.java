@@ -44,37 +44,34 @@
  */
 package org.exolab.castor.util;
 
-import java.util.Properties;
-import java.io.OutputStream;
-import java.io.Writer;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.io.IOException;
-import java.util.StringTokenizer;
-import java.util.Hashtable;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Writer;
 import java.net.URL;
-
-import org.xml.sax.SAXException;
-import org.xml.sax.DocumentHandler;
-import org.xml.sax.Parser;
-import org.xml.sax.XMLReader;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.castor.util.Messages;
-
-import org.exolab.castor.xml.NodeType;
-import org.exolab.castor.xml.OutputFormat;
-import org.exolab.castor.xml.Serializer;
-import org.exolab.castor.xml.XMLNaming;
-import org.exolab.castor.xml.XMLSerializerFactory;
-import org.exolab.castor.xml.util.DefaultNaming;
+import java.util.Hashtable;
+import java.util.Properties;
+import java.util.StringTokenizer;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.castor.util.Messages;
+import org.exolab.castor.xml.NodeType;
+import org.exolab.castor.xml.OutputFormat;
+import org.exolab.castor.xml.Serializer;
+import org.exolab.castor.xml.XMLNaming;
+import org.exolab.castor.xml.util.DefaultNaming;
+import org.xml.sax.DocumentHandler;
+import org.xml.sax.Parser;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 
 /**
  * Provides default configuration for Castor components from the

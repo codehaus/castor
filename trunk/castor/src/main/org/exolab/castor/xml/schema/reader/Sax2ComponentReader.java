@@ -50,9 +50,11 @@ import org.exolab.castor.xml.AttributeSet;
 import org.exolab.castor.xml.Namespaces;
 import org.exolab.castor.xml.XMLException;
 import org.exolab.castor.xml.util.AttributeSetImpl;
-
-import org.exolab.castor.xml.schema.*;
-import org.xml.sax.*;
+import org.xml.sax.AttributeList;
+import org.xml.sax.DocumentHandler;
+import org.xml.sax.Locator;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 /**
  * A SAX adapter class for the ComponentReader.

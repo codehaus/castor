@@ -53,8 +53,6 @@ import org.exolab.castor.xml.schema.Annotation;
 import org.exolab.castor.xml.schema.ComplexType;
 import org.exolab.castor.xml.schema.ContentType;
 import org.exolab.castor.xml.schema.Resolver;
-import org.exolab.castor.xml.schema.Schema;
-import org.exolab.castor.xml.schema.SchemaException;
 import org.exolab.castor.xml.schema.SchemaNames;
 
 /**

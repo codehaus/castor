@@ -50,8 +50,6 @@ package org.exolab.castor.util;
 
 import java.lang.reflect.Constructor;
 
-import org.xml.sax.SAXException;
-
 /** 
  * The default implementation of ObjectFactory used for 
  * creating class instances

@@ -46,9 +46,7 @@
 
 package org.exolab.castor.xml.schema;
 
-import org.exolab.castor.xml.*;
-
-import java.util.Vector;
+import org.exolab.castor.xml.ValidationException;
 
 /**
  * A class which represents the field selector for an IdentityConstraint

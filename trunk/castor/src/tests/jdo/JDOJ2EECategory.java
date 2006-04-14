@@ -45,44 +45,35 @@
 package jdo;
 
 
+import harness.TestHarness;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
+import javax.transaction.TransactionManager;
+import javax.transaction.UserTransaction;
 
 import org.castor.jdo.engine.ConnectionFactory;
 import org.castor.jdo.engine.DatabaseRegistry;
 import org.castor.util.Messages;
-
-import org.exolab.castor.jdo.JDO;
 import org.exolab.castor.jdo.Database;
+import org.exolab.castor.jdo.JDO;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.mapping.MappingException;
+import org.mockejb.jndi.MockContextFactory;
 
-import java.net.URL;
-import java.net.MalformedURLException;
-import harness.TestHarness;
-
-import javax.naming.*;
-//import javax.ejb.*;
-
-//import mock ejb stuff for JNDI
-import org.mockejb.*;
-import org.mockejb.interceptor.*;
-import org.mockejb.jndi.*;
-
-//import tyrex classes for transaction management
-import tyrex.tm.TransactionDomain;
-import tyrex.resource.Resources;
 import tyrex.resource.Resource;
 import tyrex.resource.ResourceException;
+import tyrex.resource.Resources;
 import tyrex.tm.DomainConfigurationException;
 import tyrex.tm.RecoveryException;
-
-//import javax.sql stuff
-import javax.sql.DataSource;
-
-//javax.transaction classes
-import javax.transaction.UserTransaction;
-import javax.transaction.TransactionManager;
+import tyrex.tm.TransactionDomain;
 
 
 /**
