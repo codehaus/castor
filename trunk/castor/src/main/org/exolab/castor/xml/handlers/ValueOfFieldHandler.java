@@ -46,13 +46,13 @@
 package org.exolab.castor.xml.handlers;
 
 
-import org.exolab.castor.mapping.CollectionHandler;
-import org.exolab.castor.mapping.GeneralizedFieldHandler;
-import org.exolab.castor.mapping.MappingException;
-
-
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+
+import org.exolab.castor.mapping.FieldDescriptor;
+import org.exolab.castor.mapping.FieldHandler;
+import org.exolab.castor.mapping.GeneralizedFieldHandler;
+import org.exolab.castor.mapping.MappingException;
 
 
 /**

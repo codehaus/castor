@@ -53,7 +53,6 @@ import org.exolab.castor.xml.schema.Annotation;
 import org.exolab.castor.xml.schema.Schema;
 import org.exolab.castor.xml.schema.SchemaNames;
 import org.exolab.castor.xml.schema.SimpleType;
-import org.exolab.castor.xml.schema.simpletypes.ListType;
 
 /**
  * A class for Unmarshalling SimpleTypes

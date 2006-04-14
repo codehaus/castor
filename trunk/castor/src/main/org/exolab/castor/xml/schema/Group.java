@@ -45,11 +45,9 @@
 
 package org.exolab.castor.xml.schema;
 
-import org.exolab.castor.xml.*;
-
-import java.util.Vector;
-import java.util.Hashtable;
 import java.util.Enumeration;
+
+import org.exolab.castor.xml.ValidationException;
 
 /**
  * An XML Schema Group

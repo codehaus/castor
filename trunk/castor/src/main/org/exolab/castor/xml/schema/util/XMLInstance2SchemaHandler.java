@@ -45,15 +45,27 @@
 
 package org.exolab.castor.xml.schema.util;
 
-import org.exolab.castor.xml.Namespaces;
-import org.exolab.castor.xml.schema.*;
-
-import org.xml.sax.*;
-
 import java.util.Enumeration;
-import java.util.Hashtable;
 import java.util.Stack;
 import java.util.Vector;
+
+import org.exolab.castor.xml.Namespaces;
+import org.exolab.castor.xml.schema.AttributeDecl;
+import org.exolab.castor.xml.schema.ComplexType;
+import org.exolab.castor.xml.schema.ContentType;
+import org.exolab.castor.xml.schema.ElementDecl;
+import org.exolab.castor.xml.schema.Group;
+import org.exolab.castor.xml.schema.Order;
+import org.exolab.castor.xml.schema.Particle;
+import org.exolab.castor.xml.schema.Schema;
+import org.exolab.castor.xml.schema.SchemaException;
+import org.exolab.castor.xml.schema.Structure;
+import org.exolab.castor.xml.schema.XMLType;
+import org.xml.sax.AttributeList;
+import org.xml.sax.DocumentHandler;
+import org.xml.sax.Locator;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 
 

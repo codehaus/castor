@@ -45,8 +45,6 @@
 
 package org.exolab.castor.xml.schema;
 
-import org.exolab.castor.xml.ValidationException;
-
 import java.util.Enumeration;
 import java.util.Vector;
 

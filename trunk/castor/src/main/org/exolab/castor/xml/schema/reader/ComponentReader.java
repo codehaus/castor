@@ -51,9 +51,7 @@ import org.exolab.castor.xml.AttributeSet;
 import org.exolab.castor.xml.Namespaces;
 import org.exolab.castor.xml.XMLException;
 import org.exolab.castor.xml.schema.Resolver;
-
 import org.xml.sax.Locator;
-import java.io.Reader;
 
 /**
  * The base class for separate component unmarshallers for

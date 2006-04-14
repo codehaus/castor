@@ -57,7 +57,6 @@ import org.exolab.castor.xml.schema.Resolver;
 import org.exolab.castor.xml.schema.Schema;
 import org.exolab.castor.xml.schema.SchemaException;
 import org.exolab.castor.xml.schema.SchemaNames;
-import org.exolab.castor.xml.schema.Structure;
 import org.exolab.castor.xml.schema.Wildcard;
 import org.exolab.castor.xml.schema.XMLType;
 

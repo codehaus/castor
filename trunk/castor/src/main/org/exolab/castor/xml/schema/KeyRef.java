@@ -46,8 +46,6 @@
 
 package org.exolab.castor.xml.schema;
 
-import org.exolab.castor.xml.*;
-import org.exolab.castor.xml.validators.ValidationUtils;
 
 /**
  * A class that represents the XML Schema Identity Constraint: KeyRef.

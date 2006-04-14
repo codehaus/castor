@@ -46,12 +46,11 @@
 
 package org.exolab.castor.xml.schema;
 
-import org.exolab.castor.xml.*;
-import org.exolab.castor.xml.validators.ValidationUtils;
-
 import java.util.Enumeration;
 import java.util.Vector;
-import java.util.Hashtable;
+
+import org.exolab.castor.xml.ValidationException;
+import org.exolab.castor.xml.validators.ValidationUtils;
 
 /**
  * The base class for the XML Schema Identity Constraints 

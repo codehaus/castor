@@ -45,18 +45,39 @@
 
 package org.exolab.castor.xml.dtd;
 
-import org.xml.sax.SAXException;
-
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.Writer;
 import java.util.Enumeration;
 import java.util.Iterator;
 
-import org.exolab.castor.xml.*;
-import org.exolab.castor.xml.schema.*;
+import org.exolab.castor.xml.dtd.parser.DTDInitialParser;
+import org.exolab.castor.xml.dtd.parser.DTDParser;
+import org.exolab.castor.xml.dtd.parser.InputCharStream;
+import org.exolab.castor.xml.dtd.parser.ParseException;
+import org.exolab.castor.xml.dtd.parser.TokenMgrError;
+import org.exolab.castor.xml.schema.Annotation;
+import org.exolab.castor.xml.schema.AttributeDecl;
+import org.exolab.castor.xml.schema.ComplexType;
+import org.exolab.castor.xml.schema.ContentType;
+import org.exolab.castor.xml.schema.Documentation;
+import org.exolab.castor.xml.schema.ElementDecl;
+import org.exolab.castor.xml.schema.Facet;
+import org.exolab.castor.xml.schema.Group;
+import org.exolab.castor.xml.schema.Order;
+import org.exolab.castor.xml.schema.Particle;
+import org.exolab.castor.xml.schema.Schema;
+import org.exolab.castor.xml.schema.SchemaException;
+import org.exolab.castor.xml.schema.SimpleType;
 import org.exolab.castor.xml.schema.SimpleTypesFactory;
-import org.exolab.castor.xml.dtd.parser.*;
-
+import org.exolab.castor.xml.schema.Wildcard;
 import org.exolab.castor.xml.schema.writer.SchemaWriter;
+import org.xml.sax.SAXException;
 
 /**
  * Class containing static top-level methods to parse and convert

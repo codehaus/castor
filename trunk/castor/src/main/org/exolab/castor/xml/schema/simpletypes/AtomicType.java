@@ -47,10 +47,6 @@ package org.exolab.castor.xml.schema.simpletypes;
 
 import org.exolab.castor.xml.schema.Facet;
 import org.exolab.castor.xml.schema.SimpleType;
-import org.exolab.castor.xml.schema.Schema;
-
-import java.util.Enumeration;
-import java.util.Vector;
 
 /**
  * The base class for built-in atomic Schema types

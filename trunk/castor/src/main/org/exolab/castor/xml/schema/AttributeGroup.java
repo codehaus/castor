@@ -46,10 +46,9 @@
 
 package org.exolab.castor.xml.schema;
 
-import org.exolab.castor.xml.ValidationException;
-
-import java.util.Vector;
 import java.util.Enumeration;
+
+import org.exolab.castor.xml.ValidationException;
 
 /**
  * An XML Schema Attribute Group Definition

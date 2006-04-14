@@ -45,34 +45,33 @@
 
 package org.exolab.castor.xml;
 
-import org.exolab.castor.xml.descriptors.CoreDescriptors;
-import org.exolab.castor.xml.handlers.ContainerFieldHandler;
-import org.exolab.castor.xml.handlers.DateFieldHandler;
-import org.exolab.castor.xml.handlers.DefaultFieldHandlerFactory;
-import org.exolab.castor.xml.util.ContainerElement;
-import org.exolab.castor.xml.util.DefaultNaming;
-import org.exolab.castor.xml.util.XMLClassDescriptorImpl;
-import org.exolab.castor.xml.util.XMLFieldDescriptorImpl;
+import java.io.PrintWriter;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Vector;
+
 import org.exolab.castor.mapping.CollectionHandler;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.FieldHandlerFactory;
 import org.exolab.castor.mapping.GeneralizedFieldHandler;
 import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.mapping.loader.CollectionHandlers;
 import org.exolab.castor.mapping.loader.FieldHandlerImpl;
 import org.exolab.castor.mapping.loader.TypeInfo;
-import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.util.Configuration;
-import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.util.List;
-
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Serializable;
-import java.lang.reflect.*;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Vector;
+import org.exolab.castor.util.LocalConfiguration;
+import org.exolab.castor.xml.descriptors.CoreDescriptors;
+import org.exolab.castor.xml.handlers.ContainerFieldHandler;
+import org.exolab.castor.xml.handlers.DateFieldHandler;
+import org.exolab.castor.xml.handlers.DefaultFieldHandlerFactory;
+import org.exolab.castor.xml.util.ContainerElement;
+import org.exolab.castor.xml.util.XMLClassDescriptorImpl;
+import org.exolab.castor.xml.util.XMLFieldDescriptorImpl;
 
 /**
  * A Helper class for the Marshaller and Unmarshaller,

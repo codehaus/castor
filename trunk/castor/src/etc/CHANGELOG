@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+All:   Fixed bug CASTOR-1395 using contribution from Henk van Voorthujsen [voorth@xs4all.nl]
+       Fixed compiler warnings: 268 unused imports.
+       Details: http://jira.codehaus.org/browse/CASTOR-1395
+       (Ralf - 20060414)
+
 JDO:   Fixed bug CASTOR-1388 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        Refactor ClassMolder.update() to complete transfer to strategy pattern.
        Details: http://jira.codehaus.org/browse/CASTOR-1388

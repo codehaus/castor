@@ -47,8 +47,6 @@
 package org.exolab.castor.xml;
 
 import org.exolab.castor.mapping.AbstractFieldHandler;
-import org.exolab.castor.mapping.FieldHandler;
-import org.exolab.castor.mapping.ValidityException;
 
 /**
  * This FieldHandler is used in the generated descriptors.
