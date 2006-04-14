@@ -42,6 +42,26 @@
             <summary>
             </summary>
             <bugs>
+                <bug id="1401" tool="jira">
+                    <description>
+		                Added project specific settings for use with Eclipse.
+                    </description>
+                    <contributor>
+                        <name>Henk van Voorthujsen</name>
+                        <email>voorth@xs4all.nl</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Henk van Voorthujsen</name>
+                        <email>voorth@xs4all.nl</email>
+                    </reporter>
+                    <type>Enh.</type>
+                    <module>All</module>
+                    <date>20060414</date>
+                </bug>
                 <bug id="1395" tool="jira">
                     <description>
 		                Fixed compiler warnings: 268 unused imports.
