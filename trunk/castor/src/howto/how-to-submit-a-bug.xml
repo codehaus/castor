@@ -129,31 +129,35 @@
 			</section>
 			
 			<section title="Creating the patch">
-				
-				<p>As explained in <link>cvs.html</link>, we ask you to submit your code changes in the form of 
-				   a unified patch by attaching it to the relevant bug report.</p>
+				<p>As explained in <link>cvs.html</link>, we ask you to submit your code
+                   changes in the form of a unified patch by attaching it to the relevant
+                   bug report.</p>
 				   
-				<p>To create a <b>unified</b> patch for submission, you can either use the command line CVS
-				   client (which you find instructions to download for at <link>http://www.cvshome.org/</link> or 
-				   any IDE that offers support or CVS (such as Eclipse, IntelliJ, etc.)</p>
+				<p>To create a <b>unified</b> patch for submission, you can either use
+                   the command line SVN client (which you find instructions to download
+                   for at <link>http://subversion.tigris.org/</link> or any IDE that
+                   offers support or SVN (such as Eclipse with Subclipse plugin)</p>
 				   
-				<p>In any case, please note that we are trying to standardize on the use of <b>unified</b> 
-				   patches only, and that you should <b>always</b> update your code (against the CVS repository) 
-				   before creating the patch. If you have never used CVS before, there will be ways to convince us 
-				   to accept e.g. a Zip file includig your changes.</p>
+				<p>In any case, please note that we are trying to standardize on the use
+                   of <b>unified</b> patches only, and that you should <b>always</b>
+                   update your code (against the SVN repository) before creating the
+                   patch. If you have never used SVN before, there will be ways to
+                   convince us to accept e.g. a Zip file includig your changes.</p>
 			</section>
 			
 			<section title="References">
-				<p>Whilst we cannot assume that every Castor (JDO) user is an expert in the use of 
-				   JUnit, we do believe that they are quite easy to get acquainted with. As a 
-				   starting point, please find below some references:</p>
+				<p>Whilst we cannot assume that every Castor (JDO) user is an expert in
+                   the use of JUnit, we do believe that they are quite easy to get
+                   acquainted with. As a starting point, please find below some
+                   references:</p>
 	
 				<ul>
-					<li><a href="http://www.junit.org/">JUnit</a> - A well-known framework for 
-						writing integration-level and functional tests.</li>
-					<li><a href="http://www.cvshome.org/">CVS Home</a> - many useful CVS related items</li>
+					<li><a href="http://www.junit.org/">JUnit</a> - A well-known
+                        framework for writing integration-level and functional tests.</li>
+					<li><a href="http://subversion.tigris.org/">SVN Home</a> - many useful
+                        SVN related items</li>
 				</ul>
-				</section>
+			</section>
 		
 		</section>
 	</body>

@@ -84,7 +84,7 @@
       </navLink>
       <navLink>
         <url>cvs.xml</url>
-        <display>CVS/JIRA</display>
+        <display>SVN/JIRA</display>
       </navLink>
       <navLink>
         <url>contributing.xml</url>

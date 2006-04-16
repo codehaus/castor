@@ -40,8 +40,38 @@
     		<date>tbd</date>
     		<managed-by>Werner Guttmann</managed-by>
             <summary>
+				<h2>Development environment</h2>
+
+                <p>On April 14. 2006 we have migrated Castor source repository from CVS
+                   to SVN. At the moment we still provide read only access to CVS but this
+                   does not reflect commits to SVN after the migration. The read only
+                   access to CVS is intended for you to create patches of your current
+                   work and move it over to SVN. Be aware that we will switch off CVS soon.</p>
+
+                <p>For details about SVN access please have a look at: 
+				<a href="cvs.html">SVN/JIRA</a>.</p>
             </summary>
             <bugs>
+                <bug id="1380" tool="jira">
+                    <description>
+		                Migrated Castor repository from CVS to SVN.
+                    </description>
+                    <contributor>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </reporter>
+                    <type>Enh.</type>
+                    <module>All</module>
+                    <date>20060416</date>
+                </bug>
                 <bug id="1401" tool="jira">
                     <description>
 		                Added project specific settings for use with Eclipse.
