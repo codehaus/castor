@@ -27,7 +27,7 @@
 		   to hear how others make contibutions.</p>
 
 		<p>You can get your local working copy of the current code base (or any particular 
-		   release) from the <a href="cvs.html">Castor CVS repository</a>. Review the todo list at
+		   release) from the <a href="cvs.html">Castor SVN repository</a>. Review the todo list at
 		   <a href="http://jira.codehaus.org/browse/CASTOR">Jira</a>, choose a task 
 		   (or perhaps you have noticed something that needs patching). Make the changes, 
 		   do the testing, generate a patch (if you need then discuss it on the dev mailing 
@@ -60,9 +60,9 @@
 		<p>When sending patches, unified diff files (3 lines before, 3 lines after) work best:</p>
 		
 <code-panel><![CDATA[
-  cvs diff -u <file>]]></code-panel>
+  svn diff <file>]]></code-panel>
   
-		<p>againsts the up-to-date cvs version, or</p>
+		<p>againsts the up-to-date SVN version, or</p>
 			
 <code-panel><![CDATA[
   diff -u <file1> <file2>
@@ -104,12 +104,12 @@
 		   announce what and how. If you don't get a reply within a day, you can assume the
 		   coast is clear.</p>
 
-      <p><i>Test before you commit.</i> Before committing any changes run a <tt>cvs update</tt>
+      <p><i>Test before you commit.</i> Before committing any changes run a <tt>svn update</tt>
          to make sure you have the latest code base. Run the test cases to make sure nothing
          is broken.</p>
 
       <p><i>Commit all at once.</i> If the change involves more than a single file, make sure
-         to commit all the changes together. A partially committed CVS tree is not a pretty
+         to commit all the changes together. A partially committed SVN tree is not a pretty
          sight. No lunch breaks, meetings or sleep during commits.</p>
 
       <p><i>Be ready to receive complaints.</i> Hopefully all works fine, but if changes
@@ -126,7 +126,7 @@
          breaks. Don't leave the computer before the release is done. If you can't make
          it, there's alway the next release.</p>
 
-      <p><i>Document what you've done.</i> In-code documentation, CVS commit messages,
+      <p><i>Document what you've done.</i> In-code documentation, SVN commit messages,
          and the changelog. Major changes should always be recorded in the changelog.</p>
 
       <p><i>Use the document DTD.</i> When adding new documentation use the document DTD.
@@ -185,7 +185,6 @@
            <crow><td>javadoc</td><td>Builds the full JavaDocs</td></crow>
            <crow><td>source</td><td>Builds the source tarball in the dist directory</td></crow>
            <crow><td>tarball</td><td>Builds the binary distribution in the dist directory</td></crow>
-           <crow><td>cvs</td><td>Update the sources from the CVS</td></crow>
          </ctable>
 
      <p>The tarball will includes the Castor JAR, all dependent library

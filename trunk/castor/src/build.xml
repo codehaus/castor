@@ -137,7 +137,6 @@
             javadoc          Builds the full JavaDocs
             source           Builds the source tarball in the dist directory
             tarball          Builds the binary distribution in the dist directory
-            cvs              Update the sources from the CVS
 
             gen.jdo.conf     Use the Source Generator to create the Java classes for jdo-conf.xsd
             gen.mapping      Use the Source Generator to create the Java classes for mapping.xsd
@@ -692,12 +691,6 @@
         <delete file="${dist}/${archive.name}.tar"/>
         <zip zipfile="${build}/${archive.name}/examples.zip" basedir="${source}" includes="examples/**" defaultexcludes="true"/>
         <zip zipfile="${dist}/${archive.name}.zip" basedir="${build}" includes="${archive.name}/**" excludes="${archive.name}/*.tar,${archive.name}/*.tgz"/>
-    </target>
-
-    <target name="cvs" depends="clean"
-            description="Update the working directory from the CVS repository using the anoncvs login">
-        <cvs
-        cvsRoot=":pserver:anon@cvs.castor.codehaus.org:/home/projects/castor/scm" dest="." package="${project}"/>
     </target>
 
     <target name="oes" depends="prepare,compile" description="Call the XSDCompiler (org.exolab.castor.tools.XSDCompiler)">

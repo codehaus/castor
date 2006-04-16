@@ -40,12 +40,12 @@
         <p>Contributers should have:</p>
 
         <ul>
-            <li>The source code of the documents as a local working copy of the CVS 
-                repository. If you are working with the current CVS HEAD then you will 
-                have already done a 'cvs checkout castor' (see CVS Usage Precis). However, see 
+            <li>The source code of the documents as a local working copy of the SVN 
+                repository. If you are working with the current SVN HEAD then you will 
+                have already done a 'svn checkout castor'. However, see 
                 below for other ways of obtaining source for diff comparison.</li>
-            <li>The tools with which to prepare a patch. On UNIX the "cvs" program has the 
-                <tt>cvs diff -u</tt> command.</li>
+            <li>The tools with which to prepare a patch. On UNIX the "svn" program has the 
+                <tt>svn diff</tt> command.</li>
         </ul>
             
     </section>
@@ -110,21 +110,21 @@ diff -u -r1.7 contrib.xml
         
         <section title="Get ready">
             
-            <p>If you are using the HEAD of CVS then ensure that your working copy is 
+            <p>If you are using the HEAD of SVN then ensure that your working copy is 
             up-to-date. Of course, if you are using a previous public release version 
-            of Cocoon, then it is already up-to-date.</p>
+            of Castor, then it is already up-to-date.</p>
             
         </section>
 
         <section title="Generate the differences">
             
-            <p>Prepare the diff file. CVS will contact the remote repository, ensure that 
+            <p>Prepare the diff file. SVN will contact the remote repository, ensure that 
             your working copy is up-to-date, then compare your local copy with the 
             master repository.</p>
 
 <code-panel>
     cd src/doc
-    cvs diff -u jdo-howto.xml > $TEMP/castor/patch/jdo-howto.xml.diff
+    svn diff jdo-howto.xml > $TEMP/castor/patch/jdo-howto.xml.diff
 </code-panel>
             
         </section>
@@ -135,7 +135,7 @@ diff -u -r1.7 contrib.xml
             text file before you go to Jira. See further hints about this in 
             the "Description" section of the How-to Jira.</p>
 
-            <p>What version of CVS did you patch against? Was it HEAD branch? Was 
+            <p>What revision of SVN did you patch against? Was it HEAD branch? Was 
             it a nightly build? Was it a public release?</p>
             
         </section>
@@ -157,8 +157,8 @@ diff -u -r1.7 contrib.xml
             the following command does that ...</p>
 
 <code-panel>
-cd src
-cvs diff -u > $WORK/castor/patch/src.dir.diff
+    cd src
+    svn diff > $WORK/castor/patch/src.dir.diff
 </code-panel>
 
             <p>However, be careful not to go overboard with this technique. When producing 
@@ -172,16 +172,16 @@ cvs diff -u > $WORK/castor/patch/src.dir.diff
 
         <section title="Other ways of obtaining source for diff comparison">
             
-            <p>Ideally you will prepare your patches against a CVS repository. There are other 
+            <p>Ideally you will prepare your patches against a SVN repository. There are other 
             ways to do this. They do create more work for the committers, however it may 
             be the only way that you can do it. We would certainly rather receive your 
-            patch however it comes. As a mtter of fact, we would politeky ask you 
+            patch however it comes. As a matter of fact, we would politely ask you 
             first to send us a unified patch.</p>
 
-            <p>You could get the source document via the web interface to CVS. Here are the steps ...</p>
+            <p>You could get the source document via the web interface to SVN. Here are the steps ...</p>
 
             <ul>
-                <li>get the relevant XML file via ViewCVS</li>
+                <li>get the relevant XML file via FishEye</li>
                 <li>save the file to your local disk: ./jdo-howto.xml.orig</li>
                 <li>create a copy of the file: ./jdo-howto.xml</li>
                 <li>make your modifications and validate the XML</li>
@@ -197,7 +197,7 @@ cvs diff -u > $WORK/castor/patch/src.dir.diff
     <section title="Tips">
 
         <ul>
-            <li>Please review your diffs before you submit your patch to Bugzilla</li>
+            <li>Please review your diffs before you submit your patch to JIRA</li>
         </ul>    
         
     </section>
@@ -207,9 +207,8 @@ cvs diff -u > $WORK/castor/patch/src.dir.diff
 
         <ul>
             <li>The UNIX manual pages 'man diff' and 'man patch'.</li>
-            <li>CVS usage information is at www.cvshome.org and your local 'info cvs' 
-                pages or 'man cvs' pages or user documentation. This includes guidance 
-                about using cvs diff -u</li>
+		    <li><a href="http://subversion.tigris.org/">SVN Home</a> - many useful
+                SVN related items</li>
         </ul>
         
     </section>

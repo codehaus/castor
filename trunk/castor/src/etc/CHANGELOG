@@ -1,6 +1,11 @@
 
-Version (CVS)
+Version (SVN)
 -------------
+
+All:   Fixed bug CASTOR-1380 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
+       Migrated Castor repository from CVS to SVN.
+       Details: http://jira.codehaus.org/browse/CASTOR-1380
+       (Ralf - 20060416)
 
 All:   Fixed bug CASTOR-1401 using contribution from Henk van Voorthujsen [voorth@xs4all.nl]
        Added project specific settings for use with Eclipse.

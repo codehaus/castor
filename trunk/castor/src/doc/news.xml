@@ -19,6 +19,22 @@
               <span class="newsTitle">Latest Release</span><br/><br/>
               <span class="newsSummary"-->
 
+        <news id="40">
+            <title>New source repository</title>
+            <author>Ralf Joachim</author>
+            <date>Apr 16 2006</date>
+            <time>13:07:43</time>
+            <summary>
+                On April 14. 2006 we have migrated Castor source repository from CVS
+                to SVN. At the moment we still have read only access to CVS but this
+                does not reflect commits to SVN after the migration. The read only
+                access to CVS is intended for you to create patches of your current
+                work and move it over to SVN. Be aware that we will switch off CVS soon.
+
+                For details about SVN access please have a look at: 
+				<a href="cvs.html">SVN/JIRA</a>.
+            </summary>
+        </news>
         <news id="39">
             <title>Castor 1.0 (final) released</title>
             <author>Werner Guttmann</author>
