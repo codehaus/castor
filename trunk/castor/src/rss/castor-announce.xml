@@ -19,6 +19,22 @@
 --> 
 
 		<item>
+			<title>New source repository</title>
+			<pubDate>Sun, 16 Apr 2006 13:07:43 GMT</pubDate>
+			<author>Ralf Joachim</author>
+			<link>http://castor.codehaus.org/news.html#item40</link>
+			<description>
+                On April 14. 2006 we have migrated Castor source repository from CVS
+                to SVN. At the moment we still have read only access to CVS but this
+                does not reflect commits to SVN after the migration. The read only
+                access to CVS is intended for you to create patches of your current
+                work and move it over to SVN. Be aware that we will switch off CVS soon.
+
+                For details about SVN access please have a look at: 
+				http://castor.codehaus.org/cvs.html.
+			</description>
+		</item>
+		<item>
 			<title>Final 1.0 release available</title>
 			<pubDate>Thu, 6 Apr 2006 23:22:21 GMT</pubDate>
 			<author>Werner Guttmann</author>
