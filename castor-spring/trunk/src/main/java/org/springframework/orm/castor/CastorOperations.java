@@ -192,5 +192,21 @@ public interface CastorOperations {
             Class entityClass, String filter, Object[] values, String ordering)
             throws DataAccessException;
 
+    
+    /**
+     * Indicates whether the object given is persistent with Castor JDO.
+     * @param entity Object entity.
+     * @return True if the given entity is persistent.
+     */
+    boolean isPersistent(final Object entity);
+    
+    /**
+     * Indicates whether the object given is cached by Castor JDO.
+     * @param entity Object entity.
+     * @return True if the given entity is cached.
+     */
+    boolean isCached(Object entity);
 
+
+    
 }

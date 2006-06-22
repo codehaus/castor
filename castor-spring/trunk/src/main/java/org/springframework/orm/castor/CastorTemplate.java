@@ -239,7 +239,7 @@ public class CastorTemplate extends CastorAccessor implements CastorOperations {
     public void evict(final Object entity) throws DataAccessException {
         execute(new CastorCallback() {
             public Object doInCastor(Database database) throws PersistenceException {
-                database.getCacheManager().expireCache(entity.getClass(), entity);
+                database.getCacheManager().expireCache(entity.getClass(), database.getIdentity(entity));
                 return null;
             }
         });
@@ -312,6 +312,34 @@ public class CastorTemplate extends CastorAccessor implements CastorOperations {
         });
     }
 
+    //-------------------------------------------------------------------------
+    // Convenience isXXX() methods 
+    //-------------------------------------------------------------------------
+
+    public boolean isPersistent(final Object entity) {
+        Boolean isPersistent = (Boolean) execute(new CastorCallback() {
+            public Object doInCastor(Database database) throws PersistenceException {
+                return Boolean.valueOf(database.isPersistent(entity));
+            }
+        });
+        return isPersistent.booleanValue();
+    }
+
+    /**
+     * @inheritDoc
+     * @see org.springframework.orm.castor.CastorOperations#evictAll(java.lang.Class)
+     */
+    public boolean isCached(final Object entity) throws DataAccessException {
+        Boolean isCached = (Boolean) execute(new CastorCallback() {
+            public Object doInCastor(Database database) throws PersistenceException {
+                database.begin();
+                boolean isCached = database.getCacheManager().isCached(entity.getClass(), database.getIdentity(entity));
+                database.commit();
+                return Boolean.valueOf(isCached);
+            }
+        });
+        return isCached.booleanValue();
+    }
 
     //-------------------------------------------------------------------------
     // Convenience finder methods
