@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
+	
 	<bean id="jdoManager" class="org.springframework.orm.castor.LocalCastorFactoryBean">
 	  <property name="jdoProperties">
 	    <props>
@@ -82,10 +83,10 @@
 	  </property>
 	  <property name="transactionAttributeSource">
 	    <value>
-	      org.exolab.castor.service.ProductService.loadProduct*=PROPAGATION_REQUIRED
-	      org.exolab.castor.service.ProductService.createProduct*=PROPAGATION_REQUIRED
-	      org.exolab.castor.service.ProductService.deleteProduct*=PROPAGATION_REQUIRED
-	      org.exolab.castor.service.ProductService.findProducts*=PROPAGATION_REQUIRED
+	      org.exolab.castor.service.ProductService.load*=PROPAGATION_REQUIRED
+	      org.exolab.castor.service.ProductService.create*=PROPAGATION_REQUIRED
+	      org.exolab.castor.service.ProductService.delete*=PROPAGATION_REQUIRED
+	      org.exolab.castor.service.ProductService.find*=PROPAGATION_REQUIRED
 	   </value>
 	  </property>
 	</bean>
@@ -114,10 +115,10 @@
 	  </property>
 	  <property name="transactionAttributes">
 	    <props>
-	      <prop key="createProduct*">PROPAGATION_REQUIRED</prop>
-	      <prop key="loadProduct*">PROPAGATION_REQUIRED</prop>
-	      <prop key="deleteProduct*">PROPAGATION_REQUIRED</prop>
-	      <prop key="findProducts*">PROPAGATION_REQUIRED</prop>
+	      <prop key="create*">PROPAGATION_REQUIRED</prop>
+	      <prop key="load*">PROPAGATION_REQUIRED</prop>
+	      <prop key="delete*">PROPAGATION_REQUIRED</prop>
+	      <prop key="find*">PROPAGATION_REQUIRED</prop>
 	    </props>
 	  </property>
 </bean>		
