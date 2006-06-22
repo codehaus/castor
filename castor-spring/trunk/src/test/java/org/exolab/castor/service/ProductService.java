@@ -11,13 +11,13 @@ import org.exolab.castor.dao.Product;
  */
 public interface ProductService {
 
-    public Product loadProduct(final int id);
+    public Product load(final int id);
     
-    public void createProduct (final Product product);
+    public void create(final Product product);
     
-    public void deleteProduct (final Product product);
+    public void delete(final Product product);
     
-    public Collection findProducts ();
+    public Collection find();
     
-    public Collection findProductsByName (final Object id);
+    public Collection findByName (final Object id);
 }

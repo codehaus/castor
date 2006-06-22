@@ -238,7 +238,9 @@ public abstract class JDOManagerUtils {
 
         logger.debug("Closing Castor JDO Database");
         try {
-            database.close();
+            if (database != null && database.isActive()) {
+                database.close();
+            }
         }
         catch (PersistenceException ex) {
             logger.error("Could not close Castor JDO Database", ex);

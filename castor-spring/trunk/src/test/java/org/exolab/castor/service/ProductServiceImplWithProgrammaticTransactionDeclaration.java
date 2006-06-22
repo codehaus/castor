@@ -23,7 +23,7 @@ public class ProductServiceImplWithProgrammaticTransactionDeclaration implements
       this.productDao = productDao;
     }
 
-    public Product loadProduct(final int id) {
+    public Product load(final int id) {
       TransactionTemplate transactionTemplate = new TransactionTemplate(this.transactionManager);
       transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
       return (Product) transactionTemplate.execute(new TransactionCallback() {
@@ -37,7 +37,7 @@ public class ProductServiceImplWithProgrammaticTransactionDeclaration implements
     /**
      * @see org.exolab.castor.service.ProductService#createProduct(org.exolab.castor.dao.Product)
      */
-    public void createProduct(final Product product) {
+    public void create(final Product product) {
         TransactionTemplate transactionTemplate = new TransactionTemplate(this.transactionManager);
         transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
         transactionTemplate.execute(new TransactionCallback() {
@@ -49,9 +49,9 @@ public class ProductServiceImplWithProgrammaticTransactionDeclaration implements
     }
 
     /**
-     * @see org.exolab.castor.service.ProductService#deleteProduct(org.exolab.castor.dao.Product)
+     * @see org.exolab.castor.service.ProductService#delete(org.exolab.castor.dao.Product)
      */
-    public void deleteProduct(final Product product) {
+    public void delete(final Product product) {
         TransactionTemplate transactionTemplate = new TransactionTemplate(this.transactionManager);
         transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
         transactionTemplate.execute(new TransactionCallback() {
@@ -65,7 +65,7 @@ public class ProductServiceImplWithProgrammaticTransactionDeclaration implements
     /**
      * @see org.exolab.castor.service.ProductService#findProducts()
      */
-    public Collection findProducts() {
+    public Collection find() {
         TransactionTemplate transactionTemplate = new TransactionTemplate(this.transactionManager);
         transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
         return (Collection) transactionTemplate.execute(new TransactionCallback() {
@@ -78,7 +78,7 @@ public class ProductServiceImplWithProgrammaticTransactionDeclaration implements
     /**
      * @see org.exolab.castor.service.ProductService#findProductsByName(java.lang.Object)
      */
-    public Collection findProductsByName(final Object name) {
+    public Collection findByName(final Object name) {
         TransactionTemplate transactionTemplate = new TransactionTemplate(this.transactionManager);
         transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
         return (Collection) transactionTemplate.execute(new TransactionCallback() {
