@@ -34,7 +34,7 @@ public class ProductDaoImplUsingTemplate extends CastorTemplate implements Produ
      * @see org.exolab.castor.dao.ProductDao#findProducts(java.lang.Class, java.lang.String)
      */
     public Collection findProducts(Class entityClass, String whereClause, Object[] parameters) {
-        return find (entityClass, whereClause, null, parameters);
+        return find (entityClass, whereClause, parameters);
     }
 
 }

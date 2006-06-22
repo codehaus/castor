@@ -169,13 +169,12 @@ public interface CastorOperations {
      * OQL WHERE clause, using the given parameter declarations and parameter values.
      * @param entityClass a persistent class
      * @param filter the OQL WHERE clause to match
-     * @param parameters the OQL WHERE parameter declarations
      * @param values the corresponding parameter values
      * @return the persistent instances
      * @throws org.springframework.dao.DataAccessException in case of Castor JDO errors
     * @see org.exolab.castor.jdo.Database#createOQLQuery(String)
      */
-    Collection find(Class entityClass, String filter, String parameters, Object[] values)
+    Collection find(Class entityClass, String filter, Object[] values)
             throws DataAccessException;
 
     /**
@@ -184,14 +183,13 @@ public interface CastorOperations {
      * with the given result ordering.
      * @param entityClass a persistent class
      * @param filter the OQL WHERE clause to match
-     * @param parameters the OQL WHERE parameter declarations
      * @param values the corresponding parameter values
      * @param ordering the ordering of the result (or null if none)
      * @return the persistent instances
      * @throws org.springframework.dao.DataAccessException in case of JDO errors
      */
     Collection find(
-            Class entityClass, String filter, String parameters, Object[] values, String ordering)
+            Class entityClass, String filter, Object[] values, String ordering)
             throws DataAccessException;
 
 

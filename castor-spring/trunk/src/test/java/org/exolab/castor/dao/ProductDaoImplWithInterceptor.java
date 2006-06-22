@@ -12,7 +12,7 @@ import org.springframework.orm.castor.JDOManagerUtils;
 
 public class ProductDaoImplWithInterceptor extends CastorTemplate implements ProductDaoWithInterceptor
 {
-    public Product load(final int id) throws ObjectNotFoundException
+    public Product loadProduct(final int id) throws ObjectNotFoundException
     {
         Database database = JDOManagerUtils.getDatabase(getJDOManager(), false);
         try
@@ -31,7 +31,7 @@ public class ProductDaoImplWithInterceptor extends CastorTemplate implements Pro
         }
     }
 
-    public void create(Product product)
+    public void createProduct(Product product)
     {
         Database database = JDOManagerUtils.getDatabase(getJDOManager(), false);
         try
@@ -46,7 +46,7 @@ public class ProductDaoImplWithInterceptor extends CastorTemplate implements Pro
         }
     }
 
-    public void delete(Product product)
+    public void deleteProduct(Product product)
     {
         Database database = JDOManagerUtils.getDatabase(getJDOManager(), false);
         try
@@ -64,7 +64,7 @@ public class ProductDaoImplWithInterceptor extends CastorTemplate implements Pro
     /**
      * @see org.exolab.castor.dao.ProductDao#findProducts(java.lang.Class)
      */
-    public Collection find(Class entityClass)
+    public Collection findProduct(Class entityClass)
     {
         Collection collection = null;
         Database database = JDOManagerUtils.getDatabase(getJDOManager(), false);
@@ -84,7 +84,7 @@ public class ProductDaoImplWithInterceptor extends CastorTemplate implements Pro
     /**
      * @see org.exolab.castor.dao.ProductDao#findProducts(java.lang.Class, java.lang.String)
      */
-    public Collection find(Class entityClass, String whereClause)
+    public Collection findProduct(Class entityClass, String whereClause)
     {
         Collection collection = null;
         Database database = JDOManagerUtils.getDatabase(getJDOManager(), false);
@@ -104,14 +104,14 @@ public class ProductDaoImplWithInterceptor extends CastorTemplate implements Pro
     /**
      * @see org.exolab.castor.dao.ProductDao#findProducts(java.lang.Class, java.lang.String)
      */
-    public Collection find(Class entityClass, String whereClause, Object[] parameters)
+    public Collection findProduct(Class entityClass, String whereClause, Object[] parameters)
     {
         Collection collection = null;
         Database database = JDOManagerUtils.getDatabase(getJDOManager(), false);
         try
         {
             database.begin();
-            collection = find(entityClass, whereClause, null, parameters);
+            collection = super.find(entityClass, whereClause, parameters);
             database.commit();
         }
         catch (PersistenceException ex)
@@ -120,5 +120,24 @@ public class ProductDaoImplWithInterceptor extends CastorTemplate implements Pro
         }
         return collection;
     }
+
+    public Collection findDescending(Class entityClass, String ordering)
+    {
+        Collection collection = null;
+        Database database = JDOManagerUtils.getDatabase(getJDOManager(), false);
+        try
+        {
+            database.begin();
+            collection = super.find(entityClass, "", null, ordering);
+            database.commit();
+        }
+        catch (PersistenceException ex)
+        {
+            throw JDOManagerUtils.convertJdoAccessException(ex);
+        }
+        return collection;
+    }
+    
+    
 
 }

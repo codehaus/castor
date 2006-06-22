@@ -219,6 +219,11 @@ public class CastorTemplate extends CastorAccessor implements CastorOperations {
     // Convenience methods for load, save, delete
     //-------------------------------------------------------------------------
 
+    
+    /**
+     * @inheritDoc
+     * @see org.springframework.orm.castor.CastorOperations#load(java.lang.Class, java.lang.Object)
+     */
     public Object load(final Class entityClass, final Object idValue) throws DataAccessException {
         return execute(new CastorCallback() {
             public Object doInCastor(Database database) throws PersistenceException {
@@ -227,6 +232,10 @@ public class CastorTemplate extends CastorAccessor implements CastorOperations {
         });
     }
 
+    /**
+     * @inheritDoc
+     * @see org.springframework.orm.castor.CastorOperations#evict(java.lang.Object)
+     */
     public void evict(final Object entity) throws DataAccessException {
         execute(new CastorCallback() {
             public Object doInCastor(Database database) throws PersistenceException {
@@ -236,6 +245,10 @@ public class CastorTemplate extends CastorAccessor implements CastorOperations {
         });
     }
 
+    /**
+     * @inheritDoc
+     * @see org.springframework.orm.castor.CastorOperations#evictAll(java.lang.Class)
+     */
     public void evictAll(final Class entityClass) throws DataAccessException {
         execute(new CastorCallback() {
             public Object doInCastor(Database database) throws PersistenceException {
@@ -245,6 +258,10 @@ public class CastorTemplate extends CastorAccessor implements CastorOperations {
         });
     }
 
+    /**
+     * @inheritDoc
+     * @see org.springframework.orm.castor.CastorOperations#create(java.lang.Object)
+     */
     public void create(final Object entity) throws DataAccessException {
         execute(new CastorCallback() {
             public Object doInCastor(Database database) throws PersistenceException {
@@ -254,6 +271,10 @@ public class CastorTemplate extends CastorAccessor implements CastorOperations {
         });
     }
 
+    /**
+     * @inheritDoc
+     * @see org.springframework.orm.castor.CastorOperations#remove(java.lang.Object)
+     */
     public void remove(final Object entity) throws DataAccessException {
         execute(new CastorCallback() {
             public Object doInCastor(Database database) throws PersistenceException {
@@ -263,6 +284,10 @@ public class CastorTemplate extends CastorAccessor implements CastorOperations {
         });
     }
 
+    /**
+     * @inheritDoc
+     * @see org.springframework.orm.castor.CastorOperations#removeAll(java.util.Collection)
+     */
     public void removeAll(final Collection entities) throws DataAccessException {
         execute(new CastorCallback() {
             public Object doInCastor(Database database) throws PersistenceException {
@@ -274,6 +299,10 @@ public class CastorTemplate extends CastorAccessor implements CastorOperations {
         });
     }
 
+    /**
+     * @inheritDoc
+     * @see org.springframework.orm.castor.CastorOperations#flush()
+     */
     public void flush() throws DataAccessException {
         execute(new CastorCallback() {
             public Object doInCastor(Database database) throws PersistenceException {
@@ -289,11 +318,11 @@ public class CastorTemplate extends CastorAccessor implements CastorOperations {
     //-------------------------------------------------------------------------
 
     public Collection find(Class entityClass) throws DataAccessException {
-        return find(entityClass, null, null);
+        return this.find(entityClass, null);
     }
 
     public Collection find(Class entityClass, String filter) throws DataAccessException {
-        return find(entityClass, filter, null);
+        return this.find(entityClass, filter, (Object[]) null);
     }
 
     public Collection find(final Class entityClass, final String filter, final String ordering)
@@ -320,14 +349,14 @@ public class CastorTemplate extends CastorAccessor implements CastorOperations {
         });
     }
 
-    public Collection find(Class entityClass, String filter, String parameters, Object[] values)
+    public Collection find(Class entityClass, String filter, Object[] values)
             throws DataAccessException {
-        return find(entityClass, filter, parameters, values, null);
+        return this.find(entityClass, filter, values, null);
     }
 
     public Collection find(
-            final Class entityClass, final String filter, final String parameters, final Object[] values,
-            final String ordering) throws DataAccessException {
+            final Class entityClass, final String filter, final Object[] values, final String ordering) 
+    throws DataAccessException {
         return executeFind(new CastorCallback() {
             public Object doInCastor(Database database) throws PersistenceException {
             	StringBuffer oql = new StringBuffer();
@@ -339,8 +368,10 @@ public class CastorTemplate extends CastorAccessor implements CastorOperations {
                     oql.append (" order by " + ordering);
                 }
                 OQLQuery query = database.getOQLQuery(oql.toString());
-                for (int i = 0; i < values.length; i++) {
-                	query.bind (values[i]);
+                if (values != null) {
+                    for (int i = 0; i < values.length; i++) {
+                        query.bind (values[i]);
+                    }
                 }
                 prepareQuery(query);
                 QueryResults results = query.execute();
