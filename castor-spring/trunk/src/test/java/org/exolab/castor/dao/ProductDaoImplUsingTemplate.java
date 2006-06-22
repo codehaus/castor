@@ -37,4 +37,20 @@ public class ProductDaoImplUsingTemplate extends CastorTemplate implements Produ
         return find (entityClass, whereClause, parameters);
     }
 
+    public void evictProduct(Product product)
+    {
+        evict(product);
+    }
+
+    public boolean isProductPersistent(Product product)
+    {
+        return isPersistent(product);
+    }
+
+    public boolean isProductCached(Product product)
+    {
+        return isCached(product);
+    }
+
+    
 }

@@ -44,4 +44,21 @@ public class ProductServiceImplWithDeclarativeTransactionDeclaration implements 
     public Collection findByName(final Object name) {
         return this.productDao.findProducts (Product.class, "WHERE name = $1", new Object[] { name });
     }
+
+    public void evict(Product product)
+    {
+        productDao.evictProduct(product);
+    }
+
+    public boolean isCached(Product product)
+    {
+        return productDao.isProductCached(product);
+    }
+
+    public boolean isPersistent(Product product)
+    {
+        return productDao.isProductPersistent(product);
+    }
+    
+    
   }

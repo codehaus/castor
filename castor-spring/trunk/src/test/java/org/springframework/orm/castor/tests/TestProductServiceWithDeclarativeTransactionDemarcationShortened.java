@@ -50,4 +50,22 @@ public class TestProductServiceWithDeclarativeTransactionDemarcationShortened ex
         assertNotNull (products);
         assertEquals (1, products.size());
     }
+    
+    public void testEvictProductFromCache() throws Exception {
+
+        
+        Product product = this.productService.load(1);
+        assertNotNull (product);
+        assertEquals(1, product.getId());
+        assertEquals("product1", product.getName());
+        
+        boolean isCached = productService.isCached(product);
+        assertTrue(isCached);
+        
+        productService.evict(product);
+        
+        isCached = productService.isCached(product);
+        assertFalse(isCached);
+        
+    }
 }

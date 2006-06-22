@@ -20,4 +20,10 @@ public interface ProductService {
     public Collection find();
     
     public Collection findByName (final Object id);
+    
+    public void evict(final Product product);
+    
+    public boolean isCached (Product product);
+    
+    public boolean isPersistent (Product product);
 }

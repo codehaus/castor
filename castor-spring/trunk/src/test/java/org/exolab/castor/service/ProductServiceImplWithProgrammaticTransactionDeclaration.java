@@ -87,4 +87,24 @@ public class ProductServiceImplWithProgrammaticTransactionDeclaration implements
           }
         });
     }
+
+    public void evict(Product product)
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public boolean isCached(Product product)
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    public boolean isPersistent(Product product)
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
+    
+    
   }
