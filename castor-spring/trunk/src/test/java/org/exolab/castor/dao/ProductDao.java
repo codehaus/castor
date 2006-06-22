@@ -15,5 +15,12 @@ public interface ProductDao {
     public Collection findProducts (Class entityClass, String whereClause);
 
     public Collection findProducts (Class entityClass, String whereClause, Object[] parameters);
+    
+    public void evictProduct(Product product);
+    
+    public boolean isProductPersistent(Product product);
+
+    public boolean isProductCached(Product product);
+    
 
 }

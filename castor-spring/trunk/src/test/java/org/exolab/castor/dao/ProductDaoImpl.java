@@ -3,6 +3,7 @@ package org.exolab.castor.dao;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.exolab.castor.jdo.CacheManager;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.JDOManager;
 import org.exolab.castor.jdo.OQLQuery;
@@ -126,7 +127,53 @@ public class ProductDaoImpl implements ProductDao {
                 });
     }
 
-    
+    public void evictProduct(final Product product)
+    {
+        CastorTemplate template = new CastorTemplate(this.jdoManager);
+        template.execute(
+                new CastorCallback() {
+                    public Object doInCastor(Database database) throws PersistenceException {
+                        database.begin();
+                        CacheManager cacheManager = database.getCacheManager();
+                        cacheManager.expireCache(product.getClass(), database.getIdentity(product));
+                        database.commit();
+                        return null;
+                    }
+                });
+    }
+
+
+    public boolean isProductCached(final Product product)
+    {
+        CastorTemplate template = new CastorTemplate(this.jdoManager);
+        Boolean isCached = (Boolean) template.execute(
+                new CastorCallback() {
+                    public Object doInCastor(Database database) throws PersistenceException {
+                        database.begin();
+                        CacheManager cacheManager = database.getCacheManager();
+                        boolean isCached = cacheManager.isCached(product.getClass(), database.getIdentity(product));
+                        database.commit();
+                        return Boolean.valueOf(isCached);
+                    }
+                });
+        return isCached.booleanValue();
+    }
+
+    public boolean isProductPersistent(final Product product)
+    {
+        CastorTemplate template = new CastorTemplate(this.jdoManager);
+        Boolean isPersistent = (Boolean) template.execute(
+                new CastorCallback() {
+                    public Object doInCastor(Database database) throws PersistenceException {
+                        database.begin();
+                        boolean isPersistent = database.isPersistent(product);
+                        database.commit();
+                        return Boolean.valueOf(isPersistent);
+                    }
+                });
+        return isPersistent.booleanValue();
+    }
+
 
 }
 
