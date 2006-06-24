@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<persistence version="1.0">
+    <persistence-unit name="OrderManagement">
+        <description> This unit manages inventory for auto parts. It depends on 
+            features provided by the com.acme.persistence implementation. 
+            </description>
+        <provider>com.acme.AcmePersistence</provider>
+        <jta-data-source>jdbc/MyPartDB</jta-data-source>
+        <mapping-file>ormap2.xml</mapping-file>
+        <jar-file>MyPartsApp.jar</jar-file>
+        <class>com.widgets.Order</class>
+        <class>com.widgets.Customer</class>
+        <properties>
+            <property name="com.acme.persistence.sql-logging" value="on"/>
+        </properties>
+    </persistence-unit>
+</persistence>
