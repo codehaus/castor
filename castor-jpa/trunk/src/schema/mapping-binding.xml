@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : mapping-binding.ejb3.xml
+    Description:
+        A source generator binding file for the EJB3 mapping
+        schema.
+-->
+
+<cbf:binding xmlns:cbf="http://www.castor.org/SourceGenerator/Binding"
+             defaultBindingType="element">
+
+  <cbf:elementBinding name="complexType:table/unique-constraint">
+    <cbf:java-class name="TableUniqueConstraint"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:entity/table">
+    <cbf:java-class name="EntityTable"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:secondary-table/primary-key-join-column">
+    <cbf:java-class name="SecondaryTablePrimaryKeyJoinColumn"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:entity/secondary-table">
+    <cbf:java-class name="EntitySecondaryTable"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:secondary-table/unique-constraint">
+    <cbf:java-class name="SecondaryTableUniqueConstraint"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:entity/primary-key-join-column">
+    <cbf:java-class name="EntityPrimaryKeyJoinColumn"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:entity/inheritance">
+    <cbf:java-class name="EntityInheritance"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:entity/discriminator-column">
+    <cbf:java-class name="EntityDiscriminatorColumn"/>
+  </cbf:elementBinding>
+  
+  <cbf:elementBinding name="complexType:entity/sequence-generator">
+    <cbf:java-class name="EntitySequenceGenerator"/>
+  </cbf:elementBinding>
+  
+  <cbf:elementBinding name="complexType:table-generator/unique-constraint">
+    <cbf:java-class name="TableGneratorUniqueConstraint"/>
+  </cbf:elementBinding>
+  
+  <cbf:elementBinding name="complexType:entity/table-generator">
+    <cbf:java-class name="EntityTableGenerator"/>
+  </cbf:elementBinding>
+  
+  <cbf:elementBinding name="complexType:attribute-override/column">
+    <cbf:java-class name="AttributeOverrideColumn"/>
+  </cbf:elementBinding>
+  
+  <cbf:elementBinding name="complexType:entity/attribute-override">
+    <cbf:java-class name="EntityAttributeOverride"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:entity/named-query">
+    <cbf:java-class name="EntityNamedQuery"/>
+  </cbf:elementBinding>
+  
+  <cbf:elementBinding name="complexType:entity/named-native-query">
+    <cbf:java-class name="EntityNamedNativeQuery"/>
+  </cbf:elementBinding>
+  
+  <cbf:elementBinding name="complexType:named-query/hint">
+    <cbf:java-class name="NamedQueryHint"/>
+  </cbf:elementBinding>
+  
+  <cbf:elementBinding name="complexType:entity-result/field-result">
+    <cbf:java-class name="EntityResultFieldResult"/>
+  </cbf:elementBinding>
+  
+  <cbf:elementBinding name="complexType:sql-result-set-mapping/entity-result">
+    <cbf:java-class name="SqlResultSetMappingEntityResult"/>
+  </cbf:elementBinding>
+  
+  <cbf:elementBinding name="complexType:sql-result-set-mapping/column-result">
+    <cbf:java-class name="SqlResultSetMappingColumnResult"/>
+  </cbf:elementBinding>
+  
+  <cbf:elementBinding name="complexType:entity/attribute-override">
+    <cbf:java-class name="EntityAttributeOverride"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:entity/sql-result-set-mapping">
+    <cbf:java-class name="EntitySqlResultSetMapping"/>
+  </cbf:elementBinding>
+  
+  <cbf:elementBinding name="complexType:entity-listener/pre-persist">
+    <cbf:java-class name="EntityListenerPrePersist"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:entity-listener/post-persist">
+    <cbf:java-class name="EntityListenerPostPersist"/>
+  </cbf:elementBinding>
+  
+  <cbf:elementBinding name="complexType:entity-listener/pre-remove">
+    <cbf:java-class name="EntityListenerPreRemove"/>
+  </cbf:elementBinding>
+  
+  <cbf:elementBinding name="complexType:entity-listener/post-remove">
+    <cbf:java-class name="EntityListenerPostRemove" />
+  </cbf:elementBinding>
+  
+  <cbf:elementBinding name="complexType:entity-listener/pre-update">
+    <cbf:java-class name="EntityListenerPreUpdate"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:entity-listener/post-update">
+    <cbf:java-class name="EntityListenerPostUpdate"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:entity-listener/post-load">
+    <cbf:java-class name="EntityListenerPostLoad"/>
+  </cbf:elementBinding>
+  
+  <cbf:elementBinding name="complexType:entity-listeners/entity-listener">
+    <cbf:java-class name="EntityListenersEntityListener"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:entity/entity-listeners">
+    <cbf:java-class name="EntityEntityListeners"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:entity/pre-persist">
+    <cbf:java-class name="EntityPrePersist"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:entity/post-persist">
+    <cbf:java-class name="EntityPostPersist"/>
+  </cbf:elementBinding>
+  
+  <cbf:elementBinding name="complexType:entity/pre-remove">
+    <cbf:java-class name="EntityPreRemove"/>
+  </cbf:elementBinding>
+  
+  <cbf:elementBinding name="complexType:entity/post-remove">
+    <cbf:java-class name="EntityPostRemove" />
+  </cbf:elementBinding>
+  
+  <cbf:elementBinding name="complexType:entity/pre-update">
+    <cbf:java-class name="EntityPreUpdate"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:entity/post-update">
+    <cbf:java-class name="EntityPostUpdate"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:entity/post-load">
+    <cbf:java-class name="EntityPostLoad"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:id/column">
+    <cbf:java-class name="IdColumn"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:id/generated-column">
+    <cbf:java-class name="IdGeneratedColumn"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:entity/id">
+    <cbf:java-class name="EntityId"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:embedded-id/attribute-override">
+    <cbf:java-class name="EmbeddedIdAttributeOverride"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:entity/embedded-id">
+    <cbf:java-class name="EntityEmbeddedId"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:attribute/basic">
+    <cbf:java-class name="AttributeBasic"/>
+  </cbf:elementBinding>
+  
+  <cbf:elementBinding name="complexType:attribute/many-to-one">
+    <cbf:java-class name="AttributeManyToOne"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:attribute/one-to-many">
+    <cbf:java-class name="AttributeOneToMany"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:id/generated-value">
+    <cbf:java-class name="IdGeneratedValue"/>
+  </cbf:elementBinding>
+  
+  <cbf:elementBinding name="complexType:attribute/one-to-one">
+    <cbf:java-class name="AttributeOneToOne"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:attribute/many-to-many">
+    <cbf:java-class name="AttributeManyToMany"/>
+  </cbf:elementBinding>
+  
+  <cbf:elementBinding name="complexType:attribute/column">
+    <cbf:java-class name="AttributeColumn"/>
+  </cbf:elementBinding>
+  
+  <cbf:elementBinding name="complexType:attribute/join-column">
+    <cbf:java-class name="AttributeJoinColumn"/>
+  </cbf:elementBinding>
+  
+  <cbf:elementBinding name="complexType:join-table/join-column">
+    <cbf:java-class name="JoinTableJoinColumn"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:join-table/unique-constraint">
+    <cbf:java-class name="JoinTableUniqueConstraint"/>
+  </cbf:elementBinding>
+  
+  <cbf:elementBinding name="complexType:attribute/join-table">
+    <cbf:java-class name="AttributeJoinTable"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:attribute/map-key">
+    <cbf:java-class name="AttributeMapKey"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:attribute/attribute-override">
+    <cbf:java-class name="AttributeAtttributeOverride"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:entity/attribute">
+    <cbf:java-class name="EntityAttribute"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="/entity-mappings/entity">
+    <cbf:java-class name="EntityMappingsEntity"/>
+  </cbf:elementBinding>
+  
+  <cbf:elementBinding name="complexType:embeddable-attribute/basic">
+    <cbf:java-class name="EmbeddableAttributeBasic"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="/entity-mappings/embeddable">
+    <cbf:java-class name="EntityMappingsEmbeddable"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:embeddable-attribute/column">
+    <cbf:java-class name="EmbeddableAttributeColumn"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:embeddable/embeddable-attribute">
+    <cbf:java-class name="EmbeddableEmbeddableAttribute"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:mapped-superclass/entity-listener">
+    <cbf:java-class name="MappedSuperclassEntityListener"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:mapped-superclass/pre-persist">
+    <cbf:java-class name="MappedSuperclassPrePersist"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:mapped-superclass/post-persist">
+    <cbf:java-class name="MappedSuperclassPostPersist"/>
+  </cbf:elementBinding>
+  
+  <cbf:elementBinding name="complexType:mapped-superclass/pre-remove">
+    <cbf:java-class name="MappedSuperclassPreRemove"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:mapped-superclass/post-remove">
+    <cbf:java-class name="MappedSuperclassPostRemove"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:mapped-superclass/pre-update">
+    <cbf:java-class name="MappedSuperclassPreUpdate"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:mapped-superclass/post-update">
+    <cbf:java-class name="MappedSuperclassPostUpdate"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:mapped-superclass/post-load">
+    <cbf:java-class name="MappedSuperclassPostLoad"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:mapped-superclass/id">
+    <cbf:java-class name="MappedSuperclassId"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:mapped-superclass/embedded-id">
+    <cbf:java-class name="MappedSuperclassEmbeddedId"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:mapped-superclass/attribute">
+    <cbf:java-class name="MappedSuperclassAttribute"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="/entity-mappings/mapped-superclass">
+    <cbf:java-class name="EntityMappingsMappedSuperclass"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="/entity-mappings/named-query">
+    <cbf:java-class name="EntityMappingsNamedQuery"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="/entity-mappings/named-native-query">
+    <cbf:java-class name="EntityMappingsNamedNativeQuery"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="/entity-mappings/sql-result-set-mapping">
+    <cbf:java-class name="EntityMappingsSqlResultSetMapping"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="/entity-mappings/sequence-generator">
+    <cbf:java-class name="EntityMappingsSequenceGenerator"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="/entity-mappings/table-generator">
+    <cbf:java-class name="EntityMappingsTableGenerator"/>
+  </cbf:elementBinding>
+
+<!-- 
+  <cbf:elementBinding name="complexType:entity">
+    <cbf:elementBinding name="class">
+      <cbf:member name="className"/>
+    </cbf:elementBinding>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:entity-listener">
+    <cbf:elementBinding name="class">
+      <cbf:member name="className"/>
+    </cbf:elementBinding>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="complexType:embeddable">
+    <cbf:elementBinding name="class">
+      <cbf:member name="className"/>
+    </cbf:elementBinding>
+  </cbf:elementBinding>
+-->  
+  
+  
+<!--   
+  <cbf:elementBinding name="field">
+    <cbf:java-class name="FieldMapping"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="class">
+    <cbf:java-class name="ClassMapping"/>
+    <cbf:elementBinding name="field">
+      <cbf:member name="fieldMapping"/>
+    </cbf:elementBinding>
+    <cbf:elementBinding name="cache-type">
+      <cbf:member name="cacheTypeMapping"/>
+    </cbf:elementBinding>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="cache-type">
+    <cbf:java-class name="CacheTypeMapping"/>
+  </cbf:elementBinding>
+
+  <cbf:elementBinding name="key-generator">
+    <cbf:java-class name="KeyGeneratorDef"/>
+  </cbf:elementBinding>
+  -->
+
+</cbf:binding>
