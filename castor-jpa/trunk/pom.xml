@@ -56,7 +56,32 @@ http://maven.apache.org/maven-v4_0_0.xsd">
                 </executions>
             </plugin>       
 
-		</plugins>
+            <plugin>
+               <groupId>org.codehaus.mojo</groupId>
+               <artifactId>castor-maven-plugin</artifactId>
+               <version>1.0</version>
+               <executions>
+                <execution>
+                  <goals>
+                    <goal>generate</goal>
+                  </goals>
+                  <configuration>
+                        <properties>${basedir}/src/main/castor/castorbuilder.properties</properties>
+                        <schemaDirectory>${basedir}/src/schema</schemaDirectory>
+                        <schema>mapping.xsd</schema>
+                        <packaging>org.castor.jpa.mapping.xml</packaging>
+                        <!-- won't be injected as there's no setter
+                        <bindingfile>${basedir}/src/schema/binding.xml</bindingfile>
+                        -->
+                        <verbose>true</verbose>
+                        <warnings>true</warnings>
+                        <types>j2</types>
+                  </configuration>
+                </execution>
+               </executions>
+            </plugin>
+
+ 		</plugins>
 
 	</build>
 
