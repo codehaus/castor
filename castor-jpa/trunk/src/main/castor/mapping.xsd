@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Java Persistence orm.xml schema -->
+
 <xsd:schema targetNamespace="http://java.sun.com/xml/ns/persistence/orm"
 	xmlns:orm="http://java.sun.com/xml/ns/persistence/orm"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
@@ -21,6 +22,7 @@ used to locate the file as resource on the classpath.
 ]]>
 		</xsd:documentation>
 	</xsd:annotation>
+    
 	<!--  <xsd:include schemaLocation="orm_1_0.xsd" /> -->
 	<!-- **************************************************** -->
 	<xsd:element name="entity-mappings">
