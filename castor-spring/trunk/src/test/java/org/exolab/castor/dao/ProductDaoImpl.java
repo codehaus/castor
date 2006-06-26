@@ -2,6 +2,7 @@ package org.exolab.castor.dao;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 
 import org.exolab.castor.jdo.CacheManager;
 import org.exolab.castor.jdo.Database;
@@ -47,20 +48,50 @@ public class ProductDaoImpl implements ProductDao {
                 });
     }
 
-       // TODO [WG]: delete needs to load the obect first if it's not TimeStampable
     public void deleteProduct (final Product product) {
         CastorTemplate template = new CastorTemplate(this.jdoManager);
         template.execute(
                 new CastorCallback() {
                     public Object doInCastor(Database database) throws PersistenceException {
                         database.begin();
-                        database.remove(product);
+                        Product toDelete = (Product) database.load(product.getClass(), database.getIdentity(product));
+                        database.remove(toDelete);
                         database.commit();
                         return null;
                     }
                 });
     }
 
+    public void deleteProducts (final Collection products) {
+        CastorTemplate template = new CastorTemplate(this.jdoManager);
+        template.execute(
+                new CastorCallback() {
+                    public Object doInCastor(Database database) throws PersistenceException {
+                        database.begin();
+                        Iterator iter = products.iterator();
+                        while (iter.hasNext()) {
+                            Product product = (Product) iter.next();
+                            Product toDelete = (Product) database.load(product.getClass(), database.getIdentity(product));
+                            database.remove(toDelete);
+                        }
+                        database.commit();
+                        return null;
+                    }
+                });
+    }
+    
+    public void updateProduct (final Product product) {
+        CastorTemplate template = new CastorTemplate(this.jdoManager);
+        template.execute(
+                new CastorCallback() {
+                    public Object doInCastor(Database database) throws PersistenceException {
+                        database.begin();
+                        database.update(product);
+                        database.commit();
+                        return null;
+                    }
+                });
+    }
     public Collection findProducts(final Class entityClass) {
         CastorTemplate template = new CastorTemplate(this.jdoManager);
         return (Collection) template.execute(
@@ -68,6 +99,27 @@ public class ProductDaoImpl implements ProductDao {
                     public Object doInCastor(Database database) throws PersistenceException {
                         database.begin();
                         OQLQuery query = database.getOQLQuery("select o from " + entityClass.getName() + " o");
+                        QueryResults results = query.execute();
+                        // TODO [WG]: is ArrayList the correct type to return here ?
+                        Collection objects = new ArrayList();
+                        Object object;
+                        while (results.hasMore()) {
+                            object = results.next();
+                            objects.add (object);
+                        }
+                        database.commit();
+                        return objects;
+                    }
+                });
+    }
+
+    public Collection findProductsNative(final Class entityClass) {
+        CastorTemplate template = new CastorTemplate(this.jdoManager);
+        return (Collection) template.execute(
+                new CastorCallback() {
+                    public Object doInCastor(Database database) throws PersistenceException {
+                        database.begin();
+                        OQLQuery query = database.getOQLQuery("CALL SQL select id, name from product AS " + entityClass.getName());
                         QueryResults results = query.execute();
                         // TODO [WG]: is ArrayList the correct type to return here ?
                         Collection objects = new ArrayList();
@@ -143,6 +195,21 @@ public class ProductDaoImpl implements ProductDao {
     }
 
 
+    public void evictAll()
+    {
+        CastorTemplate template = new CastorTemplate(this.jdoManager);
+        template.execute(
+                new CastorCallback() {
+                    public Object doInCastor(Database database) throws PersistenceException {
+                        database.begin();
+                        CacheManager cacheManager = database.getCacheManager();
+                        cacheManager.expireCache(new Class[] { Product.class });
+                        database.commit();
+                        return null;
+                    }
+                });
+    }
+
     public boolean isProductCached(final Product product)
     {
         CastorTemplate template = new CastorTemplate(this.jdoManager);
@@ -158,22 +225,6 @@ public class ProductDaoImpl implements ProductDao {
                 });
         return isCached.booleanValue();
     }
-
-    public boolean isProductPersistent(final Product product)
-    {
-        CastorTemplate template = new CastorTemplate(this.jdoManager);
-        Boolean isPersistent = (Boolean) template.execute(
-                new CastorCallback() {
-                    public Object doInCastor(Database database) throws PersistenceException {
-                        database.begin();
-                        boolean isPersistent = database.isPersistent(product);
-                        database.commit();
-                        return Boolean.valueOf(isPersistent);
-                    }
-                });
-        return isPersistent.booleanValue();
-    }
-
 
 }
 

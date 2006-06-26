@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<!DOCTYPE jdo-conf PUBLIC "-//EXOLAB/Castor JDO Configuration DTD Version 1.0//EN"
+                           "http://castor.exolab.org/jdo-conf.dtd">
+
+<jdo-conf>
+    <database name="testDerby2PC" engine="derby" >
+        <data-source class-name="org.apache.derby.jdbc.ClientXADataSource">
+            <param name="databaseName" value="spring"/>
+            <param name="connectionAttributes" value="create"/>
+            <param name="serverName" value="localhost" />
+            <param name="user" value="spring"/>
+            <param name="password" value="springtest"/>
+            <param name="retrieveMessageText" value="true" />
+        </data-source>
+        <mapping href="mapping.xml" />
+    </database>
+    <transaction-demarcation mode="global">
+        <transaction-manager name="jotm" />
+    </transaction-demarcation>
+</jdo-conf>

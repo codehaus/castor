@@ -10,12 +10,19 @@ public class AllTests {
                 "Test for org.springframework.orm.castor.tests");
         //$JUnit-BEGIN$
         suite.addTestSuite(TestCastorTemplateFunctions.class);
-        suite.addTestSuite(TestDAOWithCastorTemplate.class);
+        suite
+                .addTestSuite(TestProductServiceWithProgrammaticTransactionDemarcation.class);
+        suite
+                .addTestSuite(TestProductServiceWithDeclarativeTransactionDemarcation.class);
         suite.addTestSuite(TestDAOWithoutTemplate.class);
+        suite
+                .addTestSuite(TestDerby2PCProductServiceWithDeclarativeTransactionDemarcationShortened.class);
+        suite
+                .addTestSuite(Test2PCProductServiceWithDeclarativeTransactionDemarcationShortened.class);
+        suite
+                .addTestSuite(TestProductServiceWithDeclarativeTransactionDemarcationShortened.class);
+        suite.addTestSuite(TestDAOWithCastorTemplate.class);
         suite.addTestSuite(TestLocalCastorFactoryBean.class);
-        suite.addTestSuite(TestProductServiceWithDeclarativeTransactionDemarcation.class);
-        suite.addTestSuite(TestProductServiceWithDeclarativeTransactionDemarcationShortened.class);
-        suite.addTestSuite(TestProductServiceWithProgrammaticTransactionDemarcation.class);
         //$JUnit-END$
         return suite;
     }

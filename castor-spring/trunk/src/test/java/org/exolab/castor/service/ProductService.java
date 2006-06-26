@@ -17,13 +17,20 @@ public interface ProductService {
     
     public void delete(final Product product);
     
-    public Collection find();
+    public void delete(final Collection products);
     
+    public void update (Product product);
+    
+    public Collection find();
+
+    public Collection findNative();
+
     public Collection findByName (final Object id);
     
     public void evict(final Product product);
+
+    public void evictAll();
     
     public boolean isCached (Product product);
     
-    public boolean isPersistent (Product product);
 }

@@ -1,5 +1,7 @@
 package org.exolab.castor.dao;
 import java.util.Collection;
+import java.util.Iterator;
+
 import org.springframework.orm.castor.CastorTemplate;
 
 public class ProductDaoImplUsingTemplate extends CastorTemplate implements ProductDao {
@@ -12,15 +14,31 @@ public class ProductDaoImplUsingTemplate extends CastorTemplate implements Produ
         create(product);
     }
     
-    public void deleteProduct (Product product) {
-        remove (product);
+    public void deleteProduct (final Product product) {
+        Object toDelete = load(product.getClass(), new Integer(product.getId()));
+        remove(toDelete);
+    }
+
+    public void deleteProducts (final Collection products) {
+        removeAll(products);
+    }
+
+    public void updateProduct (final Product product) {
+        update(product);
     }
 
     /**
      * @see org.exolab.castor.dao.ProductDao#findProducts(java.lang.Class)
      */
-    public Collection findProducts(Class entityClass) {
+    public Collection findProducts(final Class entityClass) {
         return find (entityClass);
+    }
+
+    /**
+     * @see org.exolab.castor.dao.ProductDao#findProducts(java.lang.Class)
+     */
+    public Collection findProductsNative(final Class entityClass) {
+        return findNative (entityClass, "select id, name from product");
     }
 
     /**
@@ -42,15 +60,14 @@ public class ProductDaoImplUsingTemplate extends CastorTemplate implements Produ
         evict(product);
     }
 
-    public boolean isProductPersistent(Product product)
-    {
-        return isPersistent(product);
-    }
-
     public boolean isProductCached(Product product)
     {
         return isCached(product);
     }
 
+    public void evictAll()
+    {
+        evictAll(Product.class);
+    }
     
 }

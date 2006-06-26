@@ -13,9 +13,7 @@ import org.exolab.castor.jdo.JDOManager;
  * JUnit test case for Castor's Spring integration.
  * @author Werner Guttmann  
  */
-public class TestDAOWithoutTemplate extends BaseSpringTestCase {
-
-    private ProductDao productDAO;
+public class TestDAOWithoutTemplate extends BaseSpringTestCaseAtDAOLevel {
 
     protected void setUp() throws Exception {
         super.setUp();
@@ -33,59 +31,6 @@ public class TestDAOWithoutTemplate extends BaseSpringTestCase {
         connection.createStatement().execute("delete from spring.product where id <> 1");
         db.commit();
         db.close();
-    }
-
-
-    public void testLoad () throws Exception {
-        Product product = productDAO.loadProduct (1);
-        assertNotNull (product);
-    }
-    
-    public void testLoadNotExistingProduct() throws Exception {
-        try {
-            Product product = productDAO.loadProduct (9);
-        }
-        catch (Exception e) {
-            assertEquals(e.getClass().getName(), "org.springframework.orm.castor.CastorObjectRetrievalFailureException");
-        }
-    }
-    
-    public void testFindAll() throws Exception {
-        Collection products = productDAO.findProducts(Product.class);
-        assertNotNull(products);
-        assertFalse (products.isEmpty());
-        assertEquals(1, products.size());
-        
-        Product product = (Product) products.iterator().next();
-        assertNotNull(product);
-        assertEquals(1, product.getId());
-        assertEquals("product1", product.getName());
-    }
-
-    public void testFindAllWithSimpleWhereClause() throws Exception {
-        
-        Collection products = productDAO.findProducts(Product.class, "where id = 1");
-        assertNotNull(products);
-        assertFalse (products.isEmpty());
-        assertEquals(1, products.size());
-        
-        Product product = (Product) products.iterator().next();
-        assertNotNull(product);
-        assertEquals(1, product.getId());
-        assertEquals("product1", product.getName());
-    }
-
-    public void testFindAllWithWhereClauseWithPlaceholders() throws Exception {
-        
-        Collection products = productDAO.findProducts(Product.class, "where id = $1", new Object[] {new Integer(1) });
-        assertNotNull(products);
-        assertFalse (products.isEmpty());
-        assertEquals(1, products.size());
-        
-        Product product = (Product) products.iterator().next();
-        assertNotNull(product);
-        assertEquals(1, product.getId());
-        assertEquals("product1", product.getName());
     }
 
     public void testCreateProductsAndFindAll() throws Exception {
