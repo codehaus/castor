@@ -292,8 +292,23 @@ public class CastorTemplate extends CastorAccessor implements CastorOperations {
         execute(new CastorCallback() {
             public Object doInCastor(Database database) throws PersistenceException {
                 for (Iterator iter = entities.iterator(); iter.hasNext(); ) {
-                    database.remove(iter.next());
+                    Object object = iter.next();
+                    Object object2Delete = database.load(object.getClass(), database.getIdentity(object));
+                    database.remove(object2Delete);
                 }
+                return null;
+            }
+        });
+    }
+
+    /**
+     * @inheritDoc
+     * @see org.springframework.orm.castor.CastorOperations#update(java.lang.Object)
+     */
+    public void update(final Object entity) throws DataAccessException {
+        execute(new CastorCallback() {
+            public Object doInCastor(Database database) throws PersistenceException {
+                database.update(entity);
                 return null;
             }
         });
@@ -316,15 +331,6 @@ public class CastorTemplate extends CastorAccessor implements CastorOperations {
     // Convenience isXXX() methods 
     //-------------------------------------------------------------------------
 
-    public boolean isPersistent(final Object entity) {
-        Boolean isPersistent = (Boolean) execute(new CastorCallback() {
-            public Object doInCastor(Database database) throws PersistenceException {
-                return Boolean.valueOf(database.isPersistent(entity));
-            }
-        });
-        return isPersistent.booleanValue();
-    }
-
     /**
      * @inheritDoc
      * @see org.springframework.orm.castor.CastorOperations#evictAll(java.lang.Class)
@@ -332,9 +338,7 @@ public class CastorTemplate extends CastorAccessor implements CastorOperations {
     public boolean isCached(final Object entity) throws DataAccessException {
         Boolean isCached = (Boolean) execute(new CastorCallback() {
             public Object doInCastor(Database database) throws PersistenceException {
-                database.begin();
                 boolean isCached = database.getCacheManager().isCached(entity.getClass(), database.getIdentity(entity));
-                database.commit();
                 return Boolean.valueOf(isCached);
             }
         });
@@ -349,6 +353,23 @@ public class CastorTemplate extends CastorAccessor implements CastorOperations {
         return this.find(entityClass, null);
     }
 
+    public Collection findNative(final Class entityClass, final String sqlStatement) throws DataAccessException {
+        return executeFind(new CastorCallback() {
+            public Object doInCastor(Database database) throws PersistenceException {
+                StringBuffer oql = new StringBuffer();
+                oql.append ("CALL SQL " + sqlStatement + " AS " + entityClass.getName());
+                OQLQuery query = database.getOQLQuery(oql.toString());
+                prepareQuery(query);
+                QueryResults results = query.execute();
+                Collection objects = new ArrayList();
+                while (results.hasMore()) {
+                    objects.add (results.next());
+                }
+                return objects;
+            }
+        });
+    }
+    
     public Collection find(Class entityClass, String filter) throws DataAccessException {
         return this.find(entityClass, filter, (Object[]) null);
     }
