@@ -3,10 +3,8 @@ package org.exolab.castor.dao;
 import java.util.Collection;
 
 import org.exolab.castor.jdo.Database;
-import org.exolab.castor.jdo.JDOManager;
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.PersistenceException;
-import org.springframework.orm.castor.CastorCallback;
 import org.springframework.orm.castor.CastorTemplate;
 import org.springframework.orm.castor.JDOManagerUtils;
 
@@ -19,6 +17,7 @@ public class ProductDaoImplWithInterceptor extends CastorTemplate implements Pro
         {
             database.begin();
             Product product = (Product) database.load(Product.class, new Integer(1));
+            database.commit();
             return product;
         }
         catch (ObjectNotFoundException e)

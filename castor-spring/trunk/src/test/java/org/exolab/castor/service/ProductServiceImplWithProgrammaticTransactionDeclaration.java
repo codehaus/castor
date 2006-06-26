@@ -63,6 +63,34 @@ public class ProductServiceImplWithProgrammaticTransactionDeclaration implements
     }
 
     /**
+     * @see org.exolab.castor.service.ProductService#delete(org.exolab.castor.dao.Product)
+     */
+    public void delete(final Collection products) {
+        TransactionTemplate transactionTemplate = new TransactionTemplate(this.transactionManager);
+        transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+        transactionTemplate.execute(new TransactionCallback() {
+          public Object doInTransaction(TransactionStatus status) {
+            productDao.deleteProducts(products);
+            return null;
+          }
+        });
+    }
+
+    /**
+     * @see org.exolab.castor.service.ProductService#update(org.exolab.castor.dao.Product)
+     */
+    public void update(final Product product) {
+        TransactionTemplate transactionTemplate = new TransactionTemplate(this.transactionManager);
+        transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+        transactionTemplate.execute(new TransactionCallback() {
+          public Object doInTransaction(TransactionStatus status) {
+            productDao.updateProduct(product);
+            return null;
+          }
+        });
+    }
+
+    /**
      * @see org.exolab.castor.service.ProductService#findProducts()
      */
     public Collection find() {
@@ -71,6 +99,19 @@ public class ProductServiceImplWithProgrammaticTransactionDeclaration implements
         return (Collection) transactionTemplate.execute(new TransactionCallback() {
           public Object doInTransaction(TransactionStatus status) {
             return productDao.findProducts (Product.class);
+          }
+        });
+    }
+
+    /**
+     * @see org.exolab.castor.service.ProductService#findProducts()
+     */
+    public Collection findNative() {
+        TransactionTemplate transactionTemplate = new TransactionTemplate(this.transactionManager);
+        transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+        return (Collection) transactionTemplate.execute(new TransactionCallback() {
+          public Object doInTransaction(TransactionStatus status) {
+            return productDao.findProductsNative (Product.class);
           }
         });
     }
@@ -88,22 +129,39 @@ public class ProductServiceImplWithProgrammaticTransactionDeclaration implements
         });
     }
 
-    public void evict(Product product)
+    public void evict(final Product product)
     {
-        // TODO Auto-generated method stub
-        
+        TransactionTemplate transactionTemplate = new TransactionTemplate(this.transactionManager);
+        transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+        transactionTemplate.execute(new TransactionCallback() {
+          public Object doInTransaction(TransactionStatus status) {
+            productDao.evictProduct(product);
+            return null;
+          }
+        });
     }
 
-    public boolean isCached(Product product)
+    public boolean isCached(final Product product)
     {
-        // TODO Auto-generated method stub
-        return false;
+        TransactionTemplate transactionTemplate = new TransactionTemplate(this.transactionManager);
+        transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+        Boolean returnValue = (Boolean) transactionTemplate.execute(new TransactionCallback() {
+            public Object doInTransaction(TransactionStatus status) {
+                return Boolean.valueOf(productDao.isProductCached(product));
+            }
+        });
+        return returnValue.booleanValue();
     }
 
-    public boolean isPersistent(Product product)
-    {
-        // TODO Auto-generated method stub
-        return false;
+    public void evictAll() {
+        TransactionTemplate transactionTemplate = new TransactionTemplate(this.transactionManager);
+        transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+        transactionTemplate.execute(new TransactionCallback() {
+          public Object doInTransaction(TransactionStatus status) {
+            productDao.evictAll();
+            return null;
+          }
+        });
     }
     
     

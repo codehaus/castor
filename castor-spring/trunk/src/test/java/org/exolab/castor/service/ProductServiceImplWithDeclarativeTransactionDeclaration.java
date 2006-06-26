@@ -32,10 +32,30 @@ public class ProductServiceImplWithDeclarativeTransactionDeclaration implements 
     }
 
     /**
+     * @see org.exolab.castor.service.ProductService#deleteAll()
+     */
+    public void delete(final Collection products) {
+        this.productDao.deleteProducts(products);
+    }
+
+    /**
+     * @see org.exolab.castor.service.ProductService#update(org.exolab.castor.dao.Product)
+     */
+    public void update(Product product) {
+        this.productDao.updateProduct(product);
+    }
+    /**
      * @see org.exolab.castor.service.ProductService#findProducts()
      */
     public Collection find() {
         return this.productDao.findProducts (Product.class);
+    }
+
+    /**
+     * @see org.exolab.castor.service.ProductService#findProducts()
+     */
+    public Collection findNative() {
+        return this.productDao.findProductsNative (Product.class);
     }
 
     /**
@@ -50,15 +70,15 @@ public class ProductServiceImplWithDeclarativeTransactionDeclaration implements 
         productDao.evictProduct(product);
     }
 
+    public void evictAll()
+    {
+        productDao.evictAll();
+    }
+
     public boolean isCached(Product product)
     {
         return productDao.isProductCached(product);
     }
 
-    public boolean isPersistent(Product product)
-    {
-        return productDao.isProductPersistent(product);
-    }
-    
     
   }

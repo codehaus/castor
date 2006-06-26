@@ -9,8 +9,14 @@ public interface ProductDao {
     public void createProduct (Product product);
     
     public void deleteProduct (Product product);
+    
+    public void deleteProducts(Collection products);
+    
+    public void updateProduct (Product product);
 
     public Collection findProducts (Class entityClass);
+
+    public Collection findProductsNative (Class entityClass);
 
     public Collection findProducts (Class entityClass, String whereClause);
 
@@ -18,7 +24,7 @@ public interface ProductDao {
     
     public void evictProduct(Product product);
     
-    public boolean isProductPersistent(Product product);
+    public void evictAll();
 
     public boolean isProductCached(Product product);
     

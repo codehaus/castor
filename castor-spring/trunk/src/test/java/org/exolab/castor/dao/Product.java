@@ -1,10 +1,12 @@
 package org.exolab.castor.dao;
 
-public class Product {
+import org.exolab.castor.jdo.TimeStampable;
+
+public class Product implements TimeStampable {
 
     private int id;
     private String name;
-    
+    private long timeStamp;
     
     public int getId() {
         return this.id;
@@ -17,5 +19,11 @@ public class Product {
     }
     public void setName(String name) {
         this.name = name;
+    }
+    public void jdoSetTimeStamp(long timeStamp) {
+        this.timeStamp = timeStamp;
+    }
+    public long jdoGetTimeStamp() {
+        return this.timeStamp;
     }
 }
