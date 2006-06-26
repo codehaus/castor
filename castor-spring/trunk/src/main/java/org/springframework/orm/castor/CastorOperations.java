@@ -118,6 +118,15 @@ public interface CastorOperations {
     void removeAll(Collection entities) throws DataAccessException;
 
     /**
+     * Updates the given (time-stampable) instance as part of a long
+     * transaction.
+     * @param entity the time-stampable persistent instance to update
+     * @throws org.springframework.dao.DataAccessException in case of Castor JDO errors
+     * @see org.exolab.castor.jdo.Database#delete
+     */
+    void update(Object entity) throws DataAccessException;
+    
+    /**
      * Flush all transactional modifications to the database.
      * <p>Only invoke this for selective eager flushing, for example when JDBC code
      * needs to see certain changes within the same transaction. Else, it's preferable
@@ -192,14 +201,6 @@ public interface CastorOperations {
             Class entityClass, String filter, Object[] values, String ordering)
             throws DataAccessException;
 
-    
-    /**
-     * Indicates whether the object given is persistent with Castor JDO.
-     * @param entity Object entity.
-     * @return True if the given entity is persistent.
-     */
-    boolean isPersistent(final Object entity);
-    
     /**
      * Indicates whether the object given is cached by Castor JDO.
      * @param entity Object entity.
