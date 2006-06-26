@@ -74,7 +74,9 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * @see org.springframework.transaction.jta.JtaTransactionManager
  * @see org.springframework.orm.castor.CastorTransactionManager
  */
-public class CastorTransactionManager extends AbstractPlatformTransactionManager implements InitializingBean {
+public class CastorTransactionManager 
+    extends AbstractPlatformTransactionManager 
+    implements InitializingBean {
 
 	private JDOManager jdoManager;
 
