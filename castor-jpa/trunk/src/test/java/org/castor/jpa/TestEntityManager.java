@@ -13,12 +13,21 @@ import junit.framework.TestCase;
 
 public class TestEntityManager extends TestCase {
 
+    private PersistenceProvider provider;
+    private EntityManagerFactory factory;
+
+    @Override
+    protected void setUp() throws Exception
+    {
+        provider = new CastorPersistenceProvider();
+        factory = provider.createEntityManagerFactory("jpa", null);
+    }
+
     public void testFind() throws Exception {
         
-        PersistenceProvider provider = new CastorPersistenceProvider();
-        EntityManagerFactory factory = provider.createEntityManagerFactory("jpa", null);
         EntityManager manager = factory.createEntityManager();
         EntityTransaction transaction = manager.getTransaction();
+        
         transaction.begin();
         Product product = manager.find(Product.class, Integer.valueOf(1));
         transaction.commit();
@@ -30,8 +39,6 @@ public class TestEntityManager extends TestCase {
 
     public void testFindWithoutActiveTransaction() throws Exception {
         
-        PersistenceProvider provider = new CastorPersistenceProvider();
-        EntityManagerFactory factory = provider.createEntityManagerFactory("jpa", null);
         EntityManager manager = factory.createEntityManager();
         
         Product product = null;
@@ -48,8 +55,6 @@ public class TestEntityManager extends TestCase {
 
     public void testNotFound() throws Exception {
         
-        PersistenceProvider provider = new CastorPersistenceProvider();
-        EntityManagerFactory factory = provider.createEntityManagerFactory("jpa", null);
         EntityManager manager = factory.createEntityManager();
         EntityTransaction transaction = manager.getTransaction();
         transaction.begin();
@@ -62,8 +67,6 @@ public class TestEntityManager extends TestCase {
 
     public void testQuery() throws Exception {
         
-        PersistenceProvider provider = new CastorPersistenceProvider();
-        EntityManagerFactory factory = provider.createEntityManagerFactory("jpa", null);
         EntityManager manager = factory.createEntityManager();
         EntityTransaction transaction = manager.getTransaction();
         transaction.begin();
@@ -78,8 +81,6 @@ public class TestEntityManager extends TestCase {
 
     public void testCreateAndFind() throws Exception {
         
-        PersistenceProvider provider = new CastorPersistenceProvider();
-        EntityManagerFactory factory = provider.createEntityManagerFactory("jpa", null);
         EntityManager manager = factory.createEntityManager();
         EntityTransaction transaction = manager.getTransaction();
         
@@ -116,8 +117,6 @@ public class TestEntityManager extends TestCase {
 
     public void testCreateTwice() throws Exception {
         
-        PersistenceProvider provider = new CastorPersistenceProvider();
-        EntityManagerFactory factory = provider.createEntityManagerFactory("jpa", null);
         EntityManager manager = factory.createEntityManager();
         EntityTransaction transaction = manager.getTransaction();
         
@@ -166,8 +165,6 @@ public class TestEntityManager extends TestCase {
 
     public void testCreateWithoutTransaction() throws Exception {
         
-        PersistenceProvider provider = new CastorPersistenceProvider();
-        EntityManagerFactory factory = provider.createEntityManagerFactory("jpa", null);
         EntityManager manager = factory.createEntityManager();
         
         Product newProduct = new Product();
@@ -185,8 +182,6 @@ public class TestEntityManager extends TestCase {
 
     public void testContains() throws Exception {
         
-        PersistenceProvider provider = new CastorPersistenceProvider();
-        EntityManagerFactory factory = provider.createEntityManagerFactory("jpa", null);
         EntityManager manager = factory.createEntityManager();
         EntityTransaction transaction = manager.getTransaction();
         transaction.begin();
@@ -222,8 +217,6 @@ public class TestEntityManager extends TestCase {
 
     public void testContainsNot() throws Exception {
         
-        PersistenceProvider provider = new CastorPersistenceProvider();
-        EntityManagerFactory factory = provider.createEntityManagerFactory("jpa", null);
         EntityManager manager = factory.createEntityManager();
         EntityTransaction transaction = manager.getTransaction();
 
@@ -239,8 +232,6 @@ public class TestEntityManager extends TestCase {
 
     public void testNativeQueryWithResultClass() throws Exception {
         
-        PersistenceProvider provider = new CastorPersistenceProvider();
-        EntityManagerFactory factory = provider.createEntityManagerFactory("jpa", null);
         EntityManager manager = factory.createEntityManager();
         EntityTransaction transaction = manager.getTransaction();
         transaction.begin();
