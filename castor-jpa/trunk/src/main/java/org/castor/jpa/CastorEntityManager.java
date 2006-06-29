@@ -189,7 +189,7 @@ public class CastorEntityManager implements EntityManager {
 
         try {
             // TODO find a way to pass in 'laziness' at run-time
-            database.load(entityClass, primaryKey);
+            object = (T) database.getReference(entityClass, primaryKey);
         }
         catch (ObjectNotFoundException e) {
             throw new EntityNotFoundException("Entity of type " + entityClass.getName() + " with id " + primaryKey + " not found", e);

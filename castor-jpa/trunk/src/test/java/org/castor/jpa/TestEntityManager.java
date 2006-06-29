@@ -2,10 +2,13 @@ package org.castor.jpa;
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityNotFoundException;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 import javax.persistence.TransactionRequiredException;
 import javax.persistence.spi.PersistenceProvider;
+
+import net.sf.cglib.proxy.Factory;
 
 import org.castor.jpa.spi.CastorPersistenceProvider;
 
@@ -243,5 +246,58 @@ public class TestEntityManager extends TestCase {
 
         manager.close();
     }
+    
+    public void testGetReferenceWithoutAccess() throws Exception {
+        
+        EntityManager manager = factory.createEntityManager();
+        EntityTransaction transaction = manager.getTransaction();
+        
+        transaction.begin();
+        Product product = manager.getReference(Product.class, Integer.valueOf(1));
+        transaction.commit();
+        assertNotNull (product);
+        
+        //assertTrue(product instanceof Factory);
+        
+        manager.close();
+    }
+
+    public void testGetReference() throws Exception {
+        
+        EntityManager manager = factory.createEntityManager();
+        EntityTransaction transaction = manager.getTransaction();
+        
+        transaction.begin();
+        Product product = manager.getReference(Product.class, Integer.valueOf(1));
+        transaction.commit();
+        assertNotNull (product);
+        
+        // accessing the content of the proxy for the first time
+        assertEquals(1, product.getId());
+        assertEquals("product1", product.getName());
+        
+        manager.close();
+    }
+
+    public void testGetReferenceForNotExistingProduct() throws Exception {
+        
+        EntityManager manager = factory.createEntityManager();
+        EntityTransaction transaction = manager.getTransaction();
+        
+        transaction.begin();
+        Product product = null;
+        try {
+            product = manager.getReference(Product.class, Integer.valueOf(100));
+            fail("Expected EntityNotFoundException to be thrown.");
+        } catch (EntityNotFoundException e) {
+            transaction.rollback();
+        }
+        
+        assertNull (product);
+        
+        manager.close();
+    }
+
+
 
 }
