@@ -26,7 +26,7 @@ June 2005
        of the original document wherever possible. It's almost unnecessary to 
        mention that all credits go to the original author.</p>
 
-    <section title="Preface: Spring Benefits for Castor Users">
+    <section name="Preface: Spring Benefits for Castor Users">
 		
 		<p>Spring's lightweight bean container offers IoC-style wiring up of business objects, DAOs, and 
 		   resources like JDBC DataSources and Castor JDO JDOManager instances. Such an XML-defined 
@@ -60,7 +60,7 @@ June 2005
 		
 	</section>
 	
-	<section title="Introduction: Resource Management">
+	<section name="Introduction: Resource Management">
 
 		<p>Typical business applications are often cluttered with repetitive resource management code. 
 		   Many projects try to invent own solutions for this issue, sometimes sacrificing proper handling 
@@ -96,7 +96,7 @@ June 2005
 
 	</section>
 	
-	<section title="Resource Definitions in an Application Context">
+	<section name="Resource Definitions in an Application Context">
 
 		<p>To avoid tying application objects to hard-coded resource lookups, Spring allows to define 
 		   resources like a JDBC DataSource or a Castor JDOManager as beans in an application context. 
@@ -147,7 +147,7 @@ June 2005
 
 	</section>
 	
-	<section title="Inversion of Control: Template and Callback">
+	<section name="Inversion of Control: Template and Callback">
 
 		<p>The basic programming model for templating looks as follows, for methods that can be part of any 
 		   custom data access object or business object. There are no restrictions on the implementation of 
@@ -210,7 +210,7 @@ public class ProductDaoImpl extends CastorDaoSupport implements ProductDao {
 
 	</section>
 	
-	<section title="Applying an AOP Interceptor Instead of a Template">
+	<section name="Applying an AOP Interceptor Instead of a Template">
 
 		<p>An alternative to using a CastorTemplate is Spring's AOP CastorInterceptor, replacing the 
 		   callback implementation with straight Castort JDO code within a delegating try/catch block, 
@@ -279,7 +279,7 @@ public class ProductDaoImpl extends CastorDaoSupport implements ProductDao {
 
 	</section>
 	
-	<section title="Programmatic Transaction Demarcation">
+	<section name="Programmatic Transaction Demarcation">
 
 		<p>On top of such lower-level data access services, transactions can be demarcated in a higher level 
 		   of the application, spanning any number of operations. There are no restrictions on the 
@@ -338,7 +338,7 @@ public class ProductServiceImpl implements ProductService {
 
 	</section>
 	
-	<section title="Declarative Transaction Demarcation">
+	<section name="Declarative Transaction Demarcation">
 		
 		<p>Alternatively, one can use Spring's AOP TransactionInterceptor, replacing the transaction 
 		   demarcation code with an interceptor configuration in the application context. This allows 
@@ -440,7 +440,7 @@ public class ProductServiceImpl implements ProductService {
 
 	</section>
 	
-	<section title="Transaction Management Strategies">
+	<section name="Transaction Management Strategies">
 
 		<p>Both TransactionTemplate and TransactionInterceptor delegate the 
            actual transaction handling to a PlatformTransactionManager instance, which 
@@ -562,7 +562,7 @@ public class ProductServiceImpl implements ProductService {
 		
 	</section>
 	
-	<section title="Using Spring-managed Application Beans">
+	<section name="Using Spring-managed Application Beans">
 
 		<p>A Spring application context definition can be loaded with a variety of context 
 		   implementations, from FileSystemXmlApplicationContext and 
@@ -613,7 +613,8 @@ ProductService productService = (ProductService) context.getBean("myProductServi
 
 	</section>
 
-	<section title="Skeletons and Samples">
+
+	<section name="Skeletons and Samples">
 
 		<p>For a commented and detailed sample configuration of a J2EE web app with Spring 
 		   and Castor, have a look at the "webapp-typical" skeleton, included in the Spring 
