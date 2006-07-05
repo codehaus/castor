@@ -15,10 +15,8 @@ public class AllTests {
         suite
                 .addTestSuite(TestProductServiceWithDeclarativeTransactionDemarcation.class);
         suite.addTestSuite(TestDAOWithoutTemplate.class);
-        suite
-                .addTestSuite(TestDerby2PCProductServiceWithDeclarativeTransactionDemarcationShortened.class);
-        suite
-                .addTestSuite(Test2PCProductServiceWithDeclarativeTransactionDemarcationShortened.class);
+//        suite
+//                .addTestSuite(Test2PCProductServiceWithDeclarativeTransactionDemarcationShortened.class);
         suite
                 .addTestSuite(TestProductServiceWithDeclarativeTransactionDemarcationShortened.class);
         suite.addTestSuite(TestDAOWithCastorTemplate.class);

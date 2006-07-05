@@ -25,15 +25,6 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 				<configuration>
 					<source>1.4</source>
 					<target>1.4</target>
-					<!--
-					<excludes>
-					<exclude implementation="java.lang.String">SourceGenerator/**</exclude>
-					</excludes>
-					<testExcludes>
-					<exclude implementation="java.lang.String">xml/MasterTestSuite/**</exclude>
-					<exclude implementation="java.lang.String">xml/RegressionTestSuite/**</exclude>
-					</testExcludes>
-					-->
 				</configuration>
 			</plugin>
 			
@@ -61,8 +52,8 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<excludes>
-						<exclude>**/BaseSpringTestCase.java</exclude>
-                        <exclude>**/BaseSpringTestCaseWithTransactionDemarcation.java</exclude>
+						<exclude>**/BaseSpringTestCase*.java</exclude>
+						<exclude>**/TestDerby*.java</exclude>
 					</excludes>
 				</configuration>
 			</plugin>
@@ -220,7 +211,37 @@ http://maven.apache.org/maven-v4_0_0.xsd">
         </dependency>
 
 	</dependencies>
+	
+	<repositories>
+		<repository>
+			<id>java.net</id>
+			<name>java.net Maven Repository</name>
+			<url>https://maven-repository.dev.java.net/nonav/repository</url>
+			<layout>legacy</layout>
+		</repository>		
+<!--		
+		<repository>
+			<id>maven2-repository.dev.java.net</id>
+			<name>Java.net Repository for Maven</name>
+			<url>https://maven2-repository.dev.java.net/nonav/repository</url>
+			<layout>default</layout>	  
+		</repository>		
+-->	
+	</repositories>
 
+	<pluginRepositories>
+		<pluginRepository>
+			<id>Maven Codehaus Snapshots</id> 
+			<url>http://snapshots.maven.codehaus.org/maven2/</url> 
+			<snapshots>
+				<enabled>true</enabled> 
+			</snapshots>
+			<releases>
+				<enabled>false</enabled> 
+			</releases>
+		</pluginRepository>
+	</pluginRepositories>
+	
 	<reporting>
 		<plugins>
 			<plugin>
@@ -233,6 +254,13 @@ http://maven.apache.org/maven-v4_0_0.xsd">
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<exclude>**/TestDerby*.java</exclude>
+						<exclude>**/BaseSpring*.java</exclude>
+						<exclude>**/TestAll.java</exclude>
+					</excludes>
+				</configuration>
             </plugin>            
             <plugin>
                <groupId>org.apache.maven.plugins</groupId>
@@ -285,13 +313,11 @@ http://maven.apache.org/maven-v4_0_0.xsd">
                     <licenseLocation>${basedir}/src/etc/CLOVER.LICENSE</licenseLocation>     
                 </configuration>        
             </plugin>
-<!--            
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>jdepend-maven-plugin</artifactId>
                 <version>2.0-beta-1-SNAPSHOT</version>
             </plugin>
--->
 		</plugins>
 	</reporting>
 </project>
