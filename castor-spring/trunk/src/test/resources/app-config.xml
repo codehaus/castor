@@ -175,7 +175,9 @@
 	  </property>
     </bean>
 
+	
     <!-- Derby XA sample -->
+<!--	
 	<bean id="derbyDataSource" 
           class="org.apache.derby.jdbc.ClientXADataSource" destroy-method="close">
 	  <property name="databaseName">
@@ -238,6 +240,6 @@
 	    </props>
 	  </property>
     </bean>
-
+-->
         
 </beans>
