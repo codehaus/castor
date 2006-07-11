@@ -6,7 +6,7 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>castor</groupId>
 	<artifactId>castor-spring</artifactId>
-	<version>RC1</version>
+	<version>RC2-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>Spring ORM implementation for Castor JDO</name>
@@ -25,13 +25,14 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 				<configuration>
 					<source>1.4</source>
 					<target>1.4</target>
+					<debug>true</debug>
 				</configuration>
 			</plugin>
-			
+<!--			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-clover-plugin</artifactId>
-				<version>2.1</version>
+				<version>2.2</version>
 				<configuration>
 					<jdk>1.4</jdk>
 					<cloverDatabase>target/clover-db</cloverDatabase>
@@ -47,6 +48,19 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 					</execution>
 				</executions>
 			</plugin>
+-->	
+			
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+				<executions>
+				  <execution>
+					<goals>
+					  <goal>clean</goal>
+					</goals>
+				  </execution>
+				</executions>
+			</plugin>			
 			
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
@@ -311,6 +325,7 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 				<groupId>org.codehaus.mojo</groupId>
                 <artifactId>taglist-maven-plugin</artifactId>
 			</plugin>
+<!--			
             <plugin> 
                 <artifactId>maven-clover-plugin</artifactId>
                 <version>2.1</version>
@@ -320,11 +335,18 @@ http://maven.apache.org/maven-v4_0_0.xsd">
                     <licenseLocation>${basedir}/src/etc/CLOVER.LICENSE</licenseLocation>     
                 </configuration>        
             </plugin>
+-->	
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>jdepend-maven-plugin</artifactId>
                 <version>2.0-beta-1-SNAPSHOT</version>
             </plugin>
+			
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+			</plugin>			
+			
 		</plugins>
 	</reporting>
 </project>
