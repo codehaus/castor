@@ -433,6 +433,31 @@ public class CastorTemplate extends CastorAccessor implements CastorOperations {
         });
     }
 
+    public Collection findByNamedQuery(String queryName) throws DataAccessException {
+        return this.findByNamedQuery(queryName, null);
+    }
+
+    public Collection findByNamedQuery(final String queryName, final Object[] values)
+            throws DataAccessException {
+        return executeFind(new CastorCallback() {
+            public Object doInCastor(Database database) throws PersistenceException {
+                OQLQuery query = database.getNamedQuery(queryName);
+                if (values != null) {
+                    for (int i = 0; i < values.length; i++) {
+                        query.bind (values[i]);
+                    }
+                }
+                prepareQuery(query);
+                QueryResults results = query.execute();
+                Collection objects = new ArrayList();
+                while (results.hasMore()) {
+                    objects.add (results.next());
+                }
+                return objects;
+            }
+        });
+    }
+
     /**
      * Prepare the given Castor JDO OQLQuery object. To be used within a CastorCallback.
      * Applies a transaction timeout, if any. If you don't use such timeouts,
