@@ -97,6 +97,30 @@ public class BaseSpringTestCaseAtDAOLevel extends BaseSpringTestCase {
         assertEquals("product1", product.getName());
     }
 
+    public void testFindAllProductsByNamedQuery() throws Exception {
+        Collection products = productDAO.findProductsByNamedQuery("allProducts");
+        assertNotNull(products);
+        assertFalse (products.isEmpty());
+        assertEquals(1, products.size());
+        
+        Product product = (Product) products.iterator().next();
+        assertNotNull(product);
+        assertEquals(1, product.getId());
+        assertEquals("product1", product.getName());
+    }
+
+    public void testFindSelectedProductsByNamedQuery() throws Exception {
+        Collection products = productDAO.findProductsByNamedQuery("selectedProducts", new Object[] { "product1" });
+        assertNotNull(products);
+        assertFalse (products.isEmpty());
+        assertEquals(1, products.size());
+        
+        Product product = (Product) products.iterator().next();
+        assertNotNull(product);
+        assertEquals(1, product.getId());
+        assertEquals("product1", product.getName());
+    }
+
     public void testEvictProductFromCache() throws Exception {
         
         Product product = this.productDAO.loadProduct(1);

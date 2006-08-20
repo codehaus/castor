@@ -68,6 +68,32 @@ public class BaseSpringTestCaseWithTransactionDemarcation extends
         assertNotNull (products);
         assertEquals (1, products.size());
     }
+    
+    public void testFindAllProductsByNamedQuery() throws Exception {
+        Collection products = this.productService.findByNamedQuery("allProducts");
+        assertNotNull(products);
+        assertFalse (products.isEmpty());
+        assertEquals(1, products.size());
+        
+        Product product = (Product) products.iterator().next();
+        assertNotNull(product);
+        assertEquals(1, product.getId());
+        assertEquals("product1", product.getName());
+    }
+
+    public void testFindSelectedProductsByNamedQuery() throws Exception {
+        Collection products = this.productService.findByNamedQuery("selectedProducts", new Object[] { "product1" });
+        assertNotNull(products);
+        assertFalse (products.isEmpty());
+        assertEquals(1, products.size());
+        
+        Product product = (Product) products.iterator().next();
+        assertNotNull(product);
+        assertEquals(1, product.getId());
+        assertEquals("product1", product.getName());
+    }
+
+    
 
     public void testEvictProductFromCache() throws Exception {
         
