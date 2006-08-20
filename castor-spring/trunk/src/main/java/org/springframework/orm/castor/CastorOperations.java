@@ -200,6 +200,27 @@ public interface CastorOperations {
     Collection find(
             Class entityClass, String filter, Object[] values, String ordering)
             throws DataAccessException;
+    
+    /**
+     * Return all persistent instances of a given class as specified in a named
+     * query with the given name
+     * @param queryName Name of the OQL query to execute
+     * @return the persistent instances
+     * @throws org.springframework.dao.DataAccessException in case of JDO errors
+     */
+    public Collection findByNamedQuery(String queryName) throws DataAccessException;
+    
+    /**
+     * Return all persistent instances of a given class as specified in a named
+     * query with the given name, supplying additional parameters to be used during
+     * uery execution.
+     * @param queryName Name of the OQL query to execute
+     * @param parameters Additional parameter values to be used during query execution.
+     * @return the persistent instances
+     * @throws org.springframework.dao.DataAccessException in case of JDO errors
+     */
+    public Collection findByNamedQuery(final String queryName, final Object[] values);
+
 
     /**
      * Indicates whether the object given is cached by Castor JDO.
