@@ -6,7 +6,6 @@ import javax.persistence.EntityNotFoundException;
 import javax.persistence.EntityTransaction;
 import javax.persistence.FlushModeType;
 import javax.persistence.LockMode;
-import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceContextType;
 import javax.persistence.Query;
 import javax.persistence.TransactionRequiredException;
@@ -249,7 +248,11 @@ public class CastorEntityManager implements EntityManager {
 
     public Query createNamedQuery(String name) {
         checkIsOpen();
-        throw new UnsupportedOperationException();
+        try {
+            return new CastorQuery(database.getNamedQuery(name));
+        } catch (PersistenceException e) {
+            throw new javax.persistence.PersistenceException("General problem", e);
+        }
     }
 
     public Query createNativeQuery(String sqlString) {
