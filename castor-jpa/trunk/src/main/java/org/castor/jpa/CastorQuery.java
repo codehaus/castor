@@ -29,7 +29,7 @@ public class CastorQuery implements Query
     {
         setDatabase(database);
         try {
-            query = database.getOQLQuery(ejbqlString);
+            query = this.database.getOQLQuery(ejbqlString);
         } catch (PersistenceException e) {
             throw new javax.persistence.PersistenceException("Problem creating query instance", e);
         }
@@ -38,10 +38,25 @@ public class CastorQuery implements Query
     public CastorQuery(String sqlString, Class resultClass, Database database) {
         setDatabase(database);
         try {
-            query = database.getOQLQuery("CALL SQL " + sqlString + " AS " + resultClass.getName());
+            query = this.database.getOQLQuery("CALL SQL " + sqlString + " AS " + resultClass.getName());
         } catch (PersistenceException e) {
             throw new javax.persistence.PersistenceException("Problem creating query instance", e);
         }
+    }
+
+    /**
+     * Creates an instance of CastorQuery, deriving the query string from the 
+     * OQLQuery passed as an argument.
+     * @param query An OQLQuery instance.
+     */
+    public CastorQuery(OQLQuery query)
+    {
+        setQuery(query);
+    }
+
+    private void setQuery(OQLQuery query)
+    {
+        this.query = query;
     }
 
     private void setDatabase(Database database) {
