@@ -183,24 +183,24 @@ public class CastorEntityManager implements EntityManager {
     
         T object = null;
         
-        // TODO throw IllegalArgumentException if the first argument does not denote an entity type
-        
-        // TODO throw IllegalArgumentException if the second argument is not a valid type for that entity’s primary key
-
-        try {
-            // TODO find a way to pass in 'laziness' at run-time
-            object = (T) database.getReference(entityClass, primaryKey);
-        }
-        catch (ObjectNotFoundException e) {
-            throw new EntityNotFoundException("Entity of type " + entityClass.getName() + " with id " + primaryKey + " not found", e);
-        } catch (TransactionNotInProgressException e) {
-            throw new TransactionRequiredException("Active transaction required", e);
-        } catch (LockNotGrantedException e) {
-            // TODO !!!!!!!!!!!! Investigate what should be done !!!!!!!!!!!!!!
-            throw new javax.persistence.PersistenceException("Lock not granted by Castor", e);
-        } catch (PersistenceException e) {
-            throw new javax.persistence.PersistenceException("General problem", e);
-        }
+//        // TODO throw IllegalArgumentException if the first argument does not denote an entity type
+//        
+//        // TODO throw IllegalArgumentException if the second argument is not a valid type for that entity’s primary key
+//
+//        try {
+//            // TODO find a way to pass in 'laziness' at run-time
+//            object = (T) database.getReference(entityClass, primaryKey);
+//        }
+//        catch (ObjectNotFoundException e) {
+//            throw new EntityNotFoundException("Entity of type " + entityClass.getName() + " with id " + primaryKey + " not found", e);
+//        } catch (TransactionNotInProgressException e) {
+//            throw new TransactionRequiredException("Active transaction required", e);
+//        } catch (LockNotGrantedException e) {
+//            // TODO !!!!!!!!!!!! Investigate what should be done !!!!!!!!!!!!!!
+//            throw new javax.persistence.PersistenceException("Lock not granted by Castor", e);
+//        } catch (PersistenceException e) {
+//            throw new javax.persistence.PersistenceException("General problem", e);
+//        }
         
         return object;
     }
