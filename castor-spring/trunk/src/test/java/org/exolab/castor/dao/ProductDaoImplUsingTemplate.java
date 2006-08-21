@@ -1,7 +1,6 @@
 package org.exolab.castor.dao;
-import java.util.Collection;
-import java.util.Iterator;
 
+import java.util.Collection;
 import org.springframework.orm.castor.CastorTemplate;
 
 public class ProductDaoImplUsingTemplate extends CastorTemplate implements ProductDao {
