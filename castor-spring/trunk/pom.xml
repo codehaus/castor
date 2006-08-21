@@ -10,6 +10,12 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 	<packaging>jar</packaging>
 
 	<name>Spring ORM implementation for Castor JDO</name>
+	<description>This project provides a Castor JDO-specific implementation of the Spring 
+		ORM interfaces (as described at 
+		http://static.springframework.org/spring/docs/1.2.x/reference/orm.html), allowing users
+		to use Spring ORM as their preferred choice of dealing with the persistence aspects of 
+		their applications.
+	</description>
 	<!--<url>http://castor.org</url>-->
 
 	<issueManagement>
