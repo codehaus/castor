@@ -8,8 +8,6 @@ import javax.persistence.Query;
 import javax.persistence.TransactionRequiredException;
 import javax.persistence.spi.PersistenceProvider;
 
-import net.sf.cglib.proxy.Factory;
-
 import org.castor.jpa.spi.CastorPersistenceProvider;
 
 import junit.framework.TestCase;
@@ -82,6 +80,21 @@ public class TestEntityManager extends TestCase {
         manager.close();
     }
 
+    public void testNamedQuery() throws Exception {
+        
+        EntityManager manager = factory.createEntityManager();
+        EntityTransaction transaction = manager.getTransaction();
+        transaction.begin();
+        Query query = manager.createNamedQuery("allProducts");
+        Product product = (Product) query.getSingleResult();
+        transaction.commit();
+        
+        assertNotNull (product);
+        assertEquals(1, product.getId());
+        
+        manager.close();
+    }
+    
     public void testCreateAndFind() throws Exception {
         
         EntityManager manager = factory.createEntityManager();
