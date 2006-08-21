@@ -179,8 +179,9 @@ public class CastorTemplate extends CastorAccessor implements CastorOperations {
     public Object execute(CastorCallback action, boolean exposeNativeDatabase) throws DataAccessException {
         Database database = JDOManagerUtils.getDatabase(
             getJDOManager(), isAllowCreate());
-        boolean existingTransaction =
-            TransactionSynchronizationManager.hasResource(getJDOManager());
+        // TODO [WG]: uncomment after having implemented support for (eager) flushing
+        // boolean existingTransaction =
+        //    TransactionSynchronizationManager.hasResource(getJDOManager());
         try {
             Database databaseToExpose = (exposeNativeDatabase ? database : createDatabaseProxy(database));
             Object result = action.doInCastor(databaseToExpose);
