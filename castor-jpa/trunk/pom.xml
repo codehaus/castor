@@ -56,6 +56,7 @@ http://maven.apache.org/maven-v4_0_0.xsd">
                 </executions>
             </plugin>       
 
+<!--			
             <plugin>
                <groupId>org.codehaus.mojo</groupId>
                <artifactId>castor-maven-plugin</artifactId>
@@ -70,9 +71,8 @@ http://maven.apache.org/maven-v4_0_0.xsd">
                         <!-- <schemaDirectory>${basedir}/src/schema</schemaDirectory> -->
                         <schema>${basedir}/src/main/castor/mapping.xsd</schema>
                         <packaging>org.castor.jpa.mapping.xml</packaging>
-                        <!-- won't be injected as there's no setter
+                        won't be injected as there's no setter
                         <bindingfile>${basedir}/src/schema/binding.xml</bindingfile>
-                        -->
                         <verbose>true</verbose>
                         <warnings>true</warnings>
                         <types>j2</types>
@@ -80,6 +80,7 @@ http://maven.apache.org/maven-v4_0_0.xsd">
                 </execution>
                </executions>
             </plugin>
+-->			
 
  		</plugins>
 
@@ -158,12 +159,20 @@ http://maven.apache.org/maven-v4_0_0.xsd">
     
 	<dependencies>
 
-
+		<!-- replace with dependency to final release -->
 		<dependency>
 			<groupId>castor</groupId>
 			<artifactId>castor</artifactId>
-			<version>1.0.2</version>
+			<version>1.0.3-SNAPSHOT</version>
 		</dependency>
+		
+<!--
+		<dependency>
+			<groupId>castor</groupId>
+			<artifactId>castor</artifactId>
+			<version>1.0.3-SNAPSHOT</version>
+		</dependency>
+-->	
 
 		<dependency>
 			<groupId>cglib</groupId>
