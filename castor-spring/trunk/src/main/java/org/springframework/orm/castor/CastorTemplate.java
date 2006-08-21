@@ -14,7 +14,6 @@ import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.QueryResults;
 import org.springframework.dao.DataAccessException;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
  * Helper class that simplifies Castor JDO data access code, and converts
