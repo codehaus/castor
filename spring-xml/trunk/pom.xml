@@ -32,7 +32,7 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 				</configuration>
 			</plugin>
 
-						<plugin>
+			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<excludes>
@@ -172,14 +172,6 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 			<url>https://maven-repository.dev.java.net/nonav/repository</url>
 			<layout>legacy</layout>
 		</repository>		
-<!--		
-		<repository>
-			<id>maven2-repository.dev.java.net</id>
-			<name>Java.net Repository for Maven</name>
-			<url>https://maven2-repository.dev.java.net/nonav/repository</url>
-			<layout>default</layout>	  
-		</repository>		
--->	
 	</repositories>
 
 	<pluginRepositories>
@@ -209,9 +201,7 @@ http://maven.apache.org/maven-v4_0_0.xsd">
                 <artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<excludes>
-						<exclude>**/TestDerby*.java</exclude>
 						<exclude>**/BaseSpring*.java</exclude>
-						<exclude>**/TestAll.java</exclude>
 					</excludes>
 				</configuration>
             </plugin>            
@@ -242,6 +232,8 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 				</configuration>
 			</plugin>
 
+-->
+
 			<plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>changes-maven-plugin</artifactId>
@@ -251,7 +243,6 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 				<groupId>org.codehaus.mojo</groupId>
                 <artifactId>changelog-maven-plugin</artifactId>
 			</plugin>
--->
             
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
