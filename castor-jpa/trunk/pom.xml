@@ -1,7 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-http://maven.apache.org/maven-v4_0_0.xsd">
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>castor</groupId>
@@ -68,8 +67,8 @@ http://maven.apache.org/maven-v4_0_0.xsd">
                   </goals>
                   <configuration>
                         <properties>${basedir}/src/main/castor/castorbuilder.properties</properties>
-                        <!-- <schemaDirectory>${basedir}/src/schema</schemaDirectory> -->
-                        <schema>${basedir}/src/main/castor/mapping.xsd</schema>
+                        <schema>${basedir}/src/main/castor/mapping.ejb3.xsd</schema>
+                        <bindingfile>${basedir}/src/main/castor/mapping-binding.ejb3.xml</bindingfile>
                         <packaging>org.castor.jpa.mapping.xml</packaging>
                         won't be injected as there's no setter
                         <bindingfile>${basedir}/src/schema/binding.xml</bindingfile>
