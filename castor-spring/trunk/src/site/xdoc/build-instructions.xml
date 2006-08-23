@@ -34,7 +34,7 @@
 
         <p>July 5th, 2006: I have decided to make available a first release candidate
            of the Spring ORM implementation for Castor. Please note that in order 
-           to be able to test this module, you'll <b>have to</b> download the ?
+           to be able to test this module, you'll <b>have to</b> download the
            following release candidate of Castor 1.0.2 as well</p>
             
         <table>
