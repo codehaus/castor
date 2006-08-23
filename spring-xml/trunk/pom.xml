@@ -4,13 +4,15 @@
 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>castor</groupId>
-	<artifactId>castor-spring-xml</artifactId>
+	<groupId>org.codehaus.castor</groupId>
+	<artifactId>spring-xml</artifactId>
 	<version>0.9-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>Spring XML abstraction for Castor</name>
-	<description>This project provides ...</description>
+	<description>This project (mainly) provides Spring BeanFactory instances for
+        the (Un)Marshaller and obtaining a shared ClassDescriptorResolver instance, and 
+        wiring them together.</description>
 	<!--<url>http://castor.org</url>-->
 
 	<issueManagement>
