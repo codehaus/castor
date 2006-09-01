@@ -233,17 +233,16 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 			</plugin>
 
 -->
-
+<!--
 			<plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>changes-maven-plugin</artifactId>
 			</plugin>
-
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
                 <artifactId>changelog-maven-plugin</artifactId>
 			</plugin>
-            
+-->            
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
                 <artifactId>taglist-maven-plugin</artifactId>
