@@ -21,12 +21,14 @@ public class CastorResolverFactoryBean implements FactoryBean, InitializingBean 
     /**
      * Log instance
      */
-    private static final Log           LOG = LogFactory.getLog(CastorResolverFactoryBean.class);
+    private static final Log LOG = LogFactory
+            .getLog(CastorResolverFactoryBean.class);
+
     /**
      * Spring resource defining Castor properties
      */
-    private Properties                 castorProperties;
-    
+    private Properties castorProperties;
+
     /**
      * XMlClassDescriptorResolver interface
      */
@@ -38,27 +40,27 @@ public class CastorResolverFactoryBean implements FactoryBean, InitializingBean 
      * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
      */
     public void afterPropertiesSet() throws Exception {
-        if (this.castorProperties == null) {
-            throw new IllegalArgumentException(
-                    "Please specifiy the Castor properties using the propertyName 'castorProperties' in your application context.");
-        }
+        this.resolver = (XMLClassDescriptorResolver) ClassDescriptorResolverFactory
+        .createClassDescriptorResolver(BindingType.XML);
+        if (this.castorProperties != null) {
+            String mappingLocation = this.castorProperties
+                    .getProperty("mappingLocation");
+            if (mappingLocation != null) {
+                try {
+                    Mapping mapping = new Mapping();
+                    mapping.loadMapping(new InputSource(mappingLocation));
 
-        String mappingLocation = this.castorProperties.getProperty("mappingLocation");
-        if (mappingLocation == null) {
-            throw new IllegalArgumentException("Please specify a valid Castor mapping file location.");
-        }
-
-        try {
-            Mapping mapping = new Mapping();
-            mapping.loadMapping(new InputSource(mappingLocation));
-
-            this.resolver = (XMLClassDescriptorResolver) ClassDescriptorResolverFactory.createClassDescriptorResolver(BindingType.XML);
-            MappingUnmarshaller mappingUnmarshaller = new MappingUnmarshaller();
-            MappingLoader loader = mappingUnmarshaller.getMappingLoader(mapping, BindingType.XML);
-            this.resolver.setMappingLoader(loader);
-        } catch (MappingException e) {
-            LOG.error("Problem locating/loading Castor mapping file from location " + mappingLocation, e);
-            throw e;
+                    MappingUnmarshaller mappingUnmarshaller = new MappingUnmarshaller();
+                    MappingLoader loader = mappingUnmarshaller
+                            .getMappingLoader(mapping, BindingType.XML);
+                    this.resolver.setMappingLoader(loader);
+                } catch (MappingException e) {
+                    LOG.error(
+                            "Problem locating/loading Castor mapping file from location "
+                                    + mappingLocation, e);
+                    throw e;
+                }
+            }
         }
     }
 
