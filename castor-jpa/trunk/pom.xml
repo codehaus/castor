@@ -3,9 +3,9 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>castor</groupId>
+	<groupId>org.codehaus.castor</groupId>
 	<artifactId>castor-jpa</artifactId>
-	<version>0.2</version>
+	<version>0.2-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>Castor JPA - An implementation of JPA 3.0</name>
@@ -151,10 +151,27 @@
 	</mailingLists>
 
 	<scm>
-       <connection>scm:svn:svn://svn.castor.codehaus.org/castor/scm/castor-jpa/</connection>
-<!--       <developerConnection>scm:svn:http://svn.wakaleo.com/hoteldatabase/</developerConnection> -->
+       <connection>scm:svn:svn://svn.codehaus.org/castor/castor-jpa/</connection>
+       <developerConnection>scm:svn:https://svn.codehaus.org/castor/castor-jpa/</developerConnection>
        <url>http://svn.castor.codehaus.org/viewrep/castor/castor-jpa</url>
 	</scm>	
+    
+    <distributionManagement>
+        <repository>
+          <id>codehaus.org</id>
+          <name>Castor Central Distribution Repository</name>
+          <url>dav:https://dav.codehaus.org/repository/castor/</url>
+        </repository>
+        <snapshotRepository>
+          <id>codehaus.org</id>
+          <name>Castor Central Development Repository</name>
+          <url>dav:https://dav.codehaus.org/snapshots.repository/castor/</url>
+        </snapshotRepository>
+        <site>
+          <id>codehaus.org</id>
+          <url>dav:https://dav.codehaus.org/castor/</url>
+        </site>
+    </distributionManagement>
     
 	<dependencies>
 
