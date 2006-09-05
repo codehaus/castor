@@ -164,11 +164,13 @@ http://maven.apache.org/maven-v4_0_0.xsd">
     
 	<dependencies>
 
+<!--
         <dependency>
             <groupId>adaptx</groupId>
             <artifactId>adaptx</artifactId>
             <version>0.9.13</version>
         </dependency>
+-->
 
 		<dependency>
 			<groupId>castor</groupId>
