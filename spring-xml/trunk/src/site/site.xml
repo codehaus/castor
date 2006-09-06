@@ -16,9 +16,9 @@
       <item name="Codehaus" href="http://www.codehaus.org/"/>
     </links>
 
-    <menu name="Documentation">
+    <menu name="Main">
     
-        <item name="How to ..." href="/how-to-use-marshaller.html" />
+        <item name="How to use" href="/how-to-use-marshaller.html" />
     	
     </menu>
 
