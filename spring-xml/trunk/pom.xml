@@ -65,6 +65,16 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 			<timezone>+1</timezone>
 		</developer>
 
+		<developer>
+			<id>sdolg</id>
+			<name>Steven Dolg</name>
+			<email>stevendolg@gmx.at</email>
+			<roles>
+				<role>Contributor for Castor Spring integration</role>
+			</roles>
+			<timezone>+1</timezone>
+		</developer>
+
 	</developers>
 
 	<mailingLists>
@@ -91,13 +101,11 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 		</mailingList>
 	</mailingLists>
 
-<!--
 	<scm>
-       <connection>scm:svn:svn://svn.castor.codehaus.org/castor/scm/castor-spring/</connection>
-       <developerConnection>scm:svn:https://svn.codehaus.org/castor/castor-spring/</developerConnection>
-       <url>http://svn.castor.codehaus.org/viewrep/castor/castor-spring</url>
+       <connection>scm:svn:svn://svn.castor.codehaus.org/castor/scm/spring-xml/</connection>
+       <developerConnection>scm:svn:https://svn.codehaus.org/castor/spring-xml/</developerConnection>
+       <url>http://svn.castor.codehaus.org/viewrep/castor/spring-xml</url>
 	</scm>	
--->		
 
     <distributionManagement>
         <repository>
@@ -161,6 +169,7 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 			<groupId>xerces</groupId>
 			<artifactId>xerces</artifactId>
 			<version>1.4.0</version>
+			
 		</dependency>
         
 	</dependencies>
