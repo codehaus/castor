@@ -166,11 +166,11 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
+			<artifactId>spring-mock</artifactId>
 			<version>1.2.7</version>
             <scope>test</scope>
 		</dependency>
-
+        
 		<dependency>
             <optional>true</optional>
 			<groupId>xerces</groupId>
