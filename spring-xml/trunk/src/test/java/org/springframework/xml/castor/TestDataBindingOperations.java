@@ -1,6 +1,8 @@
 package org.springframework.xml.castor;
 
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
 
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
@@ -33,6 +35,22 @@ public class TestDataBindingOperations extends BaseSpringTestCase {
 
         InputSource inputSource = new InputSource(getClass().getClassLoader().getResource("input.xml").openStream());
         Object object = template.unmarshal(inputSource, Product.class);
+        assertNotNull(object);
+        assertTrue(object instanceof Product);
+        
+        Product product = (Product) object;
+        assertNotNull(product);
+        
+        assertEquals(1, product.getId());
+        assertEquals("blah", product.getName());
+    }
+
+    public void testUnmarshalFromReader() throws IOException, MarshallingException, ValidationException {
+        DataBindingOperations template = (DataBindingOperations) context.getBean("template");
+        assertNotNull(template);
+
+        Reader reader = new FileReader("C:\\workspace\\spring-xml\\src\\test\\resources\\input.xml");
+        Object object = template.unmarshal(reader, Product.class);
         assertNotNull(object);
         assertTrue(object instanceof Product);
         
