@@ -3,8 +3,9 @@ package org.springframework.xml.castor;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
 
-import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 
 import org.springframework.xml.entity.Product;
@@ -94,5 +95,20 @@ public class TestDataBindingOperations extends BaseSpringTestCase {
 //        assertEquals(1, product.getId());
 //        assertEquals("blah", product.getName());
 //    }
+
+    public void testMmarshalTo() throws IOException, MarshallingException, ValidationException {
+        DataBindingOperations template = (DataBindingOperations) context.getBean("template");
+        assertNotNull(template);
+
+        Writer out = new StringWriter();
+        
+        Product product = new Product();
+        product.setId(3);
+        product.setName("product3");
+        template.marshal(product, out);
+        
+        String xml = out.toString();
+        assertNotNull(xml);
+    }
 
 }
