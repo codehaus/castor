@@ -96,7 +96,7 @@ public class TestDataBindingOperations extends BaseSpringTestCase {
 //        assertEquals("blah", product.getName());
 //    }
 
-    public void testMmarshalTo() throws IOException, MarshallingException, ValidationException {
+    public void testMarshalTo() throws IOException, MarshallingException, ValidationException {
         DataBindingOperations template = (DataBindingOperations) context.getBean("template");
         assertNotNull(template);
 
