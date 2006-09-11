@@ -7,7 +7,7 @@ package org.springframework.xml.castor;
  * 
  * @author Werner Guttmann
  */
-public class TestCastorMarshallerFactoryBean extends BaseSpringTestCase {
+public class TestCastorMarshallerFactoryBean extends BaseFactoryBeanTestCase {
 
     protected void setUp() throws Exception {
         super.setUp();

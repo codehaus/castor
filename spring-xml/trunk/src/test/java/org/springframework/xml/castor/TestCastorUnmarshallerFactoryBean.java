@@ -9,7 +9,7 @@ import org.xml.sax.InputSource;
  * 
  * @author Werner Guttmann
  */
-public class TestCastorUnmarshallerFactoryBean extends BaseSpringTestCase {
+public class TestCastorUnmarshallerFactoryBean extends BaseFactoryBeanTestCase {
 
     private Unmarshaller unmarshaller;
 

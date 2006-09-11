@@ -7,7 +7,7 @@ package org.springframework.xml.castor;
  * 
  * @author Werner Guttmann
  */
-public class TestCastorMarshallerFactoryBeanWithoutMapping extends BaseSpringTestCase {
+public class TestCastorMarshallerFactoryBeanWithoutMapping extends BaseFactoryBeanTestCase {
 
     protected void setUp() throws Exception {
         contextResource = "app-config-without-mapping.xml";
