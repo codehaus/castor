@@ -1,6 +1,9 @@
 package org.springframework.xml.castor;
 
+import java.net.URL;
+import java.util.List;
 import java.util.Properties;
+// import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -43,12 +46,14 @@ public class CastorResolverFactoryBean implements FactoryBean, InitializingBean 
         this.resolver = (XMLClassDescriptorResolver) ClassDescriptorResolverFactory
         .createClassDescriptorResolver(BindingType.XML);
         if (this.castorProperties != null) {
-            String mappingLocation = this.castorProperties
-                    .getProperty("mappingLocation");
+            
+            String mappingLocation = this.castorProperties.getProperty("mappingLocation");
+            
             if (mappingLocation != null) {
                 try {
                     Mapping mapping = new Mapping();
-                    mapping.loadMapping(new InputSource(mappingLocation));
+                    URL mappingResource = getClass().getClassLoader().getResource(mappingLocation);
+                    mapping.loadMapping(new InputSource(mappingResource.openStream()));
 
                     MappingUnmarshaller mappingUnmarshaller = new MappingUnmarshaller();
                     MappingLoader loader = mappingUnmarshaller
@@ -61,6 +66,9 @@ public class CastorResolverFactoryBean implements FactoryBean, InitializingBean 
                     throw e;
                 }
             }
+            
+            // List mappingLocations = this.castorProperties.getProperty("mappingLocations");
+
         }
     }
 
