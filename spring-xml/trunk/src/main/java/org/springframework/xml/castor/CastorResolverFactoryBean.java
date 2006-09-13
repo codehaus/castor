@@ -1,6 +1,7 @@
 package org.springframework.xml.castor;
 
 import java.net.URL;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 // import java.util.Properties;
@@ -33,6 +34,11 @@ public class CastorResolverFactoryBean implements FactoryBean, InitializingBean 
     private Properties castorProperties;
 
     /**
+     * Spring resource defining mapping file locations
+     */
+    private List mappingLocations;
+
+    /**
      * XMlClassDescriptorResolver interface
      */
     private XMLClassDescriptorResolver resolver;
@@ -44,31 +50,58 @@ public class CastorResolverFactoryBean implements FactoryBean, InitializingBean 
      */
     public void afterPropertiesSet() throws Exception {
         this.resolver = (XMLClassDescriptorResolver) ClassDescriptorResolverFactory
-        .createClassDescriptorResolver(BindingType.XML);
+                .createClassDescriptorResolver(BindingType.XML);
         if (this.castorProperties != null) {
-            
-            String mappingLocation = this.castorProperties.getProperty("mappingLocation");
-            
-            if (mappingLocation != null) {
-                try {
-                    Mapping mapping = new Mapping();
-                    URL mappingResource = getClass().getClassLoader().getResource(mappingLocation);
-                    mapping.loadMapping(new InputSource(mappingResource.openStream()));
 
-                    MappingUnmarshaller mappingUnmarshaller = new MappingUnmarshaller();
-                    MappingLoader loader = mappingUnmarshaller
-                            .getMappingLoader(mapping, BindingType.XML);
-                    this.resolver.setMappingLoader(loader);
-                } catch (MappingException e) {
-                    LOG.error(
-                            "Problem locating/loading Castor mapping file from location "
-                                    + mappingLocation, e);
-                    throw e;
+            // String mappingLocation =
+            // this.castorProperties.getProperty("mappingLocation");
+            //            
+            // if (mappingLocation != null) {
+            // try {
+            // Mapping mapping = new Mapping();
+            // URL mappingResource =
+            // getClass().getClassLoader().getResource(mappingLocation);
+            // mapping.loadMapping(new
+            // InputSource(mappingResource.openStream()));
+            //
+            // MappingUnmarshaller mappingUnmarshaller = new
+            // MappingUnmarshaller();
+            // MappingLoader loader = mappingUnmarshaller
+            // .getMappingLoader(mapping, BindingType.XML);
+            // this.resolver.setMappingLoader(loader);
+            // } catch (MappingException e) {
+            // LOG.error(
+            // "Problem locating/loading Castor mapping file from location "
+            // + mappingLocation, e);
+            // throw e;
+            // }
+            // }
+
+        }
+        
+        String mappingLocation = null;
+        if (mappingLocations != null && mappingLocations.size() > 0) {
+            Iterator iter = mappingLocations.iterator();
+            try {
+                Mapping mapping = new Mapping();
+                while (iter.hasNext()) {
+                    mappingLocation = (String) iter.next();
+                    URL mappingResource = getClass().getClassLoader()
+                            .getResource(mappingLocation);
+                    mapping.loadMapping(new InputSource(mappingResource
+                            .openStream()));
                 }
-            }
-            
-            // List mappingLocations = this.castorProperties.getProperty("mappingLocations");
 
+                MappingUnmarshaller mappingUnmarshaller = new MappingUnmarshaller();
+                MappingLoader loader = mappingUnmarshaller
+                        .getMappingLoader(mapping, BindingType.XML);
+                this.resolver.setMappingLoader(loader);
+            } catch (MappingException e) {
+                LOG.error(
+                        "Problem locating/loading Castor mapping file from location "
+                                + mappingLocation, e);
+                throw e;
+            }
         }
     }
 
@@ -105,5 +138,15 @@ public class CastorResolverFactoryBean implements FactoryBean, InitializingBean 
 
     public void setCastorProperties(Properties castorProperties) {
         this.castorProperties = castorProperties;
+    }
+
+    /**
+     * Sets a collection of mapping (file) locations.
+     * 
+     * @param mappingLocations
+     *            A collection of mapping (file) locations.
+     */
+    public void setMappingLocations(List mappingLocations) {
+        this.mappingLocations = mappingLocations;
     }
 }
