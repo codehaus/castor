@@ -2,6 +2,7 @@ package org.springframework.xml.castor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.exolab.castor.xml.UnmarshalListener;
 import org.exolab.castor.xml.Unmarshaller;
 import org.springframework.beans.factory.FactoryBeanNotInitializedException;
 import org.springframework.beans.factory.ListableBeanFactory;
@@ -52,6 +53,14 @@ public class CastorUnmarshallerFactoryBean extends AbstractCastorPrototypingXMLF
     private boolean preserveWhitespace = false;
 
     /**
+     * An (optional) {@link org.exolab.castor.xml.UnmarshalListener} to receive pre and
+     * post unmarshal notification for each Object in the tree. An UnmarshalListener is 
+     * often used to allow objects to appropriately initialize themselves by taking 
+     * appliction specific behavior as they are unloaded.
+     */
+    private UnmarshalListener unmarshalListener;
+
+    /**
      * Return an instance (possibly shared or independent) of the object managed
      * by this factory. As with a BeanFactory, this allows support for both the
      * Singleton and Prototype design pattern.
@@ -67,13 +76,22 @@ public class CastorUnmarshallerFactoryBean extends AbstractCastorPrototypingXMLF
      * @see FactoryBeanNotInitializedException
      */
     public Object getObject() throws Exception {
+        
         Unmarshaller unmarshaller = new Unmarshaller();
-        unmarshaller.setResolver(this.getResolver());
+        
         unmarshaller.setIgnoreExtraAttributes(this.ignoreExtraAttributes);
         unmarshaller.setIgnoreExtraElements(this.ignoreExtraElements);
         unmarshaller.setReuseObjects(this.reuseObjects);
         unmarshaller.setValidation(this.validation);
         unmarshaller.setWhitespacePreserve(this.preserveWhitespace);
+        
+        if (this.getResolver() != null) {
+            unmarshaller.setResolver(this.getResolver());
+        }
+        if (this.unmarshalListener != null) {
+            unmarshaller.setUnmarshalListener(this.unmarshalListener);
+        }
+        
         return unmarshaller;
     }
 
@@ -159,4 +177,20 @@ public class CastorUnmarshallerFactoryBean extends AbstractCastorPrototypingXMLF
         this.preserveWhitespace = preserveWhitespace;
     }
 
+    /**
+     * Sets an optional {@link org.exolab.castor.xml.UnmarshalListener} to receive pre and
+     * post unmarshal notification for each Object in the tree.
+     * An UnmarshalListener is often used to allow objects to
+     * appropriately initialize themselves by taking appliction
+     * specific behavior as they are unloaded.
+     * Current only one listener is allowed. If you need register multiple 
+     * listeners, you will have to create your own master listener that will
+     * forward the event notifications and manage the multiple listeners.
+     *
+     * @param listener The {@link org.exolab.castor.xml.UnmarshalListener} to set.
+    **/
+    public void setUnmarshalListener(UnmarshalListener listener) {
+        this.unmarshalListener = listener;
+    } //-- setUnmarshalListener
+    
 }
