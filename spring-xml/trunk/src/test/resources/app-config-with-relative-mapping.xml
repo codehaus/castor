@@ -12,11 +12,18 @@
     	parent="castorXMLFactoryBean" />
 
 	<bean id="resolver" class="org.springframework.xml.castor.CastorResolverFactoryBean">
-	  <property name="castorProperties">
+      <property name="mappingLocations">
+        <list>
+            <value>mapping/mapping.xml</value>
+        </list>
+      </property>
+<!--
+    <property name="castorProperties">
 	    <props>
 	      <prop key="mappingLocation">mapping/mapping.xml</prop>
 	    </props>
 	  </property>
+-->      
 	</bean>
 
     <bean 
