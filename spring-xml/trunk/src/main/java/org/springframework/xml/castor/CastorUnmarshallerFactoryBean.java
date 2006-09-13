@@ -6,12 +6,50 @@ import org.exolab.castor.xml.Unmarshaller;
 import org.springframework.beans.factory.FactoryBeanNotInitializedException;
 import org.springframework.beans.factory.ListableBeanFactory;
 
+/**
+ * Spring FactoryBean for the Unmarshaller component of Castor XML.
+ * 
+ * @since 0.9 
+ * @author <a href="mailto:werner DOT guttmann AT gmx DOT net">Werner Guttmann</a>
+ */
 public class CastorUnmarshallerFactoryBean extends AbstractCastorPrototypingXMLFactoryBean {
 
     /**
      * Log instance
      */
     private static final Log LOG = LogFactory.getLog(CastorUnmarshallerFactoryBean.class);
+    
+    /**
+     * Indicates whether extra attributes should be ignored; default is 'true'.
+     */
+    private boolean ignoreExtraAttributes = true;
+
+    /**
+     * Indicates whether extra elements should be ignored
+     */
+    private boolean ignoreExtraElements = false;
+
+    /**
+     * Indicates that objects contained within the object model should be 
+     * re-used where appropriate. This is only valid when unmarshalling
+     * to an existing object.
+     */
+    private boolean reuseObjects = false;
+
+    /**
+     * Indicates whether or not validation should be performed during 
+     * umarshalling; default is 'true' 
+     */
+    private boolean validation = true;
+
+    /**
+    /**
+     * Sets the top-level whitespace mode (&lt;xml:space&gt;) to either
+     * preserving or non preserving. Within the XML document, it is possible 
+     * to override this value using &lt;xml:space&gt; on specific
+     * elements. 
+     */
+    private boolean preserveWhitespace = false;
 
     /**
      * Return an instance (possibly shared or independent) of the object managed
@@ -31,6 +69,11 @@ public class CastorUnmarshallerFactoryBean extends AbstractCastorPrototypingXMLF
     public Object getObject() throws Exception {
         Unmarshaller unmarshaller = new Unmarshaller();
         unmarshaller.setResolver(this.getResolver());
+        unmarshaller.setIgnoreExtraAttributes(this.ignoreExtraAttributes);
+        unmarshaller.setIgnoreExtraElements(this.ignoreExtraElements);
+        unmarshaller.setReuseObjects(this.reuseObjects);
+        unmarshaller.setValidation(this.validation);
+        unmarshaller.setWhitespacePreserve(this.preserveWhitespace);
         return unmarshaller;
     }
 
@@ -67,4 +110,53 @@ public class CastorUnmarshallerFactoryBean extends AbstractCastorPrototypingXMLF
     protected Log getLog() {
         return CastorUnmarshallerFactoryBean.LOG;
     }
+    
+    /**
+     * Sets whether to ignore extra attributes
+     * @param ignoreExtraAttributes True if extra attributes should be ignored.
+     */
+    public void setIgnoreExtraAttributes(boolean ignoreExtraAttributes) {
+        this.ignoreExtraAttributes = ignoreExtraAttributes;
+    }
+
+    /**
+     * Sets whether to ignore extra attributes
+     * @param ignoreExtraAttributes True if extra attributes should be ignored.
+     */
+    public void setIgnoreExtraElements(boolean ignoreExtraElements) {
+        this.ignoreExtraElements= ignoreExtraElements;
+    }
+
+    /**
+     * Indicates that objects contained within the object model should be 
+     * re-used where appropriate. This is only valid when unmarshalling
+     * to an existing object.
+     *
+     * @param reuse indicates whether or not to re-use existing objects in the object model.
+    **/
+    public void setReuseObjects(boolean reuseObjects) {
+        this.reuseObjects = reuseObjects;
+    }
+
+    /**
+     * Indicates whether or not validation should be performed during umarshalling 
+     * @param validate True if validation should be performed during umarshalling; 
+     * default is 'true'.
+    **/
+    public void setValidation(boolean validation) {
+        this.validation = validation;
+    }
+
+    /**
+     * Sets the top-level whitespace mode (&lt;xml:space&gt;) to either
+     * preserving or non preserving. Within the XML document, it is possible 
+     * to override this value using &lt;xml:space&gt; on specific
+     * elements. This sets the "default" behavior when xml:space="default".
+     *
+     * @param preserve True to enable whitespace preserving by default. 
+     */
+    public void setPreserveWhitespace(boolean preserveWhitespace) {
+        this.preserveWhitespace = preserveWhitespace;
+    }
+
 }
