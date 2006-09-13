@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<document url="http://castor.codehaus.org/download.xml">
+
+    <properties>
+        <title>How to use the Spring DataBindingTemplate for Castor XML</title>
+        <author email="werner DOT guttmann AT gmx DOT net">Werner Guttmann</author>
+        <abstract>
+            Outlines how to use the Spring DataBindingTemplate for Castor XML
+        </abstract>
+        <status>Final</status>
+    </properties>
+
+    <body>
+        <title>How to use the Spring DataBindingTemplate for Castor XML</title>
+
+        <section name="Prerequisites">
+        
+        	<p>The following sections assume that you have a valid Castor XML
+        	   mapping for a Java entity named <tt>Product</tt> as follows:</p>
+        	   
+			<source><![CDATA[
+<mapping>
+
+  <!--  Mapping for Product  -->
+  <class name="org.springframework.xml.entity.Product" identity="id">
+    <map-to xml="product" />
+	<field name="id" type="integer">
+		  <bind-xml name="id" node="element"/>
+		</field>
+    <field name="name" type="string">
+      <bind-xml name="name" node="element" />
+    </field>
+  </class>
+
+</mapping>			
+			]]></source>        	   
+			
+			<p>The sources for this <tt>Product</tt> entity are as follows:</p>
+			
+			<source>
+public class Product {
+
+    private int id;
+    private String name;
+    
+    public int getId() {
+        return this.id;
+    }
+    public void setId(int id) {
+        this.id = id;
+    }
+    public String getName() {
+        return this.name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+			</source>
+            
+            <p>In addition, it assumes that you are familiar with configuring
+               the Castor XML Un- and Marshaller components through
+               Spring as outlined <a href="how-to-use-marshaller.html">here</a>.</p>
+        </section>
+        
+        <section name="How to obtain an instance of the DataBindingTemplate">
+
+            <p>Before you'll be able to work with a <tt>DataBindingTemplate</tt>
+               obtained through Spring, you have to add several Spring bean definition 
+               to your Spring configuration as follows:</p>
+            
+            <source><![CDATA[
+<!-- Castor XML ClassDescriptorResolver -->	
+<bean id="resolver" class="org.springframework.xml.castor.CastorResolverFactoryBean">
+  <property name="mappingLocations">
+    <list>
+      <value>mapping.xml</value>
+    </list>
+  </property>
+</bean>
+
+<!-- common parent definition for UN-/Marshaller components -->
+<bean id="castorXMLFactoryBean" abstract="true">
+  <property name="resolver"><ref local="resolver"/></property>
+</bean>
+
+<!-- Castor XML Marshaller component -->
+<bean id="marshaller"
+      class="org.springframework.xml.castor.CastorMarshallerFactoryBean"
+      parent="castorXMLFactoryBean" />
+
+<!-- Castor XML Unmarshaller component -->
+<bean id="unmarshaller"
+      class="org.springframework.xml.castor.CastorUnmarshallerFactoryBean"
+      parent="castorXMLFactoryBean" />
+    	
+<!-- Castor XML data binding template -->
+<bean id="template"
+      class="org.springframework.xml.castor.DataBindingTemplate">
+  <property name="marshaller" ref="marshaller" />
+  <property name="unmarshaller" ref="unmarshaller" />
+</bean>]]></source>
+            
+            <p>Based upon this configuration, you will be able to obtain a 
+               <tt>DataBindingTemplate</tt> instance as follows:</p>
+            
+            <source>
+ApplicationContext context = ....;
+DataBindingOperations template = (DataBindingOperations) this.context.getBean("template");            
+            </source>
+    
+	   </section>
+
+	   <section name="How to use the various template methods">
+	   
+	   	<p>Once you have obtained an instance of the <tt>DataBindingTemplate</tt>,
+           you are set to use one of the template methods defined therein. The following
+           sample shows how to use the <tt>DataBindingTemplate</tt> to unmarshall
+           an XML document from an <tt>InputSource</tt> to an instance of <tt>Product</tt>:</p>
+           
+	   	   
+	   	<source><![CDATA[
+DataBindingOperations template = (DataBindingOperations) context.getBean("template");
+
+InputSource inputSource = ...;
+Product product = (Product) template.unmarshal(inputSource, Product.class);
+... ]]></source>
+        
+        <p></p>
+	   	
+	</section>	   	
+
+  </body>
+</document>
+
+
+

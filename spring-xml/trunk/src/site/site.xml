@@ -18,7 +18,8 @@
 
     <menu name="Main">
     
-        <item name="How to use" href="/how-to-use-marshaller.html" />
+        <item name="How to use factory beans" href="/how-to-use-marshaller.html" />
+        <item name="How to use template" href="/how-to-use-template.html" />
     	
     </menu>
 
