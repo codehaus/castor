@@ -44,12 +44,20 @@ public abstract class AbstractCastorPrototypingXMLFactoryBean implements Factory
         return false;
     }
 
-    public void setResolver(XMLClassDescriptorResolver resolver) {
+    /**
+     * Sets the ClassDescriptorResolver instance to use for descriptor caching.
+     * @param resolver ClassDescriptorResolver instance to use for descriptor caching.
+     */
+    public void setResolver(final XMLClassDescriptorResolver resolver) {
         this.resolver = resolver;
     }
 
     protected abstract Log getLog();
 
+    /**
+     * Returns the ClassDescriptorResolver instance currently in use; null if none.
+     * @return the ClassDescriptorResolver instance currently in use
+     */
     protected XMLClassDescriptorResolver getResolver() {
         return this.resolver;
     }
