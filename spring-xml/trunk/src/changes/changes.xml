@@ -1,0 +1,30 @@
+<document>
+  <properties>
+    <title>Spring Factory beans for Castor XML - Changes</title>
+    <author email="werner DOT guttmann AT gmx DOT net">Werner Guttmann</author>
+  </properties>
+  <body>
+    <release version="0.9-SNAPSHOT" date="2006-09-12" description="Snapshot release via Codehaus snapshot repository">
+      <action dev="wguttmn" type="add">
+        Added additional documentation on how to use the *new* DataBindingTemplate.
+      </action>
+      <action dev="wguttmn" type="add">
+        Changed the way a mapping file location is provided (please see HOW-TO).
+      </action>
+      <action dev="wguttmn" type="add">
+        Improved test coverage.
+      </action>
+      <action dev="wguttmn" type="add">
+        Added several properties to the CastorUnmarshallerFactoryBean so that
+        it is possible to fine-tune the instantiated Unmarshaller instance
+        through the Spring beans definitions (rather than code).
+      </action>
+    </release>
+
+    <release version="0.9-SNAPSHOT" date="2006-09-11" description="First snapshot release">
+      <action dev="wguttmn" type="add">
+        Added initial set of documentation.
+      </action>
+    </release>
+  </body>
+</document>
