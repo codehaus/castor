@@ -1,30 +1,21 @@
 <document>
+    
   <properties>
-    <title>Spring Factory beans for Castor XML - Changes</title>
+    <title>Castor - Changes</title>
     <author email="werner DOT guttmann AT gmx DOT net">Werner Guttmann</author>
   </properties>
+  
   <body>
-    <release version="0.9-SNAPSHOT" date="2006-09-12" description="Snapshot release via Codehaus snapshot repository">
-      <action dev="wguttmn" type="add">
-        Added additional documentation on how to use the *new* DataBindingTemplate.
+    
+    <release version="1.0.4-SNAPSHOT" date="2006-09-22" description="Snapshot release via Codehaus snapshot repository">
+        
+      <action dev="wguttmn" type="add" issue="1575">
+        Added a new feature that allows a method prefixed with 'enum' to be specified
+        as a getter method (in a class mapping), so that this method will be used 
+        to enumerate a container's (collection's) content, and not expose the container
       </action>
-      <action dev="wguttmn" type="add">
-        Changed the way a mapping file location is provided (please see HOW-TO).
-      </action>
-      <action dev="wguttmn" type="add">
-        Improved test coverage.
-      </action>
-      <action dev="wguttmn" type="add">
-        Added several properties to the CastorUnmarshallerFactoryBean so that
-        it is possible to fine-tune the instantiated Unmarshaller instance
-        through the Spring beans definitions (rather than code).
-      </action>
+      
     </release>
 
-    <release version="0.9-SNAPSHOT" date="2006-09-11" description="First snapshot release">
-      <action dev="wguttmn" type="add">
-        Added initial set of documentation.
-      </action>
-    </release>
   </body>
 </document>
