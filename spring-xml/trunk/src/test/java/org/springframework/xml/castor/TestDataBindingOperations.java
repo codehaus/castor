@@ -62,23 +62,23 @@ public class TestDataBindingOperations extends BaseSpringTestCase {
         assertEquals("blah", product.getName());
     }
 
-    public void testUnmarshalFromSAXSource() throws IOException, MarshallingException, ValidationException {
-        DataBindingOperations template = (DataBindingOperations) context.getBean("template");
-        assertNotNull(template);
-
-        InputSource inputSource = new InputSource(getClass().getClassLoader().getResource("input.xml").openStream());
-        SAXSource saxSource = new SAXSource(inputSource);
-        Object object = template.unmarshal(saxSource, Product.class);
-        assertNotNull(object);
-        assertTrue(object instanceof Product);
-        
-        Product product = (Product) object;
-        assertNotNull(product);
-        
-        assertEquals(1, product.getId());
-        assertEquals("blah", product.getName());
-    }
-
+//    public void testUnmarshalFromSAXSource() throws IOException, MarshallingException, ValidationException {
+//        DataBindingOperations template = (DataBindingOperations) context.getBean("template");
+//        assertNotNull(template);
+//
+//        InputSource inputSource = new InputSource(getClass().getClassLoader().getResource("input.xml").openStream());
+//        SAXSource saxSource = new SAXSource(inputSource);
+//        Object object = template.unmarshal(saxSource, Product.class);
+//        assertNotNull(object);
+//        assertTrue(object instanceof Product);
+//        
+//        Product product = (Product) object;
+//        assertNotNull(product);
+//        
+//        assertEquals(1, product.getId());
+//        assertEquals("blah", product.getName());
+//    }
+//
 //    public void testUnmarshalFromDOMSource() throws IOException, MarshallingException, ValidationException {
 //        DataBindingOperations template = (DataBindingOperations) context.getBean("template");
 //        assertNotNull(template);

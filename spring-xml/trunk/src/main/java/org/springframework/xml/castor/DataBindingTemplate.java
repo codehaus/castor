@@ -64,37 +64,37 @@ public class DataBindingTemplate implements DataBindingOperations {
         this.unmarshaller = unmarshaller;
     }
 
-    /** 
-     * @inheritDoc
-     * @see org.springframework.xml.castor.DataBindingOperations#unmarshal(javax.xml.transform.sax.SAXSource, java.lang.Class)
-     */
-    public Object unmarshal(SAXSource saxSource, Class type) throws MarshallingException, IOException, ValidationException {
-        Object object;
-        try {
-            object = unmarshaller.unmarshal(saxSource);
-        } catch (MarshalException e) {
-            throw new MarshallingException(e.getMessage(), e);
-        } catch (org.exolab.castor.xml.ValidationException e) {
-            throw new ValidationException(e.getMessage(), e);
-        }
-        return object;
-    }
+//    /** 
+//     * @inheritDoc
+//     * @see org.springframework.xml.castor.DataBindingOperations#unmarshal(javax.xml.transform.sax.SAXSource, java.lang.Class)
+//     */
+//    public Object unmarshal(SAXSource saxSource, Class type) throws MarshallingException, IOException, ValidationException {
+//        Object object;
+//        try {
+//            object = unmarshaller.unmarshal(saxSource);
+//        } catch (MarshalException e) {
+//            throw new MarshallingException(e.getMessage(), e);
+//        } catch (org.exolab.castor.xml.ValidationException e) {
+//            throw new ValidationException(e.getMessage(), e);
+//        }
+//        return object;
+//    }
 
-    /**
-     * @inheritDoc
-     * @see org.springframework.xml.castor.DataBindingOperations#unmarshal(javax.xml.transform.dom.DOMSource, java.lang.Class)
-     */
-    public Object unmarshal(DOMSource domSource, Class type) throws MarshallingException, IOException, ValidationException {
-        Object object;
-        try {
-            object = unmarshaller.unmarshal(domSource);
-        } catch (MarshalException e) {
-            throw new MarshallingException(e.getMessage(), e);
-        } catch (org.exolab.castor.xml.ValidationException e) {
-            throw new ValidationException(e.getMessage(), e);
-        }
-        return object;
-    }
+//    /**
+//     * @inheritDoc
+//     * @see org.springframework.xml.castor.DataBindingOperations#unmarshal(javax.xml.transform.dom.DOMSource, java.lang.Class)
+//     */
+//    public Object unmarshal(DOMSource domSource, Class type) throws MarshallingException, IOException, ValidationException {
+//        Object object;
+//        try {
+//            object = unmarshaller.unmarshal(domSource);
+//        } catch (MarshalException e) {
+//            throw new MarshallingException(e.getMessage(), e);
+//        } catch (org.exolab.castor.xml.ValidationException e) {
+//            throw new ValidationException(e.getMessage(), e);
+//        }
+//        return object;
+//    }
 
     /**
      * @inheritDoc
