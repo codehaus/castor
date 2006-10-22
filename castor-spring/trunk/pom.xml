@@ -107,7 +107,7 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 			<email>werner.guttmann@gmx.net</email>
 			<organization>Anecon</organization>
 			<roles>
-				<role>Castor JDO Lead</role>
+				<role>Castor committer</role>
 			</roles>
 			<timezone>+1</timezone>
 		</developer>
@@ -165,7 +165,7 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 	<dependencies>
 
 		<dependency>
-			<groupId>castor</groupId>
+			<groupId>org.codehaus.castor</groupId>
 			<artifactId>castor</artifactId>
 			<version>1.0.4</version>
 		</dependency>
@@ -264,7 +264,13 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 			<name>java.net Maven Repository</name>
 			<url>https://maven-repository.dev.java.net/nonav/repository</url>
 			<layout>legacy</layout>
-		</repository>		
+		</repository>
+		<repository>
+			<id>codehaus.org</id>
+			<name>Maven Codehaus repository</name> 
+			<url>http://maven.codehaus.org/maven2/</url> 
+		</repository>
+			
 <!--		
 		<repository>
 			<id>maven2-repository.dev.java.net</id>
