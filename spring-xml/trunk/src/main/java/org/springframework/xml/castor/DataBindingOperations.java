@@ -34,29 +34,29 @@ public interface DataBindingOperations {
     Object unmarshal(InputSource inputSource, Class type)
     throws MarshallingException, IOException, ValidationException;
 
-    /**
-     * Unmarshalls the given XML data into its object equivalent, taking the XML
-     * data from the InputSource provided.
-     * @param saxSource A SAXSource instance, providing the XML to unmarshal..
-     * @param type The expected object type.
-     * @return An object instance, as a resulf of the unmarshalling.
-     * @throws MarshallingException If there's a problem with unmarshalling
-     * @throws IOException If there's a problem with accessing the InputSource
-     */
-    Object unmarshal(SAXSource saxSource, Class type)
-    throws MarshallingException, IOException, ValidationException;
+//    /**
+//     * Unmarshalls the given XML data into its object equivalent, taking the XML
+//     * data from the InputSource provided.
+//     * @param saxSource A SAXSource instance, providing the XML to unmarshal..
+//     * @param type The expected object type.
+//     * @return An object instance, as a resulf of the unmarshalling.
+//     * @throws MarshallingException If there's a problem with unmarshalling
+//     * @throws IOException If there's a problem with accessing the InputSource
+//     */
+//    Object unmarshal(SAXSource saxSource, Class type)
+//    throws MarshallingException, IOException, ValidationException;
 
-    /**
-     * Unmarshalls the given XML data into its object equivalent, taking the XML
-     * data from the InputSource provided.
-     * @param domSource A DOMSource instance, providing the XML to unmarshal..
-     * @param type The expected object type.
-     * @return An object instance, as a resulf of the unmarshalling.
-     * @throws MarshallingException If there's a problem with unmarshalling
-     * @throws IOException If there's a problem with accessing the InputSource
-     */
-    Object unmarshal(DOMSource domSource, Class type)
-    throws MarshallingException, IOException, ValidationException;
+//    /**
+//     * Unmarshalls the given XML data into its object equivalent, taking the XML
+//     * data from the InputSource provided.
+//     * @param domSource A DOMSource instance, providing the XML to unmarshal..
+//     * @param type The expected object type.
+//     * @return An object instance, as a resulf of the unmarshalling.
+//     * @throws MarshallingException If there's a problem with unmarshalling
+//     * @throws IOException If there's a problem with accessing the InputSource
+//     */
+//    Object unmarshal(DOMSource domSource, Class type)
+//    throws MarshallingException, IOException, ValidationException;
 
     /**
      * Unmarshalls the given XML data into its object equivalent, taking the XML
