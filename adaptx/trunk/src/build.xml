@@ -63,7 +63,7 @@
 
   <!-- Same as main, but no debug and no deprecation -->
   <target name="no-debug" depends="prepare">
-    <javac srcdir="${source}/main" destdir="${classes}"
+    <javac srcdir="${source}/main/java" destdir="${classes}"
            classpath="${classpath}" debug="off" deprecation="off" optimize="on"/>
   </target>
 
@@ -80,9 +80,9 @@
 
     <copy file="${source}/etc/MANIFEST.MF" tofile="${classes}/MANIFEST.MF" />
     <replace file="${classes}/MANIFEST.MF" token="$$VERSION$$" value="${version}"/>
-    <copy file="${source}/etc/LICENSE" tofile="${classes}/LICENSE" />
-    <copy file="${source}/etc/README" tofile="${classes}/README" />
-    <copy file="${source}/etc/CHANGELOG" tofile="${classes}/CHANGELOG" />
+    <copy file="${source}/main/resources/LICENSE" tofile="${classes}/LICENSE" />
+    <copy file="${source}/main/resources/README" tofile="${classes}/README" />
+    <copy file="${source}/main/resources/CHANGELOG" tofile="${classes}/CHANGELOG" />
 
     <jar jarfile="${dist}/${archive}.jar" basedir="${classes}"
          manifest="${classes}/MANIFEST.MF" includes="LICENSE,README,CHANGELOG,org/**" />
