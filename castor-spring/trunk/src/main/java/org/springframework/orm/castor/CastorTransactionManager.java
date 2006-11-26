@@ -2,6 +2,8 @@ package org.springframework.orm.castor;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.engine.AbstractDatabaseImpl;
 import org.exolab.castor.jdo.JDOManager;
@@ -452,6 +454,8 @@ public class CastorTransactionManager
 	 * @see DatabaseHolder
 	 */
 	private static class CastorTransactionObject extends JdbcTransactionObjectSupport {
+        
+        private static final Log logger = LogFactory.getLog(CastorTransactionObject.class);
 
 		private DatabaseHolder databaseHolder;
 
