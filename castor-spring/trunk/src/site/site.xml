@@ -17,6 +17,7 @@
     <menu name="Main">
         <item name="Build &amp; deployment" href="/build-instructions.html" />
         <item name="Usage" href="/data-access-with-spring.html" />
+        <item name="Usage" href="/data-access-with-spring-2.html" />
     </menu>
 
     ${reports}
