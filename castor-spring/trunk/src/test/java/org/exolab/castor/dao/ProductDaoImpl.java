@@ -2,7 +2,9 @@ package org.exolab.castor.dao;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 import org.exolab.castor.jdo.CacheManager;
 import org.exolab.castor.jdo.Database;
@@ -99,16 +101,10 @@ public class ProductDaoImpl implements ProductDao {
                     public Object doInCastor(Database database) throws PersistenceException {
                         database.begin();
                         OQLQuery query = database.getOQLQuery("select o from " + entityClass.getName() + " o");
-                        QueryResults results = query.execute();
-                        // TODO [WG]: is ArrayList the correct type to return here ?
-                        Collection objects = new ArrayList();
-                        Object object;
-                        while (results.hasMore()) {
-                            object = results.next();
-                            objects.add (object);
-                        }
+                        QueryResults queryResults = query.execute();
+                        List results = Collections.list(queryResults); 
                         database.commit();
-                        return objects;
+                        return results;
                     }
                 });
     }
@@ -120,16 +116,10 @@ public class ProductDaoImpl implements ProductDao {
                     public Object doInCastor(Database database) throws PersistenceException {
                         database.begin();
                         OQLQuery query = database.getOQLQuery("CALL SQL select id, name from product AS " + entityClass.getName());
-                        QueryResults results = query.execute();
-                        // TODO [WG]: is ArrayList the correct type to return here ?
-                        Collection objects = new ArrayList();
-                        Object object;
-                        while (results.hasMore()) {
-                            object = results.next();
-                            objects.add (object);
-                        }
+                        QueryResults queryResults = query.execute();
+                        List results = Collections.list(queryResults); 
                         database.commit();
-                        return objects;
+                        return results;
                     }
                 });
     }
@@ -141,16 +131,10 @@ public class ProductDaoImpl implements ProductDao {
                     public Object doInCastor(Database database) throws PersistenceException {
                         database.begin();
                         OQLQuery query = database.getOQLQuery("select o from " + entityClass.getName() + " o " + whereClause);
-                        QueryResults results = query.execute();
-                        // TODO [WG]: is ArrayList the correct type to return here ?
-                        Collection objects = new ArrayList();
-                        Object object;
-                        while (results.hasMore()) {
-                            object = results.next();
-                            objects.add (object);
-                        }
+                        QueryResults queryResults = query.execute();
+                        List results = Collections.list(queryResults); 
                         database.commit();
-                        return objects;
+                        return results;
                     }
                 });
     }
@@ -165,16 +149,10 @@ public class ProductDaoImpl implements ProductDao {
                         for (int i = 0; i < parameters.length; i++) {
                             query.bind(parameters[i]);
                         }
-                        QueryResults results = query.execute();
-                        // TODO [WG]: is ArrayList the correct type to return here ?
-                        Collection objects = new ArrayList();
-                        Object object;
-                        while (results.hasMore()) {
-                            object = results.next();
-                            objects.add (object);
-                        }
+                        QueryResults queryResults = query.execute();
+                        List results = Collections.list(queryResults); 
                         database.commit();
-                        return objects;
+                        return results;
                     }
                 });
     }
@@ -186,16 +164,10 @@ public class ProductDaoImpl implements ProductDao {
                     public Object doInCastor(Database database) throws PersistenceException {
                         database.begin();
                         OQLQuery query = database.getNamedQuery(queryName);
-                        QueryResults results = query.execute();
-                        // TODO [WG]: is ArrayList the correct type to return here ?
-                        Collection objects = new ArrayList();
-                        Object object;
-                        while (results.hasMore()) {
-                            object = results.next();
-                            objects.add (object);
-                        }
+                        QueryResults queryResults = query.execute();
+                        List results = Collections.list(queryResults); 
                         database.commit();
-                        return objects;
+                        return results;
                     }
                 });
     }
@@ -210,16 +182,10 @@ public class ProductDaoImpl implements ProductDao {
                         for (int i = 0; i < parameters.length; i++) {
                             query.bind(parameters[i]);
                         }
-                        QueryResults results = query.execute();
-                        // TODO [WG]: is ArrayList the correct type to return here ?
-                        Collection objects = new ArrayList();
-                        Object object;
-                        while (results.hasMore()) {
-                            object = results.next();
-                            objects.add (object);
-                        }
+                        QueryResults queryResults = query.execute();
+                        List results = Collections.list(queryResults); 
                         database.commit();
-                        return objects;
+                        return results;
                     }
                 });
     }
