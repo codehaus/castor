@@ -5,7 +5,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import junit.framework.TestCase;
 
-public class BaseSpringTestCase extends TestCase
+public abstract class BaseSpringTestCase extends TestCase
 {
     protected ApplicationContext context;
 
