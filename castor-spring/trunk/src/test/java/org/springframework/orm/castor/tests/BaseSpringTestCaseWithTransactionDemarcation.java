@@ -9,7 +9,7 @@ import org.exolab.castor.dao.Product;
 import org.exolab.castor.service.ProductService;
 import org.springframework.orm.castor.CastorObjectRetrievalFailureException;
 
-public class BaseSpringTestCaseWithTransactionDemarcation extends
+public abstract class BaseSpringTestCaseWithTransactionDemarcation extends
         BaseSpringTestCase {
 
     protected ProductService productService = null;

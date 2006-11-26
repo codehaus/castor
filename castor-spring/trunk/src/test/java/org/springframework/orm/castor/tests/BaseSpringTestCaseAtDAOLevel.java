@@ -9,7 +9,7 @@ import org.exolab.castor.dao.Product;
 import org.exolab.castor.dao.ProductDao;
 import org.springframework.orm.castor.CastorObjectRetrievalFailureException;
 
-public class BaseSpringTestCaseAtDAOLevel extends BaseSpringTestCase {
+public abstract class BaseSpringTestCaseAtDAOLevel extends BaseSpringTestCase {
 
     protected ProductDao productDAO;
 
