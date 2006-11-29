@@ -1,12 +1,10 @@
 package org.castor.jaxb;
 
-import java.io.File;
-
 import javax.xml.bind.JAXBException;
 
-import org.xml.sax.InputSource;
-
 import junit.framework.TestCase;
+
+import org.xml.sax.InputSource;
 
 public class UnmarshallerTest extends TestCase {
 
