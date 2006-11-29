@@ -90,7 +90,6 @@ public class CastorMarshallerFactoryBean extends AbstractCastorPrototypingXMLFac
     public Object getObject() throws Exception {
         Marshaller marshaller = new Marshaller();
         marshaller.setResolver(this.getResolver());
-        marshaller.setDebug(this.debug);
         // marshaller.setEncoding(this.encoding);
         marshaller.setMarshalAsDocument(this.marshalAsDocument);
         marshaller.setMarshalExtendedType(this.marshalExtendedType);
