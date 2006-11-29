@@ -17,10 +17,18 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
 import javax.xml.validation.Schema;
 
+import org.exolab.castor.xml.MarshalException;
+import org.exolab.castor.xml.ValidationException;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 
 public class Unmarshaller implements javax.xml.bind.Unmarshaller {
+    
+    private org.exolab.castor.xml.Unmarshaller unmarshaller;
+    
+    public Unmarshaller (Class aClass) {
+        unmarshaller = new org.exolab.castor.xml.Unmarshaller(aClass);
+    }
 
     public <A extends XmlAdapter> A getAdapter(Class<A> arg0) {
         // TODO Auto-generated method stub
@@ -122,9 +130,14 @@ public class Unmarshaller implements javax.xml.bind.Unmarshaller {
         return null;
     }
 
-    public Object unmarshal(InputSource arg0) throws JAXBException {
-        // TODO Auto-generated method stub
-        return null;
+    public Object unmarshal(InputSource inputSource) throws JAXBException {
+        try {
+            return unmarshaller.unmarshal(inputSource);
+        } catch (MarshalException e) {
+            throw new JAXBException("Problem unmarshalling from InputSource " + inputSource.toString(), e);
+        } catch (ValidationException e) {
+            throw new JAXBException("Problem validating XML from InputSource " + inputSource.toString(), e);
+        }
     }
 
     public Object unmarshal(Node arg0) throws JAXBException {
