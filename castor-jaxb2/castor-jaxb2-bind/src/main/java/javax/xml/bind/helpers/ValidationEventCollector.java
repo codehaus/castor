@@ -18,6 +18,8 @@ package javax.xml.bind.helpers;
 import javax.xml.bind.ValidationEventHandler;
 
 /**
+ * 
+ * @author Bruce Snyder
  * @version $Revision
  *
  */

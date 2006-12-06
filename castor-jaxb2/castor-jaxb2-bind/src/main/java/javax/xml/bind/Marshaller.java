@@ -19,6 +19,7 @@ import javax.xml.validation.Schema;
 
 /**
  * 
+ * @author Bruce Snyder
  * @version $Revision$
  *
  */

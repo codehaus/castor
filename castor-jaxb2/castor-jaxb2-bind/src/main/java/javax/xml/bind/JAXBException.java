@@ -16,9 +16,35 @@
 package javax.xml.bind;
 
 /** 
+ * 
+ * @author Bruce Snyder
  * @version $Revision$
  *
  */
-public class JAXBException extends Exception {
-
+public class JAXBException extends Exception { 
+	private String errorCode;
+	
+	private Throwable cause;
+	
+	public JAXBException(String message) {
+		super(message);
+	}
+	
+	public JAXBException(String message, String errorCode) {
+		this(message, errorCode, null);
+	}
+	
+	public JAXBException(Throwable t) {
+		this(null, null, t);
+	}
+	
+	public JAXBException(String message, Throwable t) {
+		this(message, null, t);
+	}
+	
+	public JAXBException(String message, String errorCode, Throwable t) {
+		super(message);
+		this.errorCode = errorCode;
+		
+	}
 }

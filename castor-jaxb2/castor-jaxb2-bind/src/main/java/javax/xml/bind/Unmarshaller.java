@@ -36,6 +36,8 @@ import javax.xml.transform.Result;
 import org.w3c.dom.Node;
 
 /**
+ * 
+ * @author Bruce Snyder
  * @version $Revision$
  */
 public interface Unmarshaller { 
