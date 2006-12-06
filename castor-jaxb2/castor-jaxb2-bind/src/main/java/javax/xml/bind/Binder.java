@@ -20,6 +20,7 @@ package javax.xml.bind;
  * infoset preserving view of an XML document with a possibly partial binding of 
  * the XML document to a JAXB representation.
  *
+ * @author Bruce Snyder 
  * @version $Revision$
  *
  */

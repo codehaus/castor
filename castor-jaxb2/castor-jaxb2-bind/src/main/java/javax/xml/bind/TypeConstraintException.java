@@ -16,6 +16,7 @@
 package javax.xml.bind;
 
 /** 
+ * @author Bruce Snyder
  * @version $Revision$
  *
  */
