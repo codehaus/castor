@@ -1,6 +1,7 @@
 package org.castor.jaxb;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.net.URL;
@@ -66,8 +67,7 @@ public class Unmarshaller implements javax.xml.bind.Unmarshaller {
     }
 
     public boolean isValidating() throws JAXBException {
-        // TODO Auto-generated method stub
-        return false;
+        return unmarshaller.isValidating();
     }
 
     public void setAdapter(XmlAdapter arg0) {
@@ -115,21 +115,34 @@ public class Unmarshaller implements javax.xml.bind.Unmarshaller {
         return null;
     }
 
-    public Object unmarshal(InputStream arg0) throws JAXBException {
-        // TODO Auto-generated method stub
-        return null;
+    /**
+     * @see javax.xml.bind.Unmarshaller#unmarshal(java.io.InputStream)
+     */
+    public Object unmarshal(InputStream inputStream) throws JAXBException {
+        return unmarshal(new InputSource(inputStream));
     }
 
-    public Object unmarshal(Reader arg0) throws JAXBException {
-        // TODO Auto-generated method stub
-        return null;
+    /**
+     * @see javax.xml.bind.Unmarshaller#unmarshal(java.io.Reader)
+     */
+    public Object unmarshal(Reader reader) throws JAXBException {
+        return unmarshal(new InputSource(reader));
     }
 
-    public Object unmarshal(URL arg0) throws JAXBException {
-        // TODO Auto-generated method stub
-        return null;
+    /**
+     * @see javax.xml.bind.Unmarshaller#unmarshal(java.net.URL)
+     */
+    public Object unmarshal(URL url) throws JAXBException {
+        try {
+            return unmarshal(new InputSource(url.openStream()));
+        } catch (IOException e) {
+            throw new JAXBException("Problem unmarshalling from URL " + url.toExternalForm(), e);
+        }
     }
 
+    /**
+     * @see javax.xml.bind.Unmarshaller#unmarshal(org.xml.sax.InputSource)
+     */
     public Object unmarshal(InputSource inputSource) throws JAXBException {
         try {
             return unmarshaller.unmarshal(inputSource);
@@ -145,7 +158,7 @@ public class Unmarshaller implements javax.xml.bind.Unmarshaller {
         return null;
     }
 
-    public Object unmarshal(Source arg0) throws JAXBException {
+    public Object unmarshal(Source source) throws JAXBException {
         // TODO Auto-generated method stub
         return null;
     }
