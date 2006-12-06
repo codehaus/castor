@@ -12,6 +12,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.PropertyException;
 import javax.xml.bind.UnmarshallerHandler;
 import javax.xml.bind.ValidationEventHandler;
+import javax.xml.bind.Unmarshaller.Listener;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.attachment.AttachmentUnmarshaller;
 import javax.xml.stream.XMLEventReader;
@@ -20,6 +21,7 @@ import javax.xml.transform.Source;
 import javax.xml.validation.Schema;
 
 import org.exolab.castor.xml.MarshalException;
+import org.exolab.castor.xml.UnmarshalListener;
 import org.exolab.castor.xml.ValidationException;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -27,6 +29,8 @@ import org.xml.sax.InputSource;
 public class Unmarshaller implements javax.xml.bind.Unmarshaller {
     
     private org.exolab.castor.xml.Unmarshaller unmarshaller;
+    
+    private ListenerAdapter unmarshalListener = new ListenerAdapter();
     
     public Unmarshaller (Class aClass) {
         unmarshaller = new org.exolab.castor.xml.Unmarshaller(aClass);
@@ -48,8 +52,7 @@ public class Unmarshaller implements javax.xml.bind.Unmarshaller {
     }
 
     public Listener getListener() {
-        // TODO Auto-generated method stub
-        return null;
+        return unmarshalListener.getListener();
     }
 
     public Object getProperty(String arg0) throws PropertyException {
@@ -91,9 +94,12 @@ public class Unmarshaller implements javax.xml.bind.Unmarshaller {
         
     }
 
-    public void setListener(Listener arg0) {
-        // TODO Auto-generated method stub
-        
+    /**
+     * @see javax.xml.bind.Unmarshaller#setListener(javax.xml.bind.Unmarshaller.Listener)
+     */
+    public void setListener(Listener listener) {
+        unmarshalListener.setListener(listener);
+        unmarshaller.setUnmarshalListener(unmarshalListener);
     }
 
     public void setProperty(String arg0, Object arg1) throws PropertyException {
