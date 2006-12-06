@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.xml.bind.JAXBElement;
@@ -105,14 +106,16 @@ public class Unmarshaller implements javax.xml.bind.Unmarshaller {
         
     }
 
-    public void setValidating(boolean arg0) throws JAXBException {
-        // TODO Auto-generated method stub
-        
+    public void setValidating(boolean validate) throws JAXBException {
+        unmarshaller.setValidation(validate);
     }
 
-    public Object unmarshal(File arg0) throws JAXBException {
-        // TODO Auto-generated method stub
-        return null;
+    public Object unmarshal(File file) throws JAXBException {
+        try {
+            return unmarshal(new InputSource(file.toURL().toExternalForm()));
+        } catch (MalformedURLException e) {
+            throw new JAXBException("Problem unmarshalling from file " + file.getAbsolutePath(), e);
+        }
     }
 
     /**
