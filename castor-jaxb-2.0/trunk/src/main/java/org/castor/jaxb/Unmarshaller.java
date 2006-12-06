@@ -173,24 +173,33 @@ public class Unmarshaller implements javax.xml.bind.Unmarshaller {
         return null;
     }
 
-    public <T> JAXBElement<T> unmarshal(Node arg0, Class<T> arg1) throws JAXBException {
-        // TODO Auto-generated method stub
-        return null;
+    /**
+     * @see javax.xml.bind.Unmarshaller#unmarshal(org.w3c.dom.Node, java.lang.Class)
+     */
+    public <T> JAXBElement<T> unmarshal(Node node, Class<T> type) throws JAXBException {
+        return (JAXBElement<T>) unmarshal(node, type);
     }
 
-    public <T> JAXBElement<T> unmarshal(Source arg0, Class<T> arg1) throws JAXBException {
-        // TODO Auto-generated method stub
-        return null;
+    /**
+     * @see javax.xml.bind.Unmarshaller#unmarshal(javax.xml.transform.Source, java.lang.Class)
+     */
+    public <T> JAXBElement<T> unmarshal(Source node, Class<T> type) throws JAXBException {
+        return (JAXBElement<T>) unmarshal(node, type);
     }
 
-    public <T> JAXBElement<T> unmarshal(XMLStreamReader arg0, Class<T> arg1) throws JAXBException {
+    /**
+     * @see javax.xml.bind.Unmarshaller#unmarshal(javax.xml.stream.XMLStreamReader, java.lang.Class)
+     */
+    public <T> JAXBElement<T> unmarshal(XMLStreamReader xmlStreamReader, Class<T> type) throws JAXBException {
         // TODO Auto-generated method stub
-        return null;
+        return (JAXBElement<T>) unmarshal (xmlStreamReader, type);
     }
 
+    /**
+     * @see javax.xml.bind.Unmarshaller#unmarshal(javax.xml.stream.XMLEventReader, java.lang.Class)
+     */
     public <T> JAXBElement<T> unmarshal(XMLEventReader arg0, Class<T> arg1) throws JAXBException {
-        // TODO Auto-generated method stub
-        return null;
+        return (JAXBElement<T>) unmarshal(arg0, arg1);
     }
 
 }
