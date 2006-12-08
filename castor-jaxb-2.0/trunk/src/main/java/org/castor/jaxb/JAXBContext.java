@@ -50,8 +50,7 @@ public class JAXBContext extends javax.xml.bind.JAXBContext {
 
     @Override
     public Marshaller createMarshaller() throws JAXBException {
-        // TODO Auto-generated method stub
-        return null;
+        return new org.castor.jaxb.Marshaller();
     }
 
     @Override
