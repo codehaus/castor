@@ -7,12 +7,12 @@ import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import javax.naming.OperationNotSupportedException;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.PropertyException;
 import javax.xml.bind.UnmarshallerHandler;
 import javax.xml.bind.ValidationEventHandler;
-import javax.xml.bind.Unmarshaller.Listener;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.attachment.AttachmentUnmarshaller;
 import javax.xml.stream.XMLEventReader;
@@ -21,7 +21,6 @@ import javax.xml.transform.Source;
 import javax.xml.validation.Schema;
 
 import org.exolab.castor.xml.MarshalException;
-import org.exolab.castor.xml.UnmarshalListener;
 import org.exolab.castor.xml.ValidationException;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -55,9 +54,13 @@ public class Unmarshaller implements javax.xml.bind.Unmarshaller {
         return unmarshalListener.getListener();
     }
 
-    public Object getProperty(String arg0) throws PropertyException {
-        // TODO Auto-generated method stub
-        return null;
+    /**
+     * @see javax.xml.bind.Unmarshaller#getProperty(java.lang.String)
+     */
+    public Object getProperty(String property) throws PropertyException {
+        throw new UnsupportedOperationException();
+        // TODO [WG]: add getProperty() to Unmarshaller
+        // return unmarshaller.getProperty(property);
     }
 
     public Schema getSchema() {
@@ -102,16 +105,22 @@ public class Unmarshaller implements javax.xml.bind.Unmarshaller {
         unmarshaller.setUnmarshalListener(unmarshalListener);
     }
 
-    public void setProperty(String arg0, Object arg1) throws PropertyException {
-        // TODO Auto-generated method stub
-        
+    /**
+     * @see javax.xml.bind.Unmarshaller#setProperty(java.lang.String, java.lang.Object)
+     */
+    public void setProperty(String property, Object value) throws PropertyException {
+        throw new UnsupportedOperationException();
+        // TODO [WG]: add setProperty(String, Object) to Unmarshaller
+        // unmarshaller.setProperty(property, value);
     }
 
     public void setSchema(Schema arg0) {
         // TODO Auto-generated method stub
-        
     }
 
+    /**
+     * @see javax.xml.bind.Unmarshaller#setValidating(boolean)
+     */
     public void setValidating(boolean validate) throws JAXBException {
         unmarshaller.setValidation(validate);
     }
