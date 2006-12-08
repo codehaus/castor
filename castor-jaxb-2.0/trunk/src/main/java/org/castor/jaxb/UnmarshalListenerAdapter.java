@@ -4,7 +4,7 @@ import javax.xml.bind.Unmarshaller.Listener;
 
 import org.exolab.castor.xml.UnmarshalListener;
 
-public class ListenerAdapter
+public class UnmarshalListenerAdapter
     implements UnmarshalListener {
     
     private Listener listener;

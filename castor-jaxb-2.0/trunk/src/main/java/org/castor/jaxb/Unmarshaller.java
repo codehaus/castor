@@ -29,7 +29,7 @@ public class Unmarshaller implements javax.xml.bind.Unmarshaller {
     
     private org.exolab.castor.xml.Unmarshaller unmarshaller;
     
-    private ListenerAdapter unmarshalListener = new ListenerAdapter();
+    private UnmarshalListenerAdapter unmarshalListener = new UnmarshalListenerAdapter();
     
     public Unmarshaller (Class aClass) {
         unmarshaller = new org.exolab.castor.xml.Unmarshaller(aClass);
