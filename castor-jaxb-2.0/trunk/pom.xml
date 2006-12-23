@@ -107,7 +107,7 @@
 		<dependency>
 			<groupId>org.codehaus.castor</groupId>
 			<artifactId>castor</artifactId>
-			<version>1.0.6-SNAPSHOT</version>
+			<version>1.1-M1</version>
 		</dependency>
 		
 		<dependency>
