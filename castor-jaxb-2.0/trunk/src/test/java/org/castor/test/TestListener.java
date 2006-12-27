@@ -16,8 +16,7 @@ public class TestListener extends Listener {
 
     @Override
     public void beforeUnmarshal(Object object, Object parent) {
-        // TODO Auto-generated method stub
-        super.beforeUnmarshal(object, parent);
+        LOG.debug("About to unmarshal " + object);
     }
     
     
