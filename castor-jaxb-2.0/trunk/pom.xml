@@ -51,6 +51,15 @@
 			</roles>
 			<timezone>+1</timezone>
 		</developer>
+		<developer>
+			<id>jgrueneis</id>
+			<name>Joachim Grueneis</name>
+			<email>jgrueneis@gmail.com</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<timezone>+1</timezone>
+		</developer>
 
 	</developers>
 
