@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<mapping>
+	<class name="org.castor.test2.Test">
+		<map-to xml="aTest" ns-uri="http://www.example.org/test" ns-prefix="test"/>
+		<field name="child" type="org.castor.test2.Child">
+			<bind-xml name="aChild"/>
+		</field>
+	</class>
+
+	<class name="org.castor.test2.Child">
+		<map-to xml="aChild" ns-uri="http://www.example.org/test" ns-prefix="test"/>
+		<field name="name" type="string" />
+	</class>
+</mapping>
