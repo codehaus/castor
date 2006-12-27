@@ -38,5 +38,11 @@ public class JAXBContextTest extends TestCase {
         assertNotNull(object);
     }
 
+    public void testCreateJAXBContextFromPackageContext() throws JAXBException {
+        JAXBContext context = org.castor.jaxb.JAXBContext.newInstance("org.castor.test2");
+        assertNotNull(context);
+    }
+    
+
 
 }
