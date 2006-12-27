@@ -14,6 +14,9 @@ import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
+import javax.xml.transform.dom.DOMResult;
+import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.Validator;
@@ -93,11 +96,27 @@ public class Marshaller implements javax.xml.bind.Marshaller {
     /**
      * @see javax.xml.bind.Marshaller#marshal(java.lang.Object, javax.xml.transform.Result)
      */
-    public void marshal(Object arg0, Result arg1) throws JAXBException {
-        throw new UnsupportedOperationException();
+    public void marshal(Object object, Result result) throws JAXBException {
+        if (result instanceof SAXResult) {
+            SAXResult saxResult = (SAXResult) result;
+            marshal(object, saxResult.getHandler());
+        }
+        else if (result instanceof DOMResult) {
+            DOMResult domResult = (DOMResult) result;
+            marshal(object, domResult.getNode());
+        }
+        else if (result instanceof StreamResult) {
+            StreamResult streamResult = (StreamResult) result;
+            // TODO: if (getWriter != null) {
+            marshal(object, streamResult.getWriter());
+            // TODO: if (getOutputStream() != null) {
+        } 
+        else {
+            throw new IllegalArgumentException("Illegal Result instance. Not soppurted by Castor");
+        }
     }
 
-    public void marshal(Object arg0, OutputStream arg1) throws JAXBException {
+    public void marshal(Object object, OutputStream stream) throws JAXBException {
         throw new UnsupportedOperationException();
     }
 
