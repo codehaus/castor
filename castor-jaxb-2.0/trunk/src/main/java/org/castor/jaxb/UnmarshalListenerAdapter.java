@@ -27,7 +27,10 @@ public class UnmarshalListenerAdapter
      * @see org.exolab.castor.xml.UnmarshalListener#initialized(java.lang.Object)
      */
     public void initialized(Object object) {
-        // not used by JAXB 2.0
+       if (listener != null) {
+           // TODO: add code to pass parent object as well
+           listener.beforeUnmarshal(object, null);
+       }
     }
 
     public void unmarshalled(Object object) {
