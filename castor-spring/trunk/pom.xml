@@ -167,14 +167,7 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 		<dependency>
 			<groupId>org.codehaus.castor</groupId>
 			<artifactId>castor</artifactId>
-			<version>1.1-M3-SNAPSHOT</version>
-		</dependency>
-
-		<dependency>
-            <scope>test</scope>
-			<groupId>cglib</groupId>
-			<artifactId>cglib-full</artifactId>
-			<version>2.0.2</version>
+			<version>1.1-M3</version>
 		</dependency>
 
 		<dependency>
@@ -214,25 +207,25 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-aop</artifactId>
-			<version>2.0</version>
+			<version>2.0.2</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-dao</artifactId>
-			<version>2.0</version>
+			<version>2.0.2</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-jdbc</artifactId>
-			<version>2.0</version>
+			<version>2.0.2</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-aspects</artifactId>
-			<version>2.0</version>
+			<version>2.0.2</version>
 		</dependency>
 
         <dependency>
@@ -247,6 +240,12 @@ http://maven.apache.org/maven-v4_0_0.xsd">
             <groupId>jotm</groupId>
             <artifactId>jotm</artifactId>
             <version>2.0.10</version>
+            <exclusions>
+            	<exclusion>
+            		<groupId>javax.resource</groupId>
+            		<artifactId>connector</artifactId>
+            	</exclusion>
+            </exclusions>
         </dependency>
 		
 		<dependency>
@@ -254,6 +253,13 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 			<groupId>org.apache.derby</groupId>
 			<artifactId>derbyclient</artifactId>
 			<version>10.1.2.1</version>
+		</dependency>
+
+		<dependency>
+			<scope>test</scope>
+			<groupId>javax.resource</groupId>
+			<artifactId>connector-api</artifactId>
+			<version>1.5</version>
 		</dependency>
 
 	</dependencies>
