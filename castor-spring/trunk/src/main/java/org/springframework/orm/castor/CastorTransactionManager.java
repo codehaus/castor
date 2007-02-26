@@ -288,7 +288,7 @@ public class CastorTransactionManager
 		Database database = txObject.getDatabaseHolder().getDatabase();
 
 		try {
-			// Delegate to JdoDialect for actual transaction begin.
+			// Delegate to CastorDialect for actual transaction begin.
 			Object transactionData = getCastorDialect().beginTransaction(database, definition);
 			txObject.setTransactionData(transactionData);
 
