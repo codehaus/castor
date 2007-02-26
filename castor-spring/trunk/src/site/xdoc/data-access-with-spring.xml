@@ -179,7 +179,7 @@ public class ProductDaoImpl implements ProductDao {
     CastorTemplate tempate = new CastorTemplate(this.jdoManager);
     return (Product) template.execute(
         new CastorCallback() {
-          public Object doInJdo(Database database) throws PersistenceException {
+          public Object doInCastor(Database database) throws PersistenceException {
             return (Product) database.load(Product.class, new Integer (id));
           }
         });
