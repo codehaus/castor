@@ -99,19 +99,22 @@ June 2005
 	<section name="Resource Definitions in an Application Context">
 
 		<p>To avoid tying application objects to hard-coded resource lookups, Spring allows to define 
-		   resources like a JDBC DataSource or a Castor JDOManager as beans in an application context. 
+		   resources like <!--  a JDBC DataSource or --> a Castor JDOManager as beans in an application context. 
 		   Application objects that need to access resources just receive references to such pre-defined 
 		   instances via bean references (the DAO definition in the next section illustrates this). The 
-		   following excerpt from an XML application context definition shows how to set up a JDBC 
-		   DataSource and a Castor JDOManager on top of it:</p>
+		   following excerpt from an XML application context definition shows how to set up <!-- a JDBC 
+		   DataSource and --> a Castor JDOManager <!-- on top of it -->:</p>
 
+<!-- 
 <source>
 &lt;bean id="myDataSource" class="org.springframework.jndi.JndiObjectFactoryBean&gt;
   &lt;property name="jndiName"&gt;
     &lt;value&gt;jdbc/myds&lt;/value&gt;
   &lt;/property&gt;
 &lt;/bean&gt;
-
+</source>
+ -->
+<source>
 &lt;bean id="jdoManager" class="org.springframework.orm.castor.LocalCastorFactoryBean"&gt;
   &lt;property name="jdoProperties"&gt;
     &lt;props&gt;
@@ -122,6 +125,23 @@ June 2005
 &lt;/bean&gt;
 </source>
 
+		<p>The JDO configuration file for <tt>hSQL</tt> looks as follows:</p>
+		
+<source>
+&lt;?xml version="1.0" ?&gt;
+&lt;!DOCTYPE jdo-conf PUBLIC "-//EXOLAB/Castor JDO Configuration DTD Version 1.0//EN" "http://castor.org/jdo-conf.dtd"&gt;
+&lt;jdo-conf&gt;
+  &lt;database name="hsqldb" engine="hsql"&gt;
+    &lt;driver class-name="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:hsql://localhost:9002/dbname"&gt;
+      &lt;param name="user" value="sa"/&gt;
+      &lt;param name="password" value=""/&gt;
+    &lt;/driver&gt;
+    &lt;mapping href="mapping.xml"/&gt;
+  &lt;/database&gt;
+  &lt;transaction-demarcation mode="local"/&gt;
+&lt;/jdo-conf&gt;
+</source>
+<!-- 
 		<p>Note that switching from a JNDI-located DataSource to a locally defined one like a 
 		   Jakarta Commons DBCP BasicDataSource is just a matter of configuration:</p>
 
@@ -141,7 +161,7 @@ June 2005
   &lt;/property&gt;
 &lt;/bean&gt;	
 </source>
-
+-->
 		<p>You can also use a JNDI-located JDOManager, but that's typically not necessary outside an 
 		   EJB context (see the "container resources vs local resources" section for a discussion).</p>
 
@@ -154,6 +174,7 @@ June 2005
 		   the surrounding object at all, it just needs to provide a Castor JDOManager. It can get the latter 
 		   from anywhere, but preferably as bean reference from a Spring application context - via a 
 		   simple setJDOMaanger bean property setter. The following snippets show a DAO definition in a 
+		
 		   Spring application context, referencing the above defined JDOManager, and an example for a DAO 
 		   method implementation.</p>
 
