@@ -39,6 +39,13 @@
 	    <ref bean="jdoManager"/>
 	  </property>
 	</bean>
+
+	<bean id="mySophisticatedProductDaoUsingDaoSupport" class="org.exolab.castor.dao.ProductDaoImplUsingDaoSupport">
+	  <property name="JDOManager">
+	    <ref bean="jdoManager"/>
+	  </property>
+	</bean>
+	
 	
 	<bean id="myCastorInterceptor" class="org.springframework.orm.castor.CastorInterceptor">
 	  <property name="JDOManager">
@@ -78,6 +85,15 @@
 	    <ref bean="mySophisticatedProductDao"/>
 	  </property>
 	</bean>	
+
+	<bean id="myProductServiceUsingDaoSupport" class="org.exolab.castor.service.ProductServiceImplWithProgrammaticTransactionDeclaration">
+	  <property name="transactionManager">
+	    <ref bean="myTransactionManager"/>
+	  </property>
+	  <property name="productDao">
+	    <ref bean="mySophisticatedProductDaoUsingDaoSupport"/>
+	  </property>
+	</bean>	
 	
 	<bean id="myTransactionInterceptor" class="org.springframework.transaction.interceptor.TransactionInterceptor">
 	  <property name="transactionManager">
@@ -97,9 +113,17 @@
 	
 	<bean id="myProductServiceTarget" class="org.exolab.castor.service.ProductServiceImplWithDeclarativeTransactionDeclaration">
 	  <property name="productDao">
+	    <ref bean="mySophisticatedProductDaoUsingDaoSupport"/>
+	  </property>
+	</bean>
+
+	<bean id="myProductServiceUsingDaoSupportTarget" 
+	      class="org.exolab.castor.service.ProductServiceImplWithDeclarativeTransactionDeclaration">
+	  <property name="productDao">
 	    <ref bean="mySophisticatedProductDao"/>
 	  </property>
 	</bean>
+	
 	
 	<bean id="myProductServiceDeclarative" class="org.springframework.aop.framework.ProxyFactoryBean">
 	  <property name="proxyInterfaces">
@@ -107,6 +131,16 @@
 	  </property>
 	  <property name="interceptorNames">
 	    <value>myTransactionInterceptor,myProductServiceTarget</value>
+	  </property>
+	</bean>
+
+	<bean id="myProductServiceUsingDaoSupportDeclarative" 
+	      class="org.springframework.aop.framework.ProxyFactoryBean">
+	  <property name="proxyInterfaces">
+	    <value>org.exolab.castor.service.ProductService</value>
+	  </property>
+	  <property name="interceptorNames">
+	    <value>myTransactionInterceptor,myProductServiceUsingDaoSupportTarget</value>
 	  </property>
 	</bean>
 
@@ -128,6 +162,27 @@
 	    </props>
 	  </property>
     </bean>
+    
+	<bean id="myProductServiceUsingDaoSupportDeclarativeShortened" 
+	      class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+	  <property name="transactionManager">
+	    <ref bean="myTransactionManager"/>
+	  </property>
+	  <property name="target">
+	    <ref bean="myProductServiceUsingDaoSupportTarget"/>
+	  </property>
+	  <property name="transactionAttributes">
+	    <props>
+	      <prop key="create*">PROPAGATION_REQUIRED</prop>
+	      <prop key="load*">PROPAGATION_REQUIRED</prop>
+	      <prop key="delete*">PROPAGATION_REQUIRED</prop>
+	      <prop key="find*">PROPAGATION_REQUIRED</prop>
+	      <prop key="evict*">PROPAGATION_REQUIRED</prop>
+	      <prop key="isCached*">PROPAGATION_REQUIRED</prop>
+	    </props>
+	  </property>
+    </bean>
+    
 
     <!-- 2PC definitions -->
 	<bean id="jdoManager2PC" class="org.springframework.orm.castor.LocalCastorFactoryBean">
