@@ -11,6 +11,7 @@
 	  </property>
 	</bean>
 
+<!-- 
 	<bean id="myDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
 	  <property name="driverClassName">
 	    <value>com.mysql.jdbc.Driver</value>
@@ -25,7 +26,8 @@
 	    <value>test</value>
 	  </property>
 	</bean>	
-	
+ -->
+ 	
 	<bean id="myProductDao" class="org.exolab.castor.dao.ProductDaoImpl">
 	  <property name="JDOManager">
 	    <ref bean="jdoManager"/>
