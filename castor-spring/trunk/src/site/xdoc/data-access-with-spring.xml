@@ -176,7 +176,7 @@ public class ProductDaoImpl implements ProductDao {
   }
 
   public Product loadProduct(final int id) {
-    CastorTemplate tempate = new CastorTemplate(this.jdoManager);
+    CastorTemplate template = new CastorTemplate(this.jdoManager);
     return (Product) template.execute(
         new CastorCallback() {
           public Object doInCastor(Database database) throws PersistenceException {
