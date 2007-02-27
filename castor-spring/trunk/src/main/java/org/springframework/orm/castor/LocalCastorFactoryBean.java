@@ -1,6 +1,6 @@
 package org.springframework.orm.castor;
-import java.util.Enumeration;
-import java.util.Properties;
+import java.io.IOException;
+import java.net.URL;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -9,6 +9,9 @@ import org.exolab.castor.mapping.MappingException;
 // import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.io.Resource;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
 
 public class LocalCastorFactoryBean 
     implements FactoryBean, InitializingBean /*, DisposableBean */{
@@ -16,7 +19,7 @@ public class LocalCastorFactoryBean
     /**
      * Log instance
      */
-    private static final Log log = LogFactory.getLog (LocalCastorFactoryBean.class);
+    private static final Log LOG = LogFactory.getLog (LocalCastorFactoryBean.class);
     
     /**
      * Castor JDO Manager instance
@@ -24,10 +27,20 @@ public class LocalCastorFactoryBean
     private JDOManager jdoManager;
     
     /**
-     * Spring resource defining databaseName
+     * Name of the database configured in the JDO configuration file.
      */
-    private Properties jdoProperties;
-
+    private String databaseName;
+    
+    /**
+     * Location of Castor JDO configuration file
+     */
+    private Resource configLocation;
+    
+    /**
+     * {@link EntityResolver} instance used to resolve cached entities, e.g. for external
+     * mapping documents.
+     */
+    private EntityResolver entityResolver;
     
     /**
      * Return an instance (possibly shared or independent) of the object
@@ -96,31 +109,19 @@ public class LocalCastorFactoryBean
     public void afterPropertiesSet() 
         throws IllegalArgumentException, MappingException 
     {
-        String databaseName = null;
-        String configuration = null; 
-        
-        if (this.jdoProperties != null) {
-            // use propertyNames enumeration to also catch default properties
-            for (Enumeration en = this.jdoProperties.propertyNames(); en.hasMoreElements();) {
-                String key = (String) en.nextElement();
-                // props.setProperty(key, this.jdoProperties.getProperty(key));
-                if ("databaseName".equals (key)) {
-                    databaseName = this.jdoProperties.getProperty(key); 
-                }
-                if ("configLocation".equals (key)) {
-                    configuration = this.jdoProperties.getProperty(key);
-                }
-            }
-        }
-        
-        if (databaseName == null) {
+        if (this.databaseName == null || this.databaseName.length() < 1) {
             throw new IllegalArgumentException ("Please specify a valid database name as defined in the JDO configuration file.");
         }
-        if (configuration == null) {
+        if (this.configLocation == null) {
             throw new IllegalArgumentException ("Please specify a valid JDO configuration file location.");
         }
         
-        this.jdoManager = createJDOManager (configuration, databaseName);
+        try {
+            LOG.debug("About to load JDO configuration file from " + configLocation.getURL().toExternalForm());
+            this.jdoManager = createJDOManager (configLocation.getURL(), databaseName);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Problem loading JDO configuration file from " + configLocation.getDescription());
+        }
         
     }
 
@@ -132,16 +133,17 @@ public class LocalCastorFactoryBean
      * @throws MappingException If the JDOManager cannot be initialized/configured. 
      * @author <a href="werner DOT guttmann AT gmx DOT net">Werner Guttmann</a>
      */
-    protected JDOManager createJDOManager(String configuration, String databaseName)
+    protected JDOManager createJDOManager(URL configuration, String databaseName)
         throws MappingException 
     {
         JDOManager jdoManagerToBeCreated = null;
         
         try {
-            JDOManager.loadConfiguration (configuration);
+            InputSource inputSource = new InputSource(configuration.toExternalForm());
+            JDOManager.loadConfiguration (inputSource, this.entityResolver, getClass().getClassLoader());
             jdoManagerToBeCreated = JDOManager.createInstance(databaseName);
         } catch (MappingException e) {
-            log.error ("Problem creating instance of JDOManager.", e);
+            LOG.error ("Problem creating instance of JDOManager.", e);
             throw e;
         }
         return jdoManagerToBeCreated;
@@ -157,9 +159,29 @@ public class LocalCastorFactoryBean
 //        // TODO [WG]: I think we should introduce a life-cycle method with JDOManager
 //        // this.jdoManager.close();
 //    }
-    
 
-    public void setJdoProperties(Properties jdoProperties) {
-        this.jdoProperties = jdoProperties;
+    /**
+     * Specifies the name of the <tt>database</tt> as configured in the JDO configuration file.
+     * @param databasename name of the <tt>database</tt>
+     */
+    public void setDatabaseName(final String databasename) {
+        this.databaseName = databasename;
+    }
+
+    /**
+     * Specifies the location of Castor JDO configuration file
+     * @param configLocation the location of Castor JDO configuration file
+     */
+    public void setConfigLocation(final Resource configLocation) {
+        this.configLocation = configLocation;
+    }
+
+    /**
+     * Specifies the {@link EntityResolver} instance used to resolve cached 
+     * entities, e.g. for external mapping documents.
+     * @param entityResolver the {@link EntityResolver} instance used to resolve cached entities
+     */
+    public void setEntityResolver(EntityResolver entityResolver) {
+        this.entityResolver = entityResolver;
     }
 }
