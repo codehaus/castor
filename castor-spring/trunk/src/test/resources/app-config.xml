@@ -3,12 +3,8 @@
 <beans>
 	
 	<bean id="jdoManager" class="org.springframework.orm.castor.LocalCastorFactoryBean">
-	  <property name="jdoProperties">
-	    <props>
-	      <prop key="databaseName">test</prop>
-	      <prop key="configLocation">src/test/resources/jdo-conf.xml</prop>
-	    </props>
-	  </property>
+		<property name="databaseName" value="test" />
+		<property name="configLocation" value="classpath:jdo-conf.xml" />
 	</bean>
 
 <!-- 
@@ -186,12 +182,8 @@
 
     <!-- 2PC definitions -->
 	<bean id="jdoManager2PC" class="org.springframework.orm.castor.LocalCastorFactoryBean">
-	  <property name="jdoProperties">
-	    <props>
-	      <prop key="databaseName">test2PC</prop>
-	      <prop key="configLocation">src/test/resources/jdo-conf-2pc.xml</prop>
-	    </props>
-	  </property>
+		<property name="databaseName" value="test2PC" />
+		<property name="configLocation" value="classpath:jdo-conf-2pc.xml" />
 	</bean>
 
 	<bean id="my2PCSophisticatedProductDao" class="org.exolab.castor.dao.ProductDaoImplUsingTemplate">
