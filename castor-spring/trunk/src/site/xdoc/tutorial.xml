@@ -104,12 +104,8 @@ public class ProductDaoImpl implements ProductDao {
 		   
 		<source>
 &lt;bean id="jdoManager" class="org.springframework.orm.castor.LocalCastorFactoryBean"&gt;
-  &lt;property name="jdoProperties"&gt;
-    &lt;props&gt;
-      &lt;prop key="databaseName"&gt;test&lt;/prop&gt;
-      &lt;prop key="configLocation"&gt;src/spring/jdo-conf.xml&lt;/prop&gt;
-    &lt;/props&gt;
-  &lt;/property&gt;
+  &lt;property name="databaseName" value="test" /&gt;
+  &lt;property name="configLocation" value="classpath:jdo-conf.xml" /&gt;
 &lt;/bean&gt;
 
 &lt;bean id="myProductDao" class="product.ProductDaoImpl"&gt;

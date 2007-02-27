@@ -116,12 +116,8 @@ June 2005
  -->
 <source>
 &lt;bean id="jdoManager" class="org.springframework.orm.castor.LocalCastorFactoryBean"&gt;
-  &lt;property name="jdoProperties"&gt;
-    &lt;props&gt;
-      &lt;prop key="databaseName"&gt;test&lt;/prop&gt;
-      &lt;prop key="configLocation"&gt;src/spring/jdo-conf.xml&lt;/prop&gt;
-    &lt;/props&gt;
-  &lt;/property&gt;
+  &lt;property name="databaseName" value="test" /&gt;
+  &lt;property name="configLocation" value="classpath:jdo-conf.xml" /&gt;
 &lt;/bean&gt;
 </source>
 
@@ -314,7 +310,7 @@ public class ProductDaoImpl extends CastorDaoSupport implements ProductDao {
 
 <source>
 &lt;bean id="myTransactionManager" class="org.springframework.orm.castor.CastorTransactionManager"&gt;
-  &lt;property name="JDOmanager"&gt;
+  &lt;property name="JDOManager"&gt;
     &lt;ref bean="myJdoManager"/&gt;
   &lt;/property&gt;
 &lt;/bean&gt;
