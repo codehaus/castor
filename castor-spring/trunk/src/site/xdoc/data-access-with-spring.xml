@@ -115,7 +115,7 @@ June 2005
 </source>
  -->
 <source>
-&lt;bean id="jdoManager" class="org.springframework.orm.castor.LocalCastorFactoryBean"&gt;
+&lt;bean id="jdoManager" class="org.castor.spring.orm.LocalCastorFactoryBean"&gt;
   &lt;property name="databaseName" value="test" /&gt;
   &lt;property name="configLocation" value="classpath:jdo-conf.xml" /&gt;
 &lt;/bean&gt;
@@ -236,7 +236,7 @@ public class ProductDaoImpl extends CastorDaoSupport implements ProductDao {
 		   an example for a DAO method implementation.</p>
 
 <source>
-&lt;bean id="myCastorInterceptor" class="org.springframework.orm.castor.CastorInterceptor"&gt;
+&lt;bean id="myCastorInterceptor" class="org.castor.spring.orm.CastorInterceptor"&gt;
   &lt;property name="JDOManager"&gt;
     &lt;ref bean="myJdoManager"/&gt;
   &lt;/property&gt;
@@ -309,7 +309,7 @@ public class ProductDaoImpl extends CastorDaoSupport implements ProductDao {
 
 
 <source>
-&lt;bean id="myTransactionManager" class="org.springframework.orm.castor.CastorTransactionManager"&gt;
+&lt;bean id="myTransactionManager" class="org.castor.spring.orm.CastorTransactionManager"&gt;
   &lt;property name="JDOManager"&gt;
     &lt;ref bean="myJdoManager"/&gt;
   &lt;/property&gt;
@@ -364,7 +364,7 @@ public class ProductServiceImpl implements ProductService {
 		   be changed in a configuration file and do not affect the business object implementations.</p>
 
 <source>
-&lt;bean id="myTransactionManager" class="org.springframework.orm.castor.CastorTransactionManager"&gt;
+&lt;bean id="myTransactionManager" class="org.castor.spring.orm.CastorTransactionManager"&gt;
   &lt;property name="JDOManager"&gt;
     &lt;ref bean="myJdoManager"/&gt;
   &lt;/property&gt;
@@ -428,7 +428,7 @@ public class ProductServiceImpl implements ProductService {
 		   not need to specify which interfaces or classes the transactional methods are defined in.</p>
 
 <source>
-&lt;bean id="myTransactionManager" class="org.springframework.orm.castor.CastorTransactionManager"&gt;
+&lt;bean id="myTransactionManager" class="org.castor.spring.orm.CastorTransactionManager"&gt;
   &lt;property name="JDOManager"&gt;
     &lt;ref bean="myJdoManager"/&gt;
   &lt;/property&gt;
@@ -495,7 +495,7 @@ public class ProductServiceImpl implements ProductService {
   &lt;/property&gt;
 &lt;/bean&gt;
 
-&lt;bean id="jdoManager1" class="org.springframework.orm.castor.LocalCastorFactoryBean"&gt;
+&lt;bean id="jdoManager1" class="org.castor.spring.orm.LocalCastorFactoryBean"&gt;
   &lt;property name="jdoProperties"&gt;
     &lt;props&gt;
       &lt;prop key="databaseName"&gt;test1&lt;/prop&gt;
@@ -504,7 +504,7 @@ public class ProductServiceImpl implements ProductService {
   &lt;/property&gt;
 &lt;/bean&gt;
 
-&lt;bean id="jdoManager2" class="org.springframework.orm.castor.LocalCastorFactoryBean"&gt;
+&lt;bean id="jdoManager2" class="org.castor.spring.orm.LocalCastorFactoryBean"&gt;
   &lt;property name="jdoProperties"&gt;
     &lt;props&gt;
       &lt;prop key="databaseName"&gt;test2&lt;/prop&gt;
