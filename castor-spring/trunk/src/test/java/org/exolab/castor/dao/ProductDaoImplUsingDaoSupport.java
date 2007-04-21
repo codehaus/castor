@@ -2,8 +2,8 @@ package org.exolab.castor.dao;
 
 import java.util.Collection;
 
+import org.castor.spring.orm.support.CastorDaoSupport;
 import org.exolab.castor.jdo.JDOManager;
-import org.springframework.orm.castor.support.CastorDaoSupport;
 
 public class ProductDaoImplUsingDaoSupport extends CastorDaoSupport implements ProductDao {
     

@@ -2,11 +2,11 @@ package org.exolab.castor.dao;
 
 import java.util.Collection;
 
+import org.castor.spring.orm.CastorTemplate;
+import org.castor.spring.orm.JDOManagerUtils;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.PersistenceException;
-import org.springframework.orm.castor.CastorTemplate;
-import org.springframework.orm.castor.JDOManagerUtils;
 
 public class ProductDaoImplWithInterceptor extends CastorTemplate implements ProductDaoWithInterceptor
 {

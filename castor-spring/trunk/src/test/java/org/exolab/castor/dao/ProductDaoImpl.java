@@ -6,14 +6,14 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.castor.spring.orm.CastorCallback;
+import org.castor.spring.orm.CastorTemplate;
 import org.exolab.castor.jdo.CacheManager;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.JDOManager;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.QueryResults;
-import org.springframework.orm.castor.CastorCallback;
-import org.springframework.orm.castor.CastorTemplate;
 
 public class ProductDaoImpl implements ProductDao {
     
