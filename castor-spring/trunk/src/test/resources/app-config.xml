@@ -2,7 +2,7 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 	
-	<bean id="jdoManager" class="org.springframework.orm.castor.LocalCastorFactoryBean">
+	<bean id="jdoManager" class="org.castor.spring.orm.LocalCastorFactoryBean">
 		<property name="databaseName" value="test" />
 		<property name="configLocation" value="classpath:jdo-conf.xml" />
 	</bean>
@@ -43,7 +43,7 @@
 	</bean>
 	
 	
-	<bean id="myCastorInterceptor" class="org.springframework.orm.castor.CastorInterceptor">
+	<bean id="myCastorInterceptor" class="org.castor.spring.orm.CastorInterceptor">
 	  <property name="JDOManager">
 	    <ref bean="jdoManager"/>
 	  </property>
@@ -67,7 +67,7 @@
 	  </property>
 	</bean>
 
-	<bean id="myTransactionManager" class="org.springframework.orm.castor.CastorTransactionManager">
+	<bean id="myTransactionManager" class="org.castor.spring.orm.CastorTransactionManager">
 	  <property name="JDOManager">
 	    <ref bean="jdoManager"/>
 	  </property>
@@ -181,7 +181,7 @@
     
 
     <!-- 2PC definitions -->
-	<bean id="jdoManager2PC" class="org.springframework.orm.castor.LocalCastorFactoryBean">
+	<bean id="jdoManager2PC" class="org.castor.spring.orm.LocalCastorFactoryBean">
 		<property name="databaseName" value="test2PC" />
 		<property name="configLocation" value="classpath:jdo-conf-2pc.xml" />
 	</bean>
@@ -249,7 +249,7 @@
 	  </property>
 	</bean>	
 
-	<bean id="jdoManagerDerby2PC" class="org.springframework.orm.castor.LocalCastorFactoryBean">
+	<bean id="jdoManagerDerby2PC" class="org.castor.spring.orm.LocalCastorFactoryBean">
 	  <property name="jdoProperties">
 	    <props>
 	      <prop key="databaseName">testDerby2PC</prop>
