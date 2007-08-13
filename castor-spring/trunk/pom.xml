@@ -293,6 +293,11 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 			<name>Maven Codehaus repository</name> 
 			<url>http://maven.codehaus.org/maven2/</url> 
 		</repository>
+		<repository>
+			<id>codehaus-snapshots</id>
+			<name>Maven Codehaus Snapshots</name>
+			<url>http://snapshots.maven.codehaus.org/maven2/</url>
+		</repository>
 	</repositories>
 
 	<pluginRepositories>
