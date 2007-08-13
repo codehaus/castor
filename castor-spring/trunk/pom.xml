@@ -74,6 +74,7 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 					<excludes>
 						<exclude>**/BaseSpringTestCase*.java</exclude>
 						<exclude>**/TestDerby*.java</exclude>
+						<exclude>**/Test2PC*.java</exclude>
 					</excludes>
 				</configuration>
 			</plugin>
@@ -167,7 +168,7 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 		<dependency>
 			<groupId>org.codehaus.castor</groupId>
 			<artifactId>castor-jdo</artifactId>
-			<version>1.1.2.1</version>
+			<version>1.1.3-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
