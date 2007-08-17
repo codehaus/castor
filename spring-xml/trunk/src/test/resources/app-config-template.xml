@@ -8,10 +8,17 @@
 	
     <bean 
     	id="marshaller"
-    	class="org.springframework.xml.castor.CastorMarshallerFactoryBean"
+    	class="org.castor.spring.xml.CastorMarshallerFactoryBean"
     	parent="castorXMLFactoryBean" />
+    	
+    <bean 
+    	id="marshaller-suppress"
+    	class="org.castor.spring.xml.CastorMarshallerFactoryBean"
+    	parent="castorXMLFactoryBean">
+    	<property name="suppressNamespaces" value="true" />
+    </bean>
 
-	<bean id="resolver" class="org.springframework.xml.castor.CastorResolverFactoryBean">
+	<bean id="resolver" class="org.castor.spring.xml.CastorResolverFactoryBean">
 <!--        
 	  <property name="castorProperties">
 	    <props>
@@ -28,11 +35,11 @@
 
     <bean 
     	id="unmarshaller"
-    	class="org.springframework.xml.castor.CastorUnmarshallerFactoryBean"
+    	class="org.castor.spring.xml.CastorUnmarshallerFactoryBean"
     	parent="castorXMLFactoryBean" />
     	
     <bean id="template"
-          class="org.springframework.xml.castor.DataBindingTemplate">
+          class="org.castor.spring.xml.DataBindingTemplate">
           <property name="marshaller" ref="marshaller" />
           <property name="unmarshaller" ref="unmarshaller" />
     </bean>

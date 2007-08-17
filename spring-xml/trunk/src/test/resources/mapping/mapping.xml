@@ -4,7 +4,7 @@
 <mapping>
 
   <!--  Mapping for Product  -->
-  <class name="org.springframework.xml.entity.Product" identity="id">
+  <class name="org.castor.spring.xml.entity.Product" identity="id">
     <map-to xml="product" />
 	<field name="id" type="integer">
 		  <bind-xml name="id" node="element"/>
