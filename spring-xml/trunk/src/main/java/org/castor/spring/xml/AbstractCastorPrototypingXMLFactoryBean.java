@@ -1,4 +1,4 @@
-package org.springframework.xml.castor;
+package org.castor.spring.xml;
 
 import org.apache.commons.logging.Log;
 import org.exolab.castor.xml.XMLClassDescriptorResolver;

@@ -1,4 +1,4 @@
-package org.springframework.xml.castor;
+package org.castor.spring.xml;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -132,7 +132,7 @@ public class CastorMarshallerFactoryBean extends AbstractCastorPrototypingXMLFac
     /**
      * {@inheritDoc}
      * 
-     * @see org.springframework.xml.castor.AbstractCastorPrototypingXMLFactoryBean#getLog()
+     * @see org.castor.spring.xml.AbstractCastorPrototypingXMLFactoryBean#getLog()
      */
     protected Log getLog() {
         return CastorMarshallerFactoryBean.LOG;

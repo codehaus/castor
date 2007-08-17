@@ -1,4 +1,4 @@
-package org.springframework.xml.castor;
+package org.castor.spring.xml;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -18,7 +18,7 @@ public class DataBindingTemplate implements DataBindingOperations {
     private Unmarshaller unmarshaller;
 
     /**
-     * @see org.springframework.xml.castor.DataBindingOperations#marshal(java.lang.Object, java.io.Writer)
+     * @see org.castor.spring.xml.DataBindingOperations#marshal(java.lang.Object, java.io.Writer)
      */
     public void marshal(Object object, Writer writer) 
         throws MarshallingException, IOException, ValidationException {
@@ -34,7 +34,7 @@ public class DataBindingTemplate implements DataBindingOperations {
 
     /**
      * @inheritDoc
-     * @see org.springframework.xml.castor.DataBindingOperations#unmarshal(org.xml.sax.InputSource, java.lang.Class)
+     * @see org.castor.spring.xml.DataBindingOperations#unmarshal(org.xml.sax.InputSource, java.lang.Class)
      */
     public Object unmarshal(InputSource inputSource, Class type) throws MarshallingException, IOException, ValidationException {
         Object object;
@@ -98,7 +98,7 @@ public class DataBindingTemplate implements DataBindingOperations {
 
     /**
      * @inheritDoc
-     * @see org.springframework.xml.castor.DataBindingOperations#unmarshal(java.io.Reader, java.lang.Class)
+     * @see org.castor.spring.xml.DataBindingOperations#unmarshal(java.io.Reader, java.lang.Class)
      */
     public Object unmarshal(Reader reader, Class type) throws MarshallingException, IOException, ValidationException {
         Object object;

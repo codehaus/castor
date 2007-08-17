@@ -1,4 +1,4 @@
-package org.springframework.xml.castor;
+package org.castor.spring.xml;
 
 import java.net.URL;
 import java.util.Iterator;

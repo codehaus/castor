@@ -1,7 +1,8 @@
-package org.springframework.xml.castor;
+package org.castor.spring.xml;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.exolab.castor.util.ObjectFactory;
 import org.exolab.castor.xml.UnmarshalListener;
 import org.exolab.castor.xml.Unmarshaller;
 import org.springframework.beans.factory.FactoryBeanNotInitializedException;
@@ -51,6 +52,11 @@ public class CastorUnmarshallerFactoryBean extends AbstractCastorPrototypingXMLF
      * elements. 
      */
     private boolean preserveWhitespace = false;
+    
+    /**
+     * Sets the {@link Class} instance of the Unmarshaller instance.
+     */
+    private Class rootClass;
 
     /**
      * An (optional) {@link org.exolab.castor.xml.UnmarshalListener} to receive pre and
@@ -59,6 +65,12 @@ public class CastorUnmarshallerFactoryBean extends AbstractCastorPrototypingXMLF
      * appliction specific behavior as they are unloaded.
      */
     private UnmarshalListener unmarshalListener;
+    
+    /**
+     * An (optional) {@link import org.exolab.castor.util.ObjectFactory} to use the Spring
+     * ApplicationContext to load beans. 
+     */
+    private ObjectFactory factory;
 
     /**
      * Return an instance (possibly shared or independent) of the object managed
@@ -88,8 +100,13 @@ public class CastorUnmarshallerFactoryBean extends AbstractCastorPrototypingXMLF
         if (this.getResolver() != null) {
             unmarshaller.setResolver(this.getResolver());
         }
+        
         if (this.unmarshalListener != null) {
             unmarshaller.setUnmarshalListener(this.unmarshalListener);
+        }
+        
+        if (this.factory != null) {
+            unmarshaller.setObjectFactory(this.factory);
         }
         
         return unmarshaller;
@@ -123,7 +140,7 @@ public class CastorUnmarshallerFactoryBean extends AbstractCastorPrototypingXMLF
     /**
      * {@inheritDoc}
      * 
-     * @see org.springframework.xml.castor.AbstractCastorPrototypingXMLFactoryBean#getLog()
+     * @see org.castor.spring.xml.AbstractCastorPrototypingXMLFactoryBean#getLog()
      */
     protected Log getLog() {
         return CastorUnmarshallerFactoryBean.LOG;
@@ -193,4 +210,11 @@ public class CastorUnmarshallerFactoryBean extends AbstractCastorPrototypingXMLF
         this.unmarshalListener = listener;
     } //-- setUnmarshalListener
     
+    /**
+     * Set the object factory for this Unmarshaller.
+     * @param factory
+     */
+    public void setObjectFactory(ObjectFactory factory) {
+        this.factory = factory;
+    }
 }
