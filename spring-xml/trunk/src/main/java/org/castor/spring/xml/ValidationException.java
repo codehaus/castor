@@ -1,4 +1,4 @@
-package org.springframework.xml.castor;
+package org.castor.spring.xml;
 
 public class ValidationException extends Exception {
 
