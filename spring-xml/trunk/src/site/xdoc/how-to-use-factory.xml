@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<document url="http://castor.codehaus.org/download.xml">
+
+    <properties>
+        <title>How to use Spring prototype beans to create objects for Castor</title>
+        <author email="philion AT gmail DOT com">Paul Philion</author>
+        <abstract>
+            Describes how to use prototype beans in Spring to created objects for Castor
+            with the SpringObjectFactory.
+        </abstract>
+        <status>Final</status>
+    </properties>
+
+    <body>
+        <title>How to use Spring prototype beans to create objects for Castor</title>
+        
+        <section name="Purpose">
+            <p>There are circumstances that require the objects that Castor uses to unmarshal XML
+            have access to Spring beans or be decorated with Spring AOP. This document describes
+            the configuration and usage of the <tt>SpringObjectFactory</tt> to create Spring beans for use
+            in Castor.
+            </p>
+        </section>
+        
+        <section name="Castor Mapping">
+            <p>The Castor mapping file defines the class and how that class is mapped into XML.
+            In this example, the XML element "product" will be unmarshalled into a 
+            <tt>org.castor.spring.xml.ntity.Product</tt> object.
+            </p>
+            <source><![CDATA[
+<mapping>
+    <!--  Mapping for Product  -->
+    <class name="org.castor.spring.xml.entity.Product" identity="id">
+        <map-to xml="product" />
+        <field name="id" type="integer">
+            <bind-xml name="id" node="element"/>
+        </field>
+        <field name="name" type="string">
+            <bind-xml name="name" node="element" />
+        </field>
+    </class>
+</mapping>       
+             ]]></source>
+        </section>
+        
+        <section name="Bean Configuration">
+            <p>As with the standard Spring/Castor integration, the Castor <tt>Unmarshaller</tt> is created as
+            a typical Spring bean. In this case, a <tt>SpringObjectFactory</tt> is created and set as the 
+            object factory for the unmarshaller.
+            </p>
+            <source><![CDATA[
+<beans>
+    <!-- ObjectFactory Bean -->
+    <bean id="springObjectFactory" class="org.castor.spring.xml.SpringObjectFactory" />
+    
+    <!-- Unmarshaller Bean -->
+    <bean id="unmarshaller" 
+            class="org.castor.spring.xml.CastorUnmarshallerFactoryBean" 
+            parent="castorXMLFactoryBean">
+                
+        <property name="objectFactory">
+            <ref local="springObjectFactory" />
+        </property>
+    </bean>
+            ]]></source>
+            
+            <p>To create beans with Spring, the <tt>SpringObjectFactory</tt> (which implements Castor's 
+            <tt>ObjectFactory</tt>) will use the bean class to find the correct bean to instantiate. If 
+            there are more than one beans of that type, the SpringObjectFactory will attempted to look 
+            up the bean based on the class name, checking but the fully qualified class name 
+            ("org.castor.spring.xml.ntity.Product") and the simple name ("Product").
+            </p>
+            <source><![CDATA[
+    <bean id="Product" class="org.castor.spring.xml.Entity.Product" singleton="true">
+        <property name="catalog">
+            <value>Fall '07 Catalog</value>
+        </property>
+    </bean>
+</beans>        
+             ]]></source>
+             <p>Note that the bean is required to be a singleton (<tt>singleton="true"</tt>, or 
+             <tt>scope="prototype"</tt> in Spring 2). If the bean IS a singleton, the same bean will be 
+             used over and over again This will lead to unexpected results and the 
+             <tt>SpringObjectFactory</tt> is designed to ignore it. So use <tt>singleton="false"</tt>.
+             </p>
+        </section>	
+    </body>
+</document>
