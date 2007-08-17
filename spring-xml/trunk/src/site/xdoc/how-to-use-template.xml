@@ -22,7 +22,7 @@
 <mapping>
 
   <!--  Mapping for Product  -->
-  <class name="org.springframework.xml.entity.Product" identity="id">
+  <class name="org.castor.spring.xml.entity.Product" identity="id">
     <map-to xml="product" />
 	<field name="id" type="integer">
 		  <bind-xml name="id" node="element"/>
@@ -71,7 +71,7 @@ public class Product {
             
             <source><![CDATA[
 <!-- Castor XML ClassDescriptorResolver -->	
-<bean id="resolver" class="org.springframework.xml.castor.CastorResolverFactoryBean">
+<bean id="resolver" class="org.castor.spring.xml.CastorResolverFactoryBean">
   <property name="mappingLocations">
     <list>
       <value>mapping.xml</value>
@@ -86,17 +86,17 @@ public class Product {
 
 <!-- Castor XML Marshaller component -->
 <bean id="marshaller"
-      class="org.springframework.xml.castor.CastorMarshallerFactoryBean"
+      class="org.castor.spring.xml.CastorMarshallerFactoryBean"
       parent="castorXMLFactoryBean" />
 
 <!-- Castor XML Unmarshaller component -->
 <bean id="unmarshaller"
-      class="org.springframework.xml.castor.CastorUnmarshallerFactoryBean"
+      class="org.castor.spring.xml.CastorUnmarshallerFactoryBean"
       parent="castorXMLFactoryBean" />
     	
 <!-- Castor XML data binding template -->
 <bean id="template"
-      class="org.springframework.xml.castor.DataBindingTemplate">
+      class="org.castor.spring.xml.DataBindingTemplate">
   <property name="marshaller" ref="marshaller" />
   <property name="unmarshaller" ref="unmarshaller" />
 </bean>]]></source>
