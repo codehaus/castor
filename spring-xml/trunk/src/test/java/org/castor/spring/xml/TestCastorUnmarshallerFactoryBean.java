@@ -1,7 +1,7 @@
-package org.springframework.xml.castor;
+package org.castor.spring.xml;
 
+import org.castor.spring.xml.entity.Product;
 import org.exolab.castor.xml.Unmarshaller;
-import org.springframework.xml.entity.Product;
 import org.xml.sax.InputSource;
 
 /**

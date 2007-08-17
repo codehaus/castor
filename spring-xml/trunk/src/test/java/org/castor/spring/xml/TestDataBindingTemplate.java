@@ -1,8 +1,9 @@
-package org.springframework.xml.castor;
+package org.castor.spring.xml;
 
 import java.io.StringWriter;
 
-import org.springframework.xml.entity.Product;
+import org.castor.spring.xml.DataBindingOperations;
+import org.castor.spring.xml.entity.Product;
 import org.xml.sax.InputSource;
 
 /**
@@ -12,7 +13,7 @@ import org.xml.sax.InputSource;
 public class TestDataBindingTemplate extends BaseSpringTestCase {
     
     /**
-     * @see org.springframework.xml.castor.BaseSpringTestCase#setUp()
+     * @see org.castor.spring.xml.BaseSpringTestCase#setUp()
      */
     protected void setUp() throws Exception {
         contextResource = "app-config-template.xml";

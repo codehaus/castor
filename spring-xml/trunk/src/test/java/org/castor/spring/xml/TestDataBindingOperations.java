@@ -1,4 +1,4 @@
-package org.springframework.xml.castor;
+package org.castor.spring.xml;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -6,9 +6,11 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 
-import javax.xml.transform.sax.SAXSource;
 
-import org.springframework.xml.entity.Product;
+import org.castor.spring.xml.DataBindingOperations;
+import org.castor.spring.xml.MarshallingException;
+import org.castor.spring.xml.ValidationException;
+import org.castor.spring.xml.entity.Product;
 import org.xml.sax.InputSource;
 
 
