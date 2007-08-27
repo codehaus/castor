@@ -433,6 +433,39 @@ public class CastorTemplate extends CastorAccessor implements CastorOperations {
         });
     }
 
+    //-------------------------------------------------------------------------
+    // Convenience finder methods that return one (single) entity only.
+    //-------------------------------------------------------------------------
+
+    public Object findSingle(Class entityClass) throws DataAccessException {
+        Collection entities = this.find(entityClass);
+        return entities.iterator().next();
+    }
+
+    public Object findSingle(Class entityClass, String filter) throws DataAccessException {
+        return this.find(entityClass, filter).iterator().next();
+    }
+
+    public Object findSingle(final Class entityClass, final String filter, final String ordering)
+    throws DataAccessException {
+        return this.find(entityClass, filter, ordering).iterator().next();
+    }
+
+    public Object findSingle(Class entityClass, String filter, Object[] values)
+    throws DataAccessException {
+        return this.find(entityClass, filter, values).iterator().next();
+    }
+
+    public Object findSingle(
+            final Class entityClass, final String filter, final Object[] values, final String ordering) 
+    throws DataAccessException {
+        return this.find(entityClass, filter, values, ordering).iterator().next();
+    }
+    
+    //-------------------------------------------------------------------------
+    // Convenience finder methods using named queries
+    //-------------------------------------------------------------------------
+    
     public Collection findByNamedQuery(String queryName) throws DataAccessException {
         return this.findByNamedQuery(queryName, null);
     }
