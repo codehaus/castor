@@ -89,6 +89,19 @@ http://maven.apache.org/maven-v4_0_0.xsd">
             </plugin>
 -->
 
+			<!--  redundant; will be removed once we switch to parent structure -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
@@ -392,11 +405,12 @@ http://maven.apache.org/maven-v4_0_0.xsd">
                 <version>2.0-beta-1-SNAPSHOT</version>
             </plugin>
 			
+<!-- 
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>cobertura-maven-plugin</artifactId>
 			</plugin>			
-			
+ -->			
 		</plugins>
 	</reporting>
 </project>
