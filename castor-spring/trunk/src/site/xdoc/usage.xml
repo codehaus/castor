@@ -37,8 +37,8 @@
           <source><![CDATA[
 <dependency>
    <groupId>org.codehaus.castor</groupId>
-   <artifactId>castor-spring</artifactId>
-   <version>1.0</version>
+   <artifactId>spring-orm</artifactId>
+   <version>1.1</version>
 </dependency>]]></source>
 
           <p>
