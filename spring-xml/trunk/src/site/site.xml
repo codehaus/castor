@@ -21,6 +21,7 @@
         <item name="How to use factory beans" href="/how-to-use-marshaller.html" />
         <item name="How to use template" href="/how-to-use-template.html" />
         <item name="How to use Spring for object instantiation" href="/how-to-use-factory.html" />
+        <item name="Marshaller configuration" href="marshaller-properties.html" />
     	
     </menu>
 
