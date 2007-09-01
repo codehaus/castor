@@ -49,7 +49,10 @@ Marshaller marshaller = (Marshaller) this.context.getBean("marshaller");
 	   
 	   		<p>In order to fine-tune the workings of the Castor XML marshaller, you can 
 	   		   set values for the following properties on the 
-	   		   <tt>CastorMarshallerFactoryBean</tt>.</p>
+	   		   <tt>CastorMarshallerFactoryBean</tt>. Please follow the HTML links on the 
+	   		   property names for a more detailed description of each property, as explained 
+	   		   in the Castor XML product documentation.
+	   		   </p>
 	   		   
 	   		<table>
 	   			<tr>
