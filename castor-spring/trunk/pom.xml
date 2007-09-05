@@ -276,7 +276,7 @@ http://maven.apache.org/maven-v4_0_0.xsd">
             		<artifactId>connector</artifactId>
             	</exclusion>
             </exclusions>
-            <scope>tests</scope>
+            <scope>test</scope>
         </dependency>
 		
 		<dependency>
