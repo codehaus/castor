@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Specification-Title: Spring ORM for Castor
+Implementation-Title: Spring ORM for Castor
+Sealed: true
