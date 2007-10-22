@@ -1,19 +1,14 @@
 package org.castor.spring.xml;
 
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 
-
-import org.castor.spring.xml.DataBindingOperations;
-import org.castor.spring.xml.MarshallingException;
-import org.castor.spring.xml.ValidationException;
 import org.castor.spring.xml.entity.Product;
 import org.xml.sax.InputSource;
-
-
 
 /**
  * JUnit test case for Castor's Spring integration.
@@ -52,7 +47,8 @@ public class TestDataBindingOperations extends BaseSpringTestCase {
         DataBindingOperations template = (DataBindingOperations) context.getBean("template");
         assertNotNull(template);
 
-        Reader reader = new FileReader("C:\\workspace\\spring-xml\\src\\test\\resources\\input.xml");
+        InputStream resource = getClass().getResourceAsStream("/input.xml");
+        Reader reader = new InputStreamReader(resource);
         Object object = template.unmarshal(reader, Product.class);
         assertNotNull(object);
         assertTrue(object instanceof Product);
