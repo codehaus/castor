@@ -42,7 +42,7 @@ public class LocalCastorFactoryBean implements FactoryBean, InitializingBean /*
     private Resource configLocation;
 
     /**
-     * Whetehr to use 'autoStore' mode for Castor JDO
+     * Whether to use 'autoStore' mode for Castor JDO
      */
     private boolean autoStore;
 
@@ -175,6 +175,9 @@ public class LocalCastorFactoryBean implements FactoryBean, InitializingBean /*
             JDOManager.loadConfiguration(inputSource, this.entityResolver,
                     getClass().getClassLoader());
             jdoManagerToBeCreated = JDOManager.createInstance(databaseName);
+            
+            // set autostore mode
+            jdoManagerToBeCreated.setAutoStore(this.autoStore);
         } catch (MappingException e) {
             LOG.error("Problem creating instance of JDOManager.", e);
             throw e;
