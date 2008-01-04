@@ -7,6 +7,16 @@
   
   <body>
     
+    <release version="1.1-SNAPSHOT" date="2008-01-04">
+        
+      <action dev="jgrueneis" type="fix" issue="2203">
+      	Made spring-xml independent from the Castor release use... at least in means of
+      	the availability of InternalContext interface which was introduced with Castor
+      	1.1.3 release.
+      </action>
+      
+    </release>
+
     <release version="1.0.4-SNAPSHOT" date="2006-09-22" description="Snapshot release via Codehaus snapshot repository">
         
       <action dev="wguttmn" type="add" issue="1575">
