@@ -2,28 +2,28 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 
-
 	<bean id="castorXMLFactoryBean" abstract="true">
-	  <property name="resolver"><ref local="resolver"/></property>
+		<property name="springXmlContext">
+			<ref local="springXmlContext" />
+		</property>
 	</bean>
-	
-    <bean 
-    	id="marshaller"
-    	class="org.castor.spring.xml.CastorMarshallerFactoryBean"
-    	parent="castorXMLFactoryBean" />
-    	
-    <bean 
-    	id="marshaller-suppress"
-    	class="org.castor.spring.xml.CastorMarshallerFactoryBean"
-    	parent="castorXMLFactoryBean">
-    	<property name="suppressNamespaces" value="true" />
-    </bean>
 
-	<bean id="resolver" class="org.castor.spring.xml.CastorResolverFactoryBean"/>
+	<bean id="marshaller"
+		class="org.castor.spring.xml.CastorMarshallerFactoryBean"
+		parent="castorXMLFactoryBean" />
 
-    <bean 
-    	id="unmarshaller"
-    	class="org.castor.spring.xml.CastorUnmarshallerFactoryBean"
-    	parent="castorXMLFactoryBean" />
-	
+	<bean id="marshaller-suppress"
+		class="org.castor.spring.xml.CastorMarshallerFactoryBean"
+		parent="castorXMLFactoryBean">
+		<property name="suppressNamespaces" value="true" />
+	</bean>
+
+	<bean id="springXmlContext"
+		class="org.castor.spring.xml.CastorXMLContextFactoryBean">
+	</bean>
+
+	<bean id="unmarshaller"
+		class="org.castor.spring.xml.CastorUnmarshallerFactoryBean"
+		parent="castorXMLFactoryBean" />
+
 </beans>

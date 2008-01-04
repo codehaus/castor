@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Werner Guttmann
+ * Copyright 2007 Joachim Grueneis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,10 @@
  */
 package org.castor.spring.xml;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
-// import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,36 +27,29 @@ import org.castor.mapping.MappingUnmarshaller;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.MappingLoader;
-import org.exolab.castor.xml.ClassDescriptorResolver;
-import org.exolab.castor.xml.ClassDescriptorResolverFactory;
-import org.exolab.castor.xml.XMLClassDescriptorResolver;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.xml.sax.InputSource;
 
 /**
- * Factory bean to instantiate a XMLClassDescriptorResolver and fill it with
- * the mappings found in the mapping files specified in the bean definition.
- * This implementation is deprecated since 2008-01-02 as newer releases of
- * Castor (>1.1.2.1) work internally with InternalContext to hold descriptors
- * instead of XMLClassDescriptorResolver purely.
+ * Responsible to return the SpringXMLContext implementation matching the Castor
+ * version used. This can either be an InternalContext adapter or something to
+ * be used if no InternalContext exists.
  * 
- * @author <a href="mailto:werner DOT guttmann AT gmx DOT net">Werner Guttmann</a>
- * 
- * @deprecated
+ * @author Joachim Grueneis, jgrueneis_at_gmail_dot_com
+ * @version $Id$
  */
-public class CastorResolverFactoryBean implements FactoryBean, InitializingBean {
+public class CastorXMLContextFactoryBean implements FactoryBean, InitializingBean {
 
     /**
      * Log instance
      */
-    private static final Log LOG = LogFactory
-            .getLog(CastorResolverFactoryBean.class);
+    private static final Log LOG = LogFactory.getLog(CastorXMLContextFactoryBean.class);
 
     /**
-     * Spring resource defining Castor properties
+     * XMLContext interface
      */
-    private Properties castorProperties;
+    private SpringXMLContext springXmlContext;
 
     /**
      * Spring resource defining mapping file locations
@@ -65,46 +57,39 @@ public class CastorResolverFactoryBean implements FactoryBean, InitializingBean 
     private List mappingLocations;
 
     /**
-     * XMlClassDescriptorResolver interface
-     */
-    private XMLClassDescriptorResolver resolver;
-
-    /**
      * {@inheritDoc}
      * 
      * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
      */
     public void afterPropertiesSet() throws Exception {
-        this.resolver = (XMLClassDescriptorResolver) ClassDescriptorResolverFactory
-                .createClassDescriptorResolver(BindingType.XML);
-        if (this.castorProperties != null) {
-
-            // String mappingLocation =
-            // this.castorProperties.getProperty("mappingLocation");
-            //            
-            // if (mappingLocation != null) {
-            // try {
-            // Mapping mapping = new Mapping();
-            // URL mappingResource =
-            // getClass().getClassLoader().getResource(mappingLocation);
-            // mapping.loadMapping(new
-            // InputSource(mappingResource.openStream()));
-            //
-            // MappingUnmarshaller mappingUnmarshaller = new
-            // MappingUnmarshaller();
-            // MappingLoader loader = mappingUnmarshaller
-            // .getMappingLoader(mapping, BindingType.XML);
-            // this.resolver.setMappingLoader(loader);
-            // } catch (MappingException e) {
-            // LOG.error(
-            // "Problem locating/loading Castor mapping file from location "
-            // + mappingLocation, e);
-            // throw e;
-            // }
-            // }
-
+        if (internalContextExists()) {
+            springXmlContext = new InternalContextAdapter();
+        } else {
+            springXmlContext = new NoInternalContextAdapter();
         }
-        
+        readMappings();
+    }
+
+    /**
+     * To detect if the interface InternalContext exists in Castor and can be used...
+     * @return true if InternalContext exists
+     */
+    private boolean internalContextExists() {
+        try {
+            Class.forName("org.castor.xml.InternalContext");
+            return true;
+        } catch (ClassNotFoundException e) {
+            LOG.debug("failed to load InternalContext class - working against old Castor release... - exception was: " + e);
+        }
+        return false;
+    }
+
+    /**
+     * Read all mappings that have been provided via configuration.
+     * @throws MappingException if the mapping file could not be interpreted
+     * @throws IOException if the mapping file could not be opened for reading
+     */
+    private void readMappings() throws MappingException, IOException {
         String mappingLocation = null;
         if (mappingLocations != null && mappingLocations.size() > 0) {
             Iterator iter = mappingLocations.iterator();
@@ -114,15 +99,19 @@ public class CastorResolverFactoryBean implements FactoryBean, InitializingBean 
                     mappingLocation = (String) iter.next();
                     URL mappingResource = getClass().getClassLoader()
                             .getResource(mappingLocation);
-                    mapping.loadMapping(new InputSource(mappingResource
-                            .openStream()));
+                    mapping.loadMapping(new InputSource(mappingResource.openStream()));
                 }
 
                 MappingUnmarshaller mappingUnmarshaller = new MappingUnmarshaller();
                 MappingLoader loader = mappingUnmarshaller
                         .getMappingLoader(mapping, BindingType.XML);
-                this.resolver.setMappingLoader(loader);
+                springXmlContext.setMappingLoader(loader);
             } catch (MappingException e) {
+                LOG.error(
+                        "Problem locating/loading Castor mapping file from location "
+                                + mappingLocation, e);
+                throw e;
+            } catch (IOException e) {
                 LOG.error(
                         "Problem locating/loading Castor mapping file from location "
                                 + mappingLocation, e);
@@ -137,7 +126,7 @@ public class CastorResolverFactoryBean implements FactoryBean, InitializingBean 
      * @see org.springframework.beans.factory.FactoryBean#getObject()
      */
     public Object getObject() throws Exception {
-        return this.resolver;
+        return springXmlContext;
     }
 
     /**
@@ -146,11 +135,11 @@ public class CastorResolverFactoryBean implements FactoryBean, InitializingBean 
      * @see org.springframework.beans.factory.FactoryBean#getObjectType()
      */
     public Class getObjectType() {
-        if (this.resolver == null) {
-            return ClassDescriptorResolver.class;
+        if (this.springXmlContext == null) {
+            return SpringXMLContext.class;
         }
 
-        return this.resolver.getClass();
+        return this.springXmlContext.getClass();
     }
 
     /**
@@ -160,10 +149,6 @@ public class CastorResolverFactoryBean implements FactoryBean, InitializingBean 
      */
     public boolean isSingleton() {
         return true;
-    }
-
-    public void setCastorProperties(Properties castorProperties) {
-        this.castorProperties = castorProperties;
     }
 
     /**

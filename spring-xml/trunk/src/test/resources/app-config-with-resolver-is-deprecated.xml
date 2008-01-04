@@ -3,8 +3,8 @@
 <beans>
 
 	<bean id="castorXMLFactoryBean" abstract="true">
-		<property name="springXmlContext">
-			<ref local="springXmlContext" />
+		<property name="resolver">
+			<ref local="resolver" />
 		</property>
 	</bean>
 
@@ -18,8 +18,8 @@
 		<property name="suppressNamespaces" value="true" />
 	</bean>
 
-	<bean id="springXmlContext"
-		class="org.castor.spring.xml.CastorXMLContextFactoryBean">
+	<bean id="resolver"
+		class="org.castor.spring.xml.CastorResolverFactoryBean">
 		<property name="mappingLocations">
 			<list>
 				<value>mapping.xml</value>
