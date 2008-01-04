@@ -6,10 +6,10 @@
     <local-check-config name="castor-test-checks" location="src/tools/checkstyle/castor-test-checks.xml" type="project" description="">
         <additional-data name="protect-config-file" value="true"/>
     </local-check-config>
-    <fileset name="core main" enabled="true" check-config-name="castor-main-checks" local="true">
-        <file-match-pattern match-pattern="^src[/\\]main[/\\]java[/\\].*\.java" include-pattern="true"/>
-    </fileset>
     <fileset name="core test" enabled="true" check-config-name="castor-test-checks" local="true">
         <file-match-pattern match-pattern="^src[/\\]test[/\\]java[/\\].*\.java" include-pattern="true"/>
+    </fileset>
+    <fileset name="core main" enabled="true" check-config-name="castor-main-checks" local="true">
+        <file-match-pattern match-pattern="^src[/\\]main[/\\]java[/\\].*\.java" include-pattern="true"/>
     </fileset>
 </fileset-config>
