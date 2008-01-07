@@ -7,6 +7,12 @@
   <body>
     <release version="1.0-beta-1" date="2008-01-04" description="under development">
       <action dev="jgrueneis" type="add">
+        A bunch of classes that allow to read (interpret) JAXB annotated classes to
+        create Castor class descriptors (that is how Castor holds Java / XML mapping
+        information).
+      </action>
+
+      <action dev="jgrueneis" type="add">
         Initial beta release. Supports basic un-/marshalling according to JAXB API
         but still without interpreting any annotations in the classes.
       </action>
