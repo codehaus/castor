@@ -24,6 +24,7 @@ import org.castor.jaxb.reflection.info.ClassInfo;
 import org.castor.jaxb.reflection.info.FieldInfo;
 import org.castor.jaxb.reflection.info.PackageInfo;
 import org.castor.jaxb.reflection.info.PackageInfo.NamespaceInfo;
+import org.castor.xml.XMLNaming;
 import org.exolab.castor.mapping.CollectionHandler;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.MappingException;
@@ -32,7 +33,6 @@ import org.exolab.castor.mapping.loader.TypeInfo;
 import org.exolab.castor.xml.NodeType;
 import org.exolab.castor.xml.XMLClassDescriptor;
 import org.exolab.castor.xml.XMLFieldDescriptor;
-import org.exolab.castor.xml.XMLNaming;
 
 /**
  * A service class to build a XMLClassDescriptor instance from ClassInfo.
