@@ -17,7 +17,7 @@ package org.castor.jaxb.naming;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.exolab.castor.xml.XMLNaming;
+import org.castor.xml.XMLNaming;
 
 /**
  * JAXB specific implementation of XMLNaming to create names that conform
@@ -26,7 +26,7 @@ import org.exolab.castor.xml.XMLNaming;
  * @author Joachim Grueneis, jgrueneis_at_codehaus_dot_com
  * @version $Id$
  */
-public class NamingJava2Xml extends XMLNaming {
+public class NamingJava2Xml implements XMLNaming {
     /** 
      * Logger to be used.
      */
