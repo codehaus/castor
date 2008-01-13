@@ -114,7 +114,7 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 	</mailingLists>
 
 	<scm>
-       <connection>scm:svn:svn://svn.castor.codehaus.org/castor/scm/spring-xml/</connection>
+       <connection>scm:svn:http://svn.castor.codehaus.org/castor/scm/spring-xml/</connection>
        <developerConnection>scm:svn:https://svn.codehaus.org/castor/spring-xml/</developerConnection>
        <url>http://svn.castor.codehaus.org/viewrep/castor/spring-xml</url>
 	</scm>	
