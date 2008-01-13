@@ -103,7 +103,7 @@
 
 	<scm>
 		<connection>
-			scm:svn:svn://svn.codehaus.org/castor/castor-jaxb-2.0/trunk/
+			scm:svn:http://svn.codehaus.org/castor/castor-jaxb-2.0/trunk/
 		</connection>
 		<developerConnection>
 			scm:svn:https://svn.codehaus.org/castor/castor-jaxb-2.0/trunk/
