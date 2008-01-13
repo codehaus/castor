@@ -163,7 +163,7 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 	</mailingLists>
 
 	<scm>
-       <connection>scm:svn:svn://svn.codehaus.org/castor/castor-spring/trunk</connection>
+       <connection>scm:svn:http://svn.codehaus.org/castor/castor-spring/trunk</connection>
        <developerConnection>scm:svn:https://svn.codehaus.org/castor/castor-spring/trunk/</developerConnection>
        <url>http://svn.castor.codehaus.org/browse/castor/castor-spring/trunk</url>
 	</scm>	
