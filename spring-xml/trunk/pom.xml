@@ -127,10 +127,10 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<scm>
 		<connection>
-			scm:svn:http://svn.codehaus.org/castor/spring-xml/
+			scm:svn:http://svn.codehaus.org/castor/spring-xml/trunk/
 		</connection>
 		<developerConnection>
-			scm:svn:https://svn.codehaus.org/castor/spring-xml/
+			scm:svn:https://svn.codehaus.org/castor/spring-xml/trunk/
 		</developerConnection>
 		<url>
 			http://svn.castor.codehaus.org/viewrep/castor/spring-xml
