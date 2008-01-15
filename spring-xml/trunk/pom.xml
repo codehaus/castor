@@ -10,9 +10,11 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 	<packaging>jar</packaging>
 
 	<name>Spring XML abstraction for Castor</name>
-	<description>This project (mainly) provides Spring BeanFactory instances for
-        the (Un)Marshaller and obtaining a shared ClassDescriptorResolver instance, and 
-        wiring them together.</description>
+	<description>
+		This project (mainly) provides Spring BeanFactory instances for
+		the (Un)Marshaller and obtaining a shared
+		ClassDescriptorResolver instance, and wiring them together.
+	</description>
 	<!--<url>http://castor.org</url>-->
 
 	<issueManagement>
@@ -53,16 +55,16 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 					</execution>
 				</executions>
 			</plugin>
-			
+
 		</plugins>
-        
-        <extensions>
-            <extension>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-webdav</artifactId>
-                <version>1.0-beta-1</version>
-            </extension>
-        </extensions>
+
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-webdav</artifactId>
+				<version>1.0-beta-1</version>
+			</extension>
+		</extensions>
 
 	</build>
 
@@ -92,51 +94,69 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 	<mailingLists>
 		<mailingList>
 			<name>User mailing list</name>
-            <subscribe>user-subscribe@castor.codehaus.org</subscribe>
-			<unsubscribe>user-unsubscribe@castor.codehaus.org</unsubscribe>
+			<subscribe>user-subscribe@castor.codehaus.org</subscribe>
+			<unsubscribe>
+				user-unsubscribe@castor.codehaus.org
+			</unsubscribe>
 			<post>user@castor.codehaus.org</post>
-            <archive>http://archive.castor.codehaus.org/user</archive>
+			<archive>http://archive.castor.codehaus.org/user</archive>
 		</mailingList>
 		<mailingList>
 			<name>Development mailing list</name>
 			<subscribe>dev-subscribe@castor.codehaus.org</subscribe>
-			<unsubscribe>dev-unsubscribe@castor.codehaus.org</unsubscribe>
+			<unsubscribe>
+				dev-unsubscribe@castor.codehaus.org
+			</unsubscribe>
 			<post>dev@castor.codehaus.org</post>
-            <archive>http://archive.castor.codehaus.org/dev</archive>
+			<archive>http://archive.castor.codehaus.org/dev</archive>
 		</mailingList>
 		<mailingList>
 			<name>Announcement mailing list</name>
-			<subscribe>announce-subscribe@castor.codehaus.org</subscribe>
-			<unsubscribe>announce-unsubscribe@castor.codehaus.org</unsubscribe>
+			<subscribe>
+				announce-subscribe@castor.codehaus.org
+			</subscribe>
+			<unsubscribe>
+				announce-unsubscribe@castor.codehaus.org
+			</unsubscribe>
 			<post>announce@castor.codehaus.org</post>
-			<archive>http://archive.castor.codehaus.org/announce</archive>
+			<archive>
+				http://archive.castor.codehaus.org/announce
+			</archive>
 		</mailingList>
 	</mailingLists>
 
 	<scm>
-       <connection>scm:svn:http://svn.castor.codehaus.org/castor/scm/spring-xml/</connection>
-       <developerConnection>scm:svn:https://svn.codehaus.org/castor/spring-xml/</developerConnection>
-       <url>http://svn.castor.codehaus.org/viewrep/castor/spring-xml</url>
-	</scm>	
+		<connection>
+			scm:svn:http://svn.codehaus.org/castor/spring-xml/
+		</connection>
+		<developerConnection>
+			scm:svn:https://svn.codehaus.org/castor/spring-xml/
+		</developerConnection>
+		<url>
+			http://svn.castor.codehaus.org/viewrep/castor/spring-xml
+		</url>
+	</scm>
 
-    <distributionManagement>
-        <repository>
-          <id>codehaus.org</id>
-          <name>Castor Central Distribution Repository</name>
-          <url>dav:https://dav.codehaus.org/repository/castor/</url>
-        </repository>
-        <snapshotRepository>
-          <id>codehaus.org</id>
-          <name>Castor Central Development Repository</name>
-          <url>dav:https://dav.codehaus.org/snapshots.repository/castor/</url>
-        </snapshotRepository>
-        <site>
-          <id>codehaus.org</id>
-          <url>dav:https://dav.codehaus.org/castor/</url>
-        </site>
-    </distributionManagement>
+	<distributionManagement>
+		<repository>
+			<id>codehaus.org</id>
+			<name>Castor Central Distribution Repository</name>
+			<url>dav:https://dav.codehaus.org/repository/castor/</url>
+		</repository>
+		<snapshotRepository>
+			<id>codehaus.org</id>
+			<name>Castor Central Development Repository</name>
+			<url>
+				dav:https://dav.codehaus.org/snapshots.repository/castor/
+			</url>
+		</snapshotRepository>
+		<site>
+			<id>codehaus.org</id>
+			<url>dav:https://dav.codehaus.org/castor/</url>
+		</site>
+	</distributionManagement>
 
-    
+
 	<dependencies>
 
 		<dependency>
@@ -152,14 +172,14 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 		</dependency>
 
 		<dependency>
-            <scope>test</scope>
+			<scope>test</scope>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>3.8.1</version>
 		</dependency>
 
 		<dependency>
-            <scope>test</scope>
+			<scope>test</scope>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 			<version>1.2.13</version>
@@ -181,126 +201,128 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-mock</artifactId>
 			<version>1.2.7</version>
-            <scope>test</scope>
+			<scope>test</scope>
 		</dependency>
-        
+
 		<dependency>
-            <optional>true</optional>
+			<optional>true</optional>
 			<groupId>xerces</groupId>
 			<artifactId>xerces</artifactId>
 			<version>1.4.0</version>
-			
+
 		</dependency>
-        
+
 	</dependencies>
-	
+
 	<repositories>
 		<repository>
 			<id>java.net</id>
 			<name>java.net Maven Repository</name>
-			<url>https://maven-repository.dev.java.net/nonav/repository</url>
+			<url>
+				https://maven-repository.dev.java.net/nonav/repository
+			</url>
 			<layout>legacy</layout>
-		</repository>		
+		</repository>
 		<repository>
 			<id>codehaus.org</id>
-			<name>Maven Codehaus repository</name> 
-			<url>http://maven.codehaus.org/maven2/</url> 
+			<name>Maven Codehaus repository</name>
+			<url>http://maven.codehaus.org/maven2/</url>
 		</repository>
 	</repositories>
 
 	<pluginRepositories>
 		<pluginRepository>
-			<id>Maven Codehaus Snapshots</id> 
-			<url>http://snapshots.maven.codehaus.org/maven2/</url> 
+			<id>Maven Codehaus Snapshots</id>
+			<url>http://snapshots.maven.codehaus.org/maven2/</url>
 			<snapshots>
-				<enabled>true</enabled> 
+				<enabled>true</enabled>
 			</snapshots>
 			<releases>
-				<enabled>false</enabled> 
+				<enabled>false</enabled>
 			</releases>
 		</pluginRepository>
 		<pluginRepository>
-			<id>Maven Codehaus repository</id> 
-			<url>http://maven.codehaus.org/maven2/</url> 
+			<id>Maven Codehaus repository</id>
+			<url>http://maven.codehaus.org/maven2/</url>
 		</pluginRepository>
 	</pluginRepositories>
-	
+
 	<reporting>
 		<plugins>
 			<plugin>
-                <artifactId>maven-javadoc-plugin</artifactId>
+				<artifactId>maven-javadoc-plugin</artifactId>
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
-                <artifactId>jxr-maven-plugin</artifactId>
+				<artifactId>jxr-maven-plugin</artifactId>
 			</plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<excludes>
 						<exclude>**/BaseSpring*.java</exclude>
 					</excludes>
 				</configuration>
-            </plugin>            
-            <plugin>
-               <groupId>org.apache.maven.plugins</groupId>
-               <artifactId>maven-surefire-report-plugin</artifactId>
-            </plugin>
-            
-<!--
-            <plugin>
-                  <groupId>org.apache.maven.plugins</groupId>
-                  <artifactId>maven-checkstyle-plugin</artifactId>
-            </plugin>
-
+			</plugin>
 			<plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-pmd-plugin</artifactId>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-report-plugin</artifactId>
+			</plugin>
+
+			<!--
+				<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				</plugin>
+				
+				<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-pmd-plugin</artifactId>
 				<configuration>
-					<targetjdk>1.4</targetjdk>
-					<rulesets>
-                        <ruleset>/rulesets/basic.xml</ruleset>
-                        <ruleset>/rulesets/controversial.xml</ruleset>
-					</rulesets>
-					<format>xml</format>
-					<linkXref>true</linkXref>
-                        <sourceEncoding>utf-8</sourceEncoding>
-                        <minimumTokens>100</minimumTokens>
+				<targetjdk>1.4</targetjdk>
+				<rulesets>
+				<ruleset>/rulesets/basic.xml</ruleset>
+				<ruleset>/rulesets/controversial.xml</ruleset>
+				</rulesets>
+				<format>xml</format>
+				<linkXref>true</linkXref>
+				<sourceEncoding>utf-8</sourceEncoding>
+				<minimumTokens>100</minimumTokens>
 				</configuration>
-			</plugin>
+				</plugin>
+				
+			-->
 
--->
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>changes-maven-plugin</artifactId>
-                <!-- version>2.0-beta-1</version> -->
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <report>changes-report</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
-            </plugin>
-            
-        <!--
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
-                <artifactId>changelog-maven-plugin</artifactId>
+				<artifactId>changes-maven-plugin</artifactId>
+				<!-- version>2.0-beta-1</version> -->
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>changes-report</report>
+						</reports>
+					</reportSet>
+				</reportSets>
 			</plugin>
--->            
+
+			<!--
+				<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>changelog-maven-plugin</artifactId>
+				</plugin>
+			-->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
-                <artifactId>taglist-maven-plugin</artifactId>
+				<artifactId>taglist-maven-plugin</artifactId>
 			</plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>jdepend-maven-plugin</artifactId>
-                <version>2.0-beta-1-SNAPSHOT</version>
-            </plugin>
-			
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>jdepend-maven-plugin</artifactId>
+				<version>2.0-beta-1-SNAPSHOT</version>
+			</plugin>
+
 		</plugins>
 	</reporting>
 </project>
