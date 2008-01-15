@@ -151,8 +151,8 @@
 	</mailingLists>
 
 	<scm>
-       <connection>scm:svn:http://svn.codehaus.org/castor/castor-jpa/</connection>
-       <developerConnection>scm:svn:https://svn.codehaus.org/castor/castor-jpa/</developerConnection>
+       <connection>scm:svn:http://svn.codehaus.org/castor/castor-jpa/trunk/</connection>
+       <developerConnection>scm:svn:https://svn.codehaus.org/castor/castor-jpa/trunk/</developerConnection>
        <url>http://svn.castor.codehaus.org/viewrep/castor/castor-jpa</url>
 	</scm>	
     
