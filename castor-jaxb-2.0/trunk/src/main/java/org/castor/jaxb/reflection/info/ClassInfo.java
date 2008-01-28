@@ -16,7 +16,7 @@
 package org.castor.jaxb.reflection.info;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessOrder;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -28,6 +28,19 @@ import javax.xml.bind.annotation.XmlAccessType;
  * @version $Id$
  */
 public final class ClassInfo implements ReflectionInfo {
+    /** Default string for element annotation. */
+    public static final String DEFAULT_ELEMENT_NAME = "##default";
+    /** Default string for element annotation. */
+    public static final String DEFAULT_ELEMENT_NAMESPACE = "##default";
+    /** Default string for root element annotation. */
+    public static final String DEFAULT_ROOT_ELEMENT_NAME = "##default";
+    /** Default string for root element annotation. */
+    public static final String DEFAULT_ROOT_ELEMENT_NAMESPACE = "##default";
+    /** Default string for attribute annotation. */
+    public static final String DEFAULT_ATTRIBUTE_NAME = "##default";
+    /** Default string for attribute annotation. */
+    public static final String DEFAULT_ATTRIBUTE_NAMESPACE = "##default";
+
     /** XMLType: XML type name. */
     private String _typeName;
     /** XMLType: The names of the properties for the XML type in correct order. */
@@ -51,17 +64,21 @@ public final class ClassInfo implements ReflectionInfo {
     /** XmlAccessorOrder: The order used for the properties. */
     private XmlAccessOrder _xmlAccessOrder;
     /** The Class this descriptor describes. */
-    private Class < ? > _clazz;
+    private Class < ? > _type;
     /** The super Class of the Class this descriptor describes. */
-    private Class < ? > _superclass;
+    private Class < ? > _supertype;
     /** The interfaces of the Class this descriptor describes. */
     private Class < ? > [] _interfaces;
     /** The fileds of this class. */
-    private Collection < FieldInfo > _fieldInfos;
+    private List < FieldInfo > _fieldInfos;
     /** The Class specified by XmlEnum tag. */
     private Class < ? > _enumClass;
     /** Package information for the package of the class. */
     private PackageInfo _packageInfo;
+    /** Does the class have an empty public constructor? */
+    private boolean _hasPublicEmptyConstructor;
+    /** The name of the type, but NOT taken from XmlType! */
+    private String _className;
     
     /**
      * Simple constructor.
@@ -192,28 +209,28 @@ public final class ClassInfo implements ReflectionInfo {
         _seeAlsoClasses = value;
     }
     /**
-     * @param clazz the Class we're talking about
+     * @param type the Class we're talking about
      */
-    public void setClazz(final Class < ? > clazz) {
-        _clazz = clazz;
+    public void setType(final Class < ? > type) {
+        _type = type;
     }
     /**
      * @return the Class described
      */
-    public Class < ? > getClazz() {
-        return _clazz;
+    public Class < ? > getType() {
+        return _type;
     }
     /**
-     * @param superclass The super class.
+     * @param supertype The super class.
      */
-    public void setSuperClass(final Class < ? > superclass) {
-        _superclass = superclass;
+    public void setSupertype(final Class < ? > supertype) {
+        _supertype = supertype;
     }
     /**
      * @return get the super class of the described class
      */
-    public Class < ? > getSuperClass() {
-        return _superclass;
+    public Class < ? > getSupertype() {
+        return _supertype;
     }
     /**
      * @param interfaces the Interfaces of the class
@@ -262,7 +279,7 @@ public final class ClassInfo implements ReflectionInfo {
     /**
      * @return the Collection of FieldInfo instances collected
      */
-    public Collection < FieldInfo > getFieldInfos() {
+    public List < FieldInfo > getFieldInfos() {
         return _fieldInfos;
     }
     /**
@@ -288,5 +305,53 @@ public final class ClassInfo implements ReflectionInfo {
      */
     public void setPackageInfo(final PackageInfo packageInfo) {
         _packageInfo = packageInfo;
+    }
+
+    /**
+     * @param hasPublicEmptyConstructor hasPublicEmptyConstructor
+     */
+    public void setHasPublicEmptyConstructor(final boolean hasPublicEmptyConstructor) {
+        _hasPublicEmptyConstructor = hasPublicEmptyConstructor;
+    }
+
+    /**
+     * @return hasPublicEmptyConstructor
+     */
+    public boolean isHasPublicEmptyConstructor() {
+        return _hasPublicEmptyConstructor;
+    }
+    
+    /**
+     * Implementing the toString method to get a more meaningful log output.
+     * {@inheritDoc}
+     * @see java.lang.Object#toString()
+     */
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append(this.getClass().getName())
+        .append("[")
+        .append("type:").append(_type)
+        .append("]");
+        return sb.toString();
+    }
+
+    /**
+     * To set the Class.getName but already preprocessed (by JavaNaming).
+     * @param className the class name of the type
+     */
+    public void setClassName(final String className) {
+        _className = className;
+    }
+    
+    /**
+     * The class name which had been set or Class.getName if nothing
+     * have been set.
+     * @return the class name set or Class.getName()
+     */
+    public String getClassName() {
+        if (_className != null) {
+            return _className;
+        }
+        return _type.getName();
     }
 }

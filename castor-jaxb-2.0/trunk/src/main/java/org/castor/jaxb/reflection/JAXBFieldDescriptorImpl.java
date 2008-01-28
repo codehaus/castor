@@ -36,7 +36,7 @@ public class JAXBFieldDescriptorImpl extends XMLFieldDescriptorImpl implements X
      * @param nodeType nodeType
      */
     public JAXBFieldDescriptorImpl(
-            final Class fieldType, final String fieldName,
+            final Class < ? > fieldType, final String fieldName,
             final String xmlName, final NodeType nodeType) {
         super(fieldType, fieldName, xmlName, nodeType);
     }

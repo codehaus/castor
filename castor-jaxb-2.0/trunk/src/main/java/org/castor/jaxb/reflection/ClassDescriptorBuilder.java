@@ -19,7 +19,9 @@ import javax.xml.bind.annotation.XmlAccessType;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.castor.jaxb.naming.NamingJava2Xml;
+import org.castor.jaxb.exceptions.FatalReflectionException;
+import org.castor.jaxb.exceptions.ReflectionException;
+import org.castor.jaxb.naming.JAXBXmlNaming;
 import org.castor.jaxb.reflection.info.ClassInfo;
 import org.castor.jaxb.reflection.info.FieldInfo;
 import org.castor.jaxb.reflection.info.PackageInfo;
@@ -29,6 +31,7 @@ import org.exolab.castor.mapping.CollectionHandler;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.loader.CollectionHandlers;
+import org.exolab.castor.mapping.loader.FieldHandlerImpl;
 import org.exolab.castor.mapping.loader.TypeInfo;
 import org.exolab.castor.xml.NodeType;
 import org.exolab.castor.xml.XMLClassDescriptor;
@@ -47,6 +50,7 @@ public final class ClassDescriptorBuilder {
      * Logger to use.
      */
     private static final Log LOG = LogFactory.getLog(ClassDescriptorBuilder.class);
+
     /**
      * The naming service to use for build XML names.
      */
@@ -55,16 +59,23 @@ public final class ClassDescriptorBuilder {
     /**
      * Default constructor.
      */
-    protected ClassDescriptorBuilder() {
+    public ClassDescriptorBuilder() {
         super();
-        _xmlNaming = new NamingJava2Xml();
+        _xmlNaming = new JAXBXmlNaming();
+    }
+
+    /**
+     * @return the XMLNaming in use.
+     */
+    public XMLNaming getXMLNaming() {
+        return _xmlNaming;
     }
 
     /**
      * To set the XMLNaming service to be used.
      * @param xmlNaming XMLNaming service to use
      */
-    protected void setXMLNaming(final XMLNaming xmlNaming) {
+    public void setXMLNaming(final XMLNaming xmlNaming) {
         _xmlNaming = xmlNaming;
     }
 
@@ -75,21 +86,22 @@ public final class ClassDescriptorBuilder {
      * @param saveMapKeys @HACK no idea what this is good for...
      * @return the XMLClassDescriptor representing the class
      */
-    XMLClassDescriptor buildClassDescriptor(
+    public XMLClassDescriptor buildClassDescriptor(
             final ClassInfo classInfo,
             final boolean saveMapKeys) {
         if (classInfo == null) {
-            String message = "Argument classInfo must not be null";
-            LOG.warn(message);
-            throw new IllegalArgumentException(message);
+            IllegalArgumentException e = new IllegalArgumentException(
+                    "Argument classInfo must not be null");
+            LOG.warn(e);
+            throw e;
         }
         JAXBClassDescriptorImpl classDescriptor = new JAXBClassDescriptorImpl();
-        classDescriptor.setJavaClass(classInfo.getClazz());
-        classDescriptor.setXMLName(classInfo.getRootElementName());
+        classDescriptor.setJavaClass(classInfo.getType());
         classDescriptor.setXMLName(getXMLName(classInfo));
         classDescriptor.setNameSpacePrefix(getNamespacePrefix(classInfo));
         classDescriptor.setNameSpaceURI(getNamespaceURI(classInfo));
         for (FieldInfo fieldInfo : classInfo.getFieldInfos()) {
+            LOG.info("Field info: " + fieldInfo + " now used");
             XMLFieldDescriptor fieldDescriptor = 
                 buildFieldDescriptor(fieldInfo, classInfo.getXmlAccessType(), saveMapKeys);
             classDescriptor.addFieldDescriptor(fieldDescriptor);
@@ -99,7 +111,9 @@ public final class ClassDescriptorBuilder {
 
     /**
      * Creates a XMLFieldDescriptor for the information collected
-     * in FieldInfo.
+     * in FieldInfo. Default for fields it to use it as Element. Every
+     * other case needs to be specified using annotations.
+     * 
      * @param fieldInfo all information collected about a field
      * @param xmlAccessType the access type to use
      * @param saveMapKeys @HACK no idea what this is good for...
@@ -110,31 +124,35 @@ public final class ClassDescriptorBuilder {
             final XmlAccessType xmlAccessType,
             final boolean saveMapKeys) {
         if (fieldInfo == null) {
-            String message = "Argument fieldInfo must not be null.";
-            LOG.warn(message);
-            throw new IllegalArgumentException(message);
+            IllegalArgumentException e = new IllegalArgumentException(
+                    "Argument fieldInfo must not be null.");
+            LOG.warn(e);
+            throw e;
         }
         NodeType nodeType = null;
         String xmlName = null;
-        String fieldName = null;
-        if (fieldInfo.isElement()) {
-            nodeType = NodeType.Element;
-            xmlName = fieldInfo.getElementName();
-            fieldName = fieldInfo.getElementName();
-        } else if (fieldInfo.isAttribute()) {
+        String fieldName = fieldInfo.getFieldName();
+        if (fieldInfo.isAttribute()) {
             nodeType = NodeType.Attribute;
-            xmlName = fieldInfo.getAttributeName();
-            fieldName = fieldInfo.getAttributeName();
+            xmlName = getXMLName(fieldInfo); //fieldInfo.getAttributeName();
+        } else if (fieldInfo.isElement()) {
+            nodeType = NodeType.Element;
+            xmlName = getXMLName(fieldInfo); //fieldInfo.getElementName();
         } else {
             if (LOG.isDebugEnabled()) {
                 String message = "Field: " + fieldInfo
-                        + " is neither Element nor Attribute - so ignored";
+                        + " not specified - use it as Element";
                 LOG.debug(message);
             }
-            return null;
+            nodeType = NodeType.Element;
+            xmlName = getXMLName(fieldInfo); //fieldInfo.getElementName();
         }
         JAXBFieldDescriptorImpl fieldDescriptor = 
-            new JAXBFieldDescriptorImpl(fieldInfo.getClass(), fieldName, xmlName, nodeType);
+            new JAXBFieldDescriptorImpl(getType(fieldInfo), fieldName, xmlName, nodeType);
+        fieldDescriptor.setMultivalued(fieldInfo.isMultivalue());
+        if (fieldInfo.isMultivalue()) {
+            fieldDescriptor.setFieldType(fieldInfo.getGenericType().getClass());
+        }
         FieldHandler fieldHandler = buildFieldHandler(fieldInfo, saveMapKeys);
         fieldDescriptor.setHandler(fieldHandler);
         return fieldDescriptor;
@@ -153,33 +171,29 @@ public final class ClassDescriptorBuilder {
             final FieldInfo fieldInfo,
             final boolean saveMapKeys) {
         if (fieldInfo == null) {
-            String message = "Argument fieldInfo must not be null.";
-            LOG.warn(message);
-            throw new IllegalArgumentException(message);
+            IllegalArgumentException e = new IllegalArgumentException(
+                    "Argument fieldInfo must not be null.");
+            LOG.warn(e);
+            throw e;
         }
-        TypeInfo typeInfo = buildTypeInfo(fieldInfo);
-        FieldHandler fieldHandler = null;
-//        try {
-//            FieldHandlerImpl fieldHandlerImpl = null;
-//            if (fieldInfo.isPureField()) {
-//                fieldHandlerImpl = new FieldHandlerImpl(fieldInfo.getField(), typeInfo);
-//            } else {
-//                fieldHandlerImpl = new FieldHandlerImpl(fieldInfo.getFieldName(),
-//                        null,
-//                        null,
-//                        fieldInfo.getGetMethod(),
-//                        fieldInfo.getSetMethod(),
-//                        typeInfo);
-//            }
-//            if (fieldInfo.getAddMethod() != null) {
-//                fieldHandlerImpl.setAddMethod(fieldInfo.getAddMethod());
-//            }
-//            if (fieldInfo.getCreateMethod() != null) {
-//                fieldHandlerImpl.setCreateMethod(fieldInfo.getCreateMethod());
-//            }
-//            if (fieldInfo.isCollection() 
-//                    && saveMapKeys
-//                    && getCollectionCompatibilityKit().isMapCollection(fieldInfo.getFieldType())) {
+//        TypeInfo typeInfo = buildTypeInfo(fieldInfo);
+        JAXBFieldHandlerImpl fieldHandler = new JAXBFieldHandlerImpl();
+        if (fieldInfo.isPureField()) {
+            fieldHandler.setField(fieldInfo.getField());
+        } else {
+            fieldHandler.setMethods(fieldInfo.getMethodGet(), fieldInfo.getMethodSet());
+        }
+//        if (fieldInfo.getMethodAdd() != null) {
+//            fieldHandler.setAddMethod(fieldInfo.getMethodAdd());
+//        }
+//        if (fieldInfo.getMethodCreate() != null) {
+//            fieldHandler.setCreateMethod(fieldInfo.getMethodCreate());
+//        }
+
+// if (fieldInfo.isCollection()
+// && saveMapKeys
+// && getCollectionCompatibilityKit().isMapCollection(fieldInfo.getFieldType()))
+// {
 //                fieldHandlerImpl.setConvertFrom(new IdentityConvertor());
 //            } // if isCollection
 //            fieldHandler = fieldHandlerImpl;
@@ -211,27 +225,34 @@ public final class ClassDescriptorBuilder {
      */
     private TypeInfo buildTypeInfo(final FieldInfo fieldInfo) {
         if (fieldInfo == null) {
-            String message = "Argument fieldInfo must not be null.";
-            LOG.warn(message);
-            throw new IllegalArgumentException(message);
+            IllegalArgumentException e = new IllegalArgumentException(
+                    "Argument fieldInfo must not be null.");
+            LOG.warn(e);
+            throw e;
         }
         CollectionHandler collectionHandler = null;
         if (fieldInfo.isMultivalue()) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(fieldInfo + " is multivalued and required special collection handler.");
+            }
             try {
-                collectionHandler = CollectionHandlers.getHandler(fieldInfo.getElementType());
+                collectionHandler = CollectionHandlers.getHandler(getType(fieldInfo));
             } catch (MappingException e) {
                 // No collection found - continue without collection handler
             }
-            if (fieldInfo.getElementType().isArray()) {
-                if (fieldInfo.getElementType().getComponentType() == Byte.TYPE) {
+            if (getType(fieldInfo).isArray()) {
+                if (getType(fieldInfo).getComponentType() == Byte.TYPE) {
                     collectionHandler = null;
                 } else {
 //                    fieldInfo.setFieldType(fieldInfo.getElementType());
                 }
             }
         }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(fieldInfo + " creating TypeInfo.");
+        }
         return new TypeInfo(
-                fieldInfo.getElementType(), null, null, false, null, collectionHandler);
+                getType(fieldInfo), null, null, false, null, collectionHandler);
     }
     
     /**
@@ -243,11 +264,15 @@ public final class ClassDescriptorBuilder {
      */
     private String getXMLName(final ClassInfo classInfo) {
         if (classInfo == null) {
-            throw new IllegalArgumentException();
+            IllegalArgumentException e = new IllegalArgumentException(
+                    "getXMLName(null) is illegal.");
+            LOG.warn(e);
+            throw e;
         }
         if (classInfo.getRootElementName() == null
-                || classInfo.getRootElementName().length() == 0) {
-            return _xmlNaming.createXMLName(classInfo.getClazz());
+                || classInfo.getRootElementName().length() == 0
+                || ClassInfo.DEFAULT_ELEMENT_NAME.equals(classInfo.getRootElementName())) {
+            return _xmlNaming.toXMLName(classInfo.getClassName());
         } else {
             return classInfo.getRootElementName();
         }
@@ -262,10 +287,14 @@ public final class ClassDescriptorBuilder {
      */
     private String getNamespaceURI(final ClassInfo classInfo) {
         if (classInfo == null) {
-            throw new IllegalArgumentException();
+            IllegalArgumentException e = new IllegalArgumentException(
+                    "getNamespaceURI(null) is illegal.");
+            LOG.warn(e);
+            throw e;
         }
         if (classInfo.getRootElementNamespace() == null
-                || classInfo.getRootElementNamespace().length() == 0) {
+                || classInfo.getRootElementNamespace().length() == 0
+                || ClassInfo.DEFAULT_ELEMENT_NAMESPACE.equals(classInfo.getRootElementNamespace())) {
             return null; // currently the default
         } else {
             return classInfo.getRootElementNamespace();
@@ -279,7 +308,10 @@ public final class ClassDescriptorBuilder {
      */
     private String getNamespacePrefix(final ClassInfo classInfo) {
         if (classInfo == null) {
-            throw new IllegalArgumentException();
+            IllegalArgumentException e = new IllegalArgumentException(
+                    "getNamespacePrefix(null) is illegal.");
+            LOG.warn(e);
+            throw e;
         }
         if (classInfo.getRootElementNamespace() == null
                 || classInfo.getRootElementNamespace().length() == 0) {
@@ -293,5 +325,113 @@ public final class ClassDescriptorBuilder {
             }
             return null;
         }
+    }
+    
+    /**
+     * To get the XML name for the class. This is either the name specified
+     * in the RootElememnt annotation of derived from the class name.
+     * 
+     * @param fieldInfo the FieldInfo for which a XML name is wanted
+     * @return the XML name
+     */
+    private String getXMLName(final FieldInfo fieldInfo) {
+        if (fieldInfo == null) {
+            IllegalArgumentException e = new IllegalArgumentException(
+                    "getXMLName(null) is illegal.");
+            LOG.warn(e);
+            throw e;
+        }
+        String xmlName = null;
+        if (fieldInfo.getRootElementName() != null
+                && fieldInfo.getRootElementName().length() != 0
+                && !FieldInfo.DEFAULT_ELEMENT_NAME.equals(fieldInfo.getRootElementName())) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("XML name for: " + fieldInfo + " is: " + fieldInfo.getRootElementName());
+            }
+            xmlName = fieldInfo.getRootElementName();
+        } else if (fieldInfo.getElementName() != null
+                && fieldInfo.getElementName().length() != 0
+                && !FieldInfo.DEFAULT_ELEMENT_NAME.equals(fieldInfo.getElementName())) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("XML name for: " + fieldInfo + " is: " + fieldInfo.getElementName());
+            }
+            xmlName = fieldInfo.getElementName();
+        } else if (fieldInfo.getAttributeName() != null
+                && fieldInfo.getAttributeName().length() != 0
+                && !FieldInfo.DEFAULT_ATTRIBUTE_NAME.equals(fieldInfo.getAttributeName())) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("XML name for: " + fieldInfo + " is: " + fieldInfo.getAttributeName());
+            }
+            xmlName = fieldInfo.getAttributeName();
+        } else {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("XML name for: " + fieldInfo + " is: " + fieldInfo.getFieldName());
+            }
+            xmlName = fieldInfo.getFieldName();
+        }
+        return _xmlNaming.toXMLName(xmlName);
+    }
+    
+    /**
+     * To get the type for a field. The type of a field is either given by an
+     * annotation or needs to be extracted from field/method.
+     * 
+     * @param fieldInfo the FieldInfo to interpret
+     * @return the type
+     */
+    private Class < ? > getType(final FieldInfo fieldInfo) {
+        if (fieldInfo == null) {
+            IllegalArgumentException e = new IllegalArgumentException(
+                    "getType(null) is illegal.");
+            LOG.warn(e);
+            throw e;
+        }
+        Class < ? > type = null;
+        if (fieldInfo.isElement()) {
+            if (fieldInfo.getElementType() != null) {
+                type = fieldInfo.getElementType();
+            } else {
+                type = getTypeFromFieldOrMethod(fieldInfo);
+            }
+        } else if (fieldInfo.isAttribute()) {
+            type = getTypeFromFieldOrMethod(fieldInfo);
+        } else {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Neither Element nor attribute - use default method to detect type.");
+            }
+            type = getTypeFromFieldOrMethod(fieldInfo);
+        }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Type for field: " + fieldInfo + " is: " + type);
+        }
+        return type;
+    }
+    
+    /**
+     * If the type should be read from field or method but not from an
+     * annotation information.
+     * 
+     * @param fieldInfo to get field and method from
+     * @return the type
+     */
+    private Class < ? > getTypeFromFieldOrMethod(final FieldInfo fieldInfo) {
+        if (fieldInfo == null) {
+            IllegalArgumentException e = new IllegalArgumentException(
+                    "getType(null) is illegal.");
+            LOG.warn(e);
+            throw e;
+        }
+        Class < ? > type = null;
+        if (fieldInfo.getField() != null) {
+            type = fieldInfo.getField().getType();
+        } else if (fieldInfo.getMethodGet() != null) {
+            type = fieldInfo.getMethodGet().getReturnType();
+        } else {
+            ReflectionException e = new ReflectionException(fieldInfo,
+                    "Failed to get type of fieldInfo, no field and no get method known.");
+            LOG.warn(e);
+            throw e;
+        }
+        return type;
     }
 }

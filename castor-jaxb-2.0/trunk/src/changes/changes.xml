@@ -24,6 +24,20 @@
         Initial beta release. Supports basic un-/marshalling according to JAXB API
         but still without interpreting any annotations in the classes.
       </action>
+
+      <action dev="jgrueneis" type="add">
+        Introduced JAXBFieldHandlerImpl the generic field handler for JAXB implementations.
+      </action>
+
+      <action dev="jgrueneis" type="update">
+        The naming classes are now JAXBXmlNaming and JAXBJavaNaming as this is what they do.
+        Provide the Java naming rules or the XML naming rules. As a consequence Java naming is
+        used by ClassInfoBuilder and Xml naming by ClassDescriptorBuilder.
+      </action>
+
+      <action dev="jgrueneis" type="add">
+        Tests for ClassInfoBuilder, ClassDescriptorBuilder, JAXBFieldHandler, JAXB*Naming, ...
+      </action>
 <!--
 		type can bei either add, fix, remove or update
 

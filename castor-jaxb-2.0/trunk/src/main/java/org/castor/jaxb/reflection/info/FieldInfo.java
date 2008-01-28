@@ -17,6 +17,7 @@ package org.castor.jaxb.reflection.info;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 
 /**
  * Contains the information collected for fields. Fields are either real fields or methods matching
@@ -26,10 +27,16 @@ import java.lang.reflect.Method;
  * @version $Id$
  */
 public final class FieldInfo implements ReflectionInfo {
+    /** Default string for element annotation. */
+    public static final String DEFAULT_ELEMENT_NAME = "##default";
+    /** Default string for attribute annotation. */
+    public static final String DEFAULT_ATTRIBUTE_NAME = "##default";
     /** The name of the field. Either from the field itself of taken from a method. */
     private String _fieldName;
     /** The field this information is for. */
     private Field _field;
+    /** A flag indicating that the field is multivalued. */
+    private boolean _multivalued;
     /** Add method. */
     private Method _methodAdd;
     /** Get method. */
@@ -64,6 +71,8 @@ public final class FieldInfo implements ReflectionInfo {
     private boolean _attributeRequired;
     /** The value of the XmlEnumValue annotation. */
     private String _enumValue;
+    /** The generic type - if any. */
+    private Type _genericType;
     
     /**
      * Simple constructor.
@@ -355,26 +364,15 @@ public final class FieldInfo implements ReflectionInfo {
      * @return true if the field can be multivalued
      */
     public boolean isMultivalue() {
-        return false;
-//        // TODO Auto-generated method stub
-//        throw new UnsupportedOperationException("Auto-generated method stub");
-//        // return false;
+        return _multivalued;
     }
     
     /**
-     * The field type is either taken from the element annotation, the field or from a method.
-     * @return returns the type of the field
+     * Marks the field as multivalued.
+     * @param multivalued true to mark the field as multivalued
      */
-    public Class < ? > getFieldType() {
-        if (_elementType != null) {
-            return _elementType;
-        } else if (_field != null) {
-            return _field.getType();
-        } else {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Auto-generated method stub");
-            // return false;
-        }
+    public void setMultivalued(final boolean multivalued) {
+        _multivalued = multivalued;
     }
 
     /**
@@ -389,5 +387,48 @@ public final class FieldInfo implements ReflectionInfo {
      */
     public String getFieldName() {
         return _fieldName;
+    }
+
+    /**
+     * I'm not sure if I really want to keep this method... it is not
+     * only a question of 'if methods exist' but also of the access mode
+     * to use...
+     * @deprecated
+     * @return
+     */
+    public boolean isPureField() {
+        return (getMethodGet() == null && getMethodSet() == null);
+    }
+    
+    /**
+     * Implementing the toString method to get a more meaningful log output.
+     * {@inheritDoc}
+     * @see java.lang.Object#toString()
+     */
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append(this.getClass().getName())
+        .append("[")
+        .append("fieldName:").append(_fieldName).append("/")
+        .append("field:").append(_field).append("/")
+        .append("methodGet:").append(_methodGet)
+        .append("]");
+        return sb.toString();
+    }
+
+    /**
+     * To set the generic type. Used for multivalued fields.
+     * @param genericType the generic type of the field
+     */
+    public void setGenericType(final Type genericType) {
+        _genericType = genericType;
+    }
+
+    /**
+     * To get the generic type of the field. Used for multivalued fields.
+     * @return the generic type of the field
+     */
+    public Type getGenericType() {
+        return _genericType;
     }
 }

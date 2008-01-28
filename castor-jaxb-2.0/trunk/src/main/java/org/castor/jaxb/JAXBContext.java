@@ -27,6 +27,18 @@ import javax.xml.bind.Validator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.castor.jaxb.naming.JAXBXmlNaming;
+import org.castor.jaxb.naming.JAXBJavaNaming;
+import org.castor.jaxb.reflection.ClassDescriptorBuilder;
+import org.castor.jaxb.reflection.ClassInfoBuilder;
+import org.castor.jaxb.resolver.JAXBClassResolverCommand;
+import org.castor.jaxb.resolver.JAXBPackageResolverCommand;
+import org.castor.jaxb.resolver.JAXBResolverStrategy;
+import org.castor.xml.InternalContext;
+import org.castor.xml.JavaNaming;
+import org.castor.xml.XMLNaming;
+import org.exolab.castor.mapping.Mapping;
+import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.xml.ResolverException;
 import org.exolab.castor.xml.XMLContext;
 
@@ -54,6 +66,31 @@ public final class JAXBContext extends javax.xml.bind.JAXBContext {
     private JAXBContext() {
         super();
         _xmlContext = new XMLContext();
+        InternalContext internalContext = _xmlContext.getInternalContext();
+
+        JavaNaming javaNaming = new JAXBJavaNaming();
+        XMLNaming xmlNaming = new JAXBXmlNaming();
+        
+        internalContext.setJavaNaming(javaNaming);
+        internalContext.setXMLNaming(xmlNaming);
+        
+        ClassDescriptorBuilder cdb = new ClassDescriptorBuilder();
+        cdb.setXMLNaming(xmlNaming);
+        
+        ClassInfoBuilder cib = new ClassInfoBuilder();
+        cib.setJavaNaming(javaNaming);
+        
+        JAXBPackageResolverCommand packageResolverCommand = new JAXBPackageResolverCommand();
+        
+        JAXBClassResolverCommand classResolverCommand = new JAXBClassResolverCommand();
+        classResolverCommand.setClassDescriptorBuilder(cdb);
+        classResolverCommand.setClassInfoBuilder(cib);
+        
+        JAXBResolverStrategy resolverStrategy = new JAXBResolverStrategy();
+        resolverStrategy.setClassResolverCommand(classResolverCommand);
+        resolverStrategy.setPackageResolverCommand(packageResolverCommand);
+        
+        internalContext.setResolverStrategy(resolverStrategy);
     }
 
     /**
@@ -250,6 +287,21 @@ public final class JAXBContext extends javax.xml.bind.JAXBContext {
             _xmlContext.addClasses(classesToBeBound);
         } catch (ResolverException e) {
             String message = "Failed to add classes to context with exception: " + e;
+            LOG.warn(message);
+            throw new JAXBException(message, e);
+        }
+    }
+    
+    /**
+     * Loads all descriptors of the Castor mapping as known class-XML mappings.
+     * @param mapping the Castor mappings to load
+     * @throws JAXBException in case loading of mapping failed
+     */
+    public void loadMapping(final Mapping mapping) throws JAXBException {
+        try {
+            _xmlContext.addMapping(mapping);
+        } catch (MappingException e) {
+            String message = "Failed to load mapping with exception: " + e;
             LOG.warn(message);
             throw new JAXBException(message, e);
         }
