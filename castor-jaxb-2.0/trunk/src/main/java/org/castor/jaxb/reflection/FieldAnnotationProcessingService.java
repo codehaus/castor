@@ -103,7 +103,11 @@ public class FieldAnnotationProcessingService extends AnnotationProcessingServic
                 fieldInfo.setElementNillable(xmlElement.nillable());
                 fieldInfo.setElementRequired(xmlElement.required());
                 fieldInfo.setElementNamespace(xmlElement.namespace());
-                fieldInfo.setElementType(xmlElement.type());
+                if (XmlElement.DEFAULT.class.equals(xmlElement.type())) {
+                    fieldInfo.setElementType(null);
+                } else {
+                    fieldInfo.setElementType(xmlElement.type());
+                }
                 fieldInfo.setElementDefaultValue(xmlElement.defaultValue());
             }
         }

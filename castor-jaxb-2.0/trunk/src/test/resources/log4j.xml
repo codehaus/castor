@@ -5,7 +5,7 @@
         
     <appender name="console" class="org.apache.log4j.ConsoleAppender">
         <layout class="org.apache.log4j.PatternLayout">
-            <param name="ConversionPattern" value="%d{dd MMM yyyy HH:mm:ss.SSS} [%p] [%t] [%c] - %m%n"/>
+            <param name="ConversionPattern" value="%d{dd MMM yyyy HH:mm:ss.SSS} [%p] [%t] [%c{1}] - %m%n"/>
         </layout>
     </appender>
 
@@ -18,8 +18,16 @@
         </layout>
     </appender>
 
+    <category name="org.exolab.castor">
+      <priority value="debug" />
+    </category>
+
+    <category name="org.castor">
+      <priority value="debug" />
+    </category>
+
     <category name="org.castor.jaxb">
-      <priority value="info" />
+      <priority value="debug" />
     </category>
 
     <category name="org.castor.test">

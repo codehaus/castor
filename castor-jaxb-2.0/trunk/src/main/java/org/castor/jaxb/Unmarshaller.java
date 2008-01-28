@@ -256,12 +256,12 @@ public class Unmarshaller implements javax.xml.bind.Unmarshaller {
         } catch (MarshalException e) {
             String message = "Problem unmarshalling from InputSource " 
                 + inputSource.toString() + " exception: " + e;
-            LOG.warn(message);
+            LOG.warn(message, e);
             throw new JAXBException(message, e);
         } catch (ValidationException e) {
             String message = "Problem unmarshalling from InputSource " 
                 + inputSource.toString() + " exception: " + e;
-            LOG.warn(message);
+            LOG.warn(message, e);
             throw new JAXBException(message, e);
         }
     }

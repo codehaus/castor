@@ -55,7 +55,7 @@ public abstract class AnnotationProcessingService {
      */
     protected final void annotationVisitMessage(final Log log, final Annotation annotation) {
         if (log.isDebugEnabled()) {
-            log.debug("Annotation: " + annotation.getClass().getName() + " visited.");
+            log.debug("Annotation: " + annotation.toString() + " visited.");
         }        
     }
     

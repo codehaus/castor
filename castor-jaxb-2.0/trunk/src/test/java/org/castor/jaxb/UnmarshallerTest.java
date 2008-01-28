@@ -6,6 +6,7 @@ import javax.xml.bind.Unmarshaller.Listener;
 
 import junit.framework.TestCase;
 
+import org.castor.test.Child;
 import org.castor.test.Test;
 import org.castor.test.TestListener;
 import org.xml.sax.InputSource;
@@ -14,7 +15,7 @@ public class UnmarshallerTest extends TestCase {
 
     public void testUnmarshalInputSource() throws JAXBException {
         javax.xml.bind.JAXBContext jaxbContext =
-            org.castor.jaxb.JAXBContext.newInstance(Test.class);
+            org.castor.jaxb.JAXBContext.newInstance(Test.class, Child.class);
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
         InputSource inputSource =
             new InputSource(getClass().getClassLoader().getResource("sample.xml").toExternalForm());

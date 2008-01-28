@@ -1,6 +1,7 @@
 <projectDescription>
   <name>castor-jaxb</name>
-  <comment/>
+  <comment>A layer to use Castor underneath and JAXB standard compliant API
+		and mapping definition.</comment>
   <projects/>
   <buildSpec>
     <buildCommand>
