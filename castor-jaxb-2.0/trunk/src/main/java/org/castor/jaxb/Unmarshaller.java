@@ -40,6 +40,7 @@ import javax.xml.validation.Schema;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.castor.jaxb.adapters.UnmarshalListenerAdapter;
 import org.castor.xml.InternalContext;
 import org.exolab.castor.xml.MarshalException;
 import org.exolab.castor.xml.ValidationException;
@@ -66,6 +67,7 @@ public class Unmarshaller implements javax.xml.bind.Unmarshaller {
     
     /**
      * The Unmarshaller is meant to be instantiated by JAXBContext only!
+     * @param castorUnmarshaller the Castor Unmarshaller to use
      */
     protected Unmarshaller(final org.exolab.castor.xml.Unmarshaller castorUnmarshaller) {
         _castorUnmarshaller = castorUnmarshaller;
@@ -100,7 +102,7 @@ public class Unmarshaller implements javax.xml.bind.Unmarshaller {
      * @see javax.xml.bind.Unmarshaller#getListener()
      */
     public Listener getListener() {
-        return _unmarshalListener.getJAXBListener();
+        return (_unmarshalListener == null) ? null : _unmarshalListener.getJAXBListener();
     }
 
     /**
@@ -173,9 +175,11 @@ public class Unmarshaller implements javax.xml.bind.Unmarshaller {
      * @see javax.xml.bind.Unmarshaller#setListener(javax.xml.bind.Unmarshaller.Listener)
      */
     public void setListener(final Listener listener) {
-        _unmarshalListener = new UnmarshalListenerAdapter();
-        _unmarshalListener.setJAXBListener(listener);
-        _castorUnmarshaller.setUnmarshalListener(_unmarshalListener);
+        if (listener != null) {
+            _unmarshalListener = new UnmarshalListenerAdapter();
+            _unmarshalListener.setJAXBListener(listener);
+            _castorUnmarshaller.setUnmarshalListener(_unmarshalListener);
+        }
     }
 
     /**
@@ -362,7 +366,7 @@ public class Unmarshaller implements javax.xml.bind.Unmarshaller {
      * To set the Castor XML context to use.
      * @param internalContext the Castor XML Context to use
      */
-    public void setInternalContext(final InternalContext internalContext) {
+    protected void setInternalContext(final InternalContext internalContext) {
         _internalContext = internalContext;
         _castorUnmarshaller.setInternalContext(_internalContext);
     }

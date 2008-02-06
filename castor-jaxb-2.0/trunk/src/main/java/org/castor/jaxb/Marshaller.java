@@ -37,6 +37,8 @@ import javax.xml.validation.Schema;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.castor.jaxb.adapters.MarshalListenerAdapter;
+import org.castor.jaxb.adapters.ValidationEventHandlerAdapter;
 import org.castor.xml.InternalContext;
 import org.exolab.castor.xml.MarshalException;
 import org.exolab.castor.xml.ValidationException;
@@ -90,6 +92,7 @@ public class Marshaller implements javax.xml.bind.Marshaller {
 
     /**
      * Only JAXBCopntext is allowed to instantiate Marshaller.
+     * @param castorMarshaller the Castor Marshaller to use underneath
      */
     protected Marshaller(final org.exolab.castor.xml.Marshaller castorMarshaller) {
         _castorMarshaller = castorMarshaller;
@@ -380,9 +383,11 @@ public class Marshaller implements javax.xml.bind.Marshaller {
      * @see javax.xml.bind.Marshaller#setListener(javax.xml.bind.Marshaller.Listener)
      */
     public void setListener(final Listener listener) {
-        _marshalListener = new MarshalListenerAdapter();
-        _marshalListener.setJAXBListener(listener);
-        _castorMarshaller.setMarshalListener(_marshalListener);
+        if (listener != null) {
+            _marshalListener = new MarshalListenerAdapter();
+            _marshalListener.setJAXBListener(listener);
+            _castorMarshaller.setMarshalListener(_marshalListener);
+        }
     }
 
     /**
@@ -406,7 +411,7 @@ public class Marshaller implements javax.xml.bind.Marshaller {
      * To set the Castor XML context to use.
      * @param internalContext the Castor XML Context to use
      */
-    public void setInternalContext(final InternalContext internalContext) {
+    protected void setInternalContext(final InternalContext internalContext) {
         _internalContext = internalContext;
         _castorMarshaller.setInternalContext(_internalContext);
     }
