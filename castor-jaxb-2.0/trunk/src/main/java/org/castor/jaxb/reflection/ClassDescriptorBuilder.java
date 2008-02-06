@@ -178,6 +178,9 @@ public final class ClassDescriptorBuilder {
         }
 //        TypeInfo typeInfo = buildTypeInfo(fieldInfo);
         JAXBFieldHandlerImpl fieldHandler = new JAXBFieldHandlerImpl();
+//        fieldHandler.setType(type);
+//        fieldHandler.setTypeFactory(typeFactoryClass, typeFactoryMethod);
+//        fieldHandler.setXmlAdapter(xmlAdapter);
         if (fieldInfo.isPureField()) {
             fieldHandler.setField(fieldInfo.getField());
         } else {
