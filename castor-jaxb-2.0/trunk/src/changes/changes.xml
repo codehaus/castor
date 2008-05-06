@@ -6,10 +6,16 @@
   </properties>
   <body>
     <release version="1.0-beta-1" date="2008-01-04" description="under development">
+      <action dev="mepheser" type="update">
+      	A first draft of a customized source generator to get JAXB code. Introducing the classes:
+      	Jaxb2SourceGenerator, Jaxb2AnnotationBuilder and SourceGeneratorTest.
+      </action>
+
       <action dev="jgrueneis" type="update">
       	Disabled all tests of UnmarshallerTest as these fail because of Castor problems which
       	need to be fixed there before...
       </action>
+
       <action dev="jgrueneis" type="update">
         Changed Castor dependency to 1.2-SNAPSHOT. 
       </action>
