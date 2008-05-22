@@ -18,6 +18,7 @@ package org.castor.spring.xml;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.xml.Marshaller;
+import org.exolab.castor.xml.XMLContext;
 import org.springframework.beans.factory.FactoryBeanNotInitializedException;
 import org.springframework.beans.factory.ListableBeanFactory;
 
@@ -103,11 +104,16 @@ public class CastorMarshallerFactoryBean extends AbstractCastorPrototypingXMLFac
      * @see FactoryBeanNotInitializedException
      */
     public Object getObject() throws Exception {
-        Marshaller marshaller = new Marshaller();
-        if (getSpringXMLContext() != null) {
-            getSpringXMLContext().setContext(marshaller);
+        Marshaller marshaller;
+        if (getXmlContext() != null) {
+            marshaller = getXmlContext().createMarshaller();
         } else {
-            marshaller.setResolver(this.getResolver());
+            marshaller = new Marshaller();
+            if (getSpringXMLContext() != null) {
+                getSpringXMLContext().setContext(marshaller);
+            } else {
+                marshaller.setResolver(this.getResolver());
+            }
         }
         // marshaller.setEncoding(this.encoding);
         marshaller.setMarshalAsDocument(this.marshalAsDocument);
