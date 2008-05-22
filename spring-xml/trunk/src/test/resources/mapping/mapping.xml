@@ -3,16 +3,20 @@
                            "http://castor.exolab.org/mapping.dtd">
 <mapping>
 
-  <!--  Mapping for Product  -->
-  <class name="org.castor.spring.xml.entity.Product" identity="id">
-    <map-to xml="product" />
-	<field name="id" type="integer">
-		  <bind-xml name="id" node="element"/>
-		</field>
-    <field name="name" type="string">
-      <bind-xml name="name" node="element" />
-    </field>
-  </class>
+   <!--  Mapping for Product  -->
+   <class name="org.castor.spring.xml.entity.Product" identity="id">
+      <map-to xml="product" />
+      <field name="id" type="integer">
+         <bind-xml name="id" node="element" />
+      </field>
+      <field name="name" type="string">
+         <bind-xml name="name" node="element" />
+      </field>
+      <field name="category" type="org.castor.spring.xml.entity.ProductCategory">
+         <bind-xml name="category" />
+      </field>
+
+   </class>
 
 </mapping>
 

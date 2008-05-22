@@ -5,7 +5,14 @@ public class Product {
     private int id;
     private String name;
     private String catalog;
+    private ProductCategory category;
     
+    public ProductCategory getCategory() {
+        return category;
+    }
+    public void setCategory(ProductCategory category) {
+        this.category = category;
+    }
     public int getId() {
         return this.id;
     }

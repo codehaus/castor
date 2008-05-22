@@ -4,14 +4,13 @@ import java.io.StringWriter;
 import java.io.Writer;
 
 import org.castor.spring.xml.entity.Product;
+import org.castor.spring.xml.entity.ProductCategory;
 import org.exolab.castor.xml.Marshaller;
 
 public abstract class BaseFactoryBeanTestCase extends BaseSpringTestCase {
 
     public void testGetMarshaller() throws Exception {
-        Product product = new Product();
-        product.setId(1);
-        product.setName("blah");
+        Product product = createProduct();
     
         Marshaller marshaller = (Marshaller) this.context.getBean("marshaller");
         assertNotNull(marshaller);
@@ -24,9 +23,7 @@ public abstract class BaseFactoryBeanTestCase extends BaseSpringTestCase {
     }
 
     public void testMarshallSuppressNamespaces() throws Exception {
-        Product product = new Product();
-        product.setId(1);
-        product.setName("blah");
+        Product product = createProduct();
     
         Marshaller marshaller = (Marshaller) this.context.getBean("marshaller-suppress");
         assertNotNull(marshaller);
@@ -48,5 +45,18 @@ public abstract class BaseFactoryBeanTestCase extends BaseSpringTestCase {
         assertNotSame("Created Marshaller are same object, but must not", firstMarshaller, secondMarshaller);
         assertSame("Created Marshallers have different Resolvers, but must have same", firstMarshaller.getResolver(), secondMarshaller
                 .getResolver());
+    }
+
+    private Product createProduct() {
+        Product product = new Product();
+        product.setId(1);
+        product.setName("blah");
+        
+        ProductCategory category = new ProductCategory();
+        category.setId(1);
+        category.setDescription("category 1");
+        
+        product.setCategory(category );
+        return product;
     }
 }
