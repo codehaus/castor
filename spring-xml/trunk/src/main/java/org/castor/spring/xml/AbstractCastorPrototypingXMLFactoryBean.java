@@ -16,7 +16,9 @@
 package org.castor.spring.xml;
 
 import org.apache.commons.logging.Log;
+import org.exolab.castor.xml.Unmarshaller;
 import org.exolab.castor.xml.XMLClassDescriptorResolver;
+import org.exolab.castor.xml.XMLContext;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -46,6 +48,12 @@ public abstract class AbstractCastorPrototypingXMLFactoryBean implements Factory
     private SpringXMLContext springXMLContext;
 
     /**
+     * {@link XMLContext} instance used for configuring and boot-strapping
+     * object creation.
+     */
+    private XMLContext xmlContext;
+
+    /**
      * Invoked by a BeanFactory after it has set all bean properties supplied
      * (and satisfied BeanFactoryAware and ApplicationContextAware).
      * <p>
@@ -57,9 +65,10 @@ public abstract class AbstractCastorPrototypingXMLFactoryBean implements Factory
      *             If the properties are not properly set.
      */
     public void afterPropertiesSet() throws IllegalArgumentException {
-        if (this.resolver == null && this.springXMLContext == null) {
-            this.getLog().error("Neither 'resolver' nor 'springXmlContext' is set.");
-            throw new IllegalArgumentException("Please specify either Resolver ('receiver') or SpringXmlContext ('springXmlContext') as property.");
+        if (this.resolver == null && this.springXMLContext == null 
+                && getXmlContext() == null) {
+            this.getLog().error("Neither 'resolver' nor 'springXmlContext' nor 'XMLContext' is set.");
+            throw new IllegalArgumentException("Please specify either Resolver ('receiver') or XMLContext ('xmlContext') or SpringXmlContext ('springXmlContext') as property.");
         }
     }
 
@@ -110,4 +119,21 @@ public abstract class AbstractCastorPrototypingXMLFactoryBean implements Factory
     protected SpringXMLContext getSpringXMLContext() {
         return springXMLContext;
     }
+    
+    /**
+     * Sets the {@link XMLContext} instance to be used for obtaining 
+     * pre-configured {@link Unmarshaller} instances.
+     * @param xmlContext {@link XMLContext} instance used for creating {@link Unmarshaller} instances.
+     * 
+     * @see XMLContext
+     * @see XMLContext#createUnmarshaller()
+     */
+    public void setXmlContext(final XMLContext xmlContext) {
+        this.xmlContext = xmlContext;
+    }
+
+    protected XMLContext getXmlContext() {
+        return xmlContext;
+    }
+    
 }

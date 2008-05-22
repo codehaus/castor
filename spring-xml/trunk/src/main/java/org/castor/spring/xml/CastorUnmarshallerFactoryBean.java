@@ -86,7 +86,7 @@ public class CastorUnmarshallerFactoryBean extends AbstractCastorPrototypingXMLF
      * ApplicationContext to load beans. 
      */
     private ObjectFactory factory;
-
+    
     /**
      * Return an instance (possibly shared or independent) of the object managed
      * by this factory. As with a BeanFactory, this allows support for both the
@@ -104,13 +104,18 @@ public class CastorUnmarshallerFactoryBean extends AbstractCastorPrototypingXMLF
      */
     public Object getObject() throws Exception {
         
-        Unmarshaller unmarshaller = new Unmarshaller();
-
-        if (getSpringXMLContext() != null) {
-            getSpringXMLContext().setContext(unmarshaller);
+        Unmarshaller unmarshaller;
+        if (getXmlContext() != null) {
+            unmarshaller = getXmlContext().createUnmarshaller();
         } else {
-            if (this.getResolver() != null) {
-                unmarshaller.setResolver(this.getResolver());
+            unmarshaller = new Unmarshaller();
+            
+            if (getSpringXMLContext() != null) {
+                getSpringXMLContext().setContext(unmarshaller);
+            } else {
+                if (this.getResolver() != null) {
+                    unmarshaller.setResolver(this.getResolver());
+                }
             }
         }
         
@@ -227,7 +232,7 @@ public class CastorUnmarshallerFactoryBean extends AbstractCastorPrototypingXMLF
     **/
     public void setUnmarshalListener(UnmarshalListener listener) {
         this.unmarshalListener = listener;
-    } //-- setUnmarshalListener
+    }
     
     /**
      * Set the object factory for this Unmarshaller.
@@ -236,4 +241,5 @@ public class CastorUnmarshallerFactoryBean extends AbstractCastorPrototypingXMLF
     public void setObjectFactory(ObjectFactory factory) {
         this.factory = factory;
     }
+
 }
