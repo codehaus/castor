@@ -20,7 +20,7 @@
    <!--  Mapping for Product  -->
    <class name="org.castor.spring.xml.entity.ProductCategory" identity="id">
       <map-to xml="product-category" ns-prefix="p" ns-uri="http://castor.org/test/product" />
-      <field name="id" type="integer">
+      <field name="id" type="long">
          <bind-xml name="id" node="element" />
       </field>
       <field name="description" type="string">
