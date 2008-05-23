@@ -1,5 +1,6 @@
-package org.castor.spring.xml;
+package org.castor.spring.xml.context;
 
+import org.castor.spring.xml.BaseFactoryBeanTestCase;
 import org.castor.spring.xml.entity.Product;
 import org.exolab.castor.xml.Unmarshaller;
 import org.xml.sax.InputSource;
