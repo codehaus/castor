@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.xml.util.JDOClassDescriptorResolver;
 import org.exolab.castor.xml.util.JDOClassDescriptorResolverImpl;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.FactoryBeanNotInitializedException;
@@ -17,7 +18,7 @@ public class ClassDescriptorResolverFactoryBean implements FactoryBean,
     /**
      * Castor JDO Manager instance
      */
-    private JDOClassDescriptorResolverImpl classDescriptorResolver;
+    private JDOClassDescriptorResolver classDescriptorResolver;
 
     /**
      * List of class names.
@@ -71,11 +72,12 @@ public class ClassDescriptorResolverFactoryBean implements FactoryBean,
      */
     public Class getObjectType() {
 
+        // TODO should we drop the next three lines ....
         if (this.classDescriptorResolver != null) {
             return this.classDescriptorResolver.getClass();
         }
 
-        return JDOClassDescriptorResolverImpl.class;
+        return JDOClassDescriptorResolver.class;
     }
 
     /**
@@ -115,7 +117,7 @@ public class ClassDescriptorResolverFactoryBean implements FactoryBean,
                     "Please specify at least one class name or package name.");
         }
 
-        JDOClassDescriptorResolverImpl classDescriptorResolver = new JDOClassDescriptorResolverImpl();
+        JDOClassDescriptorResolver classDescriptorResolver = new JDOClassDescriptorResolverImpl();
 
         if (!this.packages.isEmpty()) {
             for (Iterator iterator = this.packages.iterator(); iterator

@@ -6,7 +6,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.jdo.JDOManager;
 import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.xml.util.JDOClassDescriptorResolverImpl;
+import org.exolab.castor.xml.util.JDOClassDescriptorResolver;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.FactoryBeanNotInitializedException;
 import org.springframework.beans.factory.InitializingBean;
@@ -53,9 +53,9 @@ public class LocalCastorFactoryBean implements FactoryBean, InitializingBean /*
     private EntityResolver entityResolver;
 
     /**
-     * {@link JDOClassDescriptorResolverImpl} instance.
+     * {@link JDOClassDescriptorResolver} instance.
      */
-    private JDOClassDescriptorResolverImpl classDescriptorResolver;
+    private JDOClassDescriptorResolver classDescriptorResolver;
 
     /**
      * Return an instance (possibly shared or independent) of the object managed
@@ -249,7 +249,7 @@ public class LocalCastorFactoryBean implements FactoryBean, InitializingBean /*
     }
 
     public void setClassDescriptorResolver(
-            JDOClassDescriptorResolverImpl classDescriptorResolver) {
+            JDOClassDescriptorResolver classDescriptorResolver) {
         this.classDescriptorResolver = classDescriptorResolver;
     }
 
