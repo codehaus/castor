@@ -81,10 +81,8 @@
 
 	<bean id="myJDOManager"
 		class="org.castor.spring.orm.LocalCastorFactoryBean">
-	    <props>
-	      <prop key="databaseName">test</prop>
-	      <prop key="configLocation">src/test/resources/jdo-conf.xml</prop>
-	    </props>
+        <property name="databaseName" value="test" />
+        <property name="configLocation" value="classpath:jdo-conf.xml" />
 	</bean>
 
 </beans>
@@ -524,18 +522,14 @@ public class ProductServiceImpl implements ProductService {
 
 	<bean id="myJDOManager1"
 		class="org.castor.spring.orm.LocalCastorFactoryBean">
-	    <props>
-	      <prop key="databaseName">test1</prop>
-	      <prop key="configLocation">src/test/resources/jdo-conf-1.xml</prop>
-	    </props>
+        <property name="databaseName" value="test1" />      
+        <property name="configLocation" value="classpath:jdo-conf-1.xml" />
 	</bean>
 
 	<bean id="myJDOManager2"
 		class="org.castor.spring.orm.LocalCastorFactoryBean">
-	    <props>
-	      <prop key="databaseName">test2</prop>
-	      <prop key="configLocation">src/test/resources/jdo-conf-2.xml</prop>
-	    </props>
+        <property name="databaseName" value="test2" />      
+        <property name="configLocation" value="classpath:jdo-conf-2.xml" />
 	</bean>
 
 	<bean id="myTxManager"

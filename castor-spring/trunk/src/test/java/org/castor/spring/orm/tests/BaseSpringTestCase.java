@@ -12,7 +12,9 @@ public abstract class BaseSpringTestCase extends TestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        this.context = new ClassPathXmlApplicationContext("app-config.xml");
+        this.context = getApplicationContext();
     }
+
+    protected abstract ClassPathXmlApplicationContext getApplicationContext();
 
 }
