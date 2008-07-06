@@ -1,12 +1,12 @@
 package org.castor.spring.orm;
 
 import java.io.IOException;
-import java.net.URL;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.jdo.JDOManager;
 import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.xml.util.JDOClassDescriptorResolverImpl;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.FactoryBeanNotInitializedException;
 import org.springframework.beans.factory.InitializingBean;
@@ -53,6 +53,11 @@ public class LocalCastorFactoryBean implements FactoryBean, InitializingBean /*
     private EntityResolver entityResolver;
 
     /**
+     * {@link JDOClassDescriptorResolverImpl} instance.
+     */
+    private JDOClassDescriptorResolverImpl classDescriptorResolver;
+
+    /**
      * Return an instance (possibly shared or independent) of the object managed
      * by this factory. As with a BeanFactory, this allows support for both the
      * Singleton and Prototype design pattern.
@@ -64,7 +69,7 @@ public class LocalCastorFactoryBean implements FactoryBean, InitializingBean /*
      * @return an instance of the bean (should not be null; a null value will be
      *         considered as an indication of incomplete initialization)
      * @throws Exception
-     *             in case of creation errors
+     *                 in case of creation errors
      * @see FactoryBeanNotInitializedException
      */
     public Object getObject() throws Exception {
@@ -124,10 +129,10 @@ public class LocalCastorFactoryBean implements FactoryBean, InitializingBean /*
      * in the event of misconfiguration.
      * 
      * @throws MappingException
-     *             If Castor cannot resolve the mapping file successfully.
+     *                 If Castor cannot resolve the mapping file successfully.
      * @throws Exception
-     *             in the event of misconfiguration (such as failure to set an
-     *             essential property) or if initialization fails.
+     *                 in the event of misconfiguration (such as failure to set
+     *                 an essential property) or if initialization fails.
      */
     public void afterPropertiesSet() throws IllegalArgumentException,
             MappingException {
@@ -143,8 +148,7 @@ public class LocalCastorFactoryBean implements FactoryBean, InitializingBean /*
         try {
             LOG.debug("About to load JDO configuration file from "
                     + configLocation.getURL().toExternalForm());
-            this.jdoManager = createJDOManager(configLocation.getURL(),
-                    databaseName);
+            this.jdoManager = createJDOManager();
         } catch (IOException e) {
             throw new IllegalArgumentException(
                     "Problem loading JDO configuration file from "
@@ -157,25 +161,27 @@ public class LocalCastorFactoryBean implements FactoryBean, InitializingBean /*
      * Creates a JDOManager instance for the configuration specified.
      * 
      * @param configuration
-     *            JDOManager configuration file
+     *                JDOManager configuration file
      * @param databaseName
-     *            Name of the database instance.
+     *                Name of the database instance.
      * @return A fully-configured JDOManager instance
      * @throws MappingException
-     *             If the JDOManager cannot be initialized/configured.
+     *                 If the JDOManager cannot be initialized/configured.
      * @author <a href="werner DOT guttmann AT gmx DOT net">Werner Guttmann</a>
+     * @throws IOException
      */
-    protected JDOManager createJDOManager(URL configuration, String databaseName)
-            throws MappingException {
+    protected JDOManager createJDOManager() throws MappingException,
+            IOException {
         JDOManager jdoManagerToBeCreated = null;
 
         try {
-            InputSource inputSource = new InputSource(configuration
-                    .toExternalForm());
+            InputSource inputSource = new InputSource(this.configLocation
+                    .getURL().toExternalForm());
             JDOManager.loadConfiguration(inputSource, this.entityResolver,
-                    getClass().getClassLoader());
-            jdoManagerToBeCreated = JDOManager.createInstance(databaseName);
-            
+                    getClass().getClassLoader(), this.classDescriptorResolver);
+            jdoManagerToBeCreated = JDOManager
+                    .createInstance(this.databaseName);
+
             // set autostore mode
             jdoManagerToBeCreated.setAutoStore(this.autoStore);
         } catch (MappingException e) {
@@ -202,7 +208,7 @@ public class LocalCastorFactoryBean implements FactoryBean, InitializingBean /*
      * configuration file.
      * 
      * @param databasename
-     *            name of the <tt>database</tt>
+     *                name of the <tt>database</tt>
      */
     public void setDatabaseName(final String databasename) {
         this.databaseName = databasename;
@@ -212,7 +218,7 @@ public class LocalCastorFactoryBean implements FactoryBean, InitializingBean /*
      * Specifies the location of Castor JDO configuration file
      * 
      * @param configLocation
-     *            the location of Castor JDO configuration file
+     *                the location of Castor JDO configuration file
      */
     public void setConfigLocation(final Resource configLocation) {
         this.configLocation = configLocation;
@@ -223,8 +229,8 @@ public class LocalCastorFactoryBean implements FactoryBean, InitializingBean /*
      * entities, e.g. for external mapping documents.
      * 
      * @param entityResolver
-     *            the {@link EntityResolver} instance used to resolve cached
-     *            entities
+     *                the {@link EntityResolver} instance used to resolve cached
+     *                entities
      */
     public void setEntityResolver(EntityResolver entityResolver) {
         this.entityResolver = entityResolver;
@@ -235,12 +241,16 @@ public class LocalCastorFactoryBean implements FactoryBean, InitializingBean /*
      * {@link JDOManager} instance will use autostore mode.
      * 
      * @param autoStore
-     *            the {@link EntityResolver} instance used to resolve cached
-     *            entities
+     *                the {@link EntityResolver} instance used to resolve cached
+     *                entities
      */
     public void setAutostore(final boolean autoStore) {
         this.autoStore = autoStore;
     }
 
+    public void setClassDescriptorResolver(
+            JDOClassDescriptorResolverImpl classDescriptorResolver) {
+        this.classDescriptorResolver = classDescriptorResolver;
+    }
 
 }

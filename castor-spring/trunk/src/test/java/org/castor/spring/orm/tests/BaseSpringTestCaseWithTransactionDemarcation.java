@@ -8,6 +8,7 @@ import java.util.List;
 import org.castor.spring.orm.CastorObjectRetrievalFailureException;
 import org.exolab.castor.dao.Product;
 import org.exolab.castor.service.ProductService;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public abstract class BaseSpringTestCaseWithTransactionDemarcation extends
         BaseSpringTestCase {
@@ -16,6 +17,10 @@ public abstract class BaseSpringTestCaseWithTransactionDemarcation extends
 
     protected void setUp() throws Exception {
         super.setUp();
+    }
+
+    protected ClassPathXmlApplicationContext getApplicationContext() {
+        return new ClassPathXmlApplicationContext("app-config.xml");
     }
 
     public void testLoadProduct() throws Exception {

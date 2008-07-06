@@ -21,6 +21,8 @@ public class AllTests {
                 .addTestSuite(TestProductServiceWithDeclarativeTransactionDemarcationShortened.class);
         suite.addTestSuite(TestDAOWithCastorTemplate.class);
         suite.addTestSuite(TestLocalCastorFactoryBean.class);
+        suite.addTestSuite(TestLocalCastorFactoryBeanWithClassDescriptorResolver.class);
+        suite.addTestSuite(TestClassDescriptorResolverFactoryBean.class);
         //$JUnit-END$
         return suite;
     }

@@ -8,6 +8,7 @@ import org.exolab.castor.dao.Product;
 import org.exolab.castor.dao.ProductDaoWithInterceptor;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.JDOManager;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * JUnit test case for Castor's Spring integration.
@@ -23,6 +24,10 @@ public class TestDAOWithCastorTemplate extends BaseSpringTestCase {
         assertNotNull (productDAO);
     }
     
+    protected ClassPathXmlApplicationContext getApplicationContext() {
+        return new ClassPathXmlApplicationContext("app-config.xml");
+    }
+
     protected void tearDown() throws Exception
     {
         super.tearDown();
