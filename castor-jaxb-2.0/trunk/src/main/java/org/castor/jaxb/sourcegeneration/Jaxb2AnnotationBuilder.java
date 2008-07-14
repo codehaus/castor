@@ -21,6 +21,7 @@ import org.exolab.castor.builder.AnnotationBuilder;
 import org.exolab.castor.builder.info.ClassInfo;
 import org.exolab.castor.builder.info.FieldInfo;
 import org.exolab.castor.builder.info.XMLInfo;
+import org.exolab.castor.builder.info.nature.XMLInfoNature;
 import org.exolab.castor.builder.types.XSId;
 import org.exolab.castor.builder.types.XSIdRef;
 import org.exolab.castor.builder.types.XSIdRefs;
@@ -51,23 +52,25 @@ public class Jaxb2AnnotationBuilder implements AnnotationBuilder {
      */
     public void addClassAnnotations(final ClassInfo classInfo, final JClass jClass) {
 
+        XMLInfoNature xmlNature = new XMLInfoNature(classInfo);
+        
         // add import for annotations
         jClass.addImport("javax.xml.bind.annotation.*");
 
         // @XmlType
         JAnnotationType requestType = new JAnnotationType("XmlType");
         JAnnotation request = new JAnnotation(requestType);
-        request.setElementValue("name", "\"" + classInfo.getNodeName() + "\"");
+        request.setElementValue("name", "\"" + xmlNature.getNodeName() + "\"");
 
         // @propOrder
         if (classInfo.isSequence()) {
-            request.setElementValue("name", "\"" + classInfo.getNodeName()
+            request.setElementValue("name", "\"" + xmlNature.getNodeName()
                     + "\"");
             FieldInfo[] fieldInfo = classInfo.getElementFields();
             ArrayList<String> arrayList = new ArrayList<String>();
             for (int i = 0; i < fieldInfo.length; i++) {
                 FieldInfo fieldInfoSequenceElement = fieldInfo[i];
-                arrayList.add("\"" + fieldInfoSequenceElement.getNodeName()
+                arrayList.add("\"" + new XMLInfoNature(fieldInfoSequenceElement).getNodeName()
                         + "\"");
             }
             request.setElementValue("propOrder", (String[]) arrayList
@@ -134,51 +137,53 @@ public class Jaxb2AnnotationBuilder implements AnnotationBuilder {
     private void addFieldAnnotations(final FieldInfo fieldInfo,
             final JAnnotatedElement element) {
 
+        XMLInfoNature xmlNature = new XMLInfoNature(fieldInfo);
+        
         // @XmlElement
-        if (fieldInfo.getNodeType() == XMLInfo.ELEMENT_TYPE
-                && !fieldInfo.isMultivalued()) {
+        if (xmlNature.getNodeType() == XMLInfo.ELEMENT_TYPE
+                && !xmlNature.isMultivalued()) {
             JAnnotationType annotationType = new JAnnotationType("XmlElement");
             JAnnotation annotation = new JAnnotation(annotationType);
-            annotation.setElementValue("name", "\"" + fieldInfo.getNodeName()
+            annotation.setElementValue("name", "\"" + xmlNature.getNodeName()
                     + "\"");
-            if (fieldInfo.getNamespacePrefix() != null) {
+            if (xmlNature.getNamespacePrefix() != null) {
                 annotation.setElementValue("namespace", "\""
-                        + fieldInfo.getNamespacePrefix() + "\"");
+                        + xmlNature.getNamespacePrefix() + "\"");
             }
             annotation.setElementValue("nillable", fieldInfo.isNillable() + "");
             element.addAnnotation(annotation);
         }
 
         // @XmlAttribute
-        else if (fieldInfo.getNodeType() == XMLInfo.ATTRIBUTE_TYPE) {
+        else if (xmlNature.getNodeType() == XMLInfo.ATTRIBUTE_TYPE) {
             JAnnotationType annotationType = new JAnnotationType("XmlAttribute");
             JAnnotation annotation = new JAnnotation(annotationType);
-            annotation.setElementValue("name", "\"" + fieldInfo.getNodeName()
+            annotation.setElementValue("name", "\"" + xmlNature.getNodeName()
                     + "\"");
-            if (fieldInfo.getNamespacePrefix() != null) {
+            if (xmlNature.getNamespacePrefix() != null) {
                 annotation.setElementValue("namespace", "\""
-                        + fieldInfo.getNamespacePrefix() + "\"");
+                        + xmlNature.getNamespacePrefix() + "\"");
             }
-            annotation.setElementValue("required", fieldInfo.isRequired() + "");
+            annotation.setElementValue("required", xmlNature.isRequired() + "");
             element.addAnnotation(annotation);
         }
 
         // @XmlId
-        if (fieldInfo.getSchemaType() instanceof XSId) {
+        if (xmlNature.getSchemaType() instanceof XSId) {
             JAnnotationType annotationType = new JAnnotationType("XmlID");
             JAnnotation annotation = new JAnnotation(annotationType);
             element.addAnnotation(annotation);
         }
 
         // @XmlIdRef
-        else if (fieldInfo.getSchemaType() instanceof XSIdRef) {
+        else if (xmlNature.getSchemaType() instanceof XSIdRef) {
             JAnnotationType annotationType = new JAnnotationType("XmlIDREF");
             JAnnotation annotation = new JAnnotation(annotationType);
             element.addAnnotation(annotation);
         }
 
         // @XmlIdRefs
-        else if (fieldInfo.getSchemaType() instanceof XSIdRefs) {
+        else if (xmlNature.getSchemaType() instanceof XSIdRefs) {
             JAnnotationType annotationType = new JAnnotationType("XmlIDREF");
             JAnnotation annotation = new JAnnotation(annotationType);
             element.addAnnotation(annotation);
