@@ -19,11 +19,9 @@ public class TestLocalCastorFactoryBeanWithClassDescriptorResolver extends BaseS
         return new ClassPathXmlApplicationContext("app-config-with-resolver.xml");
     }
     
-    /*
     public void testGetJDOManager () throws Exception {
         this.jdoManager = (JDOManager) this.context.getBean("jdoManager");
         assertNotNull (this.jdoManager);
     }
-    */
     
 }
