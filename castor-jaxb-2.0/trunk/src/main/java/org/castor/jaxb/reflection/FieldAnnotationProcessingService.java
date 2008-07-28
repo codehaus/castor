@@ -381,6 +381,7 @@ public class FieldAnnotationProcessingService extends AnnotationProcessingServic
                 fieldInfo.setAttributeName(xmlAttribute.name());
                 fieldInfo.setAttributeNamespace(xmlAttribute.namespace());
                 fieldInfo.setAttributeRequired(xmlAttribute.required());
+                fieldInfo.setAnnotatedXmlAttribute(true);
             }
         } //-- processAnnotation
 
