@@ -6,6 +6,11 @@
   </properties>
   <body>
     <release version="1.0-beta-1" date="2008-01-04" description="under development">
+      <action dev="jgrueneis" type="update" issue="CASTOR-2491">
+        Extended FieldInfo to explicitly inform if XMLAttribute annotation is present
+        or not.
+      </action>
+
       <action dev="mepheser" type="update">
       	A first draft of a customized source generator to get JAXB code. Introducing the classes:
       	Jaxb2SourceGenerator, Jaxb2AnnotationBuilder and SourceGeneratorTest.

@@ -20,8 +20,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
 /**
- * Contains the information collected for fields. Fields are either real fields or methods matching
- * certain naming (JavaBeans).
+ * Contains the information collected for fields. Fields are either real fields
+ * or methods matching certain naming (JavaBeans).
  * 
  * @author Joachim Grueneis, jgrueneis_at_codehaus_dot_com
  * @version $Id$
@@ -31,7 +31,10 @@ public final class FieldInfo implements ReflectionInfo {
     public static final String DEFAULT_ELEMENT_NAME = "##default";
     /** Default string for attribute annotation. */
     public static final String DEFAULT_ATTRIBUTE_NAME = "##default";
-    /** The name of the field. Either from the field itself of taken from a method. */
+    /**
+     * The name of the field. Either from the field itself of taken from a
+     * method.
+     */
     private String _fieldName;
     /** The field this information is for. */
     private Field _field;
@@ -56,7 +59,7 @@ public final class FieldInfo implements ReflectionInfo {
     /** XmlElement.namespace(). */
     private String _elementNamespace;
     /** XmlElement.type(). */
-    private Class < ? > _elementType;
+    private Class<?> _elementType;
     /** XmlElement.defaultValue(). */
     private String _elementDefaultValue;
     /** XmlRootElement.name(). */
@@ -73,86 +76,99 @@ public final class FieldInfo implements ReflectionInfo {
     private String _enumValue;
     /** The generic type - if any. */
     private Type _genericType;
-    
+    /** Indicator to XmlAttribute annotation. */
+    private boolean _isAnnotatedXmlAttribute = false;
+
     /**
      * Simple constructor.
      */
     public FieldInfo() {
         super();
     }
-    
+
     /**
-     * @param name XmlElement.name
+     * @param name
+     *            XmlElement.name
      */
     public void setElementName(final String name) {
         _elementName = name;
     }
 
     /**
-     * @param nillable XmlElement.nillable
+     * @param nillable
+     *            XmlElement.nillable
      */
     public void setElementNillable(final boolean nillable) {
         _elementNillable = nillable;
     }
 
     /**
-     * @param required XmlElement.required
+     * @param required
+     *            XmlElement.required
      */
     public void setElementRequired(final boolean required) {
         _elementRequired = required;
     }
 
     /**
-     * @param namespace XmlElement.namespace
+     * @param namespace
+     *            XmlElement.namespace
      */
     public void setElementNamespace(final String namespace) {
         _elementNamespace = namespace;
     }
 
     /**
-     * @param type XmlElement.type
+     * @param type
+     *            XmlElement.type
      */
-    public void setElementType(final Class < ? > type) {
+    public void setElementType(final Class<?> type) {
         _elementType = type;
     }
 
     /**
-     * @param defaultValue XmlElement.defaultValue
+     * @param defaultValue
+     *            XmlElement.defaultValue
      */
     public void setElementDefaultValue(final String defaultValue) {
         _elementDefaultValue = defaultValue;
     }
 
     /**
-     * @param rootElementName XmlRootElement.name
+     * @param rootElementName
+     *            XmlRootElement.name
      */
     public void setRootElementName(final String rootElementName) {
         _rootElementName = rootElementName;
     }
 
     /**
-     * @param rootElementNamespace XmlRootElement.namespace
+     * @param rootElementNamespace
+     *            XmlRootElement.namespace
      */
     public void setRootElementNamespace(final String rootElementNamespace) {
         _rootElementNamespace = rootElementNamespace;
     }
 
     /**
-     * @param attributeName XmlAttribute.name
+     * @param attributeName
+     *            XmlAttribute.name
      */
     public void setAttributeName(final String attributeName) {
         _attributeName = attributeName;
     }
 
     /**
-     * @param attributeNamespace XmlAttribute.namespace
+     * @param attributeNamespace
+     *            XmlAttribute.namespace
      */
     public void setAttributeNamespace(final String attributeNamespace) {
         _attributeNamespace = attributeNamespace;
     }
 
     /**
-     * @param attributeRequired XmlElement.required
+     * @param attributeRequired
+     *            XmlElement.required
      */
     public void setAttributeRequired(final boolean attributeRequired) {
         _attributeRequired = attributeRequired;
@@ -189,7 +205,7 @@ public final class FieldInfo implements ReflectionInfo {
     /**
      * @return the XmlElement.type
      */
-    public Class < ? > getElementType() {
+    public Class<?> getElementType() {
         return _elementType;
     }
 
@@ -236,7 +252,8 @@ public final class FieldInfo implements ReflectionInfo {
     }
 
     /**
-     * @param field the Field of this property
+     * @param field
+     *            the Field of this property
      */
     public void setField(final Field field) {
         _field = field;
@@ -263,12 +280,13 @@ public final class FieldInfo implements ReflectionInfo {
     }
 
     /**
-     * @param enumValue value of the XmlEnumValue annotation
+     * @param enumValue
+     *            value of the XmlEnumValue annotation
      */
     public void setEnumValue(final String enumValue) {
         _enumValue = enumValue;
     }
-    
+
     /**
      * @return true if the field is an enumeration constant
      */
@@ -284,7 +302,8 @@ public final class FieldInfo implements ReflectionInfo {
     }
 
     /**
-     * @param methodAdd the methodAdd to set
+     * @param methodAdd
+     *            the methodAdd to set
      */
     public void setMethodAdd(final Method methodAdd) {
         _methodAdd = methodAdd;
@@ -298,7 +317,8 @@ public final class FieldInfo implements ReflectionInfo {
     }
 
     /**
-     * @param methodGet the methodGet to set
+     * @param methodGet
+     *            the methodGet to set
      */
     public void setMethodGet(final Method methodGet) {
         _methodGet = methodGet;
@@ -312,7 +332,8 @@ public final class FieldInfo implements ReflectionInfo {
     }
 
     /**
-     * @param methodSet the methodSet to set
+     * @param methodSet
+     *            the methodSet to set
      */
     public void setMethodSet(final Method methodSet) {
         _methodSet = methodSet;
@@ -326,7 +347,8 @@ public final class FieldInfo implements ReflectionInfo {
     }
 
     /**
-     * @param methodCreate the methodCreate to set
+     * @param methodCreate
+     *            the methodCreate to set
      */
     public void setMethodCreate(final Method methodCreate) {
         _methodCreate = methodCreate;
@@ -340,7 +362,8 @@ public final class FieldInfo implements ReflectionInfo {
     }
 
     /**
-     * @param methodIs the methodIs to set
+     * @param methodIs
+     *            the methodIs to set
      */
     public void setMethodIs(final Method methodIs) {
         _methodIs = methodIs;
@@ -366,22 +389,25 @@ public final class FieldInfo implements ReflectionInfo {
     public boolean isMultivalue() {
         return _multivalued;
     }
-    
+
     /**
      * Marks the field as multivalued.
-     * @param multivalued true to mark the field as multivalued
+     * 
+     * @param multivalued
+     *            true to mark the field as multivalued
      */
     public void setMultivalued(final boolean multivalued) {
         _multivalued = multivalued;
     }
 
     /**
-     * @param name the FieldName to use - used to uniquely identifies a field!
+     * @param name
+     *            the FieldName to use - used to uniquely identifies a field!
      */
     public void setFieldName(final String name) {
         _fieldName = name;
     }
-    
+
     /**
      * @return the unique fieldName
      */
@@ -390,35 +416,36 @@ public final class FieldInfo implements ReflectionInfo {
     }
 
     /**
-     * I'm not sure if I really want to keep this method... it is not
-     * only a question of 'if methods exist' but also of the access mode
-     * to use...
+     * I'm not sure if I really want to keep this method... it is not only a
+     * question of 'if methods exist' but also of the access mode to use...
+     * 
      * @deprecated
      * @return
      */
     public boolean isPureField() {
         return (getMethodGet() == null && getMethodSet() == null);
     }
-    
+
     /**
      * Implementing the toString method to get a more meaningful log output.
      * {@inheritDoc}
+     * 
      * @see java.lang.Object#toString()
      */
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        sb.append(this.getClass().getName())
-        .append("[")
-        .append("fieldName:").append(_fieldName).append("/")
-        .append("field:").append(_field).append("/")
-        .append("methodGet:").append(_methodGet)
-        .append("]");
+        sb.append(this.getClass().getName()).append("[").append("fieldName:")
+                .append(_fieldName).append("/").append("field:").append(_field)
+                .append("/").append("methodGet:").append(_methodGet)
+                .append("]");
         return sb.toString();
     }
 
     /**
      * To set the generic type. Used for multivalued fields.
-     * @param genericType the generic type of the field
+     * 
+     * @param genericType
+     *            the generic type of the field
      */
     public void setGenericType(final Type genericType) {
         _genericType = genericType;
@@ -426,9 +453,26 @@ public final class FieldInfo implements ReflectionInfo {
 
     /**
      * To get the generic type of the field. Used for multivalued fields.
+     * 
      * @return the generic type of the field
      */
     public Type getGenericType() {
         return _genericType;
+    }
+
+    /**
+     * Is this field marked by XMLAttribute?
+     * @return true if this field is marked with XMLAttribute
+     */
+    public boolean isAnnotatedXmlAttribute() {
+        return _isAnnotatedXmlAttribute;
+    }
+
+    /**
+     * To set if the field is marked with a XMLAttriute annotation.
+     * @param isAnnotatedXmlAttribute true if marked with XMLAttribute
+     */
+    public void setAnnotatedXmlAttribute(final boolean isAnnotatedXmlAttribute) {
+        _isAnnotatedXmlAttribute = isAnnotatedXmlAttribute;
     }
 }
