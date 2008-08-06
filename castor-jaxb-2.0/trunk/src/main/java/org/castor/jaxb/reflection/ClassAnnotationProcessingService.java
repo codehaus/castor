@@ -27,8 +27,8 @@ import javax.xml.bind.annotation.XmlType;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.castor.jaxb.reflection.info.ClassInfo;
-import org.castor.jaxb.reflection.info.ReflectionInfo;
+import org.castor.core.nature.BaseNature;
+import org.castor.jaxb.reflection.info.JaxbClassNature;
 
 /**
  * A class to process all class related annotations and put the results into
@@ -41,9 +41,17 @@ public class ClassAnnotationProcessingService extends AnnotationProcessingServic
     /** Logging to use. */
     private static final Log LOG = LogFactory.getLog(ClassAnnotationProcessingService.class);
     /** Default String for name property. */
-    protected static final String ANNOTATION_PROPERTY_NAME_DEFAULT = "##default";
+    private static final String XML_TYPE_NAME_DEFAULT = "##default";
     /** Default String for namespace property. */
-    protected static final String ANNOTATION_PROPERTY_NAMESPACE_DEFAULT = "##default";
+    private static final String XML_TYPE_NAMESPACE_DEFAULT = "##default";
+    /** XmlType.propOrder default value. */
+    private static final String[] XML_TYPE_PROP_ORDER_DEFAUL = {""};
+    /** XmlType.factoryMethod default value. */
+    private static final String XML_TYPE_FACTORY_METHOD = "";
+    /** XmlRootElement.name default value. */
+    private static final String ROOT_ELEMENT_NAME_DEFAULT = "##default";
+    /** XmlRootElement.namespace default value. */
+    private static final String ROOT_ELEMENT_NAMESPACE_DEFAULT = "##default";
 
     /**
      * Constructs a AnnotationProcessingService what means to register all available
@@ -69,20 +77,31 @@ public class ClassAnnotationProcessingService extends AnnotationProcessingServic
         /**
          * {@inheritDoc}
          * @see org.castor.jaxb.reflection.AnnotationProcessingService.AnnotationProcessor#
-         * processAnnotation(org.castor.xml.introspection.ReflectionInfo, java.lang.annotation.Annotation)
+         * processAnnotation(org.castor.xml.introspection.BaseNature, java.lang.annotation.Annotation)
          */
-        public final < I extends ReflectionInfo, A extends Annotation > 
+        public final < I extends BaseNature, A extends Annotation > 
         void processAnnotation(final I info, final A annotation) {
-            if ((annotation instanceof XmlType) && (info instanceof ClassInfo)) {
+            if ((annotation instanceof XmlType) && (info instanceof JaxbClassNature)) {
                 XmlType xmlType = (XmlType) annotation;
-                ClassInfo classInfo = (ClassInfo) info;
+                JaxbClassNature classInfo = (JaxbClassNature) info;
                 annotationVisitMessage(LOG, xmlType);
                 //
-                classInfo.setTypeName(xmlType.name());
-                classInfo.setTypeProperties(xmlType.propOrder());
-                classInfo.setTypeNamespace(xmlType.namespace());
-                classInfo.setTypeFactoryClass(xmlType.factoryClass());
-                classInfo.setTypeFactoryMethod(xmlType.factoryMethod());
+                classInfo.setXmlType(true);
+                if (!XML_TYPE_NAME_DEFAULT.equals(xmlType.name())) {
+                    classInfo.setTypeName(xmlType.name());
+                }
+                if (!XML_TYPE_PROP_ORDER_DEFAUL.equals(xmlType.propOrder())) {
+                    classInfo.setTypeProperties(xmlType.propOrder());
+                }
+                if (!XML_TYPE_NAMESPACE_DEFAULT.equals(xmlType.namespace())) {
+                    classInfo.setTypeNamespace(xmlType.namespace());
+                }
+                if (!XmlType.DEFAULT.class.equals(xmlType.factoryClass())) {
+                    classInfo.setTypeFactoryClass(xmlType.factoryClass());
+                }
+                if (!XML_TYPE_FACTORY_METHOD.equals(xmlType.factoryMethod())) {
+                    classInfo.setTypeFactoryMethod(xmlType.factoryMethod());
+                }
             }
         } //-- processAnnotation
 
@@ -106,16 +125,21 @@ public class ClassAnnotationProcessingService extends AnnotationProcessingServic
         /**
          * {@inheritDoc}
          * @see org.castor.jaxb.reflection.AnnotationProcessingService.AnnotationProcessor#
-         * processAnnotation(org.castor.xml.introspection.ReflectionInfo, java.lang.annotation.Annotation)
+         * processAnnotation(org.castor.xml.introspection.BaseNature, java.lang.annotation.Annotation)
          */
-        public final < I extends ReflectionInfo, A extends Annotation > 
+        public final < I extends BaseNature, A extends Annotation > 
         void processAnnotation(final I info, final A annotation) {
-            if ((annotation instanceof XmlRootElement) && (info instanceof ClassInfo)) {
+            if ((annotation instanceof XmlRootElement) && (info instanceof JaxbClassNature)) {
                 XmlRootElement xmlRootElement = (XmlRootElement) annotation;
-                ClassInfo classInfo = (ClassInfo) info;
+                JaxbClassNature classInfo = (JaxbClassNature) info;
                 annotationVisitMessage(LOG, xmlRootElement);
-                classInfo.setRootElementName(xmlRootElement.name());
-                classInfo.setRootElementNamespace(xmlRootElement.namespace());
+                classInfo.setXmlRootElement(true);
+                if (!ROOT_ELEMENT_NAME_DEFAULT.equals(xmlRootElement.name())) {
+                    classInfo.setRootElementName(xmlRootElement.name());
+                }
+                if (!ROOT_ELEMENT_NAMESPACE_DEFAULT.equals(xmlRootElement.namespace())) {
+                    classInfo.setRootElementNamespace(xmlRootElement.namespace());
+                }
             }
         } //-- processAnnotation
 
@@ -139,15 +163,15 @@ public class ClassAnnotationProcessingService extends AnnotationProcessingServic
         /**
          * {@inheritDoc}
          * @see org.castor.jaxb.reflection.AnnotationProcessingService.AnnotationProcessor#
-         * processAnnotation(org.castor.xml.introspection.ReflectionInfo, java.lang.annotation.Annotation)
+         * processAnnotation(org.castor.xml.introspection.BaseNature, java.lang.annotation.Annotation)
          */
-        public final < I extends ReflectionInfo, A extends Annotation > 
+        public final < I extends BaseNature, A extends Annotation > 
         void processAnnotation(final I info, final A annotation) {
-            if ((annotation instanceof XmlTransient) && (info instanceof ClassInfo)) {
+            if ((annotation instanceof XmlTransient) && (info instanceof JaxbClassNature)) {
                 XmlTransient xmlTransient = (XmlTransient) annotation;
-                ClassInfo classInfo = (ClassInfo) info;
+                JaxbClassNature classInfo = (JaxbClassNature) info;
                 annotationVisitMessage(LOG, xmlTransient);
-                classInfo.setTransient(true);
+                classInfo.setXmlTransient(true);
                 // no annotation properties
             }
         } //-- processAnnotation
@@ -172,14 +196,15 @@ public class ClassAnnotationProcessingService extends AnnotationProcessingServic
         /**
          * {@inheritDoc}
          * @see org.castor.jaxb.reflection.AnnotationProcessingService.AnnotationProcessor#
-         * processAnnotation(org.castor.xml.introspection.ReflectionInfo, java.lang.annotation.Annotation)
+         * processAnnotation(org.castor.xml.introspection.BaseNature, java.lang.annotation.Annotation)
          */
-        public final < I extends ReflectionInfo, A extends Annotation > 
+        public final < I extends BaseNature, A extends Annotation > 
         void processAnnotation(final I info, final A annotation) {
-            if ((annotation instanceof XmlSeeAlso) && (info instanceof ClassInfo)) {
+            if ((annotation instanceof XmlSeeAlso) && (info instanceof JaxbClassNature)) {
                 XmlSeeAlso xmlSeeAlso = (XmlSeeAlso) annotation;
-                ClassInfo classInfo = (ClassInfo) info;
+                JaxbClassNature classInfo = (JaxbClassNature) info;
                 annotationVisitMessage(LOG, xmlSeeAlso);
+                classInfo.setXmlSeeAlso(true);
                 classInfo.setSeeAlsoClasses(xmlSeeAlso.value());
             }
         } //-- processAnnotation
@@ -204,14 +229,15 @@ public class ClassAnnotationProcessingService extends AnnotationProcessingServic
         /**
          * {@inheritDoc}
          * @see org.castor.jaxb.reflection.AnnotationProcessingService.AnnotationProcessor#
-         * processAnnotation(org.castor.xml.introspection.ReflectionInfo, java.lang.annotation.Annotation)
+         * processAnnotation(org.castor.xml.introspection.BaseNature, java.lang.annotation.Annotation)
          */
-        public final < I extends ReflectionInfo, A extends Annotation > 
+        public final < I extends BaseNature, A extends Annotation > 
         void processAnnotation(final I info, final A annotation) {
-            if ((annotation instanceof XmlAccessorType) && (info instanceof ClassInfo)) {
+            if ((annotation instanceof XmlAccessorType) && (info instanceof JaxbClassNature)) {
                 XmlAccessorType xmlAccessorType = (XmlAccessorType) annotation;
-                ClassInfo classInfo = (ClassInfo) info;
+                JaxbClassNature classInfo = (JaxbClassNature) info;
                 annotationVisitMessage(LOG, xmlAccessorType);
+                classInfo.setXmlAccessorType(true);
                 classInfo.setXmlAccessType(xmlAccessorType.value());
             }
         } //-- processAnnotation
@@ -236,14 +262,15 @@ public class ClassAnnotationProcessingService extends AnnotationProcessingServic
         /**
          * {@inheritDoc}
          * @see org.castor.jaxb.reflection.AnnotationProcessingService.AnnotationProcessor#
-         * processAnnotation(org.castor.xml.introspection.ReflectionInfo, java.lang.annotation.Annotation)
+         * processAnnotation(org.castor.xml.introspection.BaseNature, java.lang.annotation.Annotation)
          */
-        public final < I extends ReflectionInfo, A extends Annotation > 
+        public final < I extends BaseNature, A extends Annotation > 
         void processAnnotation(final I info, final A annotation) {
-            if ((annotation instanceof XmlAccessorOrder) && (info instanceof ClassInfo)) {
+            if ((annotation instanceof XmlAccessorOrder) && (info instanceof JaxbClassNature)) {
                 XmlAccessorOrder xmlAccessorOrder = (XmlAccessorOrder) annotation;
-                ClassInfo classInfo = (ClassInfo) info;
+                JaxbClassNature classInfo = (JaxbClassNature) info;
                 annotationVisitMessage(LOG, xmlAccessorOrder);
+                classInfo.setXmlAccessorOrder(true);
                 classInfo.setXmlAccessOrder(xmlAccessorOrder.value());
             }
         }
@@ -268,14 +295,15 @@ public class ClassAnnotationProcessingService extends AnnotationProcessingServic
         /**
          * {@inheritDoc}
          * @see org.castor.jaxb.reflection.AnnotationProcessingService.AnnotationProcessor#
-         * processAnnotation(org.castor.xml.introspection.ReflectionInfo, java.lang.annotation.Annotation)
+         * processAnnotation(org.castor.xml.introspection.BaseNature, java.lang.annotation.Annotation)
          */
-        public final < I extends ReflectionInfo, A extends Annotation > 
+        public final < I extends BaseNature, A extends Annotation > 
         void processAnnotation(final I info, final A annotation) {
-            if ((annotation instanceof XmlEnum) && (info instanceof ClassInfo)) {
+            if ((annotation instanceof XmlEnum) && (info instanceof JaxbClassNature)) {
                 XmlEnum xmlEnum = (XmlEnum) annotation;
-                ClassInfo classInfo = (ClassInfo) info;
+                JaxbClassNature classInfo = (JaxbClassNature) info;
                 annotationVisitMessage(LOG, xmlEnum);
+                classInfo.setXmlEnum(true);
                 classInfo.setEnumClass(xmlEnum.value());
             }
         }

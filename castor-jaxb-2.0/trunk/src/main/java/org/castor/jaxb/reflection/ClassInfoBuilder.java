@@ -26,41 +26,48 @@ import org.apache.commons.logging.LogFactory;
 import org.castor.jaxb.naming.JAXBJavaNaming;
 import org.castor.jaxb.reflection.info.ClassInfo;
 import org.castor.jaxb.reflection.info.FieldInfo;
+import org.castor.jaxb.reflection.info.JaxbClassNature;
+import org.castor.jaxb.reflection.info.JaxbFieldNature;
+import org.castor.jaxb.reflection.info.JaxbPackageNature;
+import org.castor.jaxb.reflection.info.OoClassNature;
+import org.castor.jaxb.reflection.info.OoFieldNature;
+import org.castor.jaxb.reflection.info.OoPackageNature;
 import org.castor.jaxb.reflection.info.PackageInfo;
 import org.castor.xml.JavaNaming;
 
 /**
- * A service class which is meant to read (interpret) a given class and
- * remember all information in form of a ClassInfo instance. It uses the
- * class information itself but most of the information is taken by
- * interpreting the annotations found for the class.
+ * A service class which is meant to read (interpret) a given class and remember
+ * all information in form of a ClassInfo instance. It uses the class
+ * information itself but most of the information is taken by interpreting the
+ * annotations found for the class.
  * 
  * @author Joachim Grueneis, jgrueneis_at_codehaus_dot_com
  * @version $Id$
  */
 public final class ClassInfoBuilder {
-    /** 
-     * Logger to use. 
+    /**
+     * Logger to use.
      */
     private static final Log LOG = LogFactory.getLog(ClassInfoBuilder.class);
-    
+
     /**
      * The service to process class level annotations.
      */
     private PackageAnnotationProcessingService _packageAnnotationProcessingService;
-    
+
     /**
      * The service to process class level annotations.
      */
     private ClassAnnotationProcessingService _classAnnotationProcessingService;
-    
+
     /**
      * The service to process field level annotations.
      */
     private FieldAnnotationProcessingService _fieldAnnotationProcessingService;
-    
+
     /**
-     * Which JavaNaming service to use for interpreting Java method, field or other names.
+     * Which JavaNaming service to use for interpreting Java method, field or
+     * other names.
      */
     private JavaNaming _javaNaming;
 
@@ -77,10 +84,12 @@ public final class ClassInfoBuilder {
 
     /**
      * Build the ClassInfo representation for a Class.
-     * @param type the Class to introspect
+     * 
+     * @param type
+     *            the Class to introspect
      * @return ClassInfo build from the Class
      */
-    public ClassInfo buildClassInfo(final Class < ? > type) {
+    public ClassInfo buildClassInfo(final Class<?> type) {
         if (type == null) {
             String message = "Argument type must not be null.";
             LOG.warn(message);
@@ -88,7 +97,8 @@ public final class ClassInfoBuilder {
         }
         if (!isDescribeable(type)) {
             if (LOG.isDebugEnabled()) {
-                String message = "Class: " + type + " cannot be described using this builder.";
+                String message = "Class: " + type
+                        + " cannot be described using this builder.";
                 LOG.debug(message);
             }
             return null;
@@ -96,13 +106,18 @@ public final class ClassInfoBuilder {
         if (LOG.isInfoEnabled()) {
             LOG.info("Now starting to build ClassInfo for: " + type);
         }
-        ClassInfo classInfo = new ClassInfo();
-        classInfo.setType(type);
-        classInfo.setClassName(_javaNaming.getClassName(type));
-        classInfo.setSupertype(type.getSuperclass());
-        classInfo.setInterfaces(type.getInterfaces());
-        classInfo.setHasPublicEmptyConstructor(hasPublicEmptyConstructor(type));
-        _classAnnotationProcessingService.processAnnotations(classInfo, type.getAnnotations());
+
+        ClassInfo classInfo = createClassInfo(_javaNaming.getClassName(type));
+        JaxbClassNature jaxbClassNature = new JaxbClassNature(classInfo);
+
+        jaxbClassNature.setType(type);
+        jaxbClassNature.setSupertype(type.getSuperclass());
+        jaxbClassNature.setInterfaces(type.getInterfaces());
+        jaxbClassNature
+                .setHasPublicEmptyConstructor(hasPublicEmptyConstructor(type));
+
+        _classAnnotationProcessingService.processAnnotations(jaxbClassNature,
+                type.getAnnotations());
         for (Field field : type.getDeclaredFields()) {
             if (LOG.isInfoEnabled()) {
                 LOG.info("Now evaluating field: " + field);
@@ -112,7 +127,8 @@ public final class ClassInfoBuilder {
             } else {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Ignoring field: " + field + " of type: "
-                            + type.getName() + " it is not useable for mapping.");
+                            + type.getName()
+                            + " it is not useable for mapping.");
                 }
             }
         }
@@ -125,7 +141,8 @@ public final class ClassInfoBuilder {
             } else {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Ignoring method: " + method + " of type: "
-                            + type.getName() + " it is not useable for mapping.");
+                            + type.getName()
+                            + " it is not useable for mapping.");
                 }
             }
         }
@@ -139,26 +156,24 @@ public final class ClassInfoBuilder {
 
     /**
      * Does the introspected class have a public empty constructor?
-     * @param type the class to check
+     * 
+     * @param type
+     *            the class to check
      * @return true if an empty public constructor exists
      */
-    private boolean hasPublicEmptyConstructor(final Class < ? > type) {
-        Constructor < ? > cnstrctr = null;
+    private boolean hasPublicEmptyConstructor(final Class<?> type) {
+        Constructor<?> cnstrctr = null;
         try {
             cnstrctr = type.getConstructor();
         } catch (SecurityException e) {
             if (LOG.isDebugEnabled()) {
-                LOG.debug(
-                        "Failed to get empty public constructor for: "
-                        + type + " with exception: " 
-                        + e + " - ingoring exception!");
+                LOG.debug("Failed to get empty public constructor for: " + type
+                        + " with exception: " + e + " - ingoring exception!");
             }
         } catch (NoSuchMethodException e) {
             if (LOG.isDebugEnabled()) {
-                LOG.debug(
-                        "Failed to get empty public constructor for: "
-                        + type + " with exception: " 
-                        + e + " - ingoring exception!");
+                LOG.debug("Failed to get empty public constructor for: " + type
+                        + " with exception: " + e + " - ingoring exception!");
             }
         }
         return (cnstrctr != null);
@@ -167,11 +182,13 @@ public final class ClassInfoBuilder {
     /**
      * Check if the Class is describeable.
      * 
-     * @param type the Class to check
+     * @param type
+     *            the Class to check
      * @return true if Class can be described
      */
-    private boolean isDescribeable(final Class < ? > type) {
-        if (Object.class.equals(type) || Void.class.equals(type) || Class.class.equals(type)) {
+    private boolean isDescribeable(final Class<?> type) {
+        if (Object.class.equals(type) || Void.class.equals(type)
+                || Class.class.equals(type)) {
             return false;
         }
         return true;
@@ -180,13 +197,15 @@ public final class ClassInfoBuilder {
     /**
      * Checks if the Method is describeable.
      * 
-     * @param type the Class of the Method
-     * @param method the Method to check
-     * @return true if the method is describeable 
+     * @param type
+     *            the Class of the Method
+     * @param method
+     *            the Method to check
+     * @return true if the method is describeable
      */
-    private boolean isDescribeable(final Class < ? > type, final Method method) {
+    private boolean isDescribeable(final Class<?> type, final Method method) {
         boolean isDescribeable = true;
-        Class < ? > declaringClass = method.getDeclaringClass();
+        Class<?> declaringClass = method.getDeclaringClass();
         if ((declaringClass != null) && !type.equals(declaringClass)
                 && (!declaringClass.isInterface())) {
             isDescribeable = false;
@@ -200,24 +219,29 @@ public final class ClassInfoBuilder {
         if (Modifier.isTransient(method.getModifiers())) {
             isDescribeable &= false;
         }
-        if (!(_javaNaming.isAddMethod(method) || _javaNaming.isCreateMethod(method)
-                || _javaNaming.isGetMethod(method) || _javaNaming.isIsMethod(method) || _javaNaming
+        if (!(_javaNaming.isAddMethod(method)
+                || _javaNaming.isCreateMethod(method)
+                || _javaNaming.isGetMethod(method)
+                || _javaNaming.isIsMethod(method) || _javaNaming
                 .isSetMethod(method))) {
             isDescribeable = false;
         }
         return isDescribeable;
     }
-    
+
     /**
-     * Checks if a field of a class is describeable or not e.g. static or transient fields
-     * are not described.
-     * @param type the Class holding the field
-     * @param field the field to check
+     * Checks if a field of a class is describeable or not e.g. static or
+     * transient fields are not described.
+     * 
+     * @param type
+     *            the Class holding the field
+     * @param field
+     *            the field to check
      * @return true if the field should be described
      */
-    private boolean isDescribeable(final Class < ? > type, final Field field) {
+    private boolean isDescribeable(final Class<?> type, final Field field) {
         boolean isDescribeable = true;
-        Class < ? > declaringClass = field.getDeclaringClass();
+        Class<?> declaringClass = field.getDeclaringClass();
         if ((declaringClass != null) && !type.equals(declaringClass)
                 && (!declaringClass.isInterface())) {
             isDescribeable = false;
@@ -236,8 +260,11 @@ public final class ClassInfoBuilder {
 
     /**
      * Build the FieldInfo for a Field.
-     * @param classInfo the ClassInfo to check if this field already exists
-     * @param field the Field to describe
+     * 
+     * @param classInfo
+     *            the ClassInfo to check if this field already exists
+     * @param field
+     *            the Field to describe
      * @return the ClassInfo containing the FieldInfo build
      */
     private ClassInfo buildFieldInfo(final ClassInfo classInfo, final Field field) {
@@ -255,24 +282,28 @@ public final class ClassInfoBuilder {
         String fieldName = _javaNaming.extractFieldNameFromField(field);
         FieldInfo fieldInfo = returnClassInfo.getFieldInfo(fieldName);
         if (fieldInfo == null) {
-            fieldInfo = new FieldInfo();
-            fieldInfo.setFieldName(fieldName);
+            fieldInfo = createFieldInfo(fieldName);
             returnClassInfo.addFieldInfo(fieldInfo);
         }
-        fieldInfo.setField(field);
-        Class < ? > fieldType = field.getDeclaringClass();
+        JaxbFieldNature jaxbFieldNature = new JaxbFieldNature(fieldInfo);
+        jaxbFieldNature.setField(field);
+        Class<?> fieldType = field.getDeclaringClass();
         if (fieldType.isArray() || fieldType.isAssignableFrom(Collection.class)) {
-            fieldInfo.setMultivalued(true);
+            jaxbFieldNature.setMultivalued(true);
         }
-        fieldInfo.setGenericType(field.getGenericType());
-        _fieldAnnotationProcessingService.processAnnotations(fieldInfo, field.getAnnotations());
+        jaxbFieldNature.setGenericType(field.getGenericType());
+        _fieldAnnotationProcessingService.processAnnotations(jaxbFieldNature,
+                field.getAnnotations());
         return returnClassInfo;
     }
 
     /**
      * Build the FieldInfo for a Method.
-     * @param classInfo the ClassInfo to look in if this field already exists
-     * @param method the Method to describe
+     * 
+     * @param classInfo
+     *            the ClassInfo to look in if this field already exists
+     * @param method
+     *            the Method to describe
      * @return the ClassInfo containing the FieldInfo build
      */
     private ClassInfo buildFieldInfo(final ClassInfo classInfo, final Method method) {
@@ -290,57 +321,64 @@ public final class ClassInfoBuilder {
         String fieldName = _javaNaming.extractFieldNameFromMethod(method);
         FieldInfo fieldInfo = returnClassInfo.getFieldInfo(fieldName);
         if (fieldInfo == null) {
-            fieldInfo = new FieldInfo();
-            fieldInfo.setFieldName(fieldName);
+            fieldInfo = createFieldInfo(fieldName);
             returnClassInfo.addFieldInfo(fieldInfo);
         }
+        JaxbFieldNature jaxbFieldNature = new JaxbFieldNature(fieldInfo);
         if (_javaNaming.isAddMethod(method)) {
-            fieldInfo.setMethodAdd(method);
-            fieldInfo.setMultivalued(true);
+            jaxbFieldNature.setMethodAdd(method);
+            jaxbFieldNature.setMultivalued(true);
         } else if (_javaNaming.isCreateMethod(method)) {
-            fieldInfo.setMethodCreate(method);
+            jaxbFieldNature.setMethodCreate(method);
         } else if (_javaNaming.isGetMethod(method)) {
-            fieldInfo.setMethodGet(method);
-            Class < ? > fieldType = method.getReturnType();
+            jaxbFieldNature.setMethodGet(method);
+            Class<?> fieldType = method.getReturnType();
             if (fieldType.isArray()
                     || fieldType.isAssignableFrom(Collection.class)
                     || Collection.class.isAssignableFrom(fieldType)) {
-                fieldInfo.setGenericType(method.getGenericReturnType());
-                fieldInfo.setMultivalued(true);
+                jaxbFieldNature.setGenericType(method.getGenericReturnType());
+                jaxbFieldNature.setMultivalued(true);
             }
         } else if (_javaNaming.isSetMethod(method)) {
-            fieldInfo.setMethodSet(method);
-            Class < ? > [] parameterTypes = method.getParameterTypes();
+            jaxbFieldNature.setMethodSet(method);
+            Class<?>[] parameterTypes = method.getParameterTypes();
             if (parameterTypes.length == 1) {
-                Class < ? > fieldType = parameterTypes[0];
+                Class<?> fieldType = parameterTypes[0];
                 if (fieldType.isArray()
                         || fieldType.isAssignableFrom(Collection.class)
                         || Collection.class.isAssignableFrom(fieldType)) {
-                    fieldInfo.setMultivalued(true);
-                    fieldInfo.setGenericType(method.getGenericParameterTypes()[0]);
+                    jaxbFieldNature.setMultivalued(true);
+                    jaxbFieldNature.setGenericType(method
+                            .getGenericParameterTypes()[0]);
                 }
             }
         } else if (_javaNaming.isIsMethod(method)) {
-            fieldInfo.setMethodIs(method);
+            jaxbFieldNature.setMethodIs(method);
         } else {
             if (LOG.isDebugEnabled()) {
-                String message = "Method: " + method + " is of unsupported type and ignored.";
+                String message = "Method: " + method
+                        + " is of unsupported type and ignored.";
                 LOG.debug(message);
             }
         }
-        _fieldAnnotationProcessingService.processAnnotations(fieldInfo, method.getAnnotations());
+        _fieldAnnotationProcessingService.processAnnotations(jaxbFieldNature,
+                method.getAnnotations());
         return returnClassInfo;
     }
-    
+
     /**
      * Build the PackageInfo for a Package.
-     * @param pkg the Package to describe
+     * 
+     * @param pkg
+     *            the Package to describe
      * @return the PackageInfo build
      */
     private PackageInfo buildPackageInfo(final Package pkg) {
-        PackageInfo packageInfo = new PackageInfo();
-        packageInfo.setPackage(pkg);
-        _packageAnnotationProcessingService.processAnnotations(packageInfo, pkg.getAnnotations());
+        PackageInfo packageInfo = createPackageInfo(pkg.getName());
+        OoPackageNature ooPackageNature = new OoPackageNature(packageInfo);
+        ooPackageNature.setPackage(pkg);
+        _packageAnnotationProcessingService.processAnnotations(
+                new JaxbPackageNature(packageInfo), pkg.getAnnotations());
         return packageInfo;
     }
 
@@ -352,10 +390,11 @@ public final class ClassInfoBuilder {
     }
 
     /**
-     * @param packageAnnotationProcessingService the PackageAnnotationProcessingService to set
+     * @param packageAnnotationProcessingService
+     *            the PackageAnnotationProcessingService to set
      */
-    public void setPackageAnnotationProcessingService(final 
-            PackageAnnotationProcessingService packageAnnotationProcessingService) {
+    public void setPackageAnnotationProcessingService(
+            final PackageAnnotationProcessingService packageAnnotationProcessingService) {
         _packageAnnotationProcessingService = packageAnnotationProcessingService;
     }
 
@@ -367,10 +406,11 @@ public final class ClassInfoBuilder {
     }
 
     /**
-     * @param classAnnotationProcessingService the classAnnotationProcessingService to set
+     * @param classAnnotationProcessingService
+     *            the classAnnotationProcessingService to set
      */
-    public void setClassAnnotationProcessingService(final 
-            ClassAnnotationProcessingService classAnnotationProcessingService) {
+    public void setClassAnnotationProcessingService(
+            final ClassAnnotationProcessingService classAnnotationProcessingService) {
         _classAnnotationProcessingService = classAnnotationProcessingService;
     }
 
@@ -382,10 +422,11 @@ public final class ClassInfoBuilder {
     }
 
     /**
-     * @param fieldAnnotationProcessingService the fieldAnnotationProcessingService to set
+     * @param fieldAnnotationProcessingService
+     *            the fieldAnnotationProcessingService to set
      */
-    public void setFieldAnnotationProcessingService(final 
-            FieldAnnotationProcessingService fieldAnnotationProcessingService) {
+    public void setFieldAnnotationProcessingService(
+            final FieldAnnotationProcessingService fieldAnnotationProcessingService) {
         _fieldAnnotationProcessingService = fieldAnnotationProcessingService;
     }
 
@@ -397,9 +438,52 @@ public final class ClassInfoBuilder {
     }
 
     /**
-     * @param javaNaming the javaNaming to set
+     * @param javaNaming
+     *            the javaNaming to set
      */
     public void setJavaNaming(final JavaNaming javaNaming) {
         _javaNaming = javaNaming;
+    }
+
+    /**
+     * Creates a new ClassInfo with all Nature's registered.
+     * 
+     * @param className
+     *            the name of the class
+     * @return a ClassInfo instance
+     */
+    private ClassInfo createClassInfo(final String className) {
+        ClassInfo classInfo = new ClassInfo(className);
+        classInfo.addNature(OoClassNature.class.getName());
+        classInfo.addNature(JaxbClassNature.class.getName());
+        return classInfo;
+    }
+
+    /**
+     * Creates a new FieldInfo with all Nature's registered.
+     * 
+     * @param fieldName
+     *            the name of the field
+     * @return a FieldInfo instance
+     */
+    private FieldInfo createFieldInfo(final String fieldName) {
+        FieldInfo fieldInfo = new FieldInfo(fieldName);
+        fieldInfo.addNature(OoFieldNature.class.getName());
+        fieldInfo.addNature(JaxbFieldNature.class.getName());
+        return fieldInfo;
+    }
+
+    /**
+     * Creates a new PackageInfo with all Nature's registered.
+     * 
+     * @param packageName
+     *            the name of the package
+     * @return a PackageInfo instance
+     */
+    private PackageInfo createPackageInfo(final String packageName) {
+        PackageInfo packageInfo = new PackageInfo(packageName);
+        packageInfo.addNature(OoPackageNature.class.getName());
+        packageInfo.addNature(JaxbPackageNature.class.getName());
+        return packageInfo;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Joachim Grueneis
+ * Copyright 2008 Joachim Grueneis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,248 +13,89 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.castor.jaxb.reflection.info;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
-import javax.xml.bind.annotation.XmlAccessOrder;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlNs;
-import javax.xml.bind.annotation.XmlNsForm;
-import javax.xml.bind.annotation.XmlSchemaType;
+import org.castor.core.nature.PropertyHolder;
 
 /**
- * The package info class holds all package related information gathered
- * using reflection and concentrating on JAXB annotations and those that
- * somehow relevant when working with JAXB. It is no reflection wrapper
- * just some class to hold information.
+ * Class PacakgeInfo.<br/>
+ * The package info for a class.
  * 
- * @author Joachim Grueneis, jgrueneis_at_gmail_dot_com
- * @version $Id$
+ * @author Joachim Grueneis, jgr uen eisATg mailDOTcom
  */
-public final class PackageInfo implements ReflectionInfo {
-    /** Package to describe. */
-    private Package _pkg;
-    /** All known namespaces. */
-    private ArrayList < NamespaceInfo > _namespacePrefixes = new ArrayList < NamespaceInfo > ();
-    /** Target namespace to use. */
-    private String _schemaNamespace;
-    /** Element form to use. */
-    private XmlNsForm _elementForm;
-    /** Attribute form to use. */
-    private XmlNsForm _attributeForm;
-    /** Access type to use for all classes within this package. */
-    private XmlAccessType _xmlAccessType;
-    /** Access order to use for all classes within this package. */
-    private XmlAccessOrder _xmlAccessOrder;
-    /** Schema types. */
-    private ArrayList < SchemaTypeInfo > _schemaTypes = new ArrayList < SchemaTypeInfo > ();
+public class PackageInfo implements PropertyHolder {
+    /**
+     * The name of the package.
+     */
+    private String _packageName;
+    
+    /**
+     * Map holding the properties set and read by Natures.
+     */
+    private Map < String, Object > _properties = new HashMap < String, Object > ();
+    
+    /**
+     * Set holding applicable natures.
+     */
+    private Set < String > _natures = new HashSet < String > ();
 
     /**
-     * @param namespace target namespace to use
+     * A package info instance has to have a package name.
+     * @param packageName the package name
      */
-    public void setSchemaNamespace(final String namespace) {
-        _schemaNamespace = namespace;
+    public PackageInfo(final String packageName) {
+        super();
+        _packageName = packageName;
+        addNature(OoPackageNature.class.getName());
+        addNature(JaxbPackageNature.class.getName());
     }
     
     /**
-     * @return target namespace
+     * To get the package name.
+     * @return the package name
      */
-    public String getSchemaNamespace() {
-        return _schemaNamespace;
+    public String getPackageName() {
+        return _packageName;
+    }
+    /**
+     * @param name the name of the property to read
+     * @return the property
+     * @see org.castor.core.nature.PropertyHolder#getProperty(java.lang.String)
+     */
+    public final Object getProperty(final String name) {
+        return _properties.get(name);
     }
 
     /**
-     * @param elementFormDefault element form to use
+     * @param name the name of the property to set
+     * @param value the value to set the property to
+     * @see org.castor.core.nature.PropertyHolder#setProperty(java.lang.String, java.lang.Object)
      */
-    public void setSchemaElementForm(final XmlNsForm elementFormDefault) {
-        _elementForm = elementFormDefault;
-    }
-    
-    /**
-     * @return element form
-     */
-    public XmlNsForm getSchemaElementForm() {
-        return _elementForm;
+    public final void setProperty(final String name, final Object value) {
+        _properties.put(name, value);
     }
 
     /**
-     * @param attributeFormDefault attribute for to use
+     * @param nature the name of the Nature to register
+     * @see org.castor.core.nature.NatureExtendable#addNature(java.lang.String)
      */
-    public void setSchemaAttributeForm(final XmlNsForm attributeFormDefault) {
-        _attributeForm = attributeFormDefault;
+    public final void addNature(final String nature) {
+        _natures.add(nature);
     }
 
     /**
-     * @return attribute form
+     * @param nature the name of the Nature to check
+     * @return true if the Nature was registered before
+     * @see org.castor.core.nature.NatureExtendable#hasNature(java.lang.String)
      */
-    public XmlNsForm getSchemaAttributeForm() {
-        return _attributeForm;
+    public final boolean hasNature(final String nature) {
+        return _natures.contains(nature);
     }
 
-    /**
-     * @param pAccessType default access type to use for all classes in this package
-     */
-    public void setAccessType(final XmlAccessType pAccessType) {
-        _xmlAccessType = pAccessType;
-    }
-
-    /**
-     * @return default XmlAccessType to use
-     */
-    public XmlAccessType getAccessType() {
-        return _xmlAccessType;
-    }
-
-    /**
-     * @param pAccessOrder default access order to use for all classes in this package
-     */
-    public void setAccessOrder(final XmlAccessOrder pAccessOrder) {
-        _xmlAccessOrder = pAccessOrder;
-    }
-    
-    /**
-     * @return default XmlAccessOrder to use
-     */
-    public XmlAccessOrder getAccessOrder() {
-        return _xmlAccessOrder;
-    }
-
-    /**
-     * @param xmlNsArray array of namespace definitions
-     */
-    public void addSchemaNsArray(final XmlNs[] xmlNsArray) {
-        for (int i = 0; i < xmlNsArray.length; i++) {
-            XmlNs xmlNs = xmlNsArray[i];
-            _namespacePrefixes.add(new NamespaceInfo(xmlNs));
-        }
-    }
-    
-    /**
-     * @return Collection of Namespaces
-     */
-    public Collection < NamespaceInfo > getNamespaces() {
-        return _namespacePrefixes;
-    }
-
-    /**
-     * @param xmlSchemaTypes Array of XmlSchemaType definitions
-     */
-    public void addSchemaTypeArray(final XmlSchemaType[] xmlSchemaTypes) {
-        for (XmlSchemaType xst : xmlSchemaTypes) {
-            addSchemaType(xst.name(), xst.namespace(), xst.type());
-        }
-    }
-    
-    /**
-     * @return Collection of SchemaTypes
-     */
-    public Collection < SchemaTypeInfo > getSchemaTypes() {
-        return _schemaTypes;
-    }
-
-    /**
-     * @param name Name of the SchemaType
-     * @param namespace Namespace of the SchemaType
-     * @param schemaType Type of the SchemaType
-     */
-    public void addSchemaType(
-            final String name,
-            final String namespace,
-            final Class < ? > schemaType) {
-        _schemaTypes.add(new SchemaTypeInfo(name, namespace, schemaType));
-    }
-
-    /**
-     * Used to define which schema type (e.g. 'xs:date') should be used for
-     * the following property. Also a namespace and a Java class can be
-     * specified.
-     */
-    public final class SchemaTypeInfo {
-        /** Name of the SchemaType. */
-        private final String _name;
-        /** Namespace of the SchemaType. */
-        private final String _namespace;
-        /** Type of the SchemaType. */
-        private final Class < ? > _schemaType;
-        /**
-         * A SchemaType consists of these three attributes and is immutable after construction.
-         * @param name Name of the SchemaType
-         * @param namespace Namespace of the SchemaType
-         * @param schemaType Type of the SchemaType
-         */
-        public SchemaTypeInfo(
-                final String name,
-                final String namespace,
-                final Class < ? > schemaType) {
-            _name = name;
-            _namespace = namespace;
-            _schemaType = schemaType;
-        }
-        /**
-         * @return Name of the SchemaType.
-         */
-        public String getName() {
-            return _name;
-        }
-        /**
-         * @return Namespace of the SchemaType.
-         */
-        public String getNamespace() {
-            return _namespace;
-        }
-        /**
-         * @return Type of the SchemaType.
-         */
-        public Class < ? > getSchemaType() {
-            return _schemaType;
-        }
-    }
-    
-    /**
-     * A namespace definition with prefix and URI.
-     * 
-     * @author Joachim Grueneis, jgrueneis_at_gmail_dot_com
-     * @version $Id$
-     */
-    public final class NamespaceInfo {
-        /** Prefix of namespace. */
-        private String _prefix;
-        /** URI of namespace. */
-        private String _namespaceURI;
-        /**
-         * @param xmlNs a namespace prefix definition
-         */
-        public NamespaceInfo(final XmlNs xmlNs) {
-            _prefix = xmlNs.prefix();
-            _namespaceURI = xmlNs.namespaceURI();
-        }
-        /**
-         * @return the prefix
-         */
-        public String getPrefix() {
-            return _prefix;
-        }
-        /**
-         * @return the namespaceURI
-         */
-        public String getNamespaceURI() {
-            return _namespaceURI;
-        }
-    }
-
-    /**
-     * @param pkg the Package to describe
-     */
-    public void setPackage(final Package pkg) {
-        _pkg = pkg;
-    }
-    
-    /**
-     * @return the Package to describe
-     */
-    public Package getPackage() {
-        return _pkg;
-    }
 }

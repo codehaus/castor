@@ -5,7 +5,17 @@
     <author email="jgrueneis@gmail.com">Joachim Grueneis</author>
   </properties>
   <body>
-    <release version="1.0-beta-1" date="2008-01-04" description="under development">
+    <release version="1.0-beta-1" description="under development"> <!-- date="2008-01-04" -->
+      <action dev="jgrueneis" type="update" issue="CASTOR-2495">
+        ClassInfo and FieldInfo now have no specific setters and getters... all JAXB properties
+        are handled through JaxbXyNature.
+      </action>
+
+      <action dev="jgrueneis" type="update" issue="CASTOR-2431">
+        Now all field related annotations are read and stored in the XyInfo property map.
+        Attention! Not everything is used to fill the XyDescriptors.
+      </action>
+
       <action dev="jgrueneis" type="update" issue="CASTOR-2491">
         Extended FieldInfo to explicitly inform if XMLAttribute annotation is present
         or not.

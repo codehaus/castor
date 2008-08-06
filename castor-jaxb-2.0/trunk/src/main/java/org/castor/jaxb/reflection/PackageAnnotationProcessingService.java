@@ -25,8 +25,9 @@ import javax.xml.bind.annotation.XmlSchemaTypes;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.castor.jaxb.reflection.info.ReflectionInfo;
-import org.castor.jaxb.reflection.info.PackageInfo;
+import org.castor.core.nature.BaseNature;
+import org.castor.core.nature.NatureExtendable;
+import org.castor.jaxb.reflection.info.JaxbPackageNature;
 
 /**
  * A service class to precess all package level annotations.
@@ -66,11 +67,11 @@ public class PackageAnnotationProcessingService extends AnnotationProcessingServ
          * @see org.castor.jaxb.reflection.AnnotationProcessingService.AnnotationProcessor#
          * processAnnotation(org.castor.xml.introspection.ReflectionInfo, java.lang.annotation.Annotation)
          */
-        public final < I extends ReflectionInfo, A extends Annotation > 
+        public final < I extends BaseNature, A extends Annotation > 
         void processAnnotation(final I info, final A annotation) {
-            if ((annotation instanceof XmlSchema) && (info instanceof PackageInfo)) {
+            if ((annotation instanceof XmlSchema) && (info instanceof JaxbPackageNature)) {
                 XmlSchema xmlSchema = (XmlSchema) annotation;
-                PackageInfo packageInfo = (PackageInfo) info;
+                JaxbPackageNature packageInfo = (JaxbPackageNature) info;
                 annotationVisitMessage(LOG, xmlSchema);
                 //
                 packageInfo.addSchemaNsArray(xmlSchema.xmlns());
@@ -101,13 +102,13 @@ public class PackageAnnotationProcessingService extends AnnotationProcessingServ
         /**
          * {@inheritDoc}
          * @see org.castor.jaxb.reflection.AnnotationProcessingService.AnnotationProcessor#
-         * processAnnotation(org.castor.xml.introspection.ReflectionInfo, java.lang.annotation.Annotation)
+         * processAnnotation(org.castor.xml.introspection.NatureExtendable, java.lang.annotation.Annotation)
          */
-        public final < I extends ReflectionInfo, A extends Annotation > 
+        public final < I extends BaseNature, A extends Annotation > 
         void processAnnotation(final I info, final A annotation) {
-            if ((annotation instanceof XmlAccessorType) && (info instanceof PackageInfo)) {
+            if ((annotation instanceof XmlAccessorType) && (info instanceof JaxbPackageNature)) {
                 XmlAccessorType xmlAccessorType = (XmlAccessorType) annotation;
-                PackageInfo packageInfo = (PackageInfo) info;
+                JaxbPackageNature packageInfo = (JaxbPackageNature) info;
                 annotationVisitMessage(LOG, xmlAccessorType);
                 //
                 packageInfo.setAccessType(xmlAccessorType.value());
@@ -136,13 +137,13 @@ public class PackageAnnotationProcessingService extends AnnotationProcessingServ
         /**
          * {@inheritDoc}
          * @see org.castor.jaxb.reflection.AnnotationProcessingService.AnnotationProcessor#
-         * processAnnotation(org.castor.xml.introspection.ReflectionInfo, java.lang.annotation.Annotation)
+         * processAnnotation(org.castor.xml.introspection.BaseNature, java.lang.annotation.Annotation)
          */
-        public final < I extends ReflectionInfo, A extends Annotation > 
+        public final < I extends BaseNature, A extends Annotation > 
         void processAnnotation(final I info, final A annotation) {
-            if ((annotation instanceof XmlAccessorOrder) && (info instanceof PackageInfo)) {
+            if ((annotation instanceof XmlAccessorOrder) && (info instanceof JaxbPackageNature)) {
                 XmlAccessorOrder xmlAccessorOrder = (XmlAccessorOrder) annotation;
-                PackageInfo packageInfo = (PackageInfo) info;
+                JaxbPackageNature packageInfo = (JaxbPackageNature) info;
                 annotationVisitMessage(LOG, xmlAccessorOrder);
                 //
                 packageInfo.setAccessOrder(xmlAccessorOrder.value());
@@ -170,13 +171,13 @@ public class PackageAnnotationProcessingService extends AnnotationProcessingServ
         /**
          * {@inheritDoc}
          * @see org.castor.jaxb.reflection.AnnotationProcessingService.AnnotationProcessor#
-         * processAnnotation(org.castor.xml.introspection.ReflectionInfo, java.lang.annotation.Annotation)
+         * processAnnotation(org.castor.xml.introspection.BaseNature, java.lang.annotation.Annotation)
          */
-        public final < I extends ReflectionInfo, A extends Annotation > 
+        public final < I extends BaseNature, A extends Annotation > 
         void processAnnotation(final I info, final A annotation) {
-            if ((annotation instanceof XmlSchemaType) && (info instanceof PackageInfo)) {
+            if ((annotation instanceof XmlSchemaType) && (info instanceof JaxbPackageNature)) {
                 XmlSchemaType xmlSchemaType = (XmlSchemaType) annotation;
-                PackageInfo packageInfo = (PackageInfo) info;
+                JaxbPackageNature packageInfo = (JaxbPackageNature) info;
                 annotationVisitMessage(LOG, xmlSchemaType);
                 //
                 packageInfo.addSchemaType(
@@ -207,13 +208,13 @@ public class PackageAnnotationProcessingService extends AnnotationProcessingServ
         /**
          * {@inheritDoc}
          * @see org.castor.jaxb.reflection.AnnotationProcessingService.AnnotationProcessor#
-         * processAnnotation(org.castor.xml.introspection.ReflectionInfo, java.lang.annotation.Annotation)
+         * processAnnotation(org.castor.xml.introspection.BaseNature, java.lang.annotation.Annotation)
          */
-        public final < I extends ReflectionInfo, A extends Annotation > 
+        public final < I extends BaseNature, A extends Annotation > 
         void processAnnotation(final I info, final A annotation) {
-            if ((annotation instanceof XmlSchemaTypes) && (info instanceof PackageInfo)) {
+            if ((annotation instanceof XmlSchemaTypes) && (info instanceof JaxbPackageNature)) {
                 XmlSchemaTypes xmlSchemaTypes = (XmlSchemaTypes) annotation;
-                PackageInfo packageInfo = (PackageInfo) info;
+                JaxbPackageNature packageInfo = (JaxbPackageNature) info;
                 annotationVisitMessage(LOG, xmlSchemaTypes);
                 //
                 packageInfo.addSchemaTypeArray(xmlSchemaTypes.value());

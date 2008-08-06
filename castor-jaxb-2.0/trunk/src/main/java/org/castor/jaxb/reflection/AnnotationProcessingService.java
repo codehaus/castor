@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.castor.core.nature.BaseNature;
 import org.castor.jaxb.reflection.info.ReflectionInfo;
 
 /**
@@ -64,7 +65,7 @@ public abstract class AnnotationProcessingService {
      * @param info the {@link ReflectionInfo} object to write the annotation information read into
      * @param annotations an array of annotations
      */
-    public final < I extends ReflectionInfo > void processAnnotations(
+    public final < I extends BaseNature > void processAnnotations(
             final I info, final Annotation[] annotations) {
         for (int i = 0; i < annotations.length; i++) {
             processAnnotation(info, annotations[i]);
@@ -76,7 +77,7 @@ public abstract class AnnotationProcessingService {
      * @param info the {@link ReflectionInfo} object to write the annotation information read into
      * @param annotation the annotation to process
      */
-    public final < I extends ReflectionInfo, A extends Annotation > void processAnnotation(
+    public final < I extends BaseNature, A extends Annotation > void processAnnotation(
             final I info, final A annotation) {
 //        boolean processed = false;
         AnnotationProcessor annotationProcessor = 
@@ -109,7 +110,7 @@ public abstract class AnnotationProcessingService {
          * @param info the Info class that should be filled with the information read
          * @param annotation the annotation to process
          */
-        < I extends ReflectionInfo, A extends Annotation > void processAnnotation(
+        < I extends BaseNature, A extends Annotation > void processAnnotation(
                 final I info, final A annotation);
     }
 }

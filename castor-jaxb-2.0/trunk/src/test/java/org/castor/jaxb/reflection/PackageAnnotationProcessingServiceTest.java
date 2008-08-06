@@ -23,6 +23,7 @@ import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import org.castor.jaxb.integrationtests.tests.test1.USAddress;
+import org.castor.jaxb.reflection.info.JaxbPackageNature;
 import org.castor.jaxb.reflection.info.PackageInfo;
 
 /**
@@ -52,7 +53,7 @@ public class PackageAnnotationProcessingServiceTest extends TestCase {
         Package pack = clazz.getPackage();
         Annotation[] annotations = pack.getAnnotations();
         PackageAnnotationProcessingService paps = new PackageAnnotationProcessingService();
-        PackageInfo packageInfo = new PackageInfo();
+        JaxbPackageNature packageInfo = new JaxbPackageNature(new PackageInfo(pack.getName()));
         paps.processAnnotations(packageInfo, annotations);
         Assert.assertEquals(XmlAccessType.PROPERTY, packageInfo.getAccessType());
     }
