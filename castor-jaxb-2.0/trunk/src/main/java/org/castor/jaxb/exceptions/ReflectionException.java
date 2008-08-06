@@ -17,6 +17,7 @@ package org.castor.jaxb.exceptions;
 
 import org.castor.jaxb.reflection.info.ClassInfo;
 import org.castor.jaxb.reflection.info.FieldInfo;
+import org.castor.jaxb.reflection.info.JaxbFieldNature;
 
 /**
  * The reflection of classes had an error which can not be recovered.
@@ -61,4 +62,8 @@ public class ReflectionException extends CastorJAXBException {
 //    public ReflectionException(final String message, final Throwable exception) {
 //        super(message, exception);
 //    }
+
+    public ReflectionException(final JaxbFieldNature jaxbFieldNature, final String message) {
+        super(message);
+    }
 }

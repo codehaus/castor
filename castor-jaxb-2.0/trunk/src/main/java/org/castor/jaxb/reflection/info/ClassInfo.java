@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Joachim Grueneis
+ * Copyright 2008 Joachim Grueneis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,237 +13,81 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.castor.jaxb.reflection.info;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import javax.xml.bind.annotation.XmlAccessOrder;
-import javax.xml.bind.annotation.XmlAccessType;
+import org.castor.core.nature.PropertyHolder;
 
 /**
- * Contains all information regarding a certain inspected class.
- * 
- * @author Joachim Grueneis, jgrueneis_at_codehaus_dot_com
- * @version $Id$
+ * Class ClassInfo.<br/>
+ * Represents the information collected about a single class. It has associated
+ * FieldInfo instances for each field identified in the class and a PackageInfo.
  */
-public final class ClassInfo implements ReflectionInfo {
-    /** Default string for element annotation. */
-    public static final String DEFAULT_ELEMENT_NAME = "##default";
-    /** Default string for element annotation. */
-    public static final String DEFAULT_ELEMENT_NAMESPACE = "##default";
-    /** Default string for root element annotation. */
-    public static final String DEFAULT_ROOT_ELEMENT_NAME = "##default";
-    /** Default string for root element annotation. */
-    public static final String DEFAULT_ROOT_ELEMENT_NAMESPACE = "##default";
-    /** Default string for attribute annotation. */
-    public static final String DEFAULT_ATTRIBUTE_NAME = "##default";
-    /** Default string for attribute annotation. */
-    public static final String DEFAULT_ATTRIBUTE_NAMESPACE = "##default";
-
-    /** XMLType: XML type name. */
-    private String _typeName;
-    /** XMLType: The names of the properties for the XML type in correct order. */
-    private String[] _typeProperties;
-    /** XMLType: The namespace of the type. */
-    private String _typeNamespace;
-    /** XMLType: The factory class to create instance of the type. */
-    private Class < ? > _typeFactoryClass;
-    /** XMLType: The factory method used to create instances of the type. */
-    private String _typeFactoryMethod;
-    /** XmlRootElement: The element name when used as root element. */
-    private String _rootElementName;
-    /** XmlRootElement: The namespace when used as root element. */
-    private String _rootElementNamespace;
-    /** XmlTransient: True if the class is to be considert transient. */
-    private boolean _trnsnt;
-    /** XmlSeeAlso: The array of class found in XmlSeeAlso annotation... no clue how to use it. */
-    private Class < ? > [] _seeAlsoClasses;
-    /** XmlAccessorType: How properties of the class should be accessed. */
-    private XmlAccessType _xmlAccessType;
-    /** XmlAccessorOrder: The order used for the properties. */
-    private XmlAccessOrder _xmlAccessOrder;
-    /** The Class this descriptor describes. */
-    private Class < ? > _type;
-    /** The super Class of the Class this descriptor describes. */
-    private Class < ? > _supertype;
-    /** The interfaces of the Class this descriptor describes. */
-    private Class < ? > [] _interfaces;
-    /** The fileds of this class. */
-    private List < FieldInfo > _fieldInfos;
-    /** The Class specified by XmlEnum tag. */
-    private Class < ? > _enumClass;
-    /** Package information for the package of the class. */
-    private PackageInfo _packageInfo;
-    /** Does the class have an empty public constructor? */
-    private boolean _hasPublicEmptyConstructor;
-    /** The name of the type, but NOT taken from XmlType! */
+public class ClassInfo implements PropertyHolder {
+    /**
+     * The name of the class.
+     */
     private String _className;
-    
     /**
-     * Simple constructor.
+     * All fields.
      */
-    public ClassInfo() {
-        super();
-        _fieldInfos = new ArrayList < FieldInfo > ();
-    }
-    
+    private List<FieldInfo> _fieldInfos = new ArrayList<FieldInfo>();
     /**
-     * @return the typeName
+     * The package of the class.
      */
-    public String getTypeName() {
-        return _typeName;
-    }
+    private PackageInfo _packageInfo;
+
     /**
-     * @param typeName the typeName to set
+     * Map holding the properties set and read by Natures.
      */
-    public void setTypeName(final String typeName) {
-        _typeName = typeName;
-    }
+    private Map<String, Object> _properties = new HashMap<String, Object>();
+
     /**
-     * @return the typeProperties
+     * Set holding applicable natures.
      */
-    public String[] getTypeProperties() {
-        return _typeProperties;
-    }
+    private Set<String> _natures = new HashSet<String>();
+
     /**
-     * @param typeProperties the typeProperties to set
+     * A ClassInfo has always a class name.
+     * @param className the class name
      */
-    public void setTypeProperties(final String[] typeProperties) {
-        _typeProperties = typeProperties;
+    public ClassInfo(final String className) {
+        _className = className;
+        addNature(OoClassNature.class.getName());
+        addNature(JaxbClassNature.class.getName());
     }
+
     /**
-     * @return the typeNamespace
+     * To get the class name.
+     * @return the class name.
      */
-    public String getTypeNamespace() {
-        return _typeNamespace;
+    public String getClassName() {
+        return _className;
     }
+
     /**
-     * @param typeNamespace the typeNamespace to set
+     * To add another FieldInfo.
+     * @param fieldInfo the FieldInfo to add
      */
-    public void setTypeNamespace(final String typeNamespace) {
-        _typeNamespace = typeNamespace;
+    public final void addFieldInfo(final FieldInfo fieldInfo) {
+        _fieldInfos.add(fieldInfo);
     }
+
     /**
-     * @return the typeFactoryClass
+     * Get all FieldInfo s.
+     * @return List of FieldInfo s
      */
-    public Class < ? > getTypeFactoryClass() {
-        return _typeFactoryClass;
+    public final List<FieldInfo> getFieldInfos() {
+        return _fieldInfos;
     }
-    /**
-     * @param typeFactoryClass the typeFactoryClass to set
-     */
-    public void setTypeFactoryClass(final Class < ? > typeFactoryClass) {
-        _typeFactoryClass = typeFactoryClass;
-    }
-    /**
-     * @return the typeFactoryMethod
-     */
-    public String getTypeFactoryMethod() {
-        return _typeFactoryMethod;
-    }
-    /**
-     * @param typeFactoryMethod the typeFactoryMethod to set
-     */
-    public void setTypeFactoryMethod(final String typeFactoryMethod) {
-        _typeFactoryMethod = typeFactoryMethod;
-    }
-    /**
-     * @return the rootElementName
-     */
-    public String getRootElementName() {
-        return _rootElementName;
-    }
-    /**
-     * @param rootElementName the rootElementName to set
-     */
-    public void setRootElementName(final String rootElementName) {
-        _rootElementName = rootElementName;
-    }
-    /**
-     * @return the rootElementNamespace
-     */
-    public String getRootElementNamespace() {
-        return _rootElementNamespace;
-    }
-    /**
-     * @param rootElementNamespace the rootElementNamespace to set
-     */
-    public void setRootElementNamespace(final String rootElementNamespace) {
-        _rootElementNamespace = rootElementNamespace;
-    }
-    /**
-     * @return the xmlAccessType
-     */
-    public XmlAccessType getXmlAccessType() {
-        return _xmlAccessType;
-    }
-    /**
-     * @param xmlAccessorType the xmlAccessType to set
-     */
-    public void setXmlAccessType(final XmlAccessType xmlAccessorType) {
-        _xmlAccessType = xmlAccessorType;
-    }
-    /**
-     * @return the xmlAccessOrder
-     */
-    public XmlAccessOrder getXmlAccessOrder() {
-        return _xmlAccessOrder;
-    }
-    /**
-     * @param xmlAccessOrder the xmlAccessOrder to set
-     */
-    public void setXmlAccessOrder(final XmlAccessOrder xmlAccessOrder) {
-        _xmlAccessOrder = xmlAccessOrder;
-    }
-    /**
-     * @param b the transient flag
-     */
-    public void setTransient(final boolean b) {
-        _trnsnt = b;
-    }
-    /**
-     * @param value the array of Class entries found in XmlSeeAlso annotation
-     */
-    public void setSeeAlsoClasses(final Class < ? > [] value) {
-        _seeAlsoClasses = value;
-    }
-    /**
-     * @param type the Class we're talking about
-     */
-    public void setType(final Class < ? > type) {
-        _type = type;
-    }
-    /**
-     * @return the Class described
-     */
-    public Class < ? > getType() {
-        return _type;
-    }
-    /**
-     * @param supertype The super class.
-     */
-    public void setSupertype(final Class < ? > supertype) {
-        _supertype = supertype;
-    }
-    /**
-     * @return get the super class of the described class
-     */
-    public Class < ? > getSupertype() {
-        return _supertype;
-    }
-    /**
-     * @param interfaces the Interfaces of the class
-     */
-    public void setInterfaces(final Class < ? > [] interfaces) {
-        _interfaces = interfaces;
-    }
-    /**
-     * @return get the interfaces of the described class
-     */
-    public Class < ? > [] getInterfaces() {
-        return _interfaces;
-    }
+
     /**
      * @param fieldName the name of the field to find
      * @return null if not found or the field identified
@@ -257,101 +101,56 @@ public final class ClassInfo implements ReflectionInfo {
         }
         return foundFieldInfo;
     }
+    
     /**
-     * @param fieldInfo a FieldInfo to add
+     * To get the package info for the class.
+     * @return the package info
      */
-    public void addFieldInfo(final FieldInfo fieldInfo) {
-        _fieldInfos.add(fieldInfo);
-    }
-    /**
-     * @return true if field is flagges as transient
-     */
-    public boolean isTransient() {
-        return _trnsnt;
-    }
-    /**
-     * @return the Array of Class found in the XmlSeeAlso annotation
-     */
-    public Class < ? > [] getSeeAlsoClasses() {
-        return _seeAlsoClasses;
-    }
-
-    /**
-     * @return the Collection of FieldInfo instances collected
-     */
-    public List < FieldInfo > getFieldInfos() {
-        return _fieldInfos;
-    }
-    /**
-     * @return the enumClass
-     */
-    public Class < ? > getEnumClass() {
-        return _enumClass;
-    }
-    /**
-     * @param enumClass the enumClass to set
-     */
-    public void setEnumClass(final Class < ? > enumClass) {
-        _enumClass = enumClass;
-    }
-    /**
-     * @return the packageInfo
-     */
-    public PackageInfo getPackageInfo() {
+    public final PackageInfo getPackageInfo() {
         return _packageInfo;
     }
+    
     /**
-     * @param packageInfo the packageInfo for the class
+     * To set the package info.
+     * @param packageInfo the package info
      */
-    public void setPackageInfo(final PackageInfo packageInfo) {
+    public final void setPackageInfo(final PackageInfo packageInfo) {
         _packageInfo = packageInfo;
     }
 
     /**
-     * @param hasPublicEmptyConstructor hasPublicEmptyConstructor
+     * @param name the name of the property to read
+     * @return the property
+     * @see org.castor.core.nature.PropertyHolder#getProperty(java.lang.String)
      */
-    public void setHasPublicEmptyConstructor(final boolean hasPublicEmptyConstructor) {
-        _hasPublicEmptyConstructor = hasPublicEmptyConstructor;
+    public final Object getProperty(final String name) {
+        return _properties.get(name);
     }
 
     /**
-     * @return hasPublicEmptyConstructor
+     * @param name the name of the property to set
+     * @param value the value to set the property to
+     * @see org.castor.core.nature.PropertyHolder#setProperty(java.lang.String, java.lang.Object)
      */
-    public boolean isHasPublicEmptyConstructor() {
-        return _hasPublicEmptyConstructor;
-    }
-    
-    /**
-     * Implementing the toString method to get a more meaningful log output.
-     * {@inheritDoc}
-     * @see java.lang.Object#toString()
-     */
-    public String toString() {
-        StringBuffer sb = new StringBuffer();
-        sb.append(this.getClass().getName())
-        .append("[")
-        .append("type:").append(_type)
-        .append("]");
-        return sb.toString();
+    public final void setProperty(final String name, final Object value) {
+        _properties.put(name, value);
     }
 
     /**
-     * To set the Class.getName but already preprocessed (by JavaNaming).
-     * @param className the class name of the type
+     * @param nature the name of the Nature to register
+     * @see org.castor.core.nature.NatureExtendable#addNature(java.lang.String)
      */
-    public void setClassName(final String className) {
-        _className = className;
+    public final void addNature(final String nature) {
+        _natures.add(nature);
     }
-    
+
     /**
-     * The class name which had been set or Class.getName if nothing
-     * have been set.
-     * @return the class name set or Class.getName()
+     * @param nature the name of the Nature to check
+     * @return true if the Nature was registered before
+     * @see org.castor.core.nature.NatureExtendable#hasNature(java.lang.String)
      */
-    public String getClassName() {
-        if (_className != null) {
-            return _className;
-        }
-        return _type.getName();
+    public final boolean hasNature(final String nature) {
+        return _natures.contains(nature);
     }
+
 }

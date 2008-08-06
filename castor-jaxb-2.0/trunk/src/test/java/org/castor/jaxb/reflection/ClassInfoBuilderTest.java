@@ -27,7 +27,8 @@ import junit.framework.TestCase;
 
 import org.castor.jaxb.naming.JAXBJavaNaming;
 import org.castor.jaxb.reflection.info.ClassInfo;
-import org.castor.jaxb.reflection.info.FieldInfo;
+import org.castor.jaxb.reflection.info.JaxbClassNature;
+import org.castor.jaxb.reflection.info.JaxbFieldNature;
 
 /**
  * @author Joachim Grueneis, jgrueneis_at_gmail_dot_com
@@ -109,12 +110,12 @@ public class ClassInfoBuilderTest extends TestCase {
     }
 
     public final void testArtist() {
-        ClassInfo ci = _builder.buildClassInfo(Artist.class);
+        JaxbClassNature ci = new JaxbClassNature(_builder.buildClassInfo(Artist.class));
         Assert.assertNotNull("ClassInfo generated must not be null", ci);
         Assert.assertEquals("Artist", ci.getRootElementName());
         Assert.assertEquals(Artist.class, ci.getType());
 //        Assert.assertEquals(3, ci.getFieldInfos().size());
-        for (FieldInfo fieldInfo : ci.getFieldInfos()) {
+        for (JaxbFieldNature fieldInfo : ci.getFields()) {
             if ("Name".equals(fieldInfo.getElementName())) {
                 Assert.assertEquals("Name", fieldInfo.getElementName());
                 Assert.assertEquals(String.class, fieldInfo.getElementType());
@@ -139,7 +140,7 @@ public class ClassInfoBuilderTest extends TestCase {
     }
     
     public final void testNoXmlElementAnnotations() {
-        ClassInfo ci = _builder.buildClassInfo(NoXmlElementAnnotations.class);
+        JaxbClassNature ci = new JaxbClassNature(_builder.buildClassInfo(NoXmlElementAnnotations.class));
         Assert.assertNotNull("ClassInfo generated must not be null", ci);
         Assert.assertNull(
                 "Without XmlRootElement annotation this has to be null", ci.getRootElementName());
@@ -147,8 +148,8 @@ public class ClassInfoBuilderTest extends TestCase {
                 "Without XmlRootElement annotation this has to be null",
                 ci.getRootElementNamespace());
         Assert.assertEquals(NoXmlElementAnnotations.class, ci.getType());
-        Assert.assertEquals("One property leads to one field info", 2, ci.getFieldInfos().size());
-        List < FieldInfo > fis = ci.getFieldInfos();
+        Assert.assertEquals("One property leads to one field info", 2, ci.getFields().size());
+        List < JaxbFieldNature > fis = ci.getFields();
         Assert.assertNull("Without XmlElement no element name is set", fis.get(0).getElementName());
         Assert.assertNull("Without XmlAttribute no attribute name is set", fis.get(0).getAttributeName());
         Assert.assertNull("Without XmlElement no element name is set", fis.get(1).getElementName());
@@ -167,17 +168,17 @@ public class ClassInfoBuilderTest extends TestCase {
     }
     
     public final void testEmptyXmlElementAnnotations() {
-        ClassInfo ci = _builder.buildClassInfo(EmptyXmlElementAnnotations.class);
+        JaxbClassNature ci = new JaxbClassNature(_builder.buildClassInfo(EmptyXmlElementAnnotations.class));
         Assert.assertNotNull("ClassInfo generated must not be null", ci);
-        Assert.assertEquals(ClassInfo.DEFAULT_ROOT_ELEMENT_NAME, ci.getRootElementName());
-        Assert.assertEquals(ClassInfo.DEFAULT_ROOT_ELEMENT_NAMESPACE, ci.getRootElementNamespace());
+        Assert.assertNull(ci.getRootElementName());
+        Assert.assertNull(ci.getRootElementNamespace());
         Assert.assertEquals(EmptyXmlElementAnnotations.class, ci.getType());
-        Assert.assertEquals("Two properties lead to two field infos", 2, ci.getFieldInfos().size());
-        List < FieldInfo > fis = ci.getFieldInfos();
-        Assert.assertEquals(ClassInfo.DEFAULT_ELEMENT_NAME, fis.get(0).getElementName());
+        Assert.assertEquals("Two properties lead to two field infos", 2, ci.getFields().size());
+        List < JaxbFieldNature > fis = ci.getFields();
+        Assert.assertNull("XmlElement.name is not set", fis.get(0).getElementName());
         Assert.assertNull("Without XmlAttribute no attribute name is set", fis.get(0).getAttributeName());
         Assert.assertNull("Without XmlElement no element name is set", fis.get(1).getElementName());
-        Assert.assertEquals(ClassInfo.DEFAULT_ATTRIBUTE_NAME, fis.get(1).getAttributeName());
+        Assert.assertNull("XmlAttribute.name is not set", fis.get(1).getAttributeName());
     }
     
     /**
@@ -192,13 +193,13 @@ public class ClassInfoBuilderTest extends TestCase {
     }
     
     public final void testNamedXmlElementAnnotations() {
-        ClassInfo ci = _builder.buildClassInfo(NamedXmlElementAnnotations.class);
+        JaxbClassNature ci = new JaxbClassNature(_builder.buildClassInfo(NamedXmlElementAnnotations.class));
         Assert.assertNotNull("ClassInfo generated must not be null", ci);
         Assert.assertEquals("NamedXmlElement", ci.getRootElementName());
-        Assert.assertEquals(ClassInfo.DEFAULT_ROOT_ELEMENT_NAMESPACE, ci.getRootElementNamespace());
+        Assert.assertNull(ci.getRootElementNamespace());
         Assert.assertEquals(NamedXmlElementAnnotations.class, ci.getType());
-        Assert.assertEquals("Two properties lead to two field infos", 2, ci.getFieldInfos().size());
-        List < FieldInfo > fis = ci.getFieldInfos();
+        Assert.assertEquals("Two properties lead to two field infos", 2, ci.getFields().size());
+        List < JaxbFieldNature > fis = ci.getFields();
         Assert.assertEquals("NamedElement", fis.get(0).getElementName());
         Assert.assertNull("Without XmlAttribute no attribute name is set", fis.get(0).getAttributeName());
         Assert.assertNull("Without XmlElement no element name is set", fis.get(1).getElementName());
