@@ -65,6 +65,8 @@ public final class JAXBContext extends javax.xml.bind.JAXBContext {
      */
     private JAXBContext() {
         super();
+        LOG.debug("Creating JAXBContext");
+        
         _xmlContext = new XMLContext();
         InternalContext internalContext = _xmlContext.getInternalContext();
 
@@ -72,7 +74,9 @@ public final class JAXBContext extends javax.xml.bind.JAXBContext {
         XMLNaming xmlNaming = new JAXBXmlNaming();
         
         internalContext.setJavaNaming(javaNaming);
+        LOG.debug("JAXBContext: JavaNaming in use: " + javaNaming.getClass().getCanonicalName());
         internalContext.setXMLNaming(xmlNaming);
+        LOG.debug("JAXBContext: XMLNaming in use: " + xmlNaming.getClass().getCanonicalName());
         
         ClassDescriptorBuilder cdb = new ClassDescriptorBuilder();
         cdb.setXMLNaming(xmlNaming);
@@ -91,6 +95,13 @@ public final class JAXBContext extends javax.xml.bind.JAXBContext {
         resolverStrategy.setPackageResolverCommand(packageResolverCommand);
         
         internalContext.setResolverStrategy(resolverStrategy);
+        
+        // this is ugly but required... for hell of backward compatibility
+        internalContext.getXMLClassDescriptorResolver().setResolverStrategy(resolverStrategy);
+
+        LOG.debug("JAXBContext: ClassResolverCommand in use: " + classResolverCommand.getClass().getCanonicalName());
+        LOG.debug("JAXBContext: PackageResolverCommand in use: " + packageResolverCommand.getClass().getCanonicalName());
+        LOG.debug("JAXBContext: ResolverStrategy in use: " + resolverStrategy.getClass().getCanonicalName());
     }
 
     /**

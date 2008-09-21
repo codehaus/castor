@@ -53,4 +53,14 @@ public class JAXBPackageResolverCommandTest extends TestCase {
         }
     }
 
+    public void testYetNotImplemented() {
+        try {
+            _cmd.resolve("org.castor.jaxb.resolver", _propertiesMap);
+            Assert.fail("We assume that it is still not yet implemented!");
+        } catch (ResolverException e) {
+            Assert.fail("Failed with exception: " + e);
+        } catch (UnsupportedOperationException e) {
+            // expected
+        }
+    }
 }

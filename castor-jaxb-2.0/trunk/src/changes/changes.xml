@@ -6,6 +6,11 @@
   </properties>
   <body>
     <release version="1.0-beta-1" description="under development"> <!-- date="2008-01-04" -->
+
+      <action dev="jgrueneis" type="update">
+      	Changed Castor dependencies to 1.3-SNAPSHOT.
+      </action>
+
       <action dev="jgrueneis" type="update" issue="CASTOR-2495">
         ClassInfo and FieldInfo now have no specific setters and getters... all JAXB properties
         are handled through JaxbXyNature.

@@ -18,8 +18,12 @@ package org.castor.jaxb.reflection;
 import java.util.Date;
 import java.util.List;
 
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlEnum;
+import javax.xml.bind.annotation.XmlMixed;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import junit.framework.Assert;
@@ -205,4 +209,60 @@ public class ClassInfoBuilderTest extends TestCase {
         Assert.assertNull("Without XmlElement no element name is set", fis.get(1).getElementName());
         Assert.assertEquals("NamedAttribute", fis.get(1).getAttributeName());
     }
+    
+    public enum FranzWithoutAnnotations {
+        TEST1(1),
+        TEST2(2),
+        TEST3(3);
+        private int _i;
+        private FranzWithoutAnnotations(final int i) {
+            _i = i;
+        }
+        public int getI() {
+            return _i;
+        }
+    }
+    public final void testEnumNoAnnotations() {
+        ClassInfo ci = _builder.buildClassInfo(FranzWithoutAnnotations.class);
+        JaxbClassNature jcn = new JaxbClassNature(ci);
+        Assert.assertNotNull("ClassInfo generated must not be null", jcn);
+        Assert.assertNull(jcn.getRootElementName());
+        Assert.assertNull(jcn.getRootElementNamespace());
+        Assert.assertEquals(FranzWithoutAnnotations.class, jcn.getType());
+        // here I should check if it is an enum...
+    }
+    
+    @XmlEnum
+    public enum FranzWithAnnotations {
+        TEST1(1),
+        TEST2(2),
+        TEST3(3);
+        private int _i;
+        private FranzWithAnnotations(final int i) {
+            _i = i;
+        }
+        public int getI() {
+            return _i;
+        }
+    }
+    public final void testEnumWithAnnotations() {
+        ClassInfo ci = _builder.buildClassInfo(FranzWithAnnotations.class);
+        JaxbClassNature jcn = new JaxbClassNature(ci);
+        Assert.assertNotNull("ClassInfo generated must not be null", jcn);
+        Assert.assertNull(jcn.getRootElementName());
+        Assert.assertNull(jcn.getRootElementNamespace());
+        Assert.assertEquals(FranzWithAnnotations.class, jcn.getType());
+    }
+    
+//    JAXBElement<T> a;
+//    
+//    public class MixedContentSample {
+//        @XmlMixed
+//        private List _mixedContent;        
+//    }
+//    
+//    @XmlElementRef
+//    public class ElementRefSample {
+//        
+//    }
 }

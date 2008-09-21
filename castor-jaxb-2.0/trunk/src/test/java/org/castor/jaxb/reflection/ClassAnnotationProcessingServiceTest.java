@@ -22,6 +22,8 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorOrder;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSeeAlso;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 import junit.framework.Assert;
@@ -102,7 +104,7 @@ public class ClassAnnotationProcessingServiceTest extends TestCase {
         Assert.assertEquals(1, classInfo.getTypeProperties().size());
         Assert.assertEquals("", classInfo.getTypeProperties().get(0));
         // XmlTransient annotation
-        Assert.assertFalse(classInfo.isTransient());
+        Assert.assertFalse(classInfo.getXmlTransient());
         // XmlSeeAlso annotation
         Assert.assertNull(classInfo.getSeeAlsoClasses());
         // XmlAccessorOrder annotations
@@ -132,7 +134,7 @@ public class ClassAnnotationProcessingServiceTest extends TestCase {
         Assert.assertNull(classInfo.getTypeNamespace());
         Assert.assertNull(classInfo.getTypeProperties());
         // XmlTransient annotation
-        Assert.assertFalse(classInfo.isTransient());
+        Assert.assertFalse(classInfo.getXmlTransient());
         // XmlSeeAlso annotation
         Assert.assertNull(classInfo.getSeeAlsoClasses());
         // XmlAccessorOrder annotations
@@ -141,67 +143,66 @@ public class ClassAnnotationProcessingServiceTest extends TestCase {
         Assert.assertNull(classInfo.getXmlAccessType());
     }
 
-    // this annotation is only allowed for fields and methods from jdk6 on...
-//    @XmlTransient()
-//    private static class WithXmlTransientAnnotation {
-//        
-//    }
-//    public final void testProcessAnnotationsWithXmlTransientAnnotation() {
-//        Class < WithXmlTransientAnnotation > clazz = WithXmlTransientAnnotation.class;
-//        Annotation[] annotations = clazz.getAnnotations();
-//        ClassAnnotationProcessingService caps = new ClassAnnotationProcessingService();
-//        ClassInfo classInfo = new ClassInfo();
-//        caps.processAnnotations(classInfo, annotations);
-//
-//        // XmlRootElement annotations
-//        Assert.assertNull(classInfo.getRootElementName());
-//        Assert.assertNull(classInfo.getRootElementNamespace());
-//        // XmlType annotation
-//        Assert.assertNull(classInfo.getTypeFactoryClass());
-//        Assert.assertNull(classInfo.getTypeFactoryMethod());
-//        Assert.assertNull(classInfo.getTypeName());
-//        Assert.assertNull(classInfo.getTypeNamespace());
-//        Assert.assertNull(classInfo.getTypeProperties());
-//        // XmlTransient annotation
-//        Assert.assertTrue(classInfo.isTransient());
-//        // XmlSeeAlso annotation
-//        Assert.assertNull(classInfo.getSeeAlsoClasses());
-//        // XmlAccessorOrder annotations
-//        Assert.assertNull(classInfo.getXmlAccessOrder());
-//        // XmlAccessorType annotations
-//        Assert.assertNull(classInfo.getXmlAccessType());
-//    }
+    @XmlTransient()
+    private static class WithXmlTransientAnnotation {
+        
+    }
+    public final void testProcessAnnotationsWithXmlTransientAnnotation() {
+        Class < WithXmlTransientAnnotation > clazz = WithXmlTransientAnnotation.class;
+        Annotation[] annotations = clazz.getAnnotations();
+        ClassAnnotationProcessingService caps = new ClassAnnotationProcessingService();
+        JaxbClassNature classInfo = new JaxbClassNature(new ClassInfo(WithXmlRootElementAnnotation.class.getName()));
+        caps.processAnnotations(classInfo, annotations);
 
-//    @XmlSeeAlso(WithXmlTransientAnnotation.class)
-//    private static class WithXmlSeeAlsoAnnotation {
-//        
-//    }
-//    public final void testProcessAnnotationsWithXmlSeeAlsoAnnotation() {
-//        Class < WithXmlSeeAlsoAnnotation > clazz = WithXmlSeeAlsoAnnotation.class;
-//        Annotation[] annotations = clazz.getAnnotations();
-//        ClassAnnotationProcessingService caps = new ClassAnnotationProcessingService();
-//        ClassInfo classInfo = new ClassInfo();
-//        caps.processAnnotations(classInfo, annotations);
-//
-//        // XmlRootElement annotations
-//        Assert.assertNull(classInfo.getRootElementName());
-//        Assert.assertNull(classInfo.getRootElementNamespace());
-//        // XmlType annotation
-//        Assert.assertNull(classInfo.getTypeFactoryClass());
-//        Assert.assertNull(classInfo.getTypeFactoryMethod());
-//        Assert.assertNull(classInfo.getTypeName());
-//        Assert.assertNull(classInfo.getTypeNamespace());
-//        Assert.assertNull(classInfo.getTypeProperties());
-//        // XmlTransient annotation
-//        Assert.assertFalse(classInfo.isTransient());
-//        // XmlSeeAlso annotation
-//        Assert.assertEquals(1, classInfo.getSeeAlsoClasses().length);
-//        Assert.assertEquals(WithXmlTransientAnnotation.class, classInfo.getSeeAlsoClasses()[0]);
-//        // XmlAccessorOrder annotations
-//        Assert.assertNull(classInfo.getXmlAccessOrder());
-//        // XmlAccessorType annotations
-//        Assert.assertNull(classInfo.getXmlAccessType());
-//    }
+        // XmlRootElement annotations
+        Assert.assertNull(classInfo.getRootElementName());
+        Assert.assertNull(classInfo.getRootElementNamespace());
+        // XmlType annotation
+        Assert.assertNull(classInfo.getTypeFactoryClass());
+        Assert.assertNull(classInfo.getTypeFactoryMethod());
+        Assert.assertNull(classInfo.getTypeName());
+        Assert.assertNull(classInfo.getTypeNamespace());
+        Assert.assertNull(classInfo.getTypeProperties());
+        // XmlTransient annotation
+        Assert.assertTrue(classInfo.getXmlTransient());
+        // XmlSeeAlso annotation
+        Assert.assertNull(classInfo.getSeeAlsoClasses());
+        // XmlAccessorOrder annotations
+        Assert.assertNull(classInfo.getXmlAccessOrder());
+        // XmlAccessorType annotations
+        Assert.assertNull(classInfo.getXmlAccessType());
+    }
+
+    @XmlSeeAlso(WithXmlTransientAnnotation.class)
+    private static class WithXmlSeeAlsoAnnotation {
+        
+    }
+    public final void testProcessAnnotationsWithXmlSeeAlsoAnnotation() {
+        Class < WithXmlSeeAlsoAnnotation > clazz = WithXmlSeeAlsoAnnotation.class;
+        Annotation[] annotations = clazz.getAnnotations();
+        ClassAnnotationProcessingService caps = new ClassAnnotationProcessingService();
+        JaxbClassNature classInfo = new JaxbClassNature(new ClassInfo(WithXmlRootElementAnnotation.class.getName()));
+        caps.processAnnotations(classInfo, annotations);
+
+        // XmlRootElement annotations
+        Assert.assertNull(classInfo.getRootElementName());
+        Assert.assertNull(classInfo.getRootElementNamespace());
+        // XmlType annotation
+        Assert.assertNull(classInfo.getTypeFactoryClass());
+        Assert.assertNull(classInfo.getTypeFactoryMethod());
+        Assert.assertNull(classInfo.getTypeName());
+        Assert.assertNull(classInfo.getTypeNamespace());
+        Assert.assertNull(classInfo.getTypeProperties());
+        // XmlTransient annotation
+        Assert.assertFalse(classInfo.getXmlTransient());
+        // XmlSeeAlso annotation
+        Assert.assertEquals(1, classInfo.getSeeAlsoClasses().size());
+        Assert.assertEquals(WithXmlTransientAnnotation.class, classInfo.getSeeAlsoClasses().get(0));
+        // XmlAccessorOrder annotations
+        Assert.assertNull(classInfo.getXmlAccessOrder());
+        // XmlAccessorType annotations
+        Assert.assertNull(classInfo.getXmlAccessType());
+    }
 
     @XmlAccessorOrder()
     private static class WithXmlAccessorOrderAnnotation {
@@ -224,7 +225,7 @@ public class ClassAnnotationProcessingServiceTest extends TestCase {
         Assert.assertNull(classInfo.getTypeNamespace());
         Assert.assertNull(classInfo.getTypeProperties());
         // XmlTransient annotation
-        Assert.assertFalse(classInfo.isTransient());
+        Assert.assertFalse(classInfo.getXmlTransient());
         // XmlSeeAlso annotation
         Assert.assertNull(classInfo.getSeeAlsoClasses());
         // XmlAccessorOrder annotations
@@ -254,7 +255,7 @@ public class ClassAnnotationProcessingServiceTest extends TestCase {
         Assert.assertNull(classInfo.getTypeNamespace());
         Assert.assertNull(classInfo.getTypeProperties());
         // XmlTransient annotation
-        Assert.assertFalse(classInfo.isTransient());
+        Assert.assertFalse(classInfo.getXmlTransient());
         // XmlSeeAlso annotation
         Assert.assertNull(classInfo.getSeeAlsoClasses());
         // XmlAccessorOrder annotations
@@ -284,12 +285,16 @@ public class ClassAnnotationProcessingServiceTest extends TestCase {
         Assert.assertNull(classInfo.getTypeNamespace());
         Assert.assertNull(classInfo.getTypeProperties());
         // XmlTransient annotation
-        Assert.assertFalse(classInfo.isTransient());
+        Assert.assertFalse(classInfo.getXmlTransient());
         // XmlSeeAlso annotation
         Assert.assertNull(classInfo.getSeeAlsoClasses());
         // XmlAccessorOrder annotations
         Assert.assertNull(classInfo.getXmlAccessOrder());
         // XmlAccessorType annotations
         Assert.assertEquals(XmlAccessType.NONE, classInfo.getXmlAccessType());
+    }
+
+    public final void testProcessAnnotationsWithXmlEnum() {
+        //Assert.fail("Not yet implemented!");
     }
 }
