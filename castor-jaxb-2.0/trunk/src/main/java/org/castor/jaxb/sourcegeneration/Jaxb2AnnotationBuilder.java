@@ -63,7 +63,7 @@ public class Jaxb2AnnotationBuilder implements AnnotationBuilder {
         request.setElementValue("name", "\"" + xmlNature.getNodeName() + "\"");
 
         // @propOrder
-        if (classInfo.isSequence()) {
+        if (xmlNature.isSequence()) {
             request.setElementValue("name", "\"" + xmlNature.getNodeName()
                     + "\"");
             FieldInfo[] fieldInfo = classInfo.getElementFields();

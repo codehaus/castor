@@ -159,28 +159,34 @@ public class JaxbClassNature extends OoClassNature { //implements Nature {
     public void setXmlAccessOrder(final XmlAccessOrder xmlAccessOrder) {
         setProperty(Properties.XML_ACCESS_ORDER, xmlAccessOrder);
     }
-    /**
-     * @param b the transient flag
-     */
-    public void setTransient(final boolean b) {
-        setProperty(Properties.TRANSIENT, new Boolean(b));
-    }
-    /**
-     * @return true if field is flagges as transient
-     */
-    public boolean isTransient() {
-        Boolean b = (Boolean) getProperty(Properties.TRANSIENT);
-        if (b == null || Boolean.FALSE.equals(b)) {
-            return false;
-        } 
-        return true;
-    }
+//    /**
+//     * @param b the transient flag
+//     */
+//    public void setTransient(final boolean b) {
+//        setProperty(Properties.TRANSIENT, new Boolean(b));
+//    }
+//    /**
+//     * @return true if field is flagges as transient
+//     */
+//    public boolean isTransient() {
+//        Boolean b = (Boolean) getProperty(Properties.TRANSIENT);
+//        if (b == null || Boolean.FALSE.equals(b)) {
+//            return false;
+//        } 
+//        return true;
+//    }
     /**
      * @param values the array of Class entries found in XmlSeeAlso annotation
      * @return 
      */
     public void setSeeAlsoClasses(final Class < ? > [] values) {
-        setProperty(Properties.SEE_ALSO_CLASSES, values);
+        if (values != null || values.length > 0) {
+            ArrayList<Class<?>> seeAlsoClasses = new ArrayList<Class<?>>();
+            for (int i = 0; i < values.length; i++) {
+                seeAlsoClasses.add(values[i]);
+            }
+            setProperty(Properties.SEE_ALSO_CLASSES, seeAlsoClasses);
+        }
     }
     /**
      * The List of Class es of the XmlSeeAlso annotations.

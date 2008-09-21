@@ -1,20 +1,16 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.codehaus.castor</groupId>
 	<artifactId>castor-jaxb</artifactId>
 	<version>1.0-beta-1-SNAPSHOT</version>
 	<packaging>jar</packaging>
-
 	<name>Castor JAXB - An implementation of JAXB 2.1</name>
 	<description>
 		A layer to use Castor underneath and JAXB standard compliant API
 		and mapping definition.
 	</description>
 	<url>http://castor.org</url>
-	
 	<licenses>
 		<license>
 			<name>The Apache Software License, Version 2.0</name>
@@ -22,32 +18,29 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
-
 	<issueManagement>
 		<system>Jira</system>
 		<url>http://jira.codehaus.org/browse/CASTOR</url>
 	</issueManagement>
-	
 	<ciManagement>
 		<system>bamboo</system>
 		<url>
 			http://bamboo.ci.codehaus.org/browse/CASTOR-XMLJAXB
 		</url>
 	</ciManagement>
-
 	<developers>
-        <developer>
-            <id>wguttmn</id>
-            <name>Werner Guttmann</name>
-            <email>wguttmn@codehaus.org</email>
-            <organization>Indoqa</organization>
-            <organizationUrl>http://www.indoqa.com</organizationUrl>
-            <roles>
-                <role>Castor JDO Lead</role>
-                <role>Castor XML Lead</role>
-            </roles>
-            <timezone>+1</timezone>
-        </developer>
+		<developer>
+			<id>wguttmn</id>
+			<name>Werner Guttmann</name>
+			<email>wguttmn@codehaus.org</email>
+			<organization>Indoqa</organization>
+			<organizationUrl>http://www.indoqa.com</organizationUrl>
+			<roles>
+				<role>Castor JDO Lead</role>
+				<role>Castor XML Lead</role>
+			</roles>
+			<timezone>+1</timezone>
+		</developer>
 		<developer>
 			<id>jgrueneis</id>
 			<name>Joachim Grueneis</name>
@@ -58,7 +51,6 @@
 			<timezone>+1</timezone>
 		</developer>
 	</developers>
-
 	<mailingLists>
 		<mailingList>
 			<name>User mailing list</name>
@@ -92,7 +84,6 @@
 			</archive>
 		</mailingList>
 	</mailingLists>
-
 	<scm>
 		<connection>
 			scm:svn:http://svn.codehaus.org/castor/castor-jaxb-2.0/trunk/
@@ -104,7 +95,6 @@
 			http://svn.castor.codehaus.org/viewrep/castor/castor-jaxb-2.0/trunk
 		</url>
 	</scm>
-
 	<distributionManagement>
 		<repository>
 			<id>codehaus.org</id>
@@ -123,67 +113,56 @@
 			<url>dav:https://dav.codehaus.org/castor/</url>
 		</site>
 	</distributionManagement>
-
 	<dependencies>
-
-        <dependency>
-            <groupId>org.codehaus.castor</groupId>
-            <artifactId>castor-core</artifactId>
-            <version>1.2.1-SNAPSHOT</version>
-        </dependency>
-
+		<dependency>
+			<groupId>org.codehaus.castor</groupId>
+			<artifactId>castor-core</artifactId>
+			<version>1.3-SNAPSHOT</version>
+		</dependency>
 		<dependency>
 			<groupId>org.codehaus.castor</groupId>
 			<artifactId>castor-xml</artifactId>
-			<version>1.2.1-SNAPSHOT</version>
+			<version>1.3-SNAPSHOT</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.codehaus.castor</groupId>
 			<artifactId>castor-codegen</artifactId>
-			<version>1.2.1-SNAPSHOT</version>
+			<version>1.3-SNAPSHOT</version>
 		</dependency>
-
-        <dependency>
-            <groupId>org.codehaus.castor</groupId>
-            <artifactId>castor-testsuite-xml-framework</artifactId>
-            <version>1.2.1-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
-
+		<dependency>
+			<groupId>org.codehaus.castor</groupId>
+			<artifactId>castor-testsuite-xml-framework</artifactId>
+			<version>1.3-SNAPSHOT</version>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>commons-logging</groupId>
 			<artifactId>commons-logging</artifactId>
 			<version>1.1</version>
 		</dependency>
-
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>3.8.1</version>
 			<scope>test</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>xmlunit</groupId>
 			<artifactId>xmlunit</artifactId>
 			<version>1.1</version>
 			<scope>test</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 			<version>1.2.13</version>
 			<scope>test</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>javax.xml.bind</groupId>
 			<artifactId>jaxb-api</artifactId>
 			<version>2.1</version>
 		</dependency>
-
 		<!-- 
 			<dependency>
 			<groupId>javax.xml</groupId>
@@ -191,20 +170,17 @@
 			<version>2.0EA3</version>
 			</dependency>
 		-->
-
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
 			<version>2.5.1</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.easymock</groupId>
 			<artifactId>easymock</artifactId>
 			<version>2.3</version>
 			<scope>test</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>org.easymock</groupId>
 			<artifactId>easymockclassextension</artifactId>
@@ -212,7 +188,6 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
 	<repositories>
 		<repository>
 			<id>Maven</id>
@@ -246,7 +221,6 @@
 			<url>http://snapshots.maven.codehaus.org/maven2/</url>
 		</repository>
 	</repositories>
-
 	<build>
 		<plugins>
 			<plugin>
@@ -315,7 +289,6 @@
 			</plugin>
 		</plugins>
 	</build>
-
 	<reporting>
 		<plugins>
 			<plugin>
@@ -346,12 +319,10 @@
 					</configuration>
 				-->
 			</plugin>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-report-plugin</artifactId>
 			</plugin>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-checkstyle-plugin</artifactId>
@@ -359,7 +330,6 @@
 					<configLocation>src/tools/checkstyle/castor-main-checks.xml</configLocation>
 				</configuration>
 			</plugin>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-pmd-plugin</artifactId>
@@ -375,7 +345,6 @@
 					<minimumTokens>100</minimumTokens>
 				</configuration>
 			</plugin>
-
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>changes-maven-plugin</artifactId>
@@ -387,12 +356,10 @@
 					</reportSet>
 				</reportSets>
 			</plugin>
-
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>changelog-maven-plugin</artifactId>
 			</plugin>
-
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>taglist-maven-plugin</artifactId>
@@ -406,8 +373,6 @@
 					</tags>
 				</configuration>
 			</plugin>
-
-
 			<!-- 
 				<plugin> 
 				<artifactId>maven-clover-plugin</artifactId>
@@ -434,5 +399,3 @@
 		</plugins>
 	</reporting>
 </project>
-
-

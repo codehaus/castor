@@ -185,4 +185,12 @@ public class ClassDescriptorBuilderTest extends TestCase {
         Assert.assertNull("Without XmlElement no element name is set", fis.get(1).getElementName());
         Assert.assertEquals("NamedAttribute", fis.get(1).getAttributeName());
     }
+    
+    public final void testEnumAnnotations() {
+        //Assert.fail("Not yet implemented!");
+    }
+    
+    public final void testXmlEnumAnnotations() {
+        //Assert.fail("Not yet implemented!");
+    }
 }

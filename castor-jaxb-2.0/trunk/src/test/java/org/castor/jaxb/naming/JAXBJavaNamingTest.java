@@ -218,9 +218,13 @@ public class JAXBJavaNamingTest extends TestCase {
      * @see org.castor.xml.JavaNaming#extractFieldNameFromField(java.lang.reflect.Field)
      */
     public void testExtractFieldNameFromField() {
-// @TODO enable after Caster has been adapted        Assert.assertNull(_javaNaming.extractFieldNameFromField(null));
+        Assert.assertNull(_javaNaming.extractFieldNameFromField(null));
         Assert.assertEquals(
                 "withLeadingUnderscore", _javaNaming.extractFieldNameFromField(_fieldWithLeadingUnderscore));
     }
 
+    public void testGetClassName() {
+        Assert.assertEquals("JAXBJavaNamingTest", _javaNaming.getClassName(JAXBJavaNamingTest.class));
+        Assert.assertEquals("JAXBJavaNamingTest$SampleClass", _javaNaming.getClassName(SampleClass.class));
+    }
 }
