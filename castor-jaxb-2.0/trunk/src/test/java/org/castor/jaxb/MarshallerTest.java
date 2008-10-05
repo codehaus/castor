@@ -3,6 +3,11 @@ package org.castor.jaxb;
 import java.io.StringWriter;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
@@ -133,4 +138,60 @@ public class MarshallerTest extends TestCase {
         assertTrue(xml.length() > 0);
     }
 
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "", propOrder = {
+        "stageName",
+        "firstName",
+        "lastName"
+    })
+    @XmlRootElement(name = "artist")
+    private class Artist {
+
+        @XmlElement(name = "stage-name")
+        protected String stageName;
+        @XmlElement(name = "first-name")
+        protected String firstName;
+        @XmlElement(name = "last-name")
+        protected String lastName;
+
+        public String getStageName() {
+            return stageName;
+        }
+
+        public void setStageName(String value) {
+            this.stageName = value;
+        }
+
+        public String getFirstName() {
+            return firstName;
+        }
+
+        public void setFirstName(String value) {
+            this.firstName = value;
+        }
+
+        public String getLastName() {
+            return lastName;
+        }
+
+        public void setLastName(String value) {
+            this.lastName = value;
+        }
+    }
+
+    public void testMarshalArtist() throws JAXBException {
+javax.xml.bind.JAXBContext context = JAXBContext.newInstance(Artist.class);
+javax.xml.bind.Marshaller marshaller = context.createMarshaller();
+
+StringWriter out = new StringWriter();
+
+Artist a = new Artist();
+a.setStageName("Falco");
+a.setFirstName("Hans");
+a.setLastName("Hšlzel");
+
+marshaller.marshal(a, out);
+
+System.out.println(out.toString());
+    }
 }

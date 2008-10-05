@@ -40,7 +40,7 @@ public class JAXBXmlNaming implements XMLNaming {
     /**
      * The Castor implementation of XMLNaming.
      */
-    private XMLNaming _castorImplementation = new DefaultNaming();
+    private XMLNaming _castorXmlNaming = new DefaultNaming();
     
     /**
      * {@inheritDoc}

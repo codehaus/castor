@@ -33,14 +33,14 @@ public class JAXBJavaNaming implements JavaNaming {
      * For all stuff that doesn't differ from Castor implementation this
      * class delegates to it.
      */
-    private JavaNaming _javaNaming = new JavaNamingImpl();
+    private JavaNaming _castorJavaNaming = new JavaNamingImpl();
 
     /**
      * {@inheritDoc}
      * @see org.castor.xml.JavaNaming#extractFieldNameFromMethod(java.lang.reflect.Method)
      */
     public String extractFieldNameFromMethod(final Method method) {
-        return _javaNaming.extractFieldNameFromMethod(method);
+        return _castorJavaNaming.extractFieldNameFromMethod(method);
     }
 
     /**
@@ -48,7 +48,7 @@ public class JAXBJavaNaming implements JavaNaming {
      * @see org.castor.xml.JavaNaming#getAddMethodNameForField(java.lang.String)
      */
     public String getAddMethodNameForField(final String fieldName) {
-        return _javaNaming.getAddMethodNameForField(fieldName);
+        return _castorJavaNaming.getAddMethodNameForField(fieldName);
     }
 
     /**
@@ -56,7 +56,7 @@ public class JAXBJavaNaming implements JavaNaming {
      * @see org.castor.xml.JavaNaming#getCreateMethodNameForField(java.lang.String)
      */
     public String getCreateMethodNameForField(final String fieldName) {
-        return _javaNaming.getCreateMethodNameForField(fieldName);
+        return _castorJavaNaming.getCreateMethodNameForField(fieldName);
     }
 
     /**
@@ -64,7 +64,7 @@ public class JAXBJavaNaming implements JavaNaming {
      * @see org.castor.xml.JavaNaming#getGetMethodNameForField(java.lang.String)
      */
     public String getGetMethodNameForField(final String fieldName) {
-        return _javaNaming.getGetMethodNameForField(fieldName);
+        return _castorJavaNaming.getGetMethodNameForField(fieldName);
     }
 
     /**
@@ -72,7 +72,7 @@ public class JAXBJavaNaming implements JavaNaming {
      * @see org.castor.xml.JavaNaming#getIsMethodNameForField(java.lang.String)
      */
     public String getIsMethodNameForField(final String fieldName) {
-        return _javaNaming.getIsMethodNameForField(fieldName);
+        return _castorJavaNaming.getIsMethodNameForField(fieldName);
     }
 
     /**
@@ -80,7 +80,7 @@ public class JAXBJavaNaming implements JavaNaming {
      * @see org.castor.xml.JavaNaming#getPackageName(java.lang.String)
      */
     public String getPackageName(final String className) {
-        return _javaNaming.getPackageName(className);
+        return _castorJavaNaming.getPackageName(className);
     }
 
     /**
@@ -88,7 +88,7 @@ public class JAXBJavaNaming implements JavaNaming {
      * @see org.castor.xml.JavaNaming#getQualifiedFileName(java.lang.String, java.lang.String)
      */
     public String getQualifiedFileName(final String fileName, final String packageName) {
-        return _javaNaming.getQualifiedFileName(fileName, packageName);
+        return _castorJavaNaming.getQualifiedFileName(fileName, packageName);
     }
 
     /**
@@ -96,7 +96,7 @@ public class JAXBJavaNaming implements JavaNaming {
      * @see org.castor.xml.JavaNaming#getSetMethodNameForField(java.lang.String)
      */
     public String getSetMethodNameForField(final String fieldName) {
-        return _javaNaming.getSetMethodNameForField(fieldName);
+        return _castorJavaNaming.getSetMethodNameForField(fieldName);
     }
 
     /**
@@ -104,7 +104,7 @@ public class JAXBJavaNaming implements JavaNaming {
      * @see org.castor.xml.JavaNaming#isAddMethod(java.lang.reflect.Method)
      */
     public boolean isAddMethod(final Method method) {
-        return _javaNaming.isAddMethod(method);
+        return _castorJavaNaming.isAddMethod(method);
     }
 
     /**
@@ -112,7 +112,7 @@ public class JAXBJavaNaming implements JavaNaming {
      * @see org.castor.xml.JavaNaming#isCreateMethod(java.lang.reflect.Method)
      */
     public boolean isCreateMethod(final Method method) {
-        return _javaNaming.isCreateMethod(method);
+        return _castorJavaNaming.isCreateMethod(method);
     }
 
     /**
@@ -120,7 +120,7 @@ public class JAXBJavaNaming implements JavaNaming {
      * @see org.castor.xml.JavaNaming#isGetMethod(java.lang.reflect.Method)
      */
     public boolean isGetMethod(final Method method) {
-        return _javaNaming.isGetMethod(method);
+        return _castorJavaNaming.isGetMethod(method);
     }
 
     /**
@@ -128,7 +128,7 @@ public class JAXBJavaNaming implements JavaNaming {
      * @see org.castor.xml.JavaNaming#isIsMethod(java.lang.reflect.Method)
      */
     public boolean isIsMethod(final Method method) {
-        return _javaNaming.isIsMethod(method);
+        return _castorJavaNaming.isIsMethod(method);
     }
 
     /**
@@ -136,7 +136,7 @@ public class JAXBJavaNaming implements JavaNaming {
      * @see org.castor.xml.JavaNaming#isKeyword(java.lang.String)
      */
     public boolean isKeyword(final String name) {
-        return _javaNaming.isKeyword(name);
+        return _castorJavaNaming.isKeyword(name);
     }
 
     /**
@@ -144,7 +144,7 @@ public class JAXBJavaNaming implements JavaNaming {
      * @see org.castor.xml.JavaNaming#isSetMethod(java.lang.reflect.Method)
      */
     public boolean isSetMethod(final Method method) {
-        return _javaNaming.isSetMethod(method);
+        return _castorJavaNaming.isSetMethod(method);
     }
 
     /**
@@ -152,7 +152,7 @@ public class JAXBJavaNaming implements JavaNaming {
      * @see org.castor.xml.JavaNaming#isValidJavaIdentifier(java.lang.String)
      */
     public boolean isValidJavaIdentifier(final String string) {
-        return _javaNaming.isValidJavaIdentifier(string);
+        return _castorJavaNaming.isValidJavaIdentifier(string);
     }
 
     /**
@@ -160,7 +160,7 @@ public class JAXBJavaNaming implements JavaNaming {
      * @see org.castor.xml.JavaNaming#isValidPackageName(java.lang.String)
      */
     public boolean isValidPackageName(final String packageName) {
-        return _javaNaming.isValidPackageName(packageName);
+        return _castorJavaNaming.isValidPackageName(packageName);
     }
 
     /**
@@ -168,7 +168,7 @@ public class JAXBJavaNaming implements JavaNaming {
      * @see org.castor.xml.JavaNaming#packageToPath(java.lang.String)
      */
     public String packageToPath(final String packageName) {
-        return _javaNaming.packageToPath(packageName);
+        return _castorJavaNaming.packageToPath(packageName);
     }
 
     /**
@@ -176,7 +176,7 @@ public class JAXBJavaNaming implements JavaNaming {
      * @see org.castor.xml.JavaNaming#toJavaClassName(java.lang.String)
      */
     public String toJavaClassName(final String name) {
-        return _javaNaming.toJavaClassName(name);
+        return _castorJavaNaming.toJavaClassName(name);
     }
 
     /**
@@ -184,7 +184,7 @@ public class JAXBJavaNaming implements JavaNaming {
      * @see org.castor.xml.JavaNaming#toJavaMemberName(java.lang.String)
      */
     public String toJavaMemberName(final String name) {
-        return _javaNaming.toJavaMemberName(name);
+        return _castorJavaNaming.toJavaMemberName(name);
     }
 
     /**
@@ -192,7 +192,7 @@ public class JAXBJavaNaming implements JavaNaming {
      * @see org.castor.xml.JavaNaming#toJavaMemberName(java.lang.String, boolean)
      */
     public String toJavaMemberName(final String name, final boolean useKeywordSubstitutions) {
-        return _javaNaming.toJavaMemberName(name, useKeywordSubstitutions);
+        return _castorJavaNaming.toJavaMemberName(name, useKeywordSubstitutions);
     }
 
     /**
@@ -200,7 +200,7 @@ public class JAXBJavaNaming implements JavaNaming {
      * @see org.castor.xml.JavaNaming#extractFieldNameFromField(java.lang.reflect.Field)
      */
     public String extractFieldNameFromField(final Field field) {
-        return _javaNaming.extractFieldNameFromField(field);
+        return _castorJavaNaming.extractFieldNameFromField(field);
     }
 
     /**
@@ -208,6 +208,6 @@ public class JAXBJavaNaming implements JavaNaming {
      * @see org.castor.xml.JavaNaming#getClassName(java.lang.Class)
      */
     public String getClassName(final Class clazz) {
-        return _javaNaming.getClassName(clazz);
+        return _castorJavaNaming.getClassName(clazz);
     }
 }
