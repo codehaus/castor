@@ -44,12 +44,12 @@ import org.exolab.castor.xml.XMLContext;
 
 /**
  * The JAXB context to use Castor for JAXB. This is where all further JAXB work
- * starts. The characteristics of JAXBContext are:
- * <li>it is (more or less) immutable; once created with newInstance no classes
- * or packages can be added; as always there is an exception: a class migth get
- * added during (un-)marshalling as it is encounted</li>
- * <li>Marshaller and Unmarshaller can only be instatiated using a context</li>
- * <li>It is the center piece to start with JAXB</li>
+ * starts. The characteristics of JAXBContext are: <li>it is (more or less)
+ * immutable; once created with newInstance no classes or packages can be added;
+ * as always there is an exception: a class migth get added during
+ * (un-)marshalling as it is encounted</li> <li>Marshaller and Unmarshaller can
+ * only be instatiated using a context</li> <li>It is the center piece to start
+ * with JAXB</li>
  * 
  * @author Joachim Grueneis, jgrueneis AT codehaus DOT org
  * @version $Id$
@@ -66,42 +66,48 @@ public final class JAXBContext extends javax.xml.bind.JAXBContext {
     private JAXBContext() {
         super();
         LOG.debug("Creating JAXBContext");
-        
+
         _xmlContext = new XMLContext();
         InternalContext internalContext = _xmlContext.getInternalContext();
 
         JavaNaming javaNaming = new JAXBJavaNaming();
         XMLNaming xmlNaming = new JAXBXmlNaming();
-        
+
         internalContext.setJavaNaming(javaNaming);
-        LOG.debug("JAXBContext: JavaNaming in use: " + javaNaming.getClass().getCanonicalName());
+        LOG.debug("JAXBContext: JavaNaming in use: "
+                + javaNaming.getClass().getCanonicalName());
         internalContext.setXMLNaming(xmlNaming);
-        LOG.debug("JAXBContext: XMLNaming in use: " + xmlNaming.getClass().getCanonicalName());
-        
+        LOG.debug("JAXBContext: XMLNaming in use: "
+                + xmlNaming.getClass().getCanonicalName());
+
         ClassDescriptorBuilder cdb = new ClassDescriptorBuilder();
         cdb.setXMLNaming(xmlNaming);
-        
+
         ClassInfoBuilder cib = new ClassInfoBuilder();
         cib.setJavaNaming(javaNaming);
-        
+
         JAXBPackageResolverCommand packageResolverCommand = new JAXBPackageResolverCommand();
-        
+
         JAXBClassResolverCommand classResolverCommand = new JAXBClassResolverCommand();
         classResolverCommand.setClassDescriptorBuilder(cdb);
         classResolverCommand.setClassInfoBuilder(cib);
-        
+
         JAXBResolverStrategy resolverStrategy = new JAXBResolverStrategy();
         resolverStrategy.setClassResolverCommand(classResolverCommand);
         resolverStrategy.setPackageResolverCommand(packageResolverCommand);
-        
-        internalContext.setResolverStrategy(resolverStrategy);
-        
-        // this is ugly but required... for hell of backward compatibility
-        internalContext.getXMLClassDescriptorResolver().setResolverStrategy(resolverStrategy);
 
-        LOG.debug("JAXBContext: ClassResolverCommand in use: " + classResolverCommand.getClass().getCanonicalName());
-        LOG.debug("JAXBContext: PackageResolverCommand in use: " + packageResolverCommand.getClass().getCanonicalName());
-        LOG.debug("JAXBContext: ResolverStrategy in use: " + resolverStrategy.getClass().getCanonicalName());
+        internalContext.setResolverStrategy(resolverStrategy);
+
+        // this is ugly but required... for hell of backward compatibility
+        internalContext.getXMLClassDescriptorResolver().setResolverStrategy(
+                resolverStrategy);
+
+        LOG.debug("JAXBContext: ClassResolverCommand in use: "
+                + classResolverCommand.getClass().getCanonicalName());
+        LOG.debug("JAXBContext: PackageResolverCommand in use: "
+                + packageResolverCommand.getClass().getCanonicalName());
+        LOG.debug("JAXBContext: ResolverStrategy in use: "
+                + resolverStrategy.getClass().getCanonicalName());
     }
 
     /**
@@ -116,12 +122,12 @@ public final class JAXBContext extends javax.xml.bind.JAXBContext {
      * @throws JAXBException
      *             creating the new context failed
      */
-    public static javax.xml.bind.JAXBContext newInstance(final String contextPath) 
-    throws JAXBException {
+    public static javax.xml.bind.JAXBContext newInstance(
+            final String contextPath) throws JAXBException {
         if ((contextPath == null) || (contextPath.length() == 0)) {
-            final String message = new StringBuffer()
-                    .append("No context path specified - contextPath: ")
-                    .append(contextPath).toString();
+            final String message = new StringBuffer().append(
+                    "No context path specified - contextPath: ").append(
+                    contextPath).toString();
             LOG.warn(message);
             throw new IllegalArgumentException(message);
         }
@@ -145,11 +151,12 @@ public final class JAXBContext extends javax.xml.bind.JAXBContext {
      *             creating the new context failed
      */
     public static javax.xml.bind.JAXBContext newInstance(
-            final String contextPath, final ClassLoader contextPathCL) 
-    throws JAXBException {
+            final String contextPath, final ClassLoader contextPathCL)
+            throws JAXBException {
         if ((contextPath == null) || (contextPath.length() == 0)) {
-            String message = new StringBuffer().append("No context path specified - contextPath: ")
-                    .append(contextPath).toString();
+            String message = new StringBuffer().append(
+                    "No context path specified - contextPath: ").append(
+                    contextPath).toString();
             LOG.warn(message);
             throw new IllegalArgumentException(message);
         }
@@ -177,13 +184,12 @@ public final class JAXBContext extends javax.xml.bind.JAXBContext {
      *             creating the new context failed
      */
     public static javax.xml.bind.JAXBContext newInstance(
-            final String contextPath, 
-            final ClassLoader contextPathCL, 
-            final Map < String, ? > properties) 
-    throws JAXBException {
+            final String contextPath, final ClassLoader contextPathCL,
+            final Map<String, ?> properties) throws JAXBException {
         if ((contextPath == null) || (contextPath.length() == 0)) {
-            String message = new StringBuffer().append("No context path specified - contextPath: ")
-                    .append(contextPath).toString();
+            String message = new StringBuffer().append(
+                    "No context path specified - contextPath: ").append(
+                    contextPath).toString();
             LOG.warn(message);
             throw new IllegalArgumentException(message);
         }
@@ -207,18 +213,19 @@ public final class JAXBContext extends javax.xml.bind.JAXBContext {
      *             in case that checking the classes fails
      */
     public static javax.xml.bind.JAXBContext newInstance(
-            final Class < ? > ... classesToBeBound)
-    throws JAXBException {
+            final Class<?>... classesToBeBound) throws JAXBException {
         if (classesToBeBound == null) {
-            String message = new StringBuffer().append("No classes specified - classesToBeBound: ")
-                    .append(classesToBeBound).toString();
+            String message = new StringBuffer().append(
+                    "No classes specified - classesToBeBound: ").append(
+                    classesToBeBound).toString();
             LOG.warn(message);
             throw new IllegalArgumentException(message);
         }
 
         if (classesToBeBound.length == 0) {
-            String message = new StringBuffer().append("No classes specified - classesToBeBound: ")
-                    .append(classesToBeBound).toString();
+            String message = new StringBuffer().append(
+                    "No classes specified - classesToBeBound: ").append(
+                    classesToBeBound).toString();
             LOG.warn(message);
             throw new IllegalArgumentException(message);
         }
@@ -241,19 +248,20 @@ public final class JAXBContext extends javax.xml.bind.JAXBContext {
      *             in case that initialization fails
      */
     public static javax.xml.bind.JAXBContext newInstance(
-            final Class < ? > [] classesToBeBound, 
-            final Map < String, ? > properties)
-    throws JAXBException {
+            final Class<?>[] classesToBeBound, final Map<String, ?> properties)
+            throws JAXBException {
         if (classesToBeBound == null) {
-            String message = new StringBuffer().append("No classes specified - classesToBeBound: ")
-                    .append(classesToBeBound).toString();
+            String message = new StringBuffer().append(
+                    "No classes specified - classesToBeBound: ").append(
+                    classesToBeBound).toString();
             LOG.warn(message);
             throw new IllegalArgumentException(message);
         }
 
         if (classesToBeBound.length == 0) {
-            String message = new StringBuffer().append("No classes specified - classesToBeBound: ")
-                    .append(classesToBeBound).toString();
+            String message = new StringBuffer().append(
+                    "No classes specified - classesToBeBound: ").append(
+                    classesToBeBound).toString();
             LOG.warn(message);
             throw new IllegalArgumentException(message);
         }
@@ -266,23 +274,28 @@ public final class JAXBContext extends javax.xml.bind.JAXBContext {
 
     /**
      * To set the class loader to use with this context instance.
-     * @param contextPathCL the class loader to use
+     * 
+     * @param contextPathCL
+     *            the class loader to use
      */
     private void setClassLoader(final ClassLoader contextPathCL) {
         LOG.warn("setClassLoader is not yet implemented!!");
-        // TODO Auto-generated method stub
     }
 
     /**
      * Adds a package to the known classes of this context.
-     * @param packageName the name (String) of the package to add
-     * @throws JAXBException in case that adding the package fails
+     * 
+     * @param packageName
+     *            the name (String) of the package to add
+     * @throws JAXBException
+     *             in case that adding the package fails
      */
     private void addPackage(final String packageName) throws JAXBException {
         try {
             _xmlContext.addPackage(packageName);
         } catch (ResolverException e) {
-            String message = "Failed to add classes to context with exception: " + e;
+            String message = "Failed to add classes to context with exception: "
+                    + e;
             LOG.warn(message);
             throw new JAXBException(message, e);
         }
@@ -290,23 +303,31 @@ public final class JAXBContext extends javax.xml.bind.JAXBContext {
 
     /**
      * TO add an array of classes to the known classes of this context.
-     * @param classesToBeBound the classes to add
-     * @throws JAXBException in case that the classes cannot be used
+     * 
+     * @param classesToBeBound
+     *            the classes to add
+     * @throws JAXBException
+     *             in case that the classes cannot be used
      */
-    private void addClasses(final Class < ? > [] classesToBeBound) throws JAXBException {
+    private void addClasses(final Class<?>[] classesToBeBound)
+            throws JAXBException {
         try {
             _xmlContext.addClasses(classesToBeBound);
         } catch (ResolverException e) {
-            String message = "Failed to add classes to context with exception: " + e;
+            String message = "Failed to add classes to context with exception: "
+                    + e;
             LOG.warn(message);
             throw new JAXBException(message, e);
         }
     }
-    
+
     /**
      * Loads all descriptors of the Castor mapping as known class-XML mappings.
-     * @param mapping the Castor mappings to load
-     * @throws JAXBException in case loading of mapping failed
+     * 
+     * @param mapping
+     *            the Castor mappings to load
+     * @throws JAXBException
+     *             in case loading of mapping failed
      */
     public void loadMapping(final Mapping mapping) throws JAXBException {
         try {
@@ -320,38 +341,47 @@ public final class JAXBContext extends javax.xml.bind.JAXBContext {
 
     /**
      * To set properties received by newinstance.
-     * @param properties a Map of properties
+     * 
+     * @param properties
+     *            a Map of properties
      */
-    private void setProperties(final Map < String, ? > properties) {
-//        _xmlContext.setProperties(properties);
+    private void setProperties(final Map<String, ?> properties) {
+        // _xmlContext.setProperties(properties);
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see javax.xml.bind.JAXBContext#createMarshaller()
      */
     @Override
     public Marshaller createMarshaller() throws JAXBException {
-        org.exolab.castor.xml.Marshaller castorMarshaller = _xmlContext.createMarshaller();
-        org.castor.jaxb.Marshaller m = new org.castor.jaxb.Marshaller(castorMarshaller);
+        org.exolab.castor.xml.Marshaller castorMarshaller = _xmlContext
+                .createMarshaller();
+        org.castor.jaxb.Marshaller m = new org.castor.jaxb.Marshaller(
+                castorMarshaller);
         m.setInternalContext(_xmlContext.getInternalContext());
         return m;
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see javax.xml.bind.JAXBContext#createUnmarshaller()
      */
     @Override
     public Unmarshaller createUnmarshaller() throws JAXBException {
-        org.exolab.castor.xml.Unmarshaller castorUnmarshaller = _xmlContext.createUnmarshaller();
-        org.castor.jaxb.Unmarshaller u = new org.castor.jaxb.Unmarshaller(castorUnmarshaller);
+        org.exolab.castor.xml.Unmarshaller castorUnmarshaller = _xmlContext
+                .createUnmarshaller();
+        org.castor.jaxb.Unmarshaller u = new org.castor.jaxb.Unmarshaller(
+                castorUnmarshaller);
         u.setInternalContext(_xmlContext.getInternalContext());
         return u;
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see javax.xml.bind.JAXBContext#createValidator()
      */
     @Override
@@ -361,32 +391,36 @@ public final class JAXBContext extends javax.xml.bind.JAXBContext {
 
     /**
      * {@inheritDoc}
+     * 
      * @see javax.xml.bind.JAXBContext#createJAXBIntrospector()
      */
     public JAXBIntrospector createJAXBIntrospector() {
         org.castor.jaxb.JAXBIntrospector ji = new org.castor.jaxb.JAXBIntrospector();
-//        ji.setClassDescriptorResolver(_classDescriptorResolver);
+        // ji.setClassDescriptorResolver(_classDescriptorResolver);
         return ji;
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see javax.xml.bind.JAXBContext#createBinder(java.lang.Class)
      */
-    public < T > Binder < T  > createBinder(final Class < T > domType) {
+    public <T> Binder<T> createBinder(final Class<T> domType) {
         throw new UnsupportedOperationException();
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see javax.xml.bind.JAXBContext#createBinder()
      */
-    public Binder < org.w3c.dom.Node > createBinder() {
+    public Binder<org.w3c.dom.Node> createBinder() {
         throw new UnsupportedOperationException();
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see javax.xml.bind.JAXBContext#generateSchema(javax.xml.bind.SchemaOutputResolver)
      */
     public void generateSchema(final SchemaOutputResolver schemaOutputResolver) {

@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import org.exolab.castor.builder.AnnotationBuilder;
 import org.exolab.castor.builder.info.ClassInfo;
 import org.exolab.castor.builder.info.FieldInfo;
-import org.exolab.castor.builder.info.XMLInfo;
+import org.exolab.castor.builder.info.NodeType;
 import org.exolab.castor.builder.info.nature.XMLInfoNature;
 import org.exolab.castor.builder.types.XSId;
 import org.exolab.castor.builder.types.XSIdRef;
@@ -140,7 +140,7 @@ public class Jaxb2AnnotationBuilder implements AnnotationBuilder {
         XMLInfoNature xmlNature = new XMLInfoNature(fieldInfo);
         
         // @XmlElement
-        if (xmlNature.getNodeType() == XMLInfo.ELEMENT_TYPE
+        if (xmlNature.getNodeType() == NodeType.ELEMENT
                 && !xmlNature.isMultivalued()) {
             JAnnotationType annotationType = new JAnnotationType("XmlElement");
             JAnnotation annotation = new JAnnotation(annotationType);
@@ -155,7 +155,7 @@ public class Jaxb2AnnotationBuilder implements AnnotationBuilder {
         }
 
         // @XmlAttribute
-        else if (xmlNature.getNodeType() == XMLInfo.ATTRIBUTE_TYPE) {
+        else if (xmlNature.getNodeType() == NodeType.ATTRIBUTE) {
             JAnnotationType annotationType = new JAnnotationType("XmlAttribute");
             JAnnotation annotation = new JAnnotation(annotationType);
             annotation.setElementValue("name", "\"" + xmlNature.getNodeName()
