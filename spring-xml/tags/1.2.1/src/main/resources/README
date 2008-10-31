@@ -1,0 +1,15 @@
+Spring factory beans for CASTOR XML
+===================================
+
+Castor integrates Java objects, XML documents and SQL relational
+databases in a unified model that allows information to be exchanged, 
+persisted and manipulated in a variety of ways.
+
+This project provides the user of Castor with Spring factory beans for Castor XML 
+components such as the (Un)Marshaller and obtaining a shared ClassDescriptorResolver 
+instance, and  wiring them together.
+
+More information is available at http://castor.codehaus.org
+
+
+

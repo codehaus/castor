@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+<!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Mapping DTD Version 1.0//EN"
+                           "http://castor.exolab.org/mapping.dtd">
+<mapping>
+
+   <!--  Mapping for Product  -->
+   <class name="org.castor.spring.xml.entity.Product" identity="id">
+      <map-to xml="product" ns-prefix="p" ns-uri="http://castor.org/test/product" />
+      <field name="id" type="integer">
+         <bind-xml name="id" node="element" />
+      </field>
+      <field name="name" type="string">
+         <bind-xml name="name" node="element" />
+      </field>
+      <field name="category" type="org.castor.spring.xml.entity.ProductCategory">
+         <bind-xml name="category" />
+      </field>
+   </class>
+
+   <!--  Mapping for Product  -->
+   <class name="org.castor.spring.xml.entity.ProductCategory" identity="id">
+      <map-to xml="product-category" ns-prefix="p" ns-uri="http://castor.org/test/product" />
+      <field name="id" type="long">
+         <bind-xml name="id" node="element" />
+      </field>
+      <field name="description" type="string">
+         <bind-xml name="description" node="element" />
+      </field>
+   </class>
+
+</mapping>
+

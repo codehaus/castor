@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+
+   <!--  XML context configuration -->
+   <bean id="xmlContext" class="org.castor.spring.xml.XMLContextFactoryBean">
+      <property name="mappingLocations">
+         <list>
+            <value>mapping-partial.xml</value>
+         </list>
+      </property>
+      <property name="classes">
+         <list>
+            <value>org.castor.spring.xml.entity.ProductCategory</value>
+         </list>
+      </property>
+      <property name="castorProperties">
+         <props>
+            <prop key="org.exolab.castor.indent">true</prop>
+         </props>
+      </property>
+   </bean>
+
+   <!--  common parent configuration for un- and marshaller instances -->
+   <bean id="castorXMLFactoryBean" abstract="true">
+      <property name="xmlContext">
+         <ref local="xmlContext" />
+      </property>
+   </bean>
+
+   <!--  (primary) marshaller configuration -->
+   <bean id="marshaller" class="org.castor.spring.xml.CastorMarshallerFactoryBean"
+      parent="castorXMLFactoryBean" />
+
+   <!--  alternative marshaller configuration -->
+   <bean id="marshaller-suppress"
+      class="org.castor.spring.xml.CastorMarshallerFactoryBean"
+      parent="castorXMLFactoryBean">
+      <property name="suppressNamespaces" value="true" />
+   </bean>
+
+   <!--  Unmarshaller configuration -->
+   <bean id="unmarshaller" class="org.castor.spring.xml.CastorUnmarshallerFactoryBean"
+      parent="castorXMLFactoryBean" />
+
+
+</beans>
