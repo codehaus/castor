@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<document url="http://castor.codehaus.org/download.xml">
+
+    <properties>
+        <title>The CastorMarshaller properties</title>
+        <author email="werner DOT guttmann AT gmx DOT net">Werner Guttmann</author>
+        <abstract>
+            Outlines the available properties on the CastorMarshallerFactoryBean
+        </abstract>
+        <status>Final</status>
+    </properties>
+
+    <body>
+        <title>The CastorMarhallerFactoryBean properties</title>
+
+        <section name="Prerequisites">
+        
+        	<p>The following sections assume that you are familiar with configuring and 
+        	   using the <tt>CastorMarshallerFactoryBean</tt> in your Spring application 
+        	   context, as explained elsewhere.</p>
+        	   
+       	</section>
+        	   
+        <section name="Basics">
+
+            <p>The basic bean definition for obtaining a Castor XML marshaller 
+               is as follows:</p>
+            
+            <source><![CDATA[
+<bean id="resolver" class="org.castor.spring.xml.CastorResolverFactoryBean"/>
+
+<bean id="marshaller"
+      class="org.castor.spring.xml.CastorMarshallerFactoryBean">
+   <property name="resolver"><ref local="resolver"/></property>
+</bean>
+            ]]></source>
+            
+            <p>Based upon this configuration, you will be able to obtain a <tt>Marshaller</tt> 
+               instance as follows:</p>
+            
+            <source>
+ApplicationContext context = ....;
+Marshaller marshaller = (Marshaller) this.context.getBean("marshaller");            
+            </source>
+
+	   </section>
+	   
+	   <section name="Available properties">
+	   
+	   		<p>In order to fine-tune the workings of the Castor XML marshaller, you can 
+	   		   set values for the following properties on the 
+	   		   <tt>CastorMarshallerFactoryBean</tt>. Please follow the HTML links on the 
+	   		   property names for a more detailed description of each property, as explained 
+	   		   in the Castor XML product documentation.
+	   		   </p>
+	   		   
+	   		<table>
+	   			<tr>
+	   				<th>Name</th>
+	   				<th>Description</th>
+	   				<th>Default value</th>
+	   				<th>Since</th>
+	   			</tr>
+	   			<tr>
+	   				<td>marshalAsDocument</td>
+	   				<td>Indicates whether or not to marshal as a complete document or not</td>
+	   				<td>True</td>
+	   				<td>0.9</td>
+	   			</tr>
+	   			<tr>
+	   				<td>marshalExtendedType</td>
+	   				<td>Indicates whether or not to use xsi:type</td>
+	   				<td>True</td>
+	   				<td>0.9</td>
+	   			</tr>
+	   			<tr>
+	   				<td>noNamespaceSchemaLocation</td>
+	   				<td>Value for the xsi:noNamespaceSchemaLocation attribute</td>
+	   				<td>-</td>
+	   				<td>0.9</td>
+	   			</tr>
+	   			<tr>
+	   				<td>rootElement</td>
+	   				<td>Name of the root element to use</td>
+	   				<td>-</td>
+	   				<td>0.9</td>
+	   			</tr>
+	   			<tr>
+	   				<td>schemaLocation</td>
+	   				<td>Value for the xsi:schemaLocation attribute</td>
+	   				<td>-</td>
+	   				<td>0.9</td>
+	   			</tr>
+	   			<tr>
+	   				<td>suppressNamespaces</td>
+	   				<td>Suppresses any namepspaces to be output.</td>
+	   				<td>false</td>
+	   				<td>0.9</td>
+	   			</tr>
+	   			<tr>
+	   				<td>suppressXSIType</td>
+	   				<td>Indicates whether to suppress the xsi:type attribute</td>
+	   				<td>false</td>
+	   				<td>0.9</td>
+	   			</tr>
+	   			<tr>
+	   				<td>suppressXMLDeclaration</td>
+	   				<td>Indicates whether to suppress the XML declaration</td>
+	   				<td>false</td>
+	   				<td>0.9</td>
+	   			</tr>
+	   			<tr>
+	   				<td>useXSITypeAtRoot</td>
+	   				<td>Indicates whether to use xsi:type attributes at the root</td>
+	   				<td>false</td>
+	   				<td>0.9</td>
+	   			</tr>
+	   			<tr>
+	   				<td>validation</td>
+	   				<td>Indicates whether to enable validation</td>
+	   				<td>true</td>
+	   				<td>0.9</td>
+	   			</tr>
+	   		</table>
+	   		
+	   		<p>To e.g. set the <tt>suppressNamespaces</tt> property to a value of 
+	   		   <tt>false</tt>, please add the following property definiton to above
+	   		   bean definition for the <tt>CastorMarshallerFactoryBean</tt>:</p>
+	   		   
+	   		<source>
+&lt;propery name="suppressNamespaces" value="true" /&gt;
+			</source>
+	   			
+	   </section>
+
+
+  </body>
+</document>
+
+
+
