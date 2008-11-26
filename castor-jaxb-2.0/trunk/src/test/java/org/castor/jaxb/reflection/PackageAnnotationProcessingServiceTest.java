@@ -44,8 +44,7 @@ public class PackageAnnotationProcessingServiceTest extends TestCase {
     }
     
     /**
-     * Test method for {@link org.castor.jaxb.reflection
-     * .AnnotationProcessingService#processAnnotations(org.castor.jaxb.reflection.info.Info, 
+     * Test method for {@link org.castor.jaxb.annoproc.BaseAnnotationProcessingService#processAnnotations(org.castor.jaxb.reflection.info.Info, 
      * java.lang.annotation.Annotation[])}.
      */
     public final void testProcessAnnotations() {
