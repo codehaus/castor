@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.codehaus.castor</groupId>
 	<artifactId>castor-jaxb</artifactId>
@@ -117,22 +118,22 @@
 		<dependency>
 			<groupId>org.codehaus.castor</groupId>
 			<artifactId>castor-core</artifactId>
-			<version>1.3-SNAPSHOT</version>
+			<version>1.3rc2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.codehaus.castor</groupId>
 			<artifactId>castor-xml</artifactId>
-			<version>1.3-SNAPSHOT</version>
+			<version>1.3rc2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.codehaus.castor</groupId>
 			<artifactId>castor-codegen</artifactId>
-			<version>1.3-SNAPSHOT</version>
+			<version>1.3rc2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.codehaus.castor</groupId>
 			<artifactId>castor-testsuite-xml-framework</artifactId>
-			<version>1.3-SNAPSHOT</version>
+			<version>1.3rc2-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -163,11 +164,9 @@
 			<artifactId>jaxb-api</artifactId>
 			<version>2.1</version>
 		</dependency>
-		<!-- 
-			<dependency>
-			<groupId>javax.xml</groupId>
-			<artifactId>jaxb-xjc</artifactId>
-			<version>2.0EA3</version>
+		<!--
+			<dependency> <groupId>javax.xml</groupId>
+			<artifactId>jaxb-xjc</artifactId> <version>2.0EA3</version>
 			</dependency>
 		-->
 		<dependency>
@@ -230,12 +229,12 @@
 					<source>1.5</source>
 					<target>1.5</target>
 					<!--
-						<excludes>
-						<exclude implementation="java.lang.String">SourceGenerator/**</exclude>
-						</excludes>
-						<testExcludes>
-						<exclude implementation="java.lang.String">xml/MasterTestSuite/**</exclude>
-						<exclude implementation="java.lang.String">xml/RegressionTestSuite/**</exclude>
+						<excludes> <exclude
+						implementation="java.lang.String">SourceGenerator/**</exclude>
+						</excludes> <testExcludes> <exclude
+						implementation="java.lang.String">xml/MasterTestSuite/**</exclude>
+						<exclude
+						implementation="java.lang.String">xml/RegressionTestSuite/**</exclude>
 						</testExcludes>
 					-->
 				</configuration>
@@ -303,19 +302,12 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<!--
-					<configuration>
-					<excludes>
+					<configuration> <excludes>
 					<exclude>org/castor/cache/simple/TestTimeLimited.java</exclude>
-					</excludes>
-					<includes>
-					<include>org/exolab/castor/**/Test*.java</include>
-					</includes>
-					<systemProperties>
-					<property>
-					<name>test.category</name>
-					<value>castor.mysql</value>
-					</property>
-					</systemProperties>                    
+					</excludes> <includes>
+					<include>org/exolab/castor/**/Test*.java</include> </includes>
+					<systemProperties> <property> <name>test.category</name>
+					<value>castor.mysql</value> </property> </systemProperties>
 					</configuration>
 				-->
 			</plugin>
@@ -373,16 +365,12 @@
 					</tags>
 				</configuration>
 			</plugin>
-			<!-- 
-				<plugin> 
-				<artifactId>maven-clover-plugin</artifactId>
-				<version>2.1</version>
-				<configuration>          
-				<jdk>1.5</jdk>
-				<cloverDatabase>target/clover-db</cloverDatabase>          
-				<licenseLocation>${basedir}/src/etc/CLOVER.LICENSE</licenseLocation>     
-				</configuration>        
-				</plugin>
+			<!--
+				<plugin> <artifactId>maven-clover-plugin</artifactId>
+				<version>2.1</version> <configuration> <jdk>1.5</jdk>
+				<cloverDatabase>target/clover-db</cloverDatabase>
+				<licenseLocation>${basedir}/src/etc/CLOVER.LICENSE</licenseLocation>
+				</configuration> </plugin>
 			-->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
