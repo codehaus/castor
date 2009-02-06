@@ -5,8 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.xml.util.JDOClassDescriptorResolver;
-import org.exolab.castor.xml.util.JDOClassDescriptorResolverImpl;
+import org.castor.cpa.util.JDOClassDescriptorResolver;
+import org.castor.cpa.util.JDOClassDescriptorResolverImpl;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.FactoryBeanNotInitializedException;
 import org.springframework.beans.factory.InitializingBean;
@@ -23,12 +23,12 @@ public class ClassDescriptorResolverFactoryBean implements FactoryBean,
     /**
      * List of class names.
      */
-    private List classes = new ArrayList();
+    private List<String> classes = new ArrayList<String>();
 
     /**
      * List of packages.
      */
-    private List packages = new ArrayList();
+    private List<String> packages = new ArrayList<String>();
 
     /**
      * Return an instance (possibly shared or independent) of the object managed
@@ -120,16 +120,12 @@ public class ClassDescriptorResolverFactoryBean implements FactoryBean,
         JDOClassDescriptorResolver classDescriptorResolver = new JDOClassDescriptorResolverImpl();
 
         if (!this.packages.isEmpty()) {
-            for (Iterator iterator = this.packages.iterator(); iterator
-                    .hasNext();) {
-                String packageName = (String) iterator.next();
+            for (String  packageName : this.packages) {
                 classDescriptorResolver.addPackage(packageName);
             }
         }
         if (!this.classes.isEmpty()) {
-            for (Iterator iterator = this.classes.iterator(); iterator
-                    .hasNext();) {
-                String className = (String) iterator.next();
+            for (String className : this.classes) {
                 classDescriptorResolver.addClass(Class.forName(className));
             }
         }
@@ -154,7 +150,7 @@ public class ClassDescriptorResolverFactoryBean implements FactoryBean,
      * @param classes
      *                List of classes to be loaded from the file system.
      */
-    public void setClasses(final List classes) {
+    public void setClasses(final List<String> classes) {
         this.classes = classes;
     }
 
@@ -164,7 +160,7 @@ public class ClassDescriptorResolverFactoryBean implements FactoryBean,
      * @param packages
      *                List of packages to be loaded from the file system.
      */
-    public void setPackages(final List packages) {
+    public void setPackages(final List<String> packages) {
         this.packages = packages;
     }
 

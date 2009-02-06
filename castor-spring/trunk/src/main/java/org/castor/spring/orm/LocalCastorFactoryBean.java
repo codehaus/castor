@@ -6,7 +6,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.jdo.JDOManager;
 import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.xml.util.JDOClassDescriptorResolver;
+import org.castor.cpa.util.JDOClassDescriptorResolver;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.FactoryBeanNotInitializedException;
 import org.springframework.beans.factory.InitializingBean;
