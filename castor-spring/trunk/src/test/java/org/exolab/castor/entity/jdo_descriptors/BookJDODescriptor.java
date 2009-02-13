@@ -1,25 +1,27 @@
+package org.exolab.castor.entity.jdo_descriptors;
+
 /*
  * This class was automatically generated with 
- * <a href="http://www.castor.org">Castor 1.2</a>, using an XML
+ * <a href="http://www.castor.org">Castor 1.3rc1</a>, using an XML
  * Schema.
  * $Id$
  */
 
-package org.exolab.castor.entity.jdo_descriptors;
 
   //---------------------------------/
  //- Imported classes and packages -/
 //---------------------------------/
 
 import java.lang.reflect.Method;
-
 import org.castor.jdo.engine.SQLTypeInfos;
 import org.exolab.castor.entity.Book;
-import org.exolab.castor.jdo.engine.JDOFieldDescriptorImpl;
+import org.exolab.castor.jdo.engine.nature.ClassDescriptorJDONature;
+import org.exolab.castor.jdo.engine.nature.FieldDescriptorJDONature;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.mapping.loader.FieldDescriptorImpl;
 import org.exolab.castor.mapping.loader.FieldHandlerImpl;
 import org.exolab.castor.mapping.loader.TypeInfo;
 import org.exolab.castor.mapping.xml.ClassChoice;
@@ -34,7 +36,7 @@ import org.exolab.castor.mapping.xml.types.ClassMappingAccessType;
  * 
  * @version $Revision$ $Date$
  */
-public class BookJDODescriptor extends org.exolab.castor.jdo.engine.JDOClassDescriptorImpl {
+public class BookJDODescriptor extends org.exolab.castor.mapping.loader.ClassDescriptorImpl {
 
 
       //----------------/
@@ -47,10 +49,12 @@ public class BookJDODescriptor extends org.exolab.castor.jdo.engine.JDOClassDesc
         ClassChoice choice = new ClassChoice();
         MapTo mapTo = new MapTo();
         
-        setTableName("book");
+        addNature(ClassDescriptorJDONature.class.getName());
+        ClassDescriptorJDONature jdoNature = new ClassDescriptorJDONature(this);
+        jdoNature.setTableName("book");
         setJavaClass(Book.class);
-        setAccessMode(AccessMode.valueOf("shared"));
-        addCacheParam("name","org.exolab.castor.entity.Book");
+        jdoNature.setAccessMode(AccessMode.valueOf("shared"));
+        jdoNature.addCacheParam("name", "org.exolab.castor.entity.Book");
         
         mapping.setAccess(ClassMappingAccessType.valueOf("shared"));
         mapping.setAutoComplete(true);
@@ -62,7 +66,7 @@ public class BookJDODescriptor extends org.exolab.castor.jdo.engine.JDOClassDesc
         
         //isbn field
         String isbnFieldName = "isbn";
-        JDOFieldDescriptorImpl isbnFieldDescr;
+        FieldDescriptorImpl isbnFieldDescr;
         FieldMapping isbnFM = new FieldMapping();
         TypeInfo isbnType = new TypeInfo(java.lang.Long.class);
         // Set columns required (= not null)
@@ -85,11 +89,15 @@ public class BookJDODescriptor extends org.exolab.castor.jdo.engine.JDOClassDesc
             throw new RuntimeException(e1.getMessage());
         }
         // Instantiate isbn field descriptor
-        isbnFieldDescr = new JDOFieldDescriptorImpl(isbnFieldName, isbnType,
-            isbnHandler, false, new String[] { "isbn" },
-            new int[] {SQLTypeInfos
-                .javaType2sqlTypeNum(java.lang.Long.class) },
-            null, new String[] {}, false, false);
+        isbnFieldDescr = new FieldDescriptorImpl(isbnFieldName, isbnType,isbnHandler, false);
+        isbnFieldDescr.addNature(FieldDescriptorJDONature.class.getName());
+        FieldDescriptorJDONature isbnFieldJdoNature = new FieldDescriptorJDONature(isbnFieldDescr);
+        isbnFieldJdoNature.setSQLName(new String[] { "isbn" });
+        isbnFieldJdoNature.setSQLType(new int[] {SQLTypeInfos.javaType2sqlTypeNum(java.lang.Long.class) });
+        isbnFieldJdoNature.setManyTable(null);
+        isbnFieldJdoNature.setManyKey(new String[] {});
+        isbnFieldJdoNature.setDirtyCheck(false);
+        isbnFieldJdoNature.setReadOnly(false);
         
         isbnFieldDescr.setContainingClassDescriptor(this);
         isbnFieldDescr.setIdentity(true);
@@ -108,7 +116,7 @@ public class BookJDODescriptor extends org.exolab.castor.jdo.engine.JDOClassDesc
         
         //title field
         String titleFieldName = "title";
-        JDOFieldDescriptorImpl titleFieldDescr;
+        FieldDescriptorImpl titleFieldDescr;
         FieldMapping titleFM = new FieldMapping();
         TypeInfo titleType = new TypeInfo(java.lang.String.class);
         // Set columns required (= not null)
@@ -131,11 +139,15 @@ public class BookJDODescriptor extends org.exolab.castor.jdo.engine.JDOClassDesc
             throw new RuntimeException(e1.getMessage());
         }
         // Instantiate title field descriptor
-        titleFieldDescr = new JDOFieldDescriptorImpl(titleFieldName, titleType,
-            titleHandler, false, new String[] { "title" },
-            new int[] {SQLTypeInfos
-                .javaType2sqlTypeNum(java.lang.String.class) },
-            null, new String[] {}, false, false);
+        titleFieldDescr = new FieldDescriptorImpl(titleFieldName, titleType,titleHandler, false);
+        titleFieldDescr.addNature(FieldDescriptorJDONature.class.getName());
+        FieldDescriptorJDONature titleFieldJdoNature = new FieldDescriptorJDONature(titleFieldDescr);
+        titleFieldJdoNature.setSQLName(new String[] { "title" });
+        titleFieldJdoNature.setSQLType(new int[] {SQLTypeInfos.javaType2sqlTypeNum(java.lang.String.class) });
+        titleFieldJdoNature.setManyTable(null);
+        titleFieldJdoNature.setManyKey(new String[] {});
+        titleFieldJdoNature.setDirtyCheck(false);
+        titleFieldJdoNature.setReadOnly(false);
         
         titleFieldDescr.setContainingClassDescriptor(this);
         titleFieldDescr.setIdentity(false);
