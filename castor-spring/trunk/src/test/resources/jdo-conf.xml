@@ -4,7 +4,7 @@
 
 <jdo-conf>
     <database name="test" engine="mysql" >
-        <driver url="jdbc:mysql://localhost:3306/spring" class-name="org.gjt.mm.mysql.Driver">
+        <driver url="jdbc:mysql://localhost:3307/spring" class-name="org.gjt.mm.mysql.Driver">
             <param name="user" value="test" />
             <param name="password" value="test" />
         </driver>
