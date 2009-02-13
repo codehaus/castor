@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<document url="http://castor.exolab.org/castor-spring/build-instructions.xml">
+  <properties>
+    <title>Build instructions</title>
+    <abstract>
+       Instructions for building this module
+    </abstract>
+    <status>Final</status>
+  </properties>
+  <body>
+    <title>Build instructions</title>
+    <header>
+    </header>
+
+    <section name="Prerequisites">
+
+        <p>In order to build the Sping ORM module for Castor JDO, you will have 
+           the following requirements met on your system:</p>
+        <p>
+            <ul>
+                <li>Download and install <a href="http://maven.apache.org">Maven 2</a></li>
+                <li>Download and install a Subversion client</li>
+                <li>Download and install <a href="http://www.springframework.org">Spring</a></li>
+            </ul>
+        </p>
+        
+        <p>As this project uses Maven 2 for build and deployment, all required 
+           compile-time dependencies will automatically be resolved by Maven 2
+           and deployed into your local Maven 2 repository.</p>
+           
+    </section>
+    
+    <section name="Downloads">
+
+        <table>
+            <tr>
+                <td><a href="http://repository.codehaus.org/org/codehaus/castor/spring-orm/1.1/spring-orm-1.1.jar">Spring ORM for Castor JDO 1.1</a></td>
+            </tr>
+        </table>
+
+    </section>    
+
+    <section name="Deployment and use">
+
+          <p>If you are not using Maven 2 to build the deployment unit
+             of your application (within which you want to use the Spring ORM 
+             module for Castor JDO and Castor JDO itself), below is a list 
+             of run-time dependencies you will have to meet.</p>
+             
+         <table cellpadding="4" border="1">
+           <tr><td>cglib-full-2.0.2.jar</td><td>CGLIB</td></tr>
+           <tr><td>commons-logging-1.1.jar</td><td>Jakarta Commons Loggin</td></tr>
+           <tr><td>jta1.0.1.jar</td><td>The JTA API (transactions)</td></tr>
+           <tr><td>xerces-J_1.4.0.jar</td><td>Xerces XML library</td></tr>
+         </table>
+         
+         <p>and optionally</p>
+         
+         <table cellpadding="4" border="1">
+           <tr><td>log4j-1.2.13.jar</td><td>Log4J</td></tr>
+         </table>
+         
+    </section>    
+    
+
+    <section name="Building the Spring ORM module">
+        
+        <p>This section describes how to build the Spring module from a command 
+           line using Maven 2. Whilst there is support for Maven 2 in various
+           IDEs (including e.g. Eclipse, IDEA, etc.), using the Maven command 
+           line seems to be the most adequate least common denominator.</p>
+           
+        <p><b>Note:</b> Please note that you will have to download several 
+            JARs for SUN APIs like JTA and the Connector API yourself and 
+            manually inject these JARs into your Maven 2 repository. For a more
+            complete explanation of the problem, please check 
+            <a href="http://maven.apache.org/guides/mini/guide-coping-with-sun-jars.html">here</a>.</p>
+           
+        <p>This section assumes that you have ckecked out the latest sources
+           from the SVN repsitory for the Spring ORM module for Castor JDO.
+           Instructions for doing so are provided <a href="source-repository.html">here</a>.</p>
+           
+        <p>Open a command line on your system, and issue the following commands:</p>
+           
+        <source>
+ > mvn jar            
+        </source>
+        
+        <p>Above command will compile the sources and create the distribution JAR
+           in the <tt>target</tt> directory of the project root.</p>
+           
+        <p>To create the complete project documentation - in addition to
+           the distribution assembly, please issue ...</p>
+           
+        <source>
+ > mvn site            
+        </source>
+        
+        <p>To install the newly created distribution JAR into your local Maven 2
+           repository, please issue the following command:</p>
+           
+        <source>
+ > mvn install            
+        </source>
+        
+    </section>
+    
+    <section name="Examples">
+        
+        <p>For examples how to use the Spring ORM module for Castor JDO, please
+           check the following <a href="data-access-with-spring.xml">document</a></p>
+           
+    </section>
+
+  </body>
+</document>
