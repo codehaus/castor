@@ -1,12 +1,11 @@
 package org.castor.spring.orm;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.exolab.castor.mapping.MappingException;
-import org.castor.cpa.util.JDOClassDescriptorResolver;
-import org.castor.cpa.util.JDOClassDescriptorResolverImpl;
+import org.exolab.castor.xml.util.JDOClassDescriptorResolver;
+import org.exolab.castor.xml.util.JDOClassDescriptorResolverImpl;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.FactoryBeanNotInitializedException;
 import org.springframework.beans.factory.InitializingBean;
