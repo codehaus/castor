@@ -16,7 +16,7 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 		to use Spring ORM as their preferred choice of dealing with the persistence aspects of 
 		their applications.
 	</description>
-	<!--<url>http://castor.org</url>-->
+	<url>http://castor.org</url>
 
 	<issueManagement>
 		<system>Jira</system>
