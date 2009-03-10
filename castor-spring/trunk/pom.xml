@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.codehaus.castor</groupId>
 	<artifactId>spring-orm</artifactId>
-	<version>1.4-SNAPSHOT</version>
+	<version>1.5-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>Spring ORM implementation for Castor JDO</name>
