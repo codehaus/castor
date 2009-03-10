@@ -1,6 +1,6 @@
 package org.castor.spring.orm.tests;
 
-import org.exolab.castor.xml.util.JDOClassDescriptorResolver;
+import org.castor.spring.orm.support.ClassDescriptorResolverProxy;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
@@ -15,8 +15,8 @@ public class TestClassDescriptorResolverFactoryBean extends BaseSpringTestCase {
     }
 
     public void testGetClassDescriptorResolver() throws Exception {
-        JDOClassDescriptorResolver classDescriptorResolver = (JDOClassDescriptorResolver) this.context
-                .getBean("classDescriptorResolver");
+        ClassDescriptorResolverProxy classDescriptorResolver = 
+            (ClassDescriptorResolverProxy) this.context.getBean("classDescriptorResolver");
         assertNotNull(classDescriptorResolver);
     }
 
