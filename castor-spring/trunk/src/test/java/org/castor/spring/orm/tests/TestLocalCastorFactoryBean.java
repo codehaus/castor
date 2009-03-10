@@ -11,10 +11,6 @@ public class TestLocalCastorFactoryBean extends BaseSpringTestCase {
 
     private JDOManager jdoManager;
 
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-    
     public void testGetJDOManager () throws Exception {
         this.jdoManager = (JDOManager) this.context.getBean("jdoManager");
         assertNotNull (this.jdoManager);

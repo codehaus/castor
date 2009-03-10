@@ -1,12 +1,13 @@
 package org.castor.spring.orm;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.castor.spring.orm.support.ClassDescriptorResolverProxy;
 import org.exolab.castor.jdo.JDOManager;
 import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.xml.util.JDOClassDescriptorResolver;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.FactoryBeanNotInitializedException;
 import org.springframework.beans.factory.InitializingBean;
@@ -19,6 +20,12 @@ public class LocalCastorFactoryBean implements FactoryBean, InitializingBean /*
                                                                                  * ,
                                                                                  * DisposableBean
                                                                                  */{
+
+    private static final String RESOLVER_INTERFACE_131_AND_LATER = "org.castor.cpa.util.JDOClassDescriptorResolver";
+    private static final String RESOLVER_CLASS_131_AND_LATER = "org.castor.cpa.util.JDOClassDescriptorResolverImpl";
+
+    private static final String RESOLVER_INTERFACE_13_AND_LESS = "org.exolab.castor.xml.util.JDOClassDescriptorResolver";
+    private static final String RESOLVER_CLASS_13_AND_LESS = "org.exolab.castor.xml.util.JDOClassDescriptorResolverImpl";
 
     /**
      * Log instance
@@ -53,9 +60,9 @@ public class LocalCastorFactoryBean implements FactoryBean, InitializingBean /*
     private EntityResolver entityResolver;
 
     /**
-     * {@link JDOClassDescriptorResolver} instance.
+     * A {@link ClassDescriptorResolverProxy} instance.
      */
-    private JDOClassDescriptorResolver classDescriptorResolver;
+    private ClassDescriptorResolverProxy classDescriptorResolverProxy;
 
     /**
      * Return an instance (possibly shared or independent) of the object managed
@@ -177,18 +184,110 @@ public class LocalCastorFactoryBean implements FactoryBean, InitializingBean /*
         try {
             InputSource inputSource = new InputSource(this.configLocation
                     .getURL().toExternalForm());
-            JDOManager.loadConfiguration(inputSource, this.entityResolver,
-                    getClass().getClassLoader(), this.classDescriptorResolver);
-            jdoManagerToBeCreated = JDOManager
-                    .createInstance(this.databaseName);
+            Object classDescriptorResolve = configureJDOClassDescriptorResolver();
+            Class<?> resolved = resolveResolverInterface();
+            Method loadConfigurationMethod = JDOManager.class.getMethod("loadConfiguration", 
+                    InputSource.class, EntityResolver.class, ClassLoader.class, 
+                    resolved);
+            loadConfigurationMethod.invoke(null, inputSource, this.entityResolver,
+                    getClass().getClassLoader(), classDescriptorResolve);
+            jdoManagerToBeCreated = JDOManager.createInstance(this.databaseName);
 
             // set autostore mode
             jdoManagerToBeCreated.setAutoStore(this.autoStore);
-        } catch (MappingException e) {
-            LOG.error("Problem creating instance of JDOManager.", e);
-            throw e;
+        } catch (Exception e) {
+            LOG.warn("problem", e);
+            // ignore, as this cannot happen
         }
         return jdoManagerToBeCreated;
+    }
+    
+    /**
+     * Creates and configures a Castor JDO-specific {@link ClassDescriptorResolver}
+     * with the values as provided by the {@link ClassDescriptorResolverProxy}
+     * instance. 
+     * @return A pre-configured JDO-specific {@link ClassDescriptorResolver} instance. 
+     */
+    private Object configureJDOClassDescriptorResolver() {
+        
+        Object resolver = null;
+
+        Class<?> resolverClass = resolveResolverClass();
+
+        try {
+            resolver = resolverClass.newInstance();
+
+            Method addPackageMethod = resolverClass.getMethod("addPackage", String.class);
+            Method addClassMethod = resolverClass.getMethod("addClass", Class.class);
+
+            for (String packageName : classDescriptorResolverProxy.getPackages()) {
+                addPackageMethod.invoke(resolver, packageName);
+            }
+
+            for (String className : classDescriptorResolverProxy.getClasses()) {
+                addClassMethod.invoke(resolver, Class.forName(className));
+            }
+        } catch (Exception e) {
+            // ignore, should never happen, as either one has to be on the class path
+        }
+        
+        return resolver;
+    }
+
+    /**
+     * Resolves the {@link Class} instance for the Castor JDO {@link ClassDescriptorResolver},
+     * basically implementing a fallback solution that looks for the classes in the 
+     * following sequence:
+     * 
+     * <ol>
+     *   <li>org.exolab.castor.xml.util.JDOClassDescriptorResolverImpl</li>
+     *   <li>org.castor.cpa.util.JDOClassDescriptorResolverImpl</li>
+     * </ol>
+     * 
+     * @return The actual JDP-specific {@link ClassDescriptorResolver}.
+     */
+    private Class<?> resolveResolverClass() {
+        Class<?> resolverClass;
+        try {
+            resolverClass = Class.forName(RESOLVER_CLASS_131_AND_LATER);
+        }
+        catch (ClassNotFoundException e) {
+            try {
+                resolverClass = Class.forName(RESOLVER_CLASS_13_AND_LESS);
+            }
+            catch (ClassNotFoundException e1) {
+                throw new IllegalArgumentException("Castor JDO classes not on the classpath");
+            }
+        }
+        return resolverClass;
+    }
+
+    /**
+     * Resolves the {@link Class} instance for the Castor JDO {@link ClassDescriptorResolver},
+     * basically implementing a fallback solution that looks for the classes in the 
+     * following sequence:
+     * 
+     * <ol>
+     *   <li>org.exolab.castor.xml.util.JDOClassDescriptorResolverImpl</li>
+     *   <li>org.castor.cpa.util.JDOClassDescriptorResolverImpl</li>
+     * </ol>
+     * 
+     * @return The actual JDP-specific {@link ClassDescriptorResolver}.
+     */
+    private Class<?> resolveResolverInterface() {
+        Class<?> resolverClass;
+        try {
+            resolverClass = Class.forName(RESOLVER_INTERFACE_131_AND_LATER);
+        }
+        catch (ClassNotFoundException e) {
+            try {
+                resolverClass = Class.forName(RESOLVER_INTERFACE_13_AND_LESS);
+            }
+            catch (ClassNotFoundException e1) {
+                throw new IllegalArgumentException("Castor JDO classes not on the classpath");
+            }
+        }
+        return resolverClass;
     }
 
     // /**
@@ -249,8 +348,8 @@ public class LocalCastorFactoryBean implements FactoryBean, InitializingBean /*
     }
 
     public void setClassDescriptorResolver(
-            JDOClassDescriptorResolver classDescriptorResolver) {
-        this.classDescriptorResolver = classDescriptorResolver;
+            ClassDescriptorResolverProxy classDescriptorResolver) {
+        this.classDescriptorResolverProxy = classDescriptorResolver;
     }
 
 }

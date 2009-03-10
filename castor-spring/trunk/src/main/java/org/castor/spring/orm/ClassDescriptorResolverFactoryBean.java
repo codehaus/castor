@@ -3,9 +3,8 @@ package org.castor.spring.orm;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.castor.spring.orm.support.ClassDescriptorResolverProxy;
 import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.xml.util.JDOClassDescriptorResolver;
-import org.exolab.castor.xml.util.JDOClassDescriptorResolverImpl;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.FactoryBeanNotInitializedException;
 import org.springframework.beans.factory.InitializingBean;
@@ -17,7 +16,7 @@ public class ClassDescriptorResolverFactoryBean implements FactoryBean,
     /**
      * Castor JDO Manager instance
      */
-    private JDOClassDescriptorResolver classDescriptorResolver;
+    private ClassDescriptorResolverProxy classDescriptorResolver;
 
     /**
      * List of class names.
@@ -76,7 +75,7 @@ public class ClassDescriptorResolverFactoryBean implements FactoryBean,
             return this.classDescriptorResolver.getClass();
         }
 
-        return JDOClassDescriptorResolver.class;
+        return ClassDescriptorResolverProxy.class;
     }
 
     /**
@@ -116,20 +115,20 @@ public class ClassDescriptorResolverFactoryBean implements FactoryBean,
                     "Please specify at least one class name or package name.");
         }
 
-        JDOClassDescriptorResolver classDescriptorResolver = new JDOClassDescriptorResolverImpl();
+        ClassDescriptorResolverProxy proxy = new ClassDescriptorResolverProxy();
 
         if (!this.packages.isEmpty()) {
-            for (String  packageName : this.packages) {
-                classDescriptorResolver.addPackage(packageName);
+            for (String packageName : this.packages) {
+                proxy.addPackage(packageName);
             }
         }
         if (!this.classes.isEmpty()) {
             for (String className : this.classes) {
-                classDescriptorResolver.addClass(Class.forName(className));
+                proxy.addClass(className);
             }
         }
         
-        this.classDescriptorResolver = classDescriptorResolver;
+        this.classDescriptorResolver = proxy;
     }
 
      /**
