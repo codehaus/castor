@@ -500,7 +500,7 @@
                            <goal>execute</goal>
                         </goals>
                         <configuration>
-                           <url>jdbc:mysql://localhost:3306/test</url>
+                           <url>${db.url}</url>
                            <autocommit>true</autocommit>
                            <srcFiles>
                               <srcFile>src/test/resources/mysql.sql</srcFile>
