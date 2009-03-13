@@ -21,6 +21,13 @@
 	</issueManagement>
 
 	<build>
+   
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+            </testResource>
+        </testResources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -108,6 +115,7 @@
 					</archive>
 				</configuration>
 			</plugin>
+
 			
 		</plugins>
         
@@ -244,13 +252,6 @@
 		</dependency>
 
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>3.1.12</version>
-            <scope>test</scope>
-        </dependency>
-        
-        <dependency>
             <groupId>jotm</groupId>
             <artifactId>jotm</artifactId>
             <version>2.0.10</version>
@@ -263,13 +264,6 @@
             <scope>test</scope>
         </dependency>
 		
-		<dependency>
-			<groupId>org.apache.derby</groupId>
-			<artifactId>derbyclient</artifactId>
-			<version>10.1.2.1</version>
-			<scope>test</scope>
-		</dependency>
-
 		<dependency>
 			<groupId>javax.resource</groupId>
 			<artifactId>connector-api</artifactId>
@@ -404,4 +398,136 @@
  -->			
 		</plugins>
 	</reporting>
+   
+   <profiles>
+    <profile>
+        <id>derby</id>
+        <activation>
+            <activeByDefault>true</activeByDefault>
+        </activation>
+        <build>
+            <plugins>
+               <plugin>
+                  <groupId>org.codehaus.mojo</groupId>
+                  <artifactId>sql-maven-plugin</artifactId>
+                  <version>1.3</version>
+                  <configuration>
+                     <username>test</username>
+                     <password>test</password>
+                     <driver>org.apache.derby.jdbc.EmbeddedDriver</driver>
+                     <skip>${maven.test.skip}</skip>
+                  </configuration>
+                  <dependencies>
+                     <dependency>
+                        <groupId>org.apache.derby</groupId>
+                        <artifactId>derby</artifactId>
+                        <version>10.4.1.3</version>
+                     </dependency>
+                  </dependencies>
+                  <executions>
+                     <execution>
+                        <id>create schema</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                           <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                           <url>jdbc:derby:${basedir}/target/test;create=true</url>
+                           <autocommit>true</autocommit>
+                           <srcFiles>
+                              <srcFile>src/test/resources/derby.sql</srcFile>
+                           </srcFiles>
+                        </configuration>
+                     </execution>
+                     <execution>
+                        <id>derby shutdown</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                           <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                           <url>jdbc:derby:${basedir}/target/test;shutdown=true</url>
+                           <skipOnConnectionError>true</skipOnConnectionError>
+                        </configuration>
+                     </execution>
+                  </executions>
+               </plugin>
+            </plugins>
+        </build>
+        <dependencies>
+            <dependency>
+               <groupId>org.apache.derby</groupId>
+               <artifactId>derby</artifactId>
+               <version>10.4.1.3</version>
+               <scope>test</scope>
+            </dependency>
+        </dependencies>
+        <properties>
+            <db.driver>org.apache.derby.jdbc.EmbeddedDriver</db.driver>
+            <db.user>test</db.user>
+            <db.password>test</db.password>
+            <db.dialect>derby</db.dialect>
+            <db.name>test</db.name>
+            <db.url>jdbc:${db.dialect}:target/${db.name}</db.url>
+        </properties>
+    </profile>
+    <profile>
+        <id>mysql</id>
+        <build>
+            <plugins>
+               <plugin>
+                  <groupId>org.codehaus.mojo</groupId>
+                  <artifactId>sql-maven-plugin</artifactId>
+                  <version>1.3</version>
+                  <configuration>
+                     <username>test</username>
+                     <password>test</password>
+                     <driver>com.mysql.jdbc.Driver</driver>
+                     <skip>${maven.test.skip}</skip>
+                  </configuration>
+                  <dependencies>
+                     <dependency>
+                        <groupId>mysql</groupId>
+                        <artifactId>mysql-connector-java</artifactId>
+                        <version>3.1.12</version>
+                     </dependency>
+                  </dependencies>
+                  <executions>
+                     <execution>
+                        <id>create schema</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                           <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                           <url>jdbc:mysql://localhost:3306/test</url>
+                           <autocommit>true</autocommit>
+                           <srcFiles>
+                              <srcFile>src/test/resources/mysql.sql</srcFile>
+                           </srcFiles>
+                        </configuration>
+                     </execution>
+                  </executions>
+               </plugin>
+            </plugins>
+        </build>
+        <dependencies>
+           <dependency>
+               <groupId>mysql</groupId>
+               <artifactId>mysql-connector-java</artifactId>
+               <version>3.1.12</version>
+               <scope>test</scope>
+           </dependency>
+        </dependencies>
+        <properties>
+            <db.driver>com.mysql.jdbc.Driver</db.driver>
+            <db.user>test</db.user>
+            <db.password>test</db.password>
+            <db.dialect>mysql</db.dialect>
+            <db.name>spring</db.name>
+            <db.url>jdbc:${db.dialect}://localhost:3306/${db.name}</db.url>
+        </properties>
+    </profile>
+   </profiles>
+   
 </project>

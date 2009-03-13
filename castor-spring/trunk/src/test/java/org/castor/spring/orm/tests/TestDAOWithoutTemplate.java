@@ -33,7 +33,7 @@ public class TestDAOWithoutTemplate extends BaseSpringTestCaseAtDAOLevel {
         Database db = jdoManager.getDatabase();
         db.begin();
         Connection connection = db.getJdbcConnection();
-        connection.createStatement().execute("delete from spring.product where id <> 1");
+        connection.createStatement().execute("delete from product where id <> 1");
         db.commit();
         db.close();
     }
