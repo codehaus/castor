@@ -1,5 +1,7 @@
 package org.castor.jpa;
 
+import java.util.Map;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceContextType;
@@ -79,6 +81,10 @@ public class CastorEntityManagerFactory implements EntityManagerFactory
     public boolean isOpen()
     {
         return isOpen;
+    }
+
+    public EntityManager createEntityManager(Map map) {
+        throw new UnsupportedOperationException();
     }
 
 }

@@ -34,8 +34,8 @@ public class CastorPersistenceProvider implements PersistenceProvider {
      * @see javax.persistence.spi.PersistenceProvider#createEntityManagerFactory(java.lang.String,
      *      java.util.Map)
      */
-    public EntityManagerFactory createEntityManagerFactory(String emName,
-            Map map) {
+    public EntityManagerFactory createEntityManagerFactory(final String emName,
+            final Map map) {
         // TODO Refine code to deal with 'persistence.xml'
         URL resourceLocation = getClass().getClassLoader().getResource(
                 "META-INF/persistence.xml");
@@ -56,7 +56,7 @@ public class CastorPersistenceProvider implements PersistenceProvider {
         EntityManagerFactory factory = null;
         
         if (namedPersistenceGroup != null) {
-            factory = createEntityManagerFactory(namedPersistenceGroup);
+            factory = createEntityManagerFactory(namedPersistenceGroup, map);
         }
         
         return factory;
@@ -67,23 +67,24 @@ public class CastorPersistenceProvider implements PersistenceProvider {
      * Creates an {@link javax.persistence.EntityManagerFactory} instance from a 
      * given {@link javax.persistence.PersistenceUnitInfo} instance.
      * @param info A given {@link javax.persistence.PersistenceUnitInfo} instance
+     * @param map An instance of confiugration parameters stored in a map
      * @return An {@link javax.persistence.EntityManagerFactory} instance 
      */
     private EntityManagerFactory createEntityManagerFactory(
-            PersistenceUnitInfo info) {
+            PersistenceUnitInfo info, final Map map) {
         EntityManagerFactory factory = null;
 
         JdoConf jdoConf = loadJDOConfiguration();
 
         Database database = getDatabase(jdoConf.getDatabase(), info.getPersistenceUnitName());
-        database.clearMapping();
+//        database.clearMapping();
         
         for (String mappingFile : info.getMappingFileNames()) {
             database.addMapping(JDOConfFactory.createMapping(mappingFile));
         }
         
         try {
-            JDOManager.loadConfiguration(jdoConf);
+            JDOManager.loadConfiguration(jdoConf, null);
             JDOManager jdoManager = JDOManager.createInstance(info.getPersistenceUnitName());
             factory = new CastorEntityManagerFactory(jdoManager);
         } catch (MappingException e) {
@@ -143,7 +144,12 @@ public class CastorPersistenceProvider implements PersistenceProvider {
      */
     public EntityManagerFactory createContainerEntityManagerFactory(
             PersistenceUnitInfo info) {
-        return createEntityManagerFactory(info);
+        return createContainerEntityManagerFactory(info, null);
+    }
+
+    public EntityManagerFactory createContainerEntityManagerFactory(
+            PersistenceUnitInfo info, Map map) {
+        return createEntityManagerFactory(info, map);
     }
 
 }

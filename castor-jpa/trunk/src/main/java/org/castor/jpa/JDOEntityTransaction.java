@@ -16,6 +16,11 @@ public class JDOEntityTransaction implements EntityTransaction {
     private Database database;
     
     /**
+     * Indicates whether the ongoing transactio should be rolled back only.
+     */
+    private boolean rollbackOnly = false;
+    
+    /**
      * Creates a new EntityTransaction instance specific for Castor JDO. This 
      * class basically proxies Castor JDO's Database interface, and delegates
      * most of the methods exposed by this class to the corresponding methods
@@ -60,6 +65,10 @@ public class JDOEntityTransaction implements EntityTransaction {
             throw new IllegalStateException ("Commit called on an inactive entity transaction.");
         }
 
+        if (getRollbackOnly()) {
+            rollback();
+        }
+        
         try {
             database.commit();
         } catch (TransactionNotInProgressException e) {
@@ -93,6 +102,18 @@ public class JDOEntityTransaction implements EntityTransaction {
      */
     public boolean isActive() {
         return database.isActive();
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see javax.persistence.EntityTransaction#getRollbackOnly()
+     */
+    public boolean getRollbackOnly() {
+        return this.rollbackOnly;
+    }
+
+    public void setRollbackOnly() {
+        this.rollbackOnly = true;
     }
 
 }
