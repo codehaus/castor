@@ -5,7 +5,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.EntityTransaction;
 import javax.persistence.FlushModeType;
-import javax.persistence.LockMode;
+import javax.persistence.LockModeType;
 import javax.persistence.PersistenceContextType;
 import javax.persistence.Query;
 import javax.persistence.TransactionRequiredException;
@@ -88,7 +88,9 @@ public class CastorEntityManager implements EntityManager {
         } catch (DuplicateIdentityException e) {
             throw new EntityExistsException("Entity of type " + entity.getClass().getName() + " exists already", e);
         } catch (TransactionNotInProgressException e) {
-            throw new TransactionRequiredException("There's no active transaction.", e);
+            TransactionRequiredException tre = new TransactionRequiredException("There's no active transaction.");
+            tre.initCause(e);
+            throw tre;
         } catch (PersistenceException e) {
             throw new javax.persistence.PersistenceException("General prob lem", e);
         }
@@ -118,7 +120,9 @@ public class CastorEntityManager implements EntityManager {
             // TODO !!!!!!!!!!!! Investigate what should be done !!!!!!!!!!!!!!
             throw new javax.persistence.PersistenceException("Lock not granted by Castor", e);
         } catch (TransactionNotInProgressException e) {
-            throw new TransactionRequiredException("Active transaction required", e);
+            TransactionRequiredException tre = new TransactionRequiredException("Active transaction required");
+            tre.initCause(e);
+            throw tre;
         } catch (PersistenceException e) {
             throw new javax.persistence.PersistenceException("General prob lem", e);
         }
@@ -150,7 +154,9 @@ public class CastorEntityManager implements EntityManager {
             // do not do anything, as 'null' should be returned
             // throw new EntityNotFoundException("Entity of type " + entityClass.getName() + " with id " + primaryKey + " not found", e);
         } catch (TransactionNotInProgressException e) {
-            throw new TransactionRequiredException("Active transaction required", e);
+            TransactionRequiredException tre = new TransactionRequiredException("Active transaction required");
+            tre.initCause(e);
+            throw tre;
         } catch (LockNotGrantedException e) {
             // TODO !!!!!!!!!!!! Investigate what should be done !!!!!!!!!!!!!!
             throw new javax.persistence.PersistenceException("Lock not granted by Castor", e);
@@ -220,7 +226,7 @@ public class CastorEntityManager implements EntityManager {
         return flushMode;
     }
 
-    public void lock(Object entity, LockMode lockMode) {
+    public void lock(Object entity, LockModeType lockMode) {
         checkIsOpen();
         throw new UnsupportedOperationException();
     }
@@ -292,6 +298,15 @@ public class CastorEntityManager implements EntityManager {
         // TODO throw IllegalStateException if invoked on a JTA EntityManager 
         
         return new JDOEntityTransaction(database);
+    }
+
+    public Object getDelegate() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public void joinTransaction() {
+        // TODO Auto-generated method stub
     }
 
 }
