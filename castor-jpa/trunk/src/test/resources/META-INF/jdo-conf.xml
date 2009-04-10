@@ -8,7 +8,7 @@
             <param name="user" value="test" />
             <param name="password" value="test" />
         </driver>
-        <mapping href="mapping2.xml" />
+        <mapping href="mapping.xml" />
     </database>
     <transaction-demarcation mode="local" />
 </jdo-conf>
