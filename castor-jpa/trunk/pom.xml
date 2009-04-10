@@ -16,7 +16,20 @@
 		<url>http://jira.codehaus.org/browse/CASTOR</url>
 	</issueManagement>
 
+
 	<build>
+      <resources>
+            <!--  instructs Maven to copy .castor.cdr files -->
+         <resource>
+            <directory>${basedir}/target/generated-sources/castor</directory>
+            <includes>
+               <include>**/*.cdr</include>
+            </includes>
+         </resource>
+         <resource>
+            <directory>src/test/resources</directory>
+         </resource>
+      </resources>
 		<plugins>
 			<plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -81,6 +94,51 @@
             </plugin>
 -->			
 
+         <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>castor-maven-plugin</artifactId>
+            <version>2.0-SNAPSHOT</version>
+            <configuration>
+               <properties>${basedir}/src/main/castor/castorbuilder.properties</properties>
+               <schema>${basedir}/src/main/castor/persistence.xsd</schema>
+               <!-- <bindingfile>${basedir}/src/main/castor/bindings.xml</bindingfile>  -->
+               <packaging>org.castor.jpa.persistence.xml</packaging>
+            </configuration>
+            <executions>
+               <execution>
+                  <goals>
+                     <goal>generate</goal>
+                  </goals>
+               </execution>
+            </executions>
+            <dependencies>
+               <dependency>
+                  <groupId>org.codehaus.castor</groupId>
+                  <artifactId>castor-codegen</artifactId>
+                  <version>1.3rc1</version>
+               </dependency>
+            </dependencies>
+         </plugin>
+            <!--  redundant, once new castor-maven-plugin has been deployed -->
+         <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <version>1.1</version>
+            <executions>
+               <execution>
+                  <id>add-source</id>
+                  <phase>generate-sources</phase>
+                  <goals>
+                     <goal>add-source</goal>
+                  </goals>
+                  <configuration>
+                     <sources>
+                        <source>${basedir}/target/generated-sources/castor</source>
+                     </sources>
+                  </configuration>
+               </execution>
+            </executions>
+         </plugin>
  		</plugins>
 
 	</build>
@@ -106,8 +164,8 @@
 		<developer>
 			<id>wguttmn</id>
 			<name>Werner Guttmann</name>
-			<email>werner.guttmann@gmx.net</email>
-			<organization>Anecon</organization>
+			<email>wguttmn@codehaus.org</email>
+			<organization>Indoqa</organization>
 			<roles>
 				<role>Castor JDO Lead</role>
 			</roles>
@@ -175,12 +233,18 @@
     
 	<dependencies>
 
-		<!-- replace with dependency to final release -->
-		<dependency>
-			<groupId>org.codehaus.castor</groupId>
-			<artifactId>castor-jdo</artifactId>
-			<version>1.3.1-SNAPSHOT</version>
-		</dependency>
+        <!-- replace with dependency to final release -->
+        <dependency>
+            <groupId>org.codehaus.castor</groupId>
+            <artifactId>castor-jdo</artifactId>
+            <version>1.3.1-SNAPSHOT</version>
+        </dependency>
+      
+        <dependency>
+          <groupId>javax.persistence</groupId>
+          <artifactId>persistence-api</artifactId>
+          <version>1.0</version>
+        </dependency>
 		
 		<dependency>
 			<groupId>commons-logging</groupId>
@@ -208,6 +272,13 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>5.1.6</version>
         </dependency>
+
+         <dependency>
+             <groupId>oro</groupId>
+             <artifactId>oro</artifactId>
+             <version>2.0.8</version>
+             <scope>test</scope>
+         </dependency>
 
 	</dependencies>
 
