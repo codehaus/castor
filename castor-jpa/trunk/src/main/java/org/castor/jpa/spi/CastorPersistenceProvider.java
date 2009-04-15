@@ -77,7 +77,8 @@ public class CastorPersistenceProvider implements PersistenceProvider {
         JdoConf jdoConf = loadJDOConfiguration();
 
         Database database = getDatabase(jdoConf.getDatabase(), info.getPersistenceUnitName());
-//        database.clearMapping();
+        //TODO: Investigate, why wrong mapping is being loaded, if not cleared.
+        database.removeAllMapping();
         
         for (String mappingFile : info.getMappingFileNames()) {
             database.addMapping(JDOConfFactory.createMapping(mappingFile));
