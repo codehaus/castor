@@ -7,6 +7,7 @@
         <provider>com.acme.AcmePersistence</provider>
         <jta-data-source>jdbc/MyPartDB</jta-data-source>
         <mapping-file>ormap2.xml</mapping-file>
+        <!--  <castor-mapping-file>mapping.xml</castor-mapping-file>  -->
         <jar-file>MyPartsApp.jar</jar-file>
         <class>com.widgets.Order</class>
         <class>com.widgets.Customer</class>
