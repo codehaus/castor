@@ -230,10 +230,9 @@
           <url>dav:https://dav.codehaus.org/castor/</url>
         </site>
     </distributionManagement>
-    
-	<dependencies>
 
-        <!-- replace with dependency to final release -->
+    <dependencyManagement>
+        <dependencies>
         <dependency>
             <groupId>org.codehaus.castor</groupId>
             <artifactId>castor-jdo</artifactId>
@@ -245,29 +244,26 @@
           <artifactId>persistence-api</artifactId>
           <version>1.0</version>
         </dependency>
-		
-		<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging</artifactId>
-			<version>1.1.1</version>
-		</dependency>
-
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.4</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.13</version>
-			<scope>test</scope>
-		</dependency>
+        
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.1.1</version>
+        </dependency>
 
         <dependency>
-            <scope>test</scope>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.13</version>
+        </dependency>
+
+        <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>5.1.6</version>
@@ -277,6 +273,48 @@
              <groupId>oro</groupId>
              <artifactId>oro</artifactId>
              <version>2.0.8</version>
+         </dependency>
+        </dependencies>
+    </dependencyManagement>    
+	<dependencies>
+
+        <!-- replace with dependency to final release -->
+        <dependency>
+            <groupId>org.codehaus.castor</groupId>
+            <artifactId>castor-jdo</artifactId>
+        </dependency>
+      
+        <dependency>
+          <groupId>javax.persistence</groupId>
+          <artifactId>persistence-api</artifactId>
+        </dependency>
+		
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+         <dependency>
+             <groupId>oro</groupId>
+             <artifactId>oro</artifactId>
              <scope>test</scope>
          </dependency>
 
