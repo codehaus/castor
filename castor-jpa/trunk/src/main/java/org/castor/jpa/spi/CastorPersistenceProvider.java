@@ -8,6 +8,8 @@ import javax.persistence.PersistenceException;
 import javax.persistence.spi.PersistenceProvider;
 import javax.persistence.spi.PersistenceUnitInfo;
 
+import org.castor.cpa.util.JDOClassDescriptorResolver;
+import org.castor.cpa.util.JDOClassDescriptorResolverImpl;
 import org.castor.jdo.conf.Database;
 import org.castor.jdo.conf.JdoConf;
 import org.castor.jdo.util.JDOConfFactory;
@@ -79,6 +81,13 @@ public class CastorPersistenceProvider implements PersistenceProvider {
         Database database = getDatabase(jdoConf.getDatabase(), info.getPersistenceUnitName());
         //TODO: Investigate, why wrong mapping is being loaded, if not cleared.
         database.removeAllMapping();
+        
+        JDOClassDescriptorResolver resolver = new JDOClassDescriptorResolverImpl();
+
+        // TODO[WG]: write code to enable persistence class specs through persistence.xml 
+//        for (String className : info.getManagedClassNames()) {
+//            resolver.addClass(Class.forName(className));
+//        }
         
         for (String mappingFile : info.getMappingFileNames()) {
             database.addMapping(JDOConfFactory.createMapping(mappingFile));
