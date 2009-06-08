@@ -161,7 +161,7 @@ public class CastorEntityManager implements EntityManager {
             // TODO !!!!!!!!!!!! Investigate what should be done !!!!!!!!!!!!!!
             throw new javax.persistence.PersistenceException("Lock not granted by Castor", e);
         } catch (PersistenceException e) {
-            throw new javax.persistence.PersistenceException("General prob lem", e);
+            throw new javax.persistence.PersistenceException("General problem", e);
         }
         
         return object;
