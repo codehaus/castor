@@ -19,8 +19,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityNotFoundException;
 import javax.persistence.spi.PersistenceProvider;
 import javax.sql.DataSource;
 
@@ -36,6 +38,7 @@ import org.springframework.test.context.transaction.TransactionConfiguration;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -44,6 +47,9 @@ import static org.junit.Assert.fail;
 public class SingleEntityTest extends
 		AbstractTransactionalJUnit4SpringContextTests {
 
+	/**
+	 * The {@link DataSource} to use. Injected by Spring.
+	 */
 	@Autowired
 	private DataSource dataSource;
 
@@ -91,9 +97,34 @@ public class SingleEntityTest extends
 		Book result = em.find(Book.class, Long.valueOf(isbn));
 
 		em.getTransaction().commit();
+		em.close();
 
 		// Verify result.
 		verifyBook(result, isbn, title);
+	}
+
+	/**
+	 * Invokes the {@link EntityManager#find(Class, Object)} method and tries to
+	 * load a {@link Book} which was not persisted before.
+	 * 
+	 * @throws SQLException
+	 *             thrown in case insertion of test data fails.
+	 */
+	@Test
+	public void findNonExistingBook() throws SQLException {
+		Long isbn = Long.valueOf(1);
+
+		// Look up book.
+		EntityManager em = factory.createEntityManager();
+		em.getTransaction().begin();
+
+		Book result = em.find(Book.class, Long.valueOf(isbn));
+
+		// Verify null result.
+		assertNull(result);
+
+		em.getTransaction().commit();
+		em.close();
 	}
 
 	/**
@@ -123,8 +154,136 @@ public class SingleEntityTest extends
 		Book result = em.find(Book.class, Long.valueOf(isbn));
 
 		em.getTransaction().commit();
+		em.close();
 
 		verifyBook(result, isbn, title);
+	}
+
+	/**
+	 * Invokes the {@link EntityManager#persist(Object)} method and verifies
+	 * correct behavior when persisting a {@link Book} object twice, which
+	 * should end up with an {@link EntityExistsException}.
+	 */
+	@Test
+	public void persistBookTwice() {
+		Long isbn = Long.valueOf(2);
+		String title = "unit-test-book-title-2";
+
+		// Persist a new book.
+		EntityManager em = factory.createEntityManager();
+		em.getTransaction().begin();
+
+		Book book = new Book(isbn, title);
+		em.persist(book);
+
+		em.getTransaction().commit();
+
+		// Verify result natively.
+		verifyPersistentBook(book);
+
+		// Persist again.
+		em.getTransaction().begin();
+
+		String otherTitle = "unit-test-book-title-3";
+		Book newBook = new Book(isbn, otherTitle);
+		try {
+			// Should fail.
+			em.persist(newBook);
+			fail("Book already exists. Should end up with an EntityExistsException!");
+		} catch (EntityExistsException e) {
+			// Correct behavior.
+		} finally {
+			// Release resources.
+			em.close();
+		}
+
+		// Verify, old book is still in database.
+		verifyPersistentBook(book);
+		assertEquals(1, countRowsInTable("book"));
+	}
+
+	/**
+	 * Deletes a {@link Book} which was not obtained from an
+	 * {@link EntityManager} before.
+	 * 
+	 * @throws SQLException
+	 *             in case insertion of test values fails.
+	 */
+	@Test(expected = EntityNotFoundException.class)
+	public void removeBookNotLoadedBefore() throws SQLException {
+		Long isbn = Long.valueOf(1);
+		String title = "unit-test-book-title-4";
+
+		// Insert test values.
+		executeUpdate("INSERT INTO book (isbn, title) VALUES (?, ?)", isbn,
+				title);
+
+		// Look up book.
+		EntityManager em = factory.createEntityManager();
+		em.getTransaction().begin();
+
+		Book book = new Book(isbn, title);
+		em.remove(book);
+
+		em.getTransaction().commit();
+		em.close();
+
+		// Verify result.
+		assertEquals(0, countRowsInTable("book"));
+	}
+
+	/**
+	 * Deletes a {@link Book} which was obtained from an {@link EntityManager}
+	 * before.
+	 * 
+	 * @throws SQLException
+	 *             in case insertion of test values fails.
+	 */
+	@Test
+	public void removeLoadedBook() throws SQLException {
+		Long isbn = Long.valueOf(1);
+		String title = "unit-test-book-title-5";
+
+		// Insert test values.
+		executeUpdate("INSERT INTO book (isbn, title) VALUES (?, ?)", isbn,
+				title);
+
+		// Look up book and delete it.
+		EntityManager em = factory.createEntityManager();
+		em.getTransaction().begin();
+
+		Book book = em.find(Book.class, isbn);
+		em.remove(book);
+
+		em.getTransaction().commit();
+		em.close();
+
+		// Verify result.
+		assertEquals(0, countRowsInTable("book"));
+	}
+
+	/**
+	 * Tries to delete a non existing {@link Book}. Should result in an
+	 * {@link EntityNotFoundException}.
+	 * 
+	 */
+	@Test(expected = EntityNotFoundException.class)
+	public void removeNonExistingBook() {
+		Long isbn = Long.valueOf(1);
+		String title = "unit-test-book-title-6";
+
+		// Verify whether table is empty.
+		assertEquals(0, countRowsInTable("book"));
+
+		// Look up book and delete it.
+		EntityManager em = factory.createEntityManager();
+		em.getTransaction().begin();
+
+		// Try to delete a non existing book.
+		Book book = new Book(isbn, title);
+
+		// Should fail.
+		em.remove(book);
 	}
 
 	/**
