@@ -274,6 +274,7 @@
 	</dependencies>
 	
 	<repositories>
+<!-- 
 		<repository>
 			<id>java.net</id>
 			<name>java.net Maven Repository</name>
@@ -286,16 +287,24 @@
 			<url>https://maven2-repository.dev.java.net/nonav/repository</url>
 			<layout>default</layout>	  
 		</repository>        
-		<repository>
+-->
+       <repository>
 			<id>codehaus.org</id>
 			<name>Maven Codehaus repository</name> 
-			<url>http://maven.codehaus.org/maven2/</url> 
+			<url>http://maven.codehaus.org/</url> 
 		</repository>
+<!--       
 		<repository>
 			<id>codehaus-snapshots</id>
 			<name>Maven Codehaus Snapshots</name>
 			<url>http://snapshots.maven.codehaus.org/maven2/</url>
 		</repository>
+ -->
+        <repository>
+            <id>codehaus-snapshots</id>
+            <name>Maven Codehaus Snapshots</name>
+            <url>http://snapshots.repository.codehaus.org</url>
+        </repository>
 	</repositories>
 
 	<pluginRepositories>
