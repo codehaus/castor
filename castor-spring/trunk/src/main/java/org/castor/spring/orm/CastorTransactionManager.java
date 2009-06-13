@@ -207,30 +207,30 @@ public class CastorTransactionManager
 	 * Auto-detect the JDOManager's DataSource, if any.
 	 */
 	public void afterPropertiesSet() {
-		if (getJdoManager() == null) {
-			throw new IllegalArgumentException("jdoManager is required");
-		}
-		getCastorDialect();
+	    if (getJdoManager() == null) {
+	        throw new IllegalArgumentException("jdoManager is required");
+	    }
+	    getCastorDialect();
 
-		// Check for DataSource as connection factory.
-        // TODO [WG]: we don't externalize a connection factory to the user.
-		if (this.autodetectDataSource && getDataSource() == null) {
-			Object pmfcf = null;
-            try {
-                pmfcf = getJdoManager().getConnectionFactory();
-            } catch (MappingException e) {
-                this.logger.error("Cannot obtain DataSource from JDOManager.", e);
-            }
-            
-			if (pmfcf != null && pmfcf instanceof DataSource) {
-				// Use the JDOManager's DataSource for exposing transactions to JDBC code.
-				this.dataSource = (DataSource) pmfcf;
-				if (this.logger.isInfoEnabled()) {
-					this.logger.info("Using DataSource [" + this.dataSource +
-							"] of JDOManager for CastorTransactionManager");
-				}
-			}
-		}
+	    // Check for DataSource as connection factory.
+	    // TODO [WG]: we don't externalize a connection factory to the user.
+	    if (this.autodetectDataSource && getDataSource() == null) {
+	        Object pmfcf = null;
+	        try {
+	            pmfcf = getJdoManager().getConnectionFactory();
+	        } catch (MappingException e) {
+	            this.logger.error("Cannot obtain DataSource from JDOManager.", e);
+	        }
+
+	        if (pmfcf != null && pmfcf instanceof DataSource) {
+	            // Use the JDOManager's DataSource for exposing transactions to JDBC code.
+	            this.dataSource = (DataSource) pmfcf;
+	            if (this.logger.isInfoEnabled()) {
+	                this.logger.info("Using DataSource [" + this.dataSource +
+	                "] of JDOManager for CastorTransactionManager");
+	            }
+	        }
+	    }
 	}
 
 
