@@ -23,11 +23,10 @@ import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityNotFoundException;
-import javax.persistence.spi.PersistenceProvider;
+import javax.persistence.Persistence;
 import javax.sql.DataSource;
 
 import org.castor.jpa.functional.model.Book;
-import org.castor.jpa.spi.CastorPersistenceProvider;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,7 +52,6 @@ public class SingleEntityTest extends
 	@Autowired
 	private DataSource dataSource;
 
-	private PersistenceProvider provider;
 	private EntityManagerFactory factory;
 
 	/**
@@ -61,8 +59,7 @@ public class SingleEntityTest extends
 	 */
 	@Before
 	public void before() {
-		provider = new CastorPersistenceProvider();
-		factory = provider.createEntityManagerFactory("jpa", null);
+		factory = Persistence.createEntityManagerFactory("castor");
 	}
 
 	/**
