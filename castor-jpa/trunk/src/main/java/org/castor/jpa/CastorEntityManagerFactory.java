@@ -10,82 +10,82 @@ import org.exolab.castor.jdo.JDOManager;
 import org.exolab.castor.jdo.PersistenceException;
 
 public class CastorEntityManagerFactory implements EntityManagerFactory {
-    JDOManager jdoManager = null;
+	JDOManager jdoManager = null;
 
-    /**
-     * Indicates whether this EntityManagerFactory is open.
-     */
-    boolean isOpen = true;
+	/**
+	 * Indicates whether this EntityManagerFactory is open.
+	 */
+	boolean isOpen = true;
 
-    public CastorEntityManagerFactory(JDOManager jdoManager) {
-        setJdoManager(jdoManager);
-    }
+	public CastorEntityManagerFactory(JDOManager jdoManager) {
+		setJdoManager(jdoManager);
+	}
 
-    private void setJdoManager(JDOManager jdoManager) {
-        this.jdoManager = jdoManager;
-    }
+	private void setJdoManager(JDOManager jdoManager) {
+		this.jdoManager = jdoManager;
+	}
 
-    public EntityManager createEntityManager() {
-        if (!isOpen) {
-            throw new IllegalStateException(
-                    "'createEntityManager' called on a closed EntityManagerFactory.");
-        }
+	public EntityManager createEntityManager() {
+		if (!isOpen) {
+			throw new IllegalStateException(
+					"'createEntityManager' called on a closed EntityManagerFactory.");
+		}
 
-        EntityManager entityManager = null;
+		EntityManager entityManager = null;
 
-        try {
-            entityManager = new CastorEntityManager(
-                    PersistenceContextType.TRANSACTION, jdoManager
-                            .getDatabase());
-        } catch (PersistenceException e) {
-            // TODO !!!!!!!!!!!!!!! Investigate what to do about this
-            // !!!!!!!!!!!!!!!!!!!
-            throw new javax.persistence.PersistenceException(
-                    "Problem obtaining Castor JDO Database instance from JDOManager");
-        }
+		try {
+			entityManager = new CastorEntityManager(
+					PersistenceContextType.TRANSACTION, jdoManager
+							.getDatabase());
+		} catch (PersistenceException e) {
+			// TODO !!!!!!!!!!!!!!! Investigate what to do about this
+			// !!!!!!!!!!!!!!!!!!!
+			throw new javax.persistence.PersistenceException(
+					"Problem obtaining Castor JDO Database instance from JDOManager");
+		}
 
-        return entityManager;
-    }
+		return entityManager;
+	}
 
-    public EntityManager createEntityManager(PersistenceContextType type) {
-        if (!isOpen) {
-            throw new IllegalStateException(
-                    "'createEntityManager' called on a closed EntityManagerFactory.");
-        }
+	public EntityManager createEntityManager(PersistenceContextType type) {
+		if (!isOpen) {
+			throw new IllegalStateException(
+					"'createEntityManager' called on a closed EntityManagerFactory.");
+		}
 
-        if (type == PersistenceContextType.TRANSACTION) {
-            return createEntityManager();
-        }
+		if (type == PersistenceContextType.TRANSACTION) {
+			return createEntityManager();
+		}
 
-        // deal with PersistenceContextType.EXTENDED
-        return null;
-    }
+		// deal with PersistenceContextType.EXTENDED
+		return null;
+	}
 
-    public EntityManager getEntityManager() {
-        if (!isOpen) {
-            throw new IllegalStateException(
-                    "'createEntityManager' called on a closed EntityManagerFactory.");
-        }
+	public EntityManager getEntityManager() {
+		if (!isOpen) {
+			throw new IllegalStateException(
+					"'createEntityManager' called on a closed EntityManagerFactory.");
+		}
 
-        throw new UnsupportedOperationException();
-    }
+		throw new UnsupportedOperationException();
+	}
 
-    public EntityManager createEntityManager(final Map map) {
-        throw new UnsupportedOperationException();
-    }
+	public EntityManager createEntityManager(final Map map) {
+		throw new UnsupportedOperationException();
+	}
 
-    public void close() {
-        if (!isOpen) {
-            throw new IllegalStateException(
-                    "'createEntityManager' called on a closed EntityManagerFactory.");
-        }
+	public void close() {
+		if (!isOpen) {
+			throw new IllegalStateException(
+					"'createEntityManager' called on a closed EntityManagerFactory.");
+		}
 
-        isOpen = false;
+		isOpen = false;
 
-    }
+	}
 
-    public boolean isOpen() {
-        return isOpen;
-    }
+	public boolean isOpen() {
+		return isOpen;
+	}
 
 }

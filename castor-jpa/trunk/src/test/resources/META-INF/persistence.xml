@@ -1,7 +1,7 @@
-<?xml version="1.0"?> 
+<?xml version="1.0"?>
 <persistence version="1.0">
-    <persistence-unit name="jpa">
-        <mapping-file>mapping.xml</mapping-file>
-        <!-- <class>org.castor.jpa.ProductItem</class>  -->
-    </persistence-unit>
+	<persistence-unit name="castor">
+		<provider>org.castor.jpa.spi.CastorPersistenceProvider</provider>
+		<mapping-file>mapping.xml</mapping-file>
+	</persistence-unit>
 </persistence>
