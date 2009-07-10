@@ -1,4 +1,4 @@
-package org.castor.jpa;
+package org.castor.jpa.functional.model;
 
 public class Product {
 

@@ -5,6 +5,12 @@
 
 	<!--  Mapping for Book  -->
 	<class name="org.castor.jpa.functional.model.Book" identity="isbn">
+		<named-query name="unit-test-named-select-query">
+			<query>SELECT b FROM Book b</query>
+		</named-query>
+		<named-query name="unit-test-named-update-query">
+			<query>DELETE FROM Book b</query>
+		</named-query>
 		<map-to table="book" />
 		<field name="isbn" type="long">
 			<sql name="isbn" type="integer" />
@@ -15,7 +21,7 @@
 	</class>
 
 	<!--  Mapping for Product  -->
-	<class name="org.castor.jpa.Product" identity="id">
+	<class name="org.castor.jpa.functional.model.Product" identity="id">
 		<map-to table="product" xml="product" />
 		<named-query name="allProducts">
 			<query>select p from org.castor.jpa.Product p</query>
