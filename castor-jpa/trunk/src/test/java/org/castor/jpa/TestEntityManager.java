@@ -8,6 +8,8 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 import javax.persistence.TransactionRequiredException;
 
+import org.castor.jpa.functional.model.Product;
+
 import junit.framework.TestCase;
 
 public class TestEntityManager extends TestCase {

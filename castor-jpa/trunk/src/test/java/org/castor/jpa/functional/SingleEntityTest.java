@@ -31,6 +31,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.NotTransactional;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import org.springframework.test.context.transaction.TransactionConfiguration;
@@ -66,6 +67,7 @@ public class SingleEntityTest extends
 	 * Method is being invoked after every single test for cleanup purpose.
 	 */
 	@After
+	@NotTransactional
 	public void after() {
 		// Clean up table.
 		this.deleteFromTables("book");
