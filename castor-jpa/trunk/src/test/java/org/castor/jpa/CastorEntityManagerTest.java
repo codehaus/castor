@@ -28,18 +28,12 @@ import javax.persistence.TransactionRequiredException;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
-import org.springframework.test.context.transaction.TransactionConfiguration;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-@ContextConfiguration(locations = { "/spring-test-applicationContext.xml" })
-@TransactionConfiguration(defaultRollback = false, transactionManager = "transactionManager")
-public class CastorEntityManagerTest extends
-		AbstractTransactionalJUnit4SpringContextTests {
+public class CastorEntityManagerTest {
 
 	private EntityManagerFactory factory;
 
