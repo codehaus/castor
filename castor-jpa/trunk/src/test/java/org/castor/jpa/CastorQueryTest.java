@@ -23,249 +23,258 @@ import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class CastorQueryTest {
 
-	private EntityManagerFactory factory;
+    private EntityManagerFactory factory;
 
-	/**
-	 * Invoked before every single test method.
-	 */
-	@Before
-	public void before() {
-		factory = Persistence.createEntityManagerFactory("castor");
-	}
+    /**
+     * Invoked before every single test method.
+     */
+    @Before
+    public void before() {
+        factory = Persistence.createEntityManagerFactory("castor");
+    }
 
-	/**
-	 * Creates a named {@link Query} and then closes the {@link EntityManager}.
-	 * The query must be invalid then.
-	 */
-	@Test(expected = PersistenceException.class)
-	public void namedQueryGetResultListOnClosedEntityManager() {
-		EntityManager em = factory.createEntityManager();
-		Query namedQuery = em.createNamedQuery("unit-test-named-query");
-		// Now close the EntityManager.
-		em.close();
+    /**
+     * Creates a named {@link Query} and then closes the {@link EntityManager}.
+     * The query must be invalid then.
+     */
+    @Test(expected = PersistenceException.class)
+    public void namedQueryGetResultListOnClosedEntityManager() {
+        EntityManager em = factory.createEntityManager();
+        Query namedQuery = em.createNamedQuery("unit-test-named-query");
+        // Now close the EntityManager.
+        em.close();
 
-		// Query must fail due to its invalidity.
-		namedQuery.getResultList();
-	}
+        // Query must fail due to its invalidity.
+        namedQuery.getResultList();
+    }
 
-	/**
-	 * Creates a named {@link Query} and then closes the {@link EntityManager}.
-	 * The query must be invalid then.
-	 */
-	@Test(expected = PersistenceException.class)
-	public void namedQueryGetSingleResultOnClosedEntityManager() {
-		EntityManager em = factory.createEntityManager();
-		Query namedQuery = em.createNamedQuery("unit-test-named-select-query");
-		// Now close the EntityManager.
-		em.close();
+    /**
+     * Creates a named {@link Query} and then closes the {@link EntityManager}.
+     * The query must be invalid then.
+     */
+    @Test(expected = PersistenceException.class)
+    public void namedQueryGetSingleResultOnClosedEntityManager() {
+        EntityManager em = factory.createEntityManager();
+        Query namedQuery = em.createNamedQuery("unit-test-named-select-query");
+        // Now close the EntityManager.
+        em.close();
 
-		// Query must fail due to its invalidity.
-		namedQuery.getSingleResult();
-	}
+        // Query must fail due to its invalidity.
+        namedQuery.getSingleResult();
+    }
 
-	/**
-	 * Creates a named {@link Query} and then closes the {@link EntityManager}.
-	 * The query must be invalid then.
-	 */
-	@Test(expected = PersistenceException.class)
-	public void namedQueryUpdateOnClosedEntityManager() {
-		EntityManager em = factory.createEntityManager();
-		Query namedQuery = em.createNamedQuery("unit-test-named-update-query");
-		// Now close the EntityManager.
-		em.close();
+    /**
+     * Creates a named {@link Query} and then closes the {@link EntityManager}.
+     * The query must be invalid then.
+     */
+    @Test(expected = PersistenceException.class)
+    public void namedQueryUpdateOnClosedEntityManager() {
+        EntityManager em = factory.createEntityManager();
+        Query namedQuery = em.createNamedQuery("unit-test-named-update-query");
+        // Now close the EntityManager.
+        em.close();
 
-		// Query must fail due to its invalidity.
-		namedQuery.executeUpdate();
-	}
+        // Query must fail due to its invalidity.
+        namedQuery.executeUpdate();
+    }
 
-	/**
-	 * Creates a JPA {@link Query} and then closes the {@link EntityManager}.
-	 * The query must be invalid then.
-	 */
-	@Test(expected = PersistenceException.class)
-	public void queryGetResultListOnClosedEntityManager() {
-		EntityManager em = factory.createEntityManager();
-		Query query = em.createQuery("SELECT e FROM Entity e");
-		// Now close the EntityManager.
-		em.close();
+    /**
+     * Creates a JPA {@link Query} and then closes the {@link EntityManager}.
+     * The query must be invalid then.
+     */
+    @Test(expected = PersistenceException.class)
+    public void queryGetResultListOnClosedEntityManager() {
+        EntityManager em = factory.createEntityManager();
+        Query query = em.createQuery("SELECT e FROM Entity e");
+        // Now close the EntityManager.
+        em.close();
 
-		// Query must fail due to its invalidity.
-		query.getResultList();
-	}
+        // Query must fail due to its invalidity.
+        query.getResultList();
+    }
 
-	/**
-	 * Creates a JPA {@link Query} and then closes the {@link EntityManager}.
-	 * The query must be invalid then.
-	 */
-	@Test(expected = PersistenceException.class)
-	public void queryGetSingleResultOnClosedEntityManager() {
-		EntityManager em = factory.createEntityManager();
-		Query query = em.createQuery("SELECT e FROM Entity e");
-		// Now close the EntityManager.
-		em.close();
+    /**
+     * Creates a JPA {@link Query} and then closes the {@link EntityManager}.
+     * The query must be invalid then.
+     */
+    @Test(expected = PersistenceException.class)
+    public void queryGetSingleResultOnClosedEntityManager() {
+        EntityManager em = factory.createEntityManager();
+        Query query = em.createQuery("SELECT e FROM Entity e");
+        // Now close the EntityManager.
+        em.close();
 
-		// Query must fail due to its invalidity.
-		query.getSingleResult();
-	}
+        // Query must fail due to its invalidity.
+        query.getSingleResult();
+    }
 
-	/**
-	 * Creates a JPA {@link Query} and then closes the {@link EntityManager}.
-	 * The query must be invalid then.
-	 */
-	@Test(expected = PersistenceException.class)
-	public void queryUpdateOnClosedEntityManager() {
-		EntityManager em = factory.createEntityManager();
-		Query query = em.createQuery("SELECT e FROM Entity e");
-		// Now close the EntityManager.
-		em.close();
+    /**
+     * Creates a JPA {@link Query} and then closes the {@link EntityManager}.
+     * The query must be invalid then.
+     */
+    @Test(expected = PersistenceException.class)
+    public void queryUpdateOnClosedEntityManager() {
+        EntityManager em = factory.createEntityManager();
+        Query query = em.createQuery("SELECT e FROM Entity e");
+        // Now close the EntityManager.
+        em.close();
 
-		// Query must fail due to its invalidity.
-		query.executeUpdate();
-	}
+        // Query must fail due to its invalidity.
+        query.executeUpdate();
+    }
 
-	/**
-	 * Creates a native {@link Query} and then closes the {@link EntityManager}.
-	 * The query must be invalid then.
-	 */
-	@Test(expected = PersistenceException.class)
-	public void nativeQueryResultListOnClosedEntityManager() {
-		EntityManager em = factory.createEntityManager();
-		Query query = em.createNativeQuery("SELECT * FROM entity");
-		// Now close the EntityManager.
-		em.close();
+    /**
+     * Creates a native {@link Query} and then closes the {@link EntityManager}.
+     * The query must be invalid then.
+     */
+    @Test(expected = PersistenceException.class)
+    @Ignore
+    public void nativeQueryResultListOnClosedEntityManager() {
+        EntityManager em = factory.createEntityManager();
+        Query query = em.createNativeQuery("SELECT * FROM entity");
+        // Now close the EntityManager.
+        em.close();
 
-		// Query must fail due to its invalidity.
-		query.getResultList();
-	}
+        // Query must fail due to its invalidity.
+        query.getResultList();
+    }
 
-	/**
-	 * Creates a native {@link Query} and then closes the {@link EntityManager}.
-	 * The query must be invalid then.
-	 */
-	@Test(expected = PersistenceException.class)
-	public void nativeQueryGetSingleResultOnClosedEntityManager() {
-		EntityManager em = factory.createEntityManager();
-		Query query = em.createNativeQuery("SELECT * FROM entity");
-		// Now close the EntityManager.
-		em.close();
+    /**
+     * Creates a native {@link Query} and then closes the {@link EntityManager}.
+     * The query must be invalid then.
+     */
+    @Test(expected = PersistenceException.class)
+    @Ignore
+    public void nativeQueryGetSingleResultOnClosedEntityManager() {
+        EntityManager em = factory.createEntityManager();
+        Query query = em.createNativeQuery("SELECT * FROM entity");
+        // Now close the EntityManager.
+        em.close();
 
-		// Query must fail due to its invalidity.
-		query.getSingleResult();
-	}
+        // Query must fail due to its invalidity.
+        query.getSingleResult();
+    }
 
-	/**
-	 * Creates a native {@link Query} and then closes the {@link EntityManager}.
-	 * The query must be invalid then.
-	 */
-	@Test(expected = PersistenceException.class)
-	public void nativeQueryUpdateOnClosedEntityManager() {
-		EntityManager em = factory.createEntityManager();
-		Query query = em.createNativeQuery("SELECT * FROM entity");
-		// Now close the EntityManager.
-		em.close();
+    /**
+     * Creates a native {@link Query} and then closes the {@link EntityManager}.
+     * The query must be invalid then.
+     */
+    @Test(expected = PersistenceException.class)
+    @Ignore
+    public void nativeQueryUpdateOnClosedEntityManager() {
+        EntityManager em = factory.createEntityManager();
+        Query query = em.createNativeQuery("SELECT * FROM entity");
+        // Now close the EntityManager.
+        em.close();
 
-		// Query must fail due to its invalidity.
-		query.executeUpdate();
-	}
+        // Query must fail due to its invalidity.
+        query.executeUpdate();
+    }
 
-	/**
-	 * Creates a native {@link Query} and then closes the {@link EntityManager}.
-	 * The query must be invalid then.
-	 */
-	@Test(expected = PersistenceException.class)
-	public void nativeQueryWithTypeResultListOnClosedEntityManager() {
-		EntityManager em = factory.createEntityManager();
-		Query query = em
-				.createNativeQuery("SELECT * FROM entity", Entity.class);
-		// Now close the EntityManager.
-		em.close();
+    /**
+     * Creates a native {@link Query} and then closes the {@link EntityManager}.
+     * The query must be invalid then.
+     */
+    @Test(expected = PersistenceException.class)
+    public void nativeQueryWithTypeResultListOnClosedEntityManager() {
+        EntityManager em = factory.createEntityManager();
+        Query query =
+                em.createNativeQuery("SELECT * FROM entity", Entity.class);
+        // Now close the EntityManager.
+        em.close();
 
-		// Query must fail due to its invalidity.
-		query.getResultList();
-	}
+        // Query must fail due to its invalidity.
+        query.getResultList();
+    }
 
-	/**
-	 * Creates a native {@link Query} and then closes the {@link EntityManager}.
-	 * The query must be invalid then.
-	 */
-	@Test(expected = PersistenceException.class)
-	public void nativeQueryWithTypeGetSingleResultOnClosedEntityManager() {
-		EntityManager em = factory.createEntityManager();
-		Query query = em
-				.createNativeQuery("SELECT * FROM entity", Entity.class);
-		// Now close the EntityManager.
-		em.close();
+    /**
+     * Creates a native {@link Query} and then closes the {@link EntityManager}.
+     * The query must be invalid then.
+     */
+    @Test(expected = PersistenceException.class)
+    public void nativeQueryWithTypeGetSingleResultOnClosedEntityManager() {
+        EntityManager em = factory.createEntityManager();
+        Query query =
+                em.createNativeQuery("SELECT * FROM entity", Entity.class);
+        // Now close the EntityManager.
+        em.close();
 
-		// Query must fail due to its invalidity.
-		query.getSingleResult();
-	}
+        // Query must fail due to its invalidity.
+        query.getSingleResult();
+    }
 
-	/**
-	 * Creates a native {@link Query} and then closes the {@link EntityManager}.
-	 * The query must be invalid then.
-	 */
-	@Test(expected = PersistenceException.class)
-	public void nativeQueryWithTypeUpdateOnClosedEntityManager() {
-		EntityManager em = factory.createEntityManager();
-		Query query = em
-				.createNativeQuery("SELECT * FROM entity", Entity.class);
-		// Now close the EntityManager.
-		em.close();
+    /**
+     * Creates a native {@link Query} and then closes the {@link EntityManager}.
+     * The query must be invalid then.
+     */
+    @Test(expected = PersistenceException.class)
+    public void nativeQueryWithTypeUpdateOnClosedEntityManager() {
+        EntityManager em = factory.createEntityManager();
+        Query query =
+                em.createNativeQuery("SELECT * FROM entity", Entity.class);
+        // Now close the EntityManager.
+        em.close();
 
-		// Query must fail due to its invalidity.
-		query.executeUpdate();
-	}
+        // Query must fail due to its invalidity.
+        query.executeUpdate();
+    }
 
-	/**
-	 * Creates a native {@link Query} and then closes the {@link EntityManager}.
-	 * The query must be invalid then.
-	 */
-	@Test(expected = PersistenceException.class)
-	public void nativeQueryWithMappingResultListOnClosedEntityManager() {
-		EntityManager em = factory.createEntityManager();
-		Query query = em.createNativeQuery("SELECT * FROM entity",
-				"unit-test-mapping");
-		// Now close the EntityManager.
-		em.close();
+    /**
+     * Creates a native {@link Query} and then closes the {@link EntityManager}.
+     * The query must be invalid then.
+     */
+    @Test(expected = PersistenceException.class)
+    @Ignore
+    public void nativeQueryWithMappingResultListOnClosedEntityManager() {
+        EntityManager em = factory.createEntityManager();
+        Query query =
+                em.createNativeQuery("SELECT * FROM entity",
+                        "unit-test-mapping");
+        // Now close the EntityManager.
+        em.close();
 
-		// Query must fail due to its invalidity.
-		query.getResultList();
-	}
+        // Query must fail due to its invalidity.
+        query.getResultList();
+    }
 
-	/**
-	 * Creates a native {@link Query} and then closes the {@link EntityManager}.
-	 * The query must be invalid then.
-	 */
-	@Test(expected = PersistenceException.class)
-	public void nativeQueryWithMappingGetSingleResultOnClosedEntityManager() {
-		EntityManager em = factory.createEntityManager();
-		Query query = em.createNativeQuery("SELECT * FROM entity",
-				"unit-test-mapping");
-		// Now close the EntityManager.
-		em.close();
+    /**
+     * Creates a native {@link Query} and then closes the {@link EntityManager}.
+     * The query must be invalid then.
+     */
+    @Test(expected = PersistenceException.class)
+    @Ignore
+    public void nativeQueryWithMappingGetSingleResultOnClosedEntityManager() {
+        EntityManager em = factory.createEntityManager();
+        Query query =
+                em.createNativeQuery("SELECT * FROM entity",
+                        "unit-test-mapping");
+        // Now close the EntityManager.
+        em.close();
 
-		// Query must fail due to its invalidity.
-		query.getSingleResult();
-	}
+        // Query must fail due to its invalidity.
+        query.getSingleResult();
+    }
 
-	/**
-	 * Creates a native {@link Query} and then closes the {@link EntityManager}.
-	 * The query must be invalid then.
-	 */
-	@Test(expected = PersistenceException.class)
-	public void nativeQueryWithMappingUpdateOnClosedEntityManager() {
-		EntityManager em = factory.createEntityManager();
-		Query query = em.createNativeQuery("DELETE FROM entity",
-				"unit-test-mapping");
-		// Now close the EntityManager.
-		em.close();
+    /**
+     * Creates a native {@link Query} and then closes the {@link EntityManager}.
+     * The query must be invalid then.
+     */
+    @Test(expected = PersistenceException.class)
+    @Ignore
+    public void nativeQueryWithMappingUpdateOnClosedEntityManager() {
+        EntityManager em = factory.createEntityManager();
+        Query query =
+                em.createNativeQuery("DELETE FROM entity", "unit-test-mapping");
+        // Now close the EntityManager.
+        em.close();
 
-		// Query must fail due to its invalidity.
-		query.executeUpdate();
-	}
+        // Query must fail due to its invalidity.
+        query.executeUpdate();
+    }
 
 }
