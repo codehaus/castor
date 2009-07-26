@@ -18,344 +18,389 @@ package org.castor.jpa.functional;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityNotFoundException;
 import javax.persistence.Persistence;
 import javax.sql.DataSource;
 
 import org.castor.jpa.functional.model.Book;
-import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.NotTransactional;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
-import org.springframework.test.context.transaction.TransactionConfiguration;
+import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 @ContextConfiguration(locations = { "/spring-test-applicationContext.xml" })
-@TransactionConfiguration(defaultRollback = false, transactionManager = "transactionManager")
-public class SingleEntityTest extends
-		AbstractTransactionalJUnit4SpringContextTests {
+@Ignore
+public class SingleEntityTest extends AbstractJUnit4SpringContextTests {
 
-	/**
-	 * The {@link DataSource} to use. Injected by Spring.
-	 */
-	@Autowired
-	private DataSource dataSource;
+    /**
+     * The {@link DataSource} to use. Injected by Spring.
+     */
+    @Autowired
+    private DataSource dataSource;
 
-	private EntityManagerFactory factory;
+    private EntityManagerFactory factory;
 
-	/**
-	 * Invoked before every single test method.
-	 */
-	@Before
-	public void before() {
-		factory = Persistence.createEntityManagerFactory("castor");
-	}
+    /**
+     * Invoked before every single test method.
+     * 
+     */
+    @Before
+    public void before() throws SQLException {
+        factory = Persistence.createEntityManagerFactory("castor");
+    }
 
-	/**
-	 * Method is being invoked after every single test for cleanup purpose.
-	 */
-	@After
-	@NotTransactional
-	public void after() {
-		// Clean up table.
-		this.deleteFromTables("book");
-	}
+    /**
+     * Invokes the {@link EntityManager#find(Class, Object)} method and verifies
+     * correct loading of a {@link Book} entity.
+     * 
+     * @throws SQLException
+     *             thrown in case insert of test data fails.
+     */
+    @Test
+    public void findBook() throws SQLException {
+        deleteFromTable("book");
 
-	/**
-	 * Invokes the {@link EntityManager#find(Class, Object)} method and verifies
-	 * correct loading of a {@link Book} entity.
-	 * 
-	 * @throws SQLException
-	 *             thrown in case insert of test data fails.
-	 */
-	@Test
-	public void findBook() throws SQLException {
-		Long isbn = Long.valueOf(1);
-		String title = "unit-test-book-title-1";
+        Long isbn = Long.valueOf(1);
+        String title = "unit-test-book-title-1";
 
-		// Insert test values.
-		executeUpdate("INSERT INTO book (isbn, title) VALUES (?, ?)", isbn,
-				title);
+        // Insert test values.
+        executeUpdate("INSERT INTO book (isbn, title) VALUES (?, ?)", isbn, title);
 
-		// Look up book.
-		EntityManager em = factory.createEntityManager();
-		em.getTransaction().begin();
+        // Look up book.
+        EntityManager em = factory.createEntityManager();
+        em.getTransaction().begin();
 
-		Book result = em.find(Book.class, Long.valueOf(isbn));
+        Book result = em.find(Book.class, Long.valueOf(isbn));
 
-		em.getTransaction().commit();
-		em.close();
+        em.getTransaction().commit();
+        em.close();
 
-		// Verify result.
-		verifyBook(result, isbn, title);
-	}
+        // Verify result.
+        verifyBook(result, isbn, title);
 
-	/**
-	 * Invokes the {@link EntityManager#find(Class, Object)} method and tries to
-	 * load a {@link Book} which was not persisted before.
-	 * 
-	 * @throws SQLException
-	 *             thrown in case insertion of test data fails.
-	 */
-	@Test
-	public void findNonExistingBook() throws SQLException {
-		Long isbn = Long.valueOf(1);
+        deleteFromTable("book");
+    }
 
-		// Look up book.
-		EntityManager em = factory.createEntityManager();
-		em.getTransaction().begin();
+    /**
+     * Invokes the {@link EntityManager#find(Class, Object)} method and tries to
+     * load a {@link Book} which was not persisted before.
+     * 
+     * @throws SQLException
+     *             thrown in case insertion of test data fails.
+     */
+    @Test
+    public void findNonExistingBook() throws SQLException {
+        deleteFromTable("book");
 
-		Book result = em.find(Book.class, Long.valueOf(isbn));
+        Long isbn = Long.valueOf(1);
 
-		// Verify null result.
-		assertNull(result);
+        // Look up book.
+        EntityManager em = factory.createEntityManager();
+        em.getTransaction().begin();
 
-		em.getTransaction().commit();
-		em.close();
-	}
+        Book result = em.find(Book.class, Long.valueOf(isbn));
 
-	/**
-	 * Invokes the {@link EntityManager#persist(Object)} method and verifies
-	 * correct persistence of a {@link Book} object.
-	 */
-	@Test
-	public void persistBook() {
-		Long isbn = Long.valueOf(2);
-		String title = "unit-test-book-title-2";
+        // Verify null result.
+        assertNull(result);
 
-		// Persist a new book.
-		EntityManager em = factory.createEntityManager();
-		em.getTransaction().begin();
+        em.getTransaction().commit();
+        em.close();
 
-		Book book = new Book(isbn, title);
-		em.persist(book);
+        deleteFromTable("book");
+    }
 
-		em.getTransaction().commit();
+    /**
+     * Invokes the {@link EntityManager#persist(Object)} method and verifies
+     * correct persistence of a {@link Book} object.
+     * 
+     * @throws SQLException
+     *             in case clean up fails.
+     */
+    @Test
+    public void persistBook() throws SQLException {
+        deleteFromTable("book");
 
-		// Verify result natively.
-		verifyPersistentBook(book);
+        Long isbn = Long.valueOf(2);
+        String title = "unit-test-book-title-2";
 
-		// Verify result via JPA.
-		em.getTransaction().begin();
+        // Persist a new book.
+        EntityManager em = factory.createEntityManager();
+        em.getTransaction().begin();
 
-		Book result = em.find(Book.class, Long.valueOf(isbn));
+        Book book = new Book(isbn, title);
+        em.persist(book);
 
-		em.getTransaction().commit();
-		em.close();
+        em.getTransaction().commit();
 
-		verifyBook(result, isbn, title);
-	}
+        // Verify result via JPA.
+        em.getTransaction().begin();
 
-	/**
-	 * Invokes the {@link EntityManager#persist(Object)} method and verifies
-	 * correct behavior when persisting a {@link Book} object twice, which
-	 * should end up with an {@link EntityExistsException}.
-	 */
-	@Test
-	public void persistBookTwice() {
-		Long isbn = Long.valueOf(2);
-		String title = "unit-test-book-title-2";
+        Book result = em.find(Book.class, Long.valueOf(isbn));
 
-		// Persist a new book.
-		EntityManager em = factory.createEntityManager();
-		em.getTransaction().begin();
+        em.getTransaction().commit();
+        em.close();
 
-		Book book = new Book(isbn, title);
-		em.persist(book);
+        verifyBook(result, isbn, title);
 
-		em.getTransaction().commit();
+        deleteFromTable("book");
+    }
 
-		// Verify result natively.
-		verifyPersistentBook(book);
+    /**
+     * Invokes the {@link EntityManager#persist(Object)} method and verifies
+     * correct behavior when persisting a {@link Book} object twice, which
+     * should end up with an {@link EntityExistsException}.
+     */
+    @Test
+    @Ignore
+    public void persistBookTwice() throws SQLException {
+        deleteFromTable("book");
 
-		// Persist again.
-		em.getTransaction().begin();
+        Long isbn = Long.valueOf(2);
+        String title = "unit-test-book-title-2";
 
-		String otherTitle = "unit-test-book-title-3";
-		Book newBook = new Book(isbn, otherTitle);
-		try {
-			// Should fail.
-			em.persist(newBook);
-			fail("Book already exists. Should end up with an EntityExistsException!");
-		} catch (EntityExistsException e) {
-			// Correct behavior.
-		} finally {
-			// Release resources.
-			em.close();
-		}
+        // Persist a new book.
+        EntityManager em = factory.createEntityManager();
+        em.getTransaction().begin();
 
-		// Verify, old book is still in database.
-		verifyPersistentBook(book);
-		assertEquals(1, countRowsInTable("book"));
-	}
+        Book book = new Book(isbn, title);
+        em.persist(book);
 
-	/**
-	 * Deletes a {@link Book} which was not obtained from an
-	 * {@link EntityManager} before.
-	 * 
-	 * @throws SQLException
-	 *             in case insertion of test values fails.
-	 */
-	@Test(expected = EntityNotFoundException.class)
-	public void removeBookNotLoadedBefore() throws SQLException {
-		Long isbn = Long.valueOf(1);
-		String title = "unit-test-book-title-4";
+        em.getTransaction().commit();
 
-		// Insert test values.
-		executeUpdate("INSERT INTO book (isbn, title) VALUES (?, ?)", isbn,
-				title);
+        // Persist again.
+        em.getTransaction().begin();
 
-		// Look up book.
-		EntityManager em = factory.createEntityManager();
-		em.getTransaction().begin();
+        String otherTitle = "unit-test-book-title-3";
+        Book newBook = new Book(isbn, otherTitle);
+        try {
+            // Should fail.
+            em.persist(newBook);
+            fail("Book already exists. Should end up with an EntityExistsException!");
+        } catch (EntityExistsException e) {
+            // Correct behavior.
+            em.getTransaction().rollback();
+        } finally {
+            // Release resources.
+            em.close();
+        }
 
-		Book book = new Book(isbn, title);
-		em.remove(book);
+        // Verify, old book is still in database.
+        verifyPersistentBook(book);
+        assertEquals(1, countRowsInTable("book"));
 
-		em.getTransaction().commit();
-		em.close();
+        deleteFromTable("book");
+    }
 
-		// Verify result.
-		assertEquals(0, countRowsInTable("book"));
-	}
+    /**
+     * Deletes a {@link Book} which was not obtained from an
+     * {@link EntityManager} before.
+     * 
+     * @throws SQLException
+     *             in case insertion of test values fails.
+     */
+    @Test
+    public void removeUnloadedBook() throws SQLException {
+        deleteFromTable("book");
 
-	/**
-	 * Deletes a {@link Book} which was obtained from an {@link EntityManager}
-	 * before.
-	 * 
-	 * @throws SQLException
-	 *             in case insertion of test values fails.
-	 */
-	@Test
-	public void removeLoadedBook() throws SQLException {
-		Long isbn = Long.valueOf(1);
-		String title = "unit-test-book-title-5";
+        Long isbn = Long.valueOf(1);
+        String title = "unit-test-book-title-4";
 
-		// Insert test values.
-		executeUpdate("INSERT INTO book (isbn, title) VALUES (?, ?)", isbn,
-				title);
+        // Insert test values.
+        executeUpdate("INSERT INTO book (isbn, title) VALUES (?, ?)", isbn, title);
 
-		// Look up book and delete it.
-		EntityManager em = factory.createEntityManager();
-		em.getTransaction().begin();
+        // Look up book.
+        EntityManager em = factory.createEntityManager();
+        em.getTransaction().begin();
 
-		Book book = em.find(Book.class, isbn);
-		em.remove(book);
+        Book book = new Book(isbn, title);
+        try {
+            em.remove(book);
+            fail("Entity must not be removed when not loaded before!");
+        } catch (IllegalArgumentException iae) {
+            // Should be here.
+        }
 
-		em.getTransaction().commit();
-		em.close();
+        em.getTransaction().commit();
+        em.close();
 
-		// Verify result.
-		assertEquals(0, countRowsInTable("book"));
-	}
+        // Verify result.
+        assertEquals(0, countRowsInTable("book"));
 
-	/**
-	 * Tries to delete a non existing {@link Book}. Should result in an
-	 * {@link EntityNotFoundException}.
-	 * 
-	 */
-	@Test(expected = EntityNotFoundException.class)
-	public void removeNonExistingBook() {
-		Long isbn = Long.valueOf(1);
-		String title = "unit-test-book-title-6";
+        deleteFromTable("book");
+    }
 
-		// Verify whether table is empty.
-		assertEquals(0, countRowsInTable("book"));
+    /**
+     * Deletes a {@link Book} which was obtained from an {@link EntityManager}
+     * before.
+     * 
+     * @throws SQLException
+     *             in case insertion of test values fails.
+     */
+    @Test
+    public void removeLoadedBook() throws SQLException {
+        deleteFromTable("book");
 
-		// Look up book and delete it.
-		EntityManager em = factory.createEntityManager();
-		em.getTransaction().begin();
+        Long isbn = Long.valueOf(1);
+        String title = "unit-test-book-title-5";
 
-		// Try to delete a non existing book.
-		Book book = new Book(isbn, title);
+        // Insert test values.
+        executeUpdate("INSERT INTO book (isbn, title) VALUES (?, ?)", isbn, title);
 
-		// Should fail.
-		em.remove(book);
-	}
+        // Look up book and delete it.
+        EntityManager em = factory.createEntityManager();
+        em.getTransaction().begin();
 
-	/**
-	 * This helper method verifies a given {@link Book} using JUnit asserts.
-	 * 
-	 * @param result
-	 *            the {@link Book} to verify.
-	 * @param isbn
-	 *            the expected isbn.
-	 * @param title
-	 *            the expected title.
-	 */
-	private static void verifyBook(Book result, long isbn, String title) {
-		assertNotNull(result);
-		assertEquals(isbn, result.getIsbn());
-		assertEquals(title, result.getTitle());
-	}
+        Book book = em.find(Book.class, isbn);
+        em.remove(book);
 
-	private void verifyPersistentBook(Book book) {
-		PreparedStatement preparedStatement;
-		try {
+        em.getTransaction().commit();
+        em.close();
 
-			// Load the book from the database.
-			preparedStatement = this.dataSource.getConnection()
-					.prepareStatement(
-							"SELECT isbn, title FROM book WHERE isbn = ?");
-			preparedStatement.setObject(1, Long.valueOf(book.getIsbn()));
-			ResultSet resultSet = preparedStatement.executeQuery();
+        // Verify result.
+        assertEquals(0, countRowsInTable("book"));
+    }
 
-			// Verify result.
-			assertEquals(1, resultSet.getFetchSize());
-			assertTrue(resultSet.next());
-			assertEquals(book.getIsbn(), resultSet.getLong(1));
-			assertEquals(book.getTitle(), resultSet.getString(2));
+    /**
+     * Tries to delete a non existing {@link Book}. Should result in an
+     * {@link IllegalArgumentException}.
+     * 
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void removeNonExistingBook() throws SQLException {
+        deleteFromTable("book");
 
-			// Release resources.
-			resultSet.close();
-			preparedStatement.close();
+        Long isbn = Long.valueOf(1);
+        String title = "unit-test-book-title-6";
 
-		} catch (SQLException e) {
-			fail("Could not verify book instance: " + e.getMessage());
-			e.printStackTrace();
-		}
-	}
+        // Look up book and delete it.
+        EntityManager em = factory.createEntityManager();
+        em.getTransaction().begin();
 
-	/**
-	 * This helper method executes a prepared statement including the given
-	 * parameters.
-	 * 
-	 * @param query
-	 *            is a native SQL query.
-	 * @param parameters
-	 *            is an array of {@link Object}s used as parameters.
-	 * @return the same as {@link PreparedStatement#executeUpdate()}.
-	 * @throws SQLException
-	 *             in case execution fails.
-	 */
-	private int executeUpdate(String query, Object... parameters)
-			throws SQLException {
-		PreparedStatement preparedStatement = this.dataSource.getConnection()
-				.prepareStatement(query);
-		for (int parameterIndex = 0; parameterIndex < parameters.length; parameterIndex++) {
-			Object parameter = parameters[parameterIndex];
-			preparedStatement.setObject(parameterIndex + 1, parameter);
-		}
+        // Try to delete a non existing book.
+        Book book = new Book(isbn, title);
 
-		// Execute query.
-		int numberAffected = preparedStatement.executeUpdate();
+        // Should fail.
+        em.remove(book);
+    }
 
-		// Release resources.
-		preparedStatement.close();
+    /**
+     * This helper method verifies a given {@link Book} using JUnit asserts.
+     * 
+     * @param result
+     *            the {@link Book} to verify.
+     * @param isbn
+     *            the expected isbn.
+     * @param title
+     *            the expected title.
+     */
+    private static void verifyBook(Book result, long isbn, String title) {
+        assertNotNull(result);
+        assertEquals(isbn, result.getIsbn());
+        assertEquals(title, result.getTitle());
+    }
 
-		return numberAffected;
-	}
+    private void verifyPersistentBook(Book book) throws SQLException {
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
 
+        int fetchSize = 0;
+        long isbn = 0;
+        String title = null;
+
+        try {
+            // Load the book from the database.
+            preparedStatement = this.dataSource.getConnection().prepareStatement(
+                    "SELECT isbn, title FROM book WHERE isbn = ?");
+            preparedStatement.setObject(1, Long.valueOf(book.getIsbn()));
+            resultSet = preparedStatement.executeQuery();
+
+            fetchSize = resultSet.getFetchSize();
+            resultSet.next();
+
+            // Get values from result set.
+            isbn = resultSet.getLong(1);
+            title = resultSet.getString(2);
+
+        } catch (SQLException e) {
+            fail("Could not verify book instance: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            // Release resources.
+            resultSet.close();
+            preparedStatement.close();
+        }
+
+        // Verify result.
+        assertEquals(1, fetchSize);
+        assertEquals(book.getIsbn(), isbn);
+        assertEquals(book.getTitle(), title);
+    }
+
+    /**
+     * This helper method executes a prepared statement including the given
+     * parameters.
+     * 
+     * @param query
+     *            is a native SQL query.
+     * @param parameters
+     *            is an array of {@link Object}s used as parameters.
+     * @return the same as {@link PreparedStatement#executeUpdate()}.
+     * @throws SQLException
+     *             in case execution fails.
+     */
+    private int executeUpdate(String query, Object... parameters) throws SQLException {
+        try {
+            this.dataSource.getConnection().setAutoCommit(false);
+            PreparedStatement preparedStatement = this.dataSource.getConnection().prepareStatement(
+                    query);
+            for (int parameterIndex = 0; parameterIndex < parameters.length; parameterIndex++) {
+                Object parameter = parameters[parameterIndex];
+                preparedStatement.setObject(parameterIndex + 1, parameter);
+            }
+
+            // Execute query.
+            int numberAffected = preparedStatement.executeUpdate();
+            // Release resources.
+            preparedStatement.close();
+
+            this.dataSource.getConnection().commit();
+            this.dataSource.getConnection().setAutoCommit(false);
+
+            return numberAffected;
+
+        } catch (SQLException e) {
+            throw e;
+        }
+
+    }
+
+    private void deleteFromTable(String table) throws SQLException {
+        executeUpdate("DELETE FROM book");
+    }
+
+    private int countRowsInTable(String table) throws SQLException {
+        String query = "SELECT COUNT(0) AS count FROM " + table;
+        Statement stmt = this.dataSource.getConnection().createStatement();
+        ResultSet resultSet = stmt.executeQuery(query);
+        int count = -1;
+        if (resultSet.next()) {
+            count = resultSet.getInt("count");
+        } else {
+            throw new IllegalStateException("Could not get result from query >" + query + "<.");
+        }
+        // Release resources.
+        stmt.close();
+        return count;
+    }
 }

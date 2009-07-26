@@ -26,6 +26,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore
 public class CastorQueryTest {
 
     private EntityManagerFactory factory;
@@ -133,7 +134,6 @@ public class CastorQueryTest {
      * The query must be invalid then.
      */
     @Test(expected = PersistenceException.class)
-    @Ignore
     public void nativeQueryResultListOnClosedEntityManager() {
         EntityManager em = factory.createEntityManager();
         Query query = em.createNativeQuery("SELECT * FROM entity");
@@ -149,7 +149,6 @@ public class CastorQueryTest {
      * The query must be invalid then.
      */
     @Test(expected = PersistenceException.class)
-    @Ignore
     public void nativeQueryGetSingleResultOnClosedEntityManager() {
         EntityManager em = factory.createEntityManager();
         Query query = em.createNativeQuery("SELECT * FROM entity");
@@ -165,7 +164,6 @@ public class CastorQueryTest {
      * The query must be invalid then.
      */
     @Test(expected = PersistenceException.class)
-    @Ignore
     public void nativeQueryUpdateOnClosedEntityManager() {
         EntityManager em = factory.createEntityManager();
         Query query = em.createNativeQuery("SELECT * FROM entity");
@@ -183,8 +181,7 @@ public class CastorQueryTest {
     @Test(expected = PersistenceException.class)
     public void nativeQueryWithTypeResultListOnClosedEntityManager() {
         EntityManager em = factory.createEntityManager();
-        Query query =
-                em.createNativeQuery("SELECT * FROM entity", Entity.class);
+        Query query = em.createNativeQuery("SELECT * FROM entity", Entity.class);
         // Now close the EntityManager.
         em.close();
 
@@ -199,8 +196,7 @@ public class CastorQueryTest {
     @Test(expected = PersistenceException.class)
     public void nativeQueryWithTypeGetSingleResultOnClosedEntityManager() {
         EntityManager em = factory.createEntityManager();
-        Query query =
-                em.createNativeQuery("SELECT * FROM entity", Entity.class);
+        Query query = em.createNativeQuery("SELECT * FROM entity", Entity.class);
         // Now close the EntityManager.
         em.close();
 
@@ -215,8 +211,7 @@ public class CastorQueryTest {
     @Test(expected = PersistenceException.class)
     public void nativeQueryWithTypeUpdateOnClosedEntityManager() {
         EntityManager em = factory.createEntityManager();
-        Query query =
-                em.createNativeQuery("SELECT * FROM entity", Entity.class);
+        Query query = em.createNativeQuery("SELECT * FROM entity", Entity.class);
         // Now close the EntityManager.
         em.close();
 
@@ -229,12 +224,9 @@ public class CastorQueryTest {
      * The query must be invalid then.
      */
     @Test(expected = PersistenceException.class)
-    @Ignore
     public void nativeQueryWithMappingResultListOnClosedEntityManager() {
         EntityManager em = factory.createEntityManager();
-        Query query =
-                em.createNativeQuery("SELECT * FROM entity",
-                        "unit-test-mapping");
+        Query query = em.createNativeQuery("SELECT * FROM entity", "unit-test-mapping");
         // Now close the EntityManager.
         em.close();
 
@@ -247,12 +239,9 @@ public class CastorQueryTest {
      * The query must be invalid then.
      */
     @Test(expected = PersistenceException.class)
-    @Ignore
     public void nativeQueryWithMappingGetSingleResultOnClosedEntityManager() {
         EntityManager em = factory.createEntityManager();
-        Query query =
-                em.createNativeQuery("SELECT * FROM entity",
-                        "unit-test-mapping");
+        Query query = em.createNativeQuery("SELECT * FROM entity", "unit-test-mapping");
         // Now close the EntityManager.
         em.close();
 
@@ -265,11 +254,9 @@ public class CastorQueryTest {
      * The query must be invalid then.
      */
     @Test(expected = PersistenceException.class)
-    @Ignore
     public void nativeQueryWithMappingUpdateOnClosedEntityManager() {
         EntityManager em = factory.createEntityManager();
-        Query query =
-                em.createNativeQuery("DELETE FROM entity", "unit-test-mapping");
+        Query query = em.createNativeQuery("DELETE FROM entity", "unit-test-mapping");
         // Now close the EntityManager.
         em.close();
 

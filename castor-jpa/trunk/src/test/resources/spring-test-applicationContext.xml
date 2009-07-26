@@ -5,16 +5,18 @@
        http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
 	<!-- PlatformTransactionManager for test purpose. -->
-	<bean id="transactionManager"
+	<!--
+		<bean id="transactionManager"
 		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-		<property name="dataSource" ref="dataSource" />
-	</bean>
+		<property name="dataSource" ref="dataSource" /> </bean>
+	-->
+
 
 	<!-- A DataSource for test purpose. -->
 	<bean id="dataSource" destroy-method="close"
 		class="org.apache.commons.dbcp.BasicDataSource">
 		<property name="driverClassName" value="org.apache.derby.jdbc.EmbeddedDriver" />
-		<property name="url" value="jdbc:derby:target/test" />
+		<property name="url" value="jdbc:derby:target/test;create=true" />
 		<property name="username" value="" />
 		<property name="password" value="" />
 	</bean>
