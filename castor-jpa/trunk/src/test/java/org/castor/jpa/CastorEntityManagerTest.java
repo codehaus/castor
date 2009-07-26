@@ -15,10 +15,10 @@
  */
 package org.castor.jpa;
 
-import java.awt.print.Book;
-
+import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityNotFoundException;
 import javax.persistence.EntityTransaction;
 import javax.persistence.FlushModeType;
 import javax.persistence.LockModeType;
@@ -26,13 +26,17 @@ import javax.persistence.Persistence;
 import javax.persistence.Query;
 import javax.persistence.TransactionRequiredException;
 
+import org.castor.jpa.functional.model.Book;
+import org.castor.jpa.functional.model.UnknownType;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class CastorEntityManagerTest {
 
@@ -58,6 +62,33 @@ public class CastorEntityManagerTest {
     }
 
     /**
+     * Tries to find an unknown entity type, which must fail.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void findUnknownEntityType() {
+        EntityManager em = factory.createEntityManager();
+        EntityTransaction tx = em.getTransaction();
+        tx.begin();
+        em.find(org.castor.jpa.functional.model.UnknownType.class, Long.valueOf(1));
+        tx.commit();
+        em.close();
+    }
+
+    /**
+     * Tries to look up an invalid primary key type.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    @Ignore
+    public void findInvalidPrimaryKeyType() {
+        EntityManager em = factory.createEntityManager();
+        EntityTransaction tx = em.getTransaction();
+        tx.begin();
+        em.find(Book.class, Float.valueOf(1 / 3f));
+        tx.commit();
+        em.close();
+    }
+
+    /**
      * Tries to execute a find on a closed {@link EntityManager}, which must
      * fail.
      */
@@ -65,8 +96,8 @@ public class CastorEntityManagerTest {
     public void findOnClosedEntityManager() {
         EntityManager em = factory.createEntityManager();
         EntityTransaction tx = em.getTransaction();
-        tx.begin();
         em.close();
+        tx.begin();
         em.find(Book.class, Long.valueOf(1));
         tx.commit();
     }
@@ -92,8 +123,8 @@ public class CastorEntityManagerTest {
         Object entity = new Object();
         EntityManager em = factory.createEntityManager();
         EntityTransaction tx = em.getTransaction();
-        tx.begin();
         em.close();
+        tx.begin();
         em.merge(entity);
         tx.commit();
     }
@@ -119,8 +150,8 @@ public class CastorEntityManagerTest {
         Object entity = new Object();
         EntityManager em = factory.createEntityManager();
         EntityTransaction tx = em.getTransaction();
-        tx.begin();
         em.close();
+        tx.begin();
         em.remove(entity);
         tx.commit();
     }
@@ -130,7 +161,6 @@ public class CastorEntityManagerTest {
      * transaction-scoped persistence context this must fail.
      */
     @Test(expected = TransactionRequiredException.class)
-    @Ignore
     public void refreshWithoutTransaction() {
         Object entity = new Object();
         EntityManager em = factory.createEntityManager();
@@ -242,11 +272,19 @@ public class CastorEntityManagerTest {
     }
 
     /**
+     * Tries to flush without an {@link EntityTransaction}.
+     */
+    @Test(expected = TransactionRequiredException.class)
+    public void flushWithoutTransaction() {
+        EntityManager em = factory.createEntityManager();
+        em.flush();
+    }
+
+    /**
      * Tries to obtain the delegate from a closed {@link EntityManager}, which
      * must fail.
      */
     @Test(expected = IllegalStateException.class)
-    @Ignore
     public void getDelegateOnClosedEntityManager() {
         EntityManager em = factory.createEntityManager();
         em.close();
@@ -269,11 +307,31 @@ public class CastorEntityManagerTest {
      * must fail.
      */
     @Test(expected = IllegalStateException.class)
-    @Ignore
     public void getReferenceOnClosedEntityManager() {
         EntityManager em = factory.createEntityManager();
         em.close();
         em.getReference(Object.class, Long.valueOf(1));
+    }
+
+    /**
+     * Tries to obtain a reference from an unknown entity type.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    @Ignore
+    public void getReferenceOfUnknownEntityType() {
+        EntityManager em = factory.createEntityManager();
+        em.getReference(UnknownType.class, Long.valueOf(1));
+    }
+
+    /**
+     * Tries to obtain a reference from a non existing entity.<br/>
+     * TODO lukas.lang: Discuss, whether exception should be thrown immediately.
+     */
+    @Test(expected = EntityNotFoundException.class)
+    @Ignore
+    public void getReferenceOfNonExistingEntity() {
+        EntityManager em = factory.createEntityManager();
+        em.getReference(Book.class, Long.valueOf(1));
     }
 
     /**
@@ -286,6 +344,51 @@ public class CastorEntityManagerTest {
         em.close();
         EntityTransaction transaction = em.getTransaction();
         assertNotNull(transaction);
+    }
+
+    /**
+     * Tries to obtain a transaction from an {@link EntityManager}.
+     */
+    @Test
+    public void getTransaction() {
+        EntityManager em = factory.createEntityManager();
+        EntityTransaction transaction = em.getTransaction();
+        assertNotNull(transaction);
+    }
+
+    /**
+     * Verifies that a {@link EntityManager#isOpen()} returns false after
+     * calling {@link EntityManager#close()}.
+     */
+    @Test
+    public void closeEntityManager() {
+        EntityManager em = factory.createEntityManager();
+        assertTrue(em.isOpen());
+        em.close();
+        assertFalse(em.isOpen());
+    }
+
+    /**
+     * Verifies idempotence of calling {@link EntityManager#close()}.
+     */
+    @Test(expected = IllegalStateException.class)
+    public void closeEntityManagerTwice() {
+        EntityManager em = factory.createEntityManager();
+        assertTrue(em.isOpen());
+        em.close();
+        assertFalse(em.isOpen());
+        em.close();
+        assertFalse(em.isOpen());
+    }
+
+    /**
+     * Verifies that a {@link EntityManager#isOpen()} returns true after
+     * creation.
+     */
+    @Test
+    public void isOpenEntityManager() {
+        EntityManager em = factory.createEntityManager();
+        assertTrue(em.isOpen());
     }
 
     /**
@@ -303,7 +406,6 @@ public class CastorEntityManagerTest {
      * Tries to join transactions on a closed {@link EntityManager}.
      */
     @Test(expected = IllegalStateException.class)
-    @Ignore
     public void joinTransactionOnClosedEntityManager() {
         EntityManager em = factory.createEntityManager();
         em.close();
@@ -311,7 +413,16 @@ public class CastorEntityManagerTest {
     }
 
     /**
-     * Tries to invoke a {@link LockModeType#READ} lock on a closed
+     * Tries to join transactions without an active {@link EntityTransaction}.
+     */
+    @Test(expected = TransactionRequiredException.class)
+    public void joinTransactionWithoutRunningTransaction() {
+        EntityManager em = factory.createEntityManager();
+        em.joinTransaction();
+    }
+
+    /**
+     * Tries to get a {@link LockModeType#READ} lock on a closed
      * {@link EntityManager}.
      */
     @Test(expected = IllegalStateException.class)
@@ -323,7 +434,95 @@ public class CastorEntityManagerTest {
     }
 
     /**
-     * Tries to invoke a {@link LockModeType#READ} lock on a closed
+     * Tries to get a {@link LockModeType#READ} lock with an unknown entity
+     * type.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    @Ignore
+    public void lockReadWithUnknownEntityType() {
+        UnknownType entity = new UnknownType();
+        EntityManager em = factory.createEntityManager();
+        em.getTransaction().begin();
+        em.lock(entity, LockModeType.READ);
+    }
+
+    /**
+     * Tries to get a {@link LockModeType#READ} lock on a detached entity.
+     */
+    @Test
+    @Ignore
+    public void lockReadOnDetachedEntity() {
+        Book book = new Book();
+        book.setIsbn(1L);
+        book.setTitle("unit-test-title");
+
+        // Create a book entity.
+        EntityManager em = factory.createEntityManager();
+        em.getTransaction().begin();
+        em.persist(book);
+        em.getTransaction().commit();
+
+        // Now get a lock on a detached entity.
+        em.getTransaction().begin();
+        try {
+            em.lock(book, LockModeType.READ);
+            fail("Lock should not be granted!");
+        } catch (IllegalArgumentException iae) {
+            // Should be here.
+        } finally {
+            // Clean up database.
+            book = em.find(Book.class, 1L);
+            em.remove(book);
+            em.getTransaction().commit();
+        }
+    }
+
+    /**
+     * Tries to get a {@link LockModeType#WRITE} lock on a detached entity.
+     */
+    @Test
+    @Ignore
+    public void lockWriteOnDetachedEntity() {
+        Book book = new Book();
+        book.setIsbn(1L);
+        book.setTitle("unit-test-title-2");
+
+        // Create a book entity.
+        EntityManager em = factory.createEntityManager();
+        em.getTransaction().begin();
+        em.persist(book);
+        em.getTransaction().commit();
+
+        // Now get a lock on a detached entity.
+        em.getTransaction().begin();
+        try {
+            em.lock(book, LockModeType.WRITE);
+            fail("Lock should not be granted!");
+        } catch (IllegalArgumentException iae) {
+            // Should be here.
+        } finally {
+            // Clean up database.
+            book = em.find(Book.class, 1L);
+            em.remove(book);
+            em.getTransaction().commit();
+        }
+    }
+
+    /**
+     * Tries to get a {@link LockModeType#WRITE} lock with an unknown entity
+     * type.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    @Ignore
+    public void lockWriteWithUnknownEntityType() {
+        UnknownType entity = new UnknownType();
+        EntityManager em = factory.createEntityManager();
+        em.getTransaction().begin();
+        em.lock(entity, LockModeType.WRITE);
+    }
+
+    /**
+     * Tries to get a {@link LockModeType#READ} lock on a closed
      * {@link EntityManager}.
      */
     @Test(expected = IllegalStateException.class)
@@ -335,29 +534,25 @@ public class CastorEntityManagerTest {
     }
 
     /**
-     * Tries to invoke a {@link LockModeType#READ} lock on a
-     * {@link EntityManager} without obtaining a transaction first.
+     * Tries to get a {@link LockModeType#READ} lock on a {@link EntityManager}
+     * without obtaining a transaction first.
      */
     @Test(expected = TransactionRequiredException.class)
-    @Ignore
     public void lockReadWithoutTransaction() {
         Object entity = new Object();
         EntityManager em = factory.createEntityManager();
         em.lock(entity, LockModeType.READ);
-        em.close();
     }
 
     /**
-     * Tries to invoke a {@link LockModeType#WRITE} lock on a
-     * {@link EntityManager} without obtaining a transaction first.
+     * Tries to get a {@link LockModeType#WRITE} lock on a {@link EntityManager}
+     * without obtaining a transaction first.
      */
     @Test(expected = TransactionRequiredException.class)
-    @Ignore
     public void lockWriteWithoutTransaction() {
         Object entity = new Object();
         EntityManager em = factory.createEntityManager();
         em.lock(entity, LockModeType.WRITE);
-        em.close();
     }
 
     /**
@@ -380,6 +575,68 @@ public class CastorEntityManagerTest {
         EntityManager em = factory.createEntityManager();
         em.close();
         em.setFlushMode(FlushModeType.COMMIT);
+    }
+
+    /**
+     * Tries to persist an {@link Object} within a closed {@link EntityManager}
+     * which must fail.
+     */
+    @Test(expected = IllegalStateException.class)
+    public void persistOnClosedEntityManager() {
+        Object entity = new Object();
+        EntityManager em = factory.createEntityManager();
+        em.close();
+        em.persist(entity);
+    }
+
+    /**
+     * Tries to persist an {@link Object} without starting an
+     * {@link EntityTransaction}.
+     */
+    @Test(expected = TransactionRequiredException.class)
+    public void persistWithoutTransaction() {
+        Object entity = new Object();
+        EntityManager em = factory.createEntityManager();
+        em.persist(entity);
+    }
+
+    /**
+     * Tries to persist an unknown entity type.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void persistUnknownEntityType() {
+        UnknownType entity = new UnknownType();
+        EntityManager em = factory.createEntityManager();
+        em.getTransaction().begin();
+        em.persist(entity);
+        em.getTransaction().commit();
+    }
+
+    /**
+     * Tries to persist an existing entity.
+     */
+    @Test(expected = EntityExistsException.class)
+    public void persistExistingEntity() {
+        EntityManager em = factory.createEntityManager();
+
+        // Ensure, there exists no book within this entity manager.
+        em.getTransaction().begin();
+        Book result = em.find(Book.class, 1L);
+        em.getTransaction().commit();
+
+        assertNull(result);
+
+        Book book = new Book();
+        book.setIsbn(1L);
+        book.setTitle("unit-test-title");
+
+        em.getTransaction().begin();
+        em.persist(book);
+
+        Book sameBook = new Book();
+        sameBook.setIsbn(1L);
+        sameBook.setTitle("unit-test-title");
+        em.persist(sameBook);
     }
 
 }
