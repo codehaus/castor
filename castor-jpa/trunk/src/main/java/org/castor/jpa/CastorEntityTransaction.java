@@ -177,6 +177,8 @@ public class CastorEntityTransaction implements EntityTransaction {
             this.database.rollback();
             // Set transaction inactive.
             this.active = false;
+            // Set roll back only false.
+            this.rollbackOnly = false;
         } catch (TransactionNotInProgressException e) {
             log.error("Could not rollback Castor transaction.", e);
             throw new PersistenceException("Could not rollback Castor transaction.", e);
