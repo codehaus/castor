@@ -15,39 +15,24 @@
  */
 package org.castor.jpa.functional;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import javax.sql.DataSource;
 
 import org.castor.jpa.functional.model.Book;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
-@ContextConfiguration(locations = { "/spring-test-applicationContext.xml" })
-@Ignore
-public class SingleEntityTest extends AbstractJUnit4SpringContextTests {
-
-    /**
-     * The {@link DataSource} to use. Injected by Spring.
-     */
-    @Autowired
-    private DataSource dataSource;
+public class SingleEntityTest extends AbstractSpringBaseTest {
 
     private EntityManagerFactory factory;
 
@@ -162,7 +147,6 @@ public class SingleEntityTest extends AbstractJUnit4SpringContextTests {
      * should end up with an {@link EntityExistsException}.
      */
     @Test
-    @Ignore
     public void persistBookTwice() throws SQLException {
         deleteFromTable("book");
 
@@ -235,7 +219,7 @@ public class SingleEntityTest extends AbstractJUnit4SpringContextTests {
         em.close();
 
         // Verify result.
-        assertEquals(0, countRowsInTable("book"));
+        assertEquals(1, countRowsInTable("book"));
 
         deleteFromTable("book");
     }
@@ -269,6 +253,8 @@ public class SingleEntityTest extends AbstractJUnit4SpringContextTests {
 
         // Verify result.
         assertEquals(0, countRowsInTable("book"));
+
+        deleteFromTable("book");
     }
 
     /**
@@ -295,6 +281,75 @@ public class SingleEntityTest extends AbstractJUnit4SpringContextTests {
     }
 
     /**
+     * Invokes the {@link EntityManager#find(Class, Object)} method and merges
+     * the detached instance.
+     * 
+     * @throws SQLException
+     *             in case clean up fails.
+     * 
+     */
+    @Test
+    @Ignore
+    public void merge() throws SQLException {
+        deleteFromTable("book");
+
+        Book book = new Book(1L, "unit-test-title-7");
+        EntityManager em = factory.createEntityManager();
+        em.getTransaction().begin();
+        em.persist(book);
+        em.getTransaction().commit();
+
+        // Apply some changes to the detached entity.
+        book.setTitle("new-unit-test-title-7");
+
+        // Merge the entity.
+        em.getTransaction().begin();
+        em.merge(book);
+        em.getTransaction().commit();
+
+        // Verify changes.
+        em.getTransaction();
+        Book result = em.find(Book.class, 1L);
+        verifyBook(result, 1L, "new-unit-test-title-7");
+
+        deleteFromTable("book");
+    }
+
+    /**
+     * Invokes the {@link EntityManager#find(Class, Object)} method and merges
+     * the detached instance within another {@link EntityManager}.
+     * 
+     * @throws SQLException
+     *             in case clean up fails.
+     * 
+     */
+    @Test
+    @Ignore
+    public void mergeWithinAnotherEntityManager() throws SQLException {
+        Book book = new Book(1L, "unit-test-title-8");
+        EntityManager em = factory.createEntityManager();
+        em.getTransaction().begin();
+        em.persist(book);
+        em.getTransaction().commit();
+
+        // Apply some changes to the detached entity.
+        book.setTitle("new-unit-test-title-8");
+
+        // Merge the entity.
+        em = factory.createEntityManager();
+        em.getTransaction().begin();
+        em.merge(book);
+        em.getTransaction().commit();
+
+        // Verify changes.
+        em.getTransaction();
+        Book result = em.find(Book.class, 1L);
+        verifyBook(result, 1L, "new-unit-test-title-8");
+
+        deleteFromTable("book");
+    }
+
+    /**
      * This helper method verifies a given {@link Book} using JUnit asserts.
      * 
      * @param result
@@ -310,97 +365,4 @@ public class SingleEntityTest extends AbstractJUnit4SpringContextTests {
         assertEquals(title, result.getTitle());
     }
 
-    private void verifyPersistentBook(Book book) throws SQLException {
-        PreparedStatement preparedStatement = null;
-        ResultSet resultSet = null;
-
-        int fetchSize = 0;
-        long isbn = 0;
-        String title = null;
-
-        try {
-            // Load the book from the database.
-            preparedStatement = this.dataSource.getConnection().prepareStatement(
-                    "SELECT isbn, title FROM book WHERE isbn = ?");
-            preparedStatement.setObject(1, Long.valueOf(book.getIsbn()));
-            resultSet = preparedStatement.executeQuery();
-
-            fetchSize = resultSet.getFetchSize();
-            resultSet.next();
-
-            // Get values from result set.
-            isbn = resultSet.getLong(1);
-            title = resultSet.getString(2);
-
-        } catch (SQLException e) {
-            fail("Could not verify book instance: " + e.getMessage());
-            e.printStackTrace();
-        } finally {
-            // Release resources.
-            resultSet.close();
-            preparedStatement.close();
-        }
-
-        // Verify result.
-        assertEquals(1, fetchSize);
-        assertEquals(book.getIsbn(), isbn);
-        assertEquals(book.getTitle(), title);
-    }
-
-    /**
-     * This helper method executes a prepared statement including the given
-     * parameters.
-     * 
-     * @param query
-     *            is a native SQL query.
-     * @param parameters
-     *            is an array of {@link Object}s used as parameters.
-     * @return the same as {@link PreparedStatement#executeUpdate()}.
-     * @throws SQLException
-     *             in case execution fails.
-     */
-    private int executeUpdate(String query, Object... parameters) throws SQLException {
-        try {
-            this.dataSource.getConnection().setAutoCommit(false);
-            PreparedStatement preparedStatement = this.dataSource.getConnection().prepareStatement(
-                    query);
-            for (int parameterIndex = 0; parameterIndex < parameters.length; parameterIndex++) {
-                Object parameter = parameters[parameterIndex];
-                preparedStatement.setObject(parameterIndex + 1, parameter);
-            }
-
-            // Execute query.
-            int numberAffected = preparedStatement.executeUpdate();
-            // Release resources.
-            preparedStatement.close();
-
-            this.dataSource.getConnection().commit();
-            this.dataSource.getConnection().setAutoCommit(false);
-
-            return numberAffected;
-
-        } catch (SQLException e) {
-            throw e;
-        }
-
-    }
-
-    private void deleteFromTable(String table) throws SQLException {
-        executeUpdate("DELETE FROM book");
-    }
-
-    private int countRowsInTable(String table) throws SQLException {
-        String query = "SELECT COUNT(0) AS count FROM " + table;
-        Statement stmt = this.dataSource.getConnection().createStatement();
-        ResultSet resultSet = stmt.executeQuery(query);
-        int count = -1;
-        if (resultSet.next()) {
-            count = resultSet.getInt("count");
-        } else {
-            throw new IllegalStateException("Could not get result from query >" + query + "<.");
-        }
-        // Release resources.
-        stmt.close();
-        return count;
-    }
 }
