@@ -316,7 +316,8 @@ public class OldCastorEntityManager implements EntityManager {
 
         // TODO throw IllegalStateException if invoked on a JTA EntityManager
 
-        return new CastorEntityTransaction(this, database);
+//        return new CastorEntityTransaction(this, database);
+        return null;
     }
 
     public Object getDelegate() {

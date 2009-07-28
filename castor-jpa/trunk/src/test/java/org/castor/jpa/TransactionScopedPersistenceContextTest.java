@@ -47,6 +47,8 @@ public class TransactionScopedPersistenceContextTest {
 
         context.remove(entity);
         assertFalse(context.contains(entity));
+
+        assertTrue(context.removed(entity));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -54,6 +56,13 @@ public class TransactionScopedPersistenceContextTest {
         PersistenceContext context = new TransactionScopedPersistenceContext();
 
         context.remove(null);
+    }
+
+    @Test
+    public void testRemoveNonExisting() {
+        PersistenceContext context = new TransactionScopedPersistenceContext();
+
+        context.remove(new Object());
     }
 
     @Test
@@ -68,6 +77,7 @@ public class TransactionScopedPersistenceContextTest {
         context.replace(oldEntity, newEntity);
         assertTrue(context.contains(newEntity));
         assertFalse(context.contains(oldEntity));
+        assertFalse(context.removed(oldEntity));
     }
 
     @Test
@@ -120,4 +130,10 @@ public class TransactionScopedPersistenceContextTest {
         context.contains(null);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testRemovedNull() {
+        PersistenceContext context = new TransactionScopedPersistenceContext();
+
+        context.removed(null);
+    }
 }

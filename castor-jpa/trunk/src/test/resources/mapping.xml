@@ -4,7 +4,8 @@
 <mapping>
 
 	<!--  Mapping for Book  -->
-	<class name="org.castor.jpa.functional.model.Book" identity="isbn">
+	<class name="org.castor.jpa.functional.model.Book" identity="isbn"
+		version="version">
 		<named-query name="unit-test-named-select-query">
 			<query>SELECT b FROM Book b</query>
 		</named-query>
@@ -17,6 +18,9 @@
 		</field>
 		<field name="title" type="string">
 			<sql name="title" type="char" />
+		</field>
+		<field name="version" type="long" required="true">
+			<sql name="version" type="bigint" />
 		</field>
 	</class>
 

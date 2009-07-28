@@ -32,17 +32,23 @@ import javax.persistence.PersistenceContextType;
 class TransactionScopedPersistenceContext implements PersistenceContext {
 
     /**
-     * The persistence context container.
+     * The set of managed entities within this persistence context.
      */
-    private Set<Object> container;
+    private Set<Object> managed;
+
+    /**
+     * The set of removed entities within this persistence context.
+     */
+    private Set<Object> removed;
 
     public TransactionScopedPersistenceContext() {
-        this.container = new HashSet<Object>();
+        this.managed = new HashSet<Object>();
+        this.removed = new HashSet<Object>();
     }
 
     public boolean contains(Object entity) {
         verifyNotNull(entity);
-        return this.container.contains(entity);
+        return this.managed.contains(entity);
     }
 
     public PersistenceContextType getScope() {
@@ -51,12 +57,16 @@ class TransactionScopedPersistenceContext implements PersistenceContext {
 
     public void manage(Object entity) {
         verifyNotNull(entity);
-        this.container.add(entity);
+        this.removed.remove(entity);
+        this.managed.add(entity);
     }
 
     public void remove(Object entity) {
         verifyNotNull(entity);
-        this.container.remove(entity);
+        if (this.managed.remove(entity)) {
+            // Add it to the set of removed entities if remove succeeded.
+            this.removed.add(entity);
+        }
     }
 
     public void replace(Object oldEntity, Object newEntity) {
@@ -66,8 +76,8 @@ class TransactionScopedPersistenceContext implements PersistenceContext {
             throw new IllegalArgumentException("Can not replace an entity of type >"
                     + oldEntity.getClass() + "< which is not managed!");
         }
-        this.remove(oldEntity);
-        this.manage(newEntity);
+        this.managed.remove(oldEntity);
+        this.managed.add(newEntity);
     }
 
     /**
@@ -81,6 +91,11 @@ class TransactionScopedPersistenceContext implements PersistenceContext {
         if (entity == null) {
             throw new IllegalArgumentException("An entity must not be null!");
         }
+    }
+
+    public boolean removed(Object entity) {
+        verifyNotNull(entity);
+        return this.removed.contains(entity);
     }
 
 }

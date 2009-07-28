@@ -1,4 +1,5 @@
 CREATE TABLE book (
     isbn INT PRIMARY KEY,
-    title VARCHAR(100) NOT NULL
+    title VARCHAR(100) NOT NULL,
+    version BIGINT NOT NULL
 );

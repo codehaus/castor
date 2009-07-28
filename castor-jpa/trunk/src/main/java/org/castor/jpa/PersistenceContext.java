@@ -19,8 +19,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContextType;
 
 /**
- * The persistence context represents the set of entities, managed by an
- * {@link EntityManager}.<br/>
+ * The persistence context represents the set of managed and removed entities
+ * within an {@link EntityManager}.<br/>
  * <br/>
  * A Persistence context can be either:<br/>
  * <ul>
@@ -51,7 +51,10 @@ interface PersistenceContext {
     void manage(Object entity);
 
     /**
-     * Removes an entity from the set of managed entities.
+     * Removes an entity from the set of managed entities. After invocation, the
+     * entity's state is <i>removed</i>.
+     * {@link PersistenceContext#removed(Object)} then returns <code>true</code>
+     * for the entity.
      * 
      * @param entity
      *            the entity.
@@ -83,4 +86,14 @@ interface PersistenceContext {
      *             in case the entity is <code>null</code>.
      */
     boolean contains(Object entity);
+
+    /**
+     * @param entity
+     *            an entity.
+     * @return <code>true</code> if the entity was passed to
+     *         {@link EntityManager#remove(Object)}.
+     * @throws IllegalArgumentException
+     *             in case the entity is <code>null</code>.
+     */
+    boolean removed(Object entity);
 }

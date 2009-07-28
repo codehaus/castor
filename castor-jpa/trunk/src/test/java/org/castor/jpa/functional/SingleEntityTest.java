@@ -28,8 +28,10 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class SingleEntityTest extends AbstractSpringBaseTest {
@@ -60,7 +62,8 @@ public class SingleEntityTest extends AbstractSpringBaseTest {
         String title = "unit-test-book-title-1";
 
         // Insert test values.
-        executeUpdate("INSERT INTO book (isbn, title) VALUES (?, ?)", isbn, title);
+        executeUpdate("INSERT INTO book (isbn, title, version) VALUES (?, ?, ?)", isbn, title,
+                System.currentTimeMillis());
 
         // Look up book.
         EntityManager em = factory.createEntityManager();
@@ -201,7 +204,8 @@ public class SingleEntityTest extends AbstractSpringBaseTest {
         String title = "unit-test-book-title-4";
 
         // Insert test values.
-        executeUpdate("INSERT INTO book (isbn, title) VALUES (?, ?)", isbn, title);
+        executeUpdate("INSERT INTO book (isbn, title, version) VALUES (?, ?, ?)", isbn, title,
+                System.currentTimeMillis());
 
         // Look up book.
         EntityManager em = factory.createEntityManager();
@@ -239,7 +243,8 @@ public class SingleEntityTest extends AbstractSpringBaseTest {
         String title = "unit-test-book-title-5";
 
         // Insert test values.
-        executeUpdate("INSERT INTO book (isbn, title) VALUES (?, ?)", isbn, title);
+        executeUpdate("INSERT INTO book (isbn, title, version) VALUES (?, ?, ?)", isbn, title,
+                System.currentTimeMillis());
 
         // Look up book and delete it.
         EntityManager em = factory.createEntityManager();
@@ -289,7 +294,6 @@ public class SingleEntityTest extends AbstractSpringBaseTest {
      * 
      */
     @Test
-    @Ignore
     public void merge() throws SQLException {
         deleteFromTable("book");
 
@@ -304,12 +308,17 @@ public class SingleEntityTest extends AbstractSpringBaseTest {
 
         // Merge the entity.
         em.getTransaction().begin();
-        em.merge(book);
+        Book merged = em.merge(book);
         em.getTransaction().commit();
 
+        assertNotNull(merged);
+        verifyBook(merged, 1L, "new-unit-test-title-7");
+
         // Verify changes.
-        em.getTransaction();
+        em.getTransaction().begin();
         Book result = em.find(Book.class, 1L);
+        em.getTransaction().commit();
+
         verifyBook(result, 1L, "new-unit-test-title-7");
 
         deleteFromTable("book");
@@ -324,8 +333,9 @@ public class SingleEntityTest extends AbstractSpringBaseTest {
      * 
      */
     @Test
-    @Ignore
     public void mergeWithinAnotherEntityManager() throws SQLException {
+        deleteFromTable("book");
+
         Book book = new Book(1L, "unit-test-title-8");
         EntityManager em = factory.createEntityManager();
         em.getTransaction().begin();
@@ -338,13 +348,154 @@ public class SingleEntityTest extends AbstractSpringBaseTest {
         // Merge the entity.
         em = factory.createEntityManager();
         em.getTransaction().begin();
-        em.merge(book);
+        Book merged = em.merge(book);
+        em.getTransaction().commit();
+
+        assertNotNull(merged);
+        verifyBook(merged, 1L, "new-unit-test-title-8");
+
+        // Verify changes.
+        em.getTransaction().begin();
+        Book result = em.find(Book.class, 1L);
+        em.getTransaction().commit();
+
+        verifyBook(result, 1L, "new-unit-test-title-8");
+
+        deleteFromTable("book");
+    }
+
+    /**
+     * Updates a loaded entity within a transaction.
+     * 
+     * @throws SQLException
+     *             in case clean up fails.
+     * 
+     */
+    @Test
+    public void updateEntity() throws SQLException {
+        deleteFromTable("book");
+
+        Long isbn = Long.valueOf(1);
+        String title = "unit-test-book-title-9";
+
+        // Insert test values.
+        executeUpdate("INSERT INTO book (isbn, title, version) VALUES (?, ?, ?)", isbn, title,
+                System.currentTimeMillis());
+
+        EntityManager em = factory.createEntityManager();
+        em.getTransaction().begin();
+        Book book = em.find(Book.class, 1L);
+        book.setTitle("new-unit-test-title-9");
         em.getTransaction().commit();
 
         // Verify changes.
-        em.getTransaction();
+        em.getTransaction().begin();
         Book result = em.find(Book.class, 1L);
-        verifyBook(result, 1L, "new-unit-test-title-8");
+        verifyBook(result, 1L, "new-unit-test-title-9");
+
+        deleteFromTable("book");
+    }
+
+    /**
+     * Verifies that object modifications within multiple transactions are
+     * detected when merging detached entities. This is based on (implicit)
+     * optimistic locking.
+     * 
+     * @throws SQLException
+     *             in case clean up fails.
+     */
+    @Test
+    public void mergeModifiedObject() throws SQLException {
+        deleteFromTable("book");
+
+        // Load book.
+        Book book = new Book(1L, "unit-test-title-10");
+        EntityManager em = factory.createEntityManager();
+        em.getTransaction().begin();
+        em.persist(book);
+        em.getTransaction().commit();
+
+        // Wait to achieve different time stamps between merge calls.
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            // Don't care.
+            e.printStackTrace();
+        }
+
+        // Load same book.
+        EntityManager em2 = factory.createEntityManager();
+        em2.getTransaction().begin();
+        Book book2 = em2.find(Book.class, 1L);
+        em2.getTransaction().commit();
+
+        // Apply some changes to the detached entity.
+        book.setTitle("new-unit-test-title-10");
+
+        // Merge the entity back.
+        em.getTransaction().begin();
+        Book merged = em.merge(book);
+        em.getTransaction().commit();
+
+        assertNotNull(merged);
+        verifyBook(merged, 1L, "new-unit-test-title-10");
+
+        // Now try to merge the second book.
+        book2.setTitle("fail-unit-test-title-10");
+        try {
+            em2.getTransaction().begin();
+            em2.merge(book2);
+            em2.getTransaction().commit();
+            fail("Object was modified. Merge operation must not succeed!");
+        } catch (IllegalArgumentException iae) {
+            // Normal behavior.
+            em2.getTransaction().rollback();
+        }
+
+        // Verify changes on first entity manager.
+        em2.getTransaction().begin();
+        Book result = em2.find(Book.class, 1L);
+        em2.getTransaction().commit();
+
+        verifyBook(result, 1L, "new-unit-test-title-10");
+
+        // Verify changes on second entity manager.
+        em.getTransaction().begin();
+        result = em.find(Book.class, 1L);
+        em.getTransaction().commit();
+
+        verifyBook(result, 1L, "new-unit-test-title-10");
+
+        deleteFromTable("book");
+    }
+
+    /**
+     * Verifies that calling {@link EntityManager#merge(Object)} with a new
+     * object results in a new managed object.
+     * 
+     * @throws SQLException
+     */
+    @Test
+    @Ignore
+    public void mergeNewEntity() throws SQLException {
+        deleteFromTable("book");
+
+        // Load book.
+        Book book = new Book(1L, "unit-test-title-10");
+        EntityManager em = factory.createEntityManager();
+        assertFalse(em.contains(book));
+
+        em.getTransaction().begin();
+        Book merged = em.merge(book);
+        em.getTransaction().commit();
+
+        // Verify that a new object was returned.
+        assertNotNull(merged);
+        assertFalse(book == merged);
+
+        // Verify that the new object is managed.
+        assertFalse(em.contains(book));
+        assertTrue(em.contains(merged));
 
         deleteFromTable("book");
     }
@@ -364,5 +515,4 @@ public class SingleEntityTest extends AbstractSpringBaseTest {
         assertEquals(isbn, result.getIsbn());
         assertEquals(title, result.getTitle());
     }
-
 }
