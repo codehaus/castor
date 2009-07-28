@@ -677,6 +677,8 @@ public final class CastorEntityManager implements EntityManager {
      * Verifies whether a given entity is persistence capable within this
      * {@link EntityManager}.
      * 
+     * TODO lukas.lang: Check should be made via the mapping loader.
+     * 
      * @param entity
      *            an entity.
      * @throws IllegalArgumentException
