@@ -38,9 +38,9 @@ import org.exolab.castor.jdo.TransactionNotInProgressException;
 public class CastorEntityTransaction implements EntityTransaction {
 
     /**
-     * The corresponding {@link EntityManager}.
+     * The corresponding {@link CastorEntityManager}.
      */
-    private EntityManager entityManager;
+    private CastorEntityManager entityManager;
 
     /**
      * The Castor {@link Database}.
@@ -63,7 +63,7 @@ public class CastorEntityTransaction implements EntityTransaction {
      */
     private final Log log = LogFactory.getLog(CastorEntityTransaction.class);
 
-    public CastorEntityTransaction(EntityManager entityManager, Database database) {
+    public CastorEntityTransaction(CastorEntityManager entityManager, Database database) {
         this.entityManager = entityManager;
         this.database = database;
     }
@@ -118,6 +118,8 @@ public class CastorEntityTransaction implements EntityTransaction {
             this.database.commit();
             // Set transaction inactive.
             this.active = false;
+            // Discard transaction-scoped persistence context.
+            this.entityManager.invalidatePersistenceContext();
 
         } catch (TransactionNotInProgressException e) {
 

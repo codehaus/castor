@@ -31,6 +31,7 @@ import org.exolab.castor.jdo.ClassNotPersistenceCapableException;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.DuplicateIdentityException;
 import org.exolab.castor.jdo.ObjectNotFoundException;
+import org.exolab.castor.persist.spi.Identity;
 
 /**
  * Castor implementation of the {@link EntityManager} interface.
@@ -61,14 +62,19 @@ public final class CastorEntityManager implements EntityManager {
     private EntityTransaction entityTransaction;
 
     /**
+     * The {@link PersistenceContext} which manages entity life cycles.
+     */
+    private PersistenceContext context;
+
+    /**
      * Constructor taking a Castor {@link Database}.
      * 
      * @param database
-     *            the Castor {@link Database} used by this {@link EntityManager}
-     *            .
+     *            the Castor {@link Database} used by the {@link EntityManager}.
      */
     public CastorEntityManager(final Database database) {
         this.database = database;
+        this.context = new TransactionScopedPersistenceContext();
         this.entityTransaction = new CastorEntityTransaction(this, database);
     }
 
@@ -130,7 +136,10 @@ public final class CastorEntityManager implements EntityManager {
         // Check whether the entity manager is open.
         verifyOpenEntityManager();
 
-        throw new UnsupportedOperationException("Not yet implemented!");
+        // Check whether the entity is persistence capable.
+        verifyPersistenceCapable(entity);
+
+        return this.context.contains(entity);
     }
 
     /**
@@ -245,12 +254,18 @@ public final class CastorEntityManager implements EntityManager {
         // Check whether a transaction is running.
         verifyRunningTransaction();
 
-        T object = null;
+        T entity = null;
 
         try {
 
             // Load the entity from the Castor database.
-            object = (T) this.database.load(entityClass, primaryKey);
+            entity = (T) this.database.load(entityClass, primaryKey);
+
+            // Add the entity to the persistence context.
+            if (entity != null) {
+                this.context.manage(entity);
+            }
+
         } catch (ObjectNotFoundException onfe) {
             if (log.isDebugEnabled()) {
                 log.debug("Entity with primary key >" + primaryKey + "< not found.");
@@ -272,7 +287,7 @@ public final class CastorEntityManager implements EntityManager {
         }
 
         // Return the object or null.
-        return object;
+        return entity;
     }
 
     /**
@@ -435,13 +450,49 @@ public final class CastorEntityManager implements EntityManager {
      *             PersistenceContextType.TRANSACTION and there is no
      *             transaction.
      */
+    @SuppressWarnings("unchecked")
     public <T> T merge(T entity) {
         // Check whether the entity manager is open.
         verifyOpenEntityManager();
         // Check whether a transaction is running.
         verifyRunningTransaction();
 
-        throw new UnsupportedOperationException("Not yet implemented!");
+        if (this.context.contains(entity)) {
+            // Entity is already managed.
+            return entity;
+        }
+
+        try {
+
+            // Merge entity.
+            this.database.update(entity);
+
+            // Get identity of merged entity.
+            Identity identity = this.database.getIdentity(entity);
+
+            // Load merged instance from database.
+            T merged = (T) this.database.load(entity.getClass(), identity, entity.getClass()
+                    .newInstance());
+
+            // Add merged entity to persistence context.
+            this.context.manage(merged);
+
+            return merged;
+
+        } catch (org.exolab.castor.jdo.PersistenceException e) {
+            log.error("Could not merge entity.", e);
+            throw new IllegalArgumentException("Could not merge entity.", e);
+        } catch (InstantiationException e) {
+            log.error("Could not create new instance of entity type >"
+                    + entity.getClass().getName() + "<.");
+            throw new IllegalArgumentException("Could not create new instance of entity type >"
+                    + entity.getClass().getName() + "<.", e);
+        } catch (IllegalAccessException e) {
+            log.error("Could not create new instance of entity type >"
+                    + entity.getClass().getName() + "<.");
+            throw new IllegalArgumentException("Could not create new instance of entity type >"
+                    + entity.getClass().getName() + "<.", e);
+        }
     }
 
     /**
@@ -468,10 +519,18 @@ public final class CastorEntityManager implements EntityManager {
         // Check whether a transaction is running.
         verifyRunningTransaction();
 
+        if (this.context.contains(entity)) {
+            // The entity is already managed within this persistence context.
+            return;
+        }
+
         try {
 
             // Create the entity.
             this.database.create(entity);
+
+            // Add the entity to the set of managed entities.
+            this.context.manage(entity);
 
         } catch (ClassNotPersistenceCapableException e) {
             log.error("Entity of type >" + entity.getClass().getName()
@@ -531,9 +590,22 @@ public final class CastorEntityManager implements EntityManager {
         // Check whether a transaction is running.
         verifyRunningTransaction();
 
+        // Check whether entity was already removed within this transaction.
+        if (this.context.removed(entity)) {
+            return;
+        }
+
+        // Check whether the given entity is managed.
+        verifyEntityIsManaged(entity);
+
         try {
+
             // Remove entity from database.
             this.database.remove(entity);
+
+            // Remove entity from the set of managed entities.
+            this.context.remove(entity);
+
         } catch (org.exolab.castor.jdo.PersistenceException e) {
             log.error("Could not remove entity.", e);
             throw new IllegalArgumentException("Could not remove entity.", e);
@@ -556,6 +628,15 @@ public final class CastorEntityManager implements EntityManager {
     }
 
     /**
+     * Invalidates the {@link PersistenceContext}. This method is called by a
+     * {@link CastorEntityTransaction} when {@link EntityTransaction#commit()}
+     * or {@link EntityTransaction#rollback()} is invoked.
+     */
+    protected void invalidatePersistenceContext() {
+        this.context = new TransactionScopedPersistenceContext();
+    }
+
+    /**
      * Verifies that {@link EntityManager#isOpen()} returns true.
      * 
      * @throws IllegalStateException
@@ -574,6 +655,50 @@ public final class CastorEntityManager implements EntityManager {
         if (!this.entityTransaction.isActive()) {
             throw new TransactionRequiredException(
                     "Method called while no EntityTransaction was running.");
+        }
+    }
+
+    /**
+     * Verifies whether the given entity is managed by this
+     * {@link EntityManager}.
+     * 
+     * @param entity
+     *            an entity.
+     */
+    private void verifyEntityIsManaged(Object entity) {
+        if (!this.context.contains(entity)) {
+            // Entity is new or detached.
+            throw new IllegalArgumentException("Entity of type >" + entity.getClass().getName()
+                    + "< is not managed by this EntityManager instance.");
+        }
+    }
+
+    /**
+     * Verifies whether a given entity is persistence capable within this
+     * {@link EntityManager}.
+     * 
+     * @param entity
+     *            an entity.
+     * @throws IllegalArgumentException
+     *             in case entity is not persistence capable.
+     */
+    private boolean verifyPersistenceCapable(Object entity) {
+        try {
+            // Try to obtain the entity's identity.
+            this.database.getIdentity(entity);
+            // No exception caught. Class is persistence capable.
+            return true;
+        } catch (ClassNotPersistenceCapableException e) {
+            log.error("Entity of type >" + entity.getClass().getName()
+                    + "< not persistence capable!", e);
+            throw new IllegalArgumentException("Entity of type >" + entity.getClass().getName()
+                    + "< not persistence capable!");
+        } catch (org.exolab.castor.jdo.PersistenceException e) {
+            if (log.isInfoEnabled()) {
+                log.info("Could not verify persistence capability of given entity of type >"
+                        + entity.getClass().getName() + "<.");
+            }
+            return false;
         }
     }
 }

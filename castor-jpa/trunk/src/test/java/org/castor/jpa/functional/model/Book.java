@@ -23,49 +23,60 @@ package org.castor.jpa.functional.model;
  */
 public class Book {
 
-	/**
-	 * A unique ISBN.
-	 */
-	private long isbn;
-	/**
-	 * The title.
-	 */
-	private String title;
+    /**
+     * A unique ISBN.
+     */
+    private long isbn;
+    /**
+     * The title.
+     */
+    private String title;
+    /**
+     * The entity's version.
+     */
+    private long version;
 
-	/**
-	 * Constructor taking an isbn and a title.
-	 * 
-	 * @param isbn
-	 *            a unique ISBN.
-	 * @param title
-	 *            the title of the book.
-	 */
-	public Book(long isbn, String title) {
-		this.isbn = isbn;
-		this.title = title;
-	}
+    /**
+     * Constructor taking an isbn and a title.
+     * 
+     * @param isbn
+     *            a unique ISBN.
+     * @param title
+     *            the title of the book.
+     */
+    public Book(long isbn, String title) {
+        this.isbn = isbn;
+        this.title = title;
+    }
 
-	/**
-	 * Default constructor.
-	 */
-	public Book() {
-		// Does nothing.
-	}
+    /**
+     * Default constructor.
+     */
+    public Book() {
+        // Does nothing.
+    }
 
-	public long getIsbn() {
-		return isbn;
-	}
+    public long getIsbn() {
+        return isbn;
+    }
 
-	public void setIsbn(long isbn) {
-		this.isbn = isbn;
-	}
+    public void setIsbn(long isbn) {
+        this.isbn = isbn;
+    }
 
-	public String getTitle() {
-		return title;
-	}
+    public String getTitle() {
+        return title;
+    }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
+    public long getVersion() {
+        return version;
+    }
+
+    public void setVersion(long version) {
+        this.version = version;
+    }
 }
