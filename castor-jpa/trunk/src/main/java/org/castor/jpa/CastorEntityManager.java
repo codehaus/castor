@@ -31,7 +31,6 @@ import org.exolab.castor.jdo.ClassNotPersistenceCapableException;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.DuplicateIdentityException;
 import org.exolab.castor.jdo.ObjectNotFoundException;
-import org.exolab.castor.persist.spi.Identity;
 
 /**
  * Castor implementation of the {@link EntityManager} interface.
@@ -450,7 +449,6 @@ public final class CastorEntityManager implements EntityManager {
      *             PersistenceContextType.TRANSACTION and there is no
      *             transaction.
      */
-    @SuppressWarnings("unchecked")
     public <T> T merge(T entity) {
         // Check whether the entity manager is open.
         verifyOpenEntityManager();
@@ -467,31 +465,14 @@ public final class CastorEntityManager implements EntityManager {
             // Merge entity.
             this.database.update(entity);
 
-            // Get identity of merged entity.
-            Identity identity = this.database.getIdentity(entity);
-
-            // Load merged instance from database.
-            T merged = (T) this.database.load(entity.getClass(), identity, entity.getClass()
-                    .newInstance());
-
             // Add merged entity to persistence context.
-            this.context.manage(merged);
+            this.context.manage(entity);
 
-            return merged;
+            return entity;
 
         } catch (org.exolab.castor.jdo.PersistenceException e) {
             log.error("Could not merge entity.", e);
             throw new IllegalArgumentException("Could not merge entity.", e);
-        } catch (InstantiationException e) {
-            log.error("Could not create new instance of entity type >"
-                    + entity.getClass().getName() + "<.");
-            throw new IllegalArgumentException("Could not create new instance of entity type >"
-                    + entity.getClass().getName() + "<.", e);
-        } catch (IllegalAccessException e) {
-            log.error("Could not create new instance of entity type >"
-                    + entity.getClass().getName() + "<.");
-            throw new IllegalArgumentException("Could not create new instance of entity type >"
-                    + entity.getClass().getName() + "<.", e);
         }
     }
 

@@ -24,13 +24,13 @@ import javax.persistence.Persistence;
 
 import org.castor.jpa.functional.model.Book;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -314,6 +314,8 @@ public class SingleEntityTest extends AbstractSpringBaseTest {
         assertNotNull(merged);
         verifyBook(merged, 1L, "new-unit-test-title-7");
 
+        assertSame(merged, book);
+
         // Verify changes.
         em.getTransaction().begin();
         Book result = em.find(Book.class, 1L);
@@ -341,6 +343,7 @@ public class SingleEntityTest extends AbstractSpringBaseTest {
         em.getTransaction().begin();
         em.persist(book);
         em.getTransaction().commit();
+        em.close();
 
         // Apply some changes to the detached entity.
         book.setTitle("new-unit-test-title-8");
@@ -444,24 +447,17 @@ public class SingleEntityTest extends AbstractSpringBaseTest {
         book2.setTitle("fail-unit-test-title-10");
         try {
             em2.getTransaction().begin();
-            em2.merge(book2);
+            Book merged2 = em2.merge(book2);
+            verifyBook(merged2, 1L, "fail-unit-test-title-10");
             em2.getTransaction().commit();
             fail("Object was modified. Merge operation must not succeed!");
-        } catch (IllegalArgumentException iae) {
+        } catch (Exception iae) {
             // Normal behavior.
-            em2.getTransaction().rollback();
         }
-
-        // Verify changes on first entity manager.
-        em2.getTransaction().begin();
-        Book result = em2.find(Book.class, 1L);
-        em2.getTransaction().commit();
-
-        verifyBook(result, 1L, "new-unit-test-title-10");
 
         // Verify changes on second entity manager.
         em.getTransaction().begin();
-        result = em.find(Book.class, 1L);
+        Book result = em.find(Book.class, 1L);
         em.getTransaction().commit();
 
         verifyBook(result, 1L, "new-unit-test-title-10");
@@ -476,7 +472,6 @@ public class SingleEntityTest extends AbstractSpringBaseTest {
      * @throws SQLException
      */
     @Test
-    @Ignore
     public void mergeNewEntity() throws SQLException {
         deleteFromTable("book");
 
@@ -487,15 +482,15 @@ public class SingleEntityTest extends AbstractSpringBaseTest {
 
         em.getTransaction().begin();
         Book merged = em.merge(book);
-        em.getTransaction().commit();
 
         // Verify that a new object was returned.
         assertNotNull(merged);
-        assertFalse(book == merged);
 
         // Verify that the new object is managed.
-        assertFalse(em.contains(book));
+        assertTrue(em.contains(book));
         assertTrue(em.contains(merged));
+
+        em.getTransaction().commit();
 
         deleteFromTable("book");
     }
