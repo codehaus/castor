@@ -91,7 +91,8 @@ public final class CastorEntityManager implements EntityManager {
         // Check whether the entity manager is open.
         verifyOpenEntityManager();
 
-        throw new UnsupportedOperationException("Not yet implemented!");
+        // Invalidate context.
+        invalidatePersistenceContext();
     }
 
     /**

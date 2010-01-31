@@ -15,10 +15,15 @@
  */
 package org.castor.jpa;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityNotFoundException;
 import javax.persistence.EntityTransaction;
 import javax.persistence.FlushModeType;
 import javax.persistence.LockModeType;
@@ -31,12 +36,6 @@ import org.castor.jpa.functional.model.UnknownType;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class CastorEntityManagerTest {
 
@@ -195,7 +194,6 @@ public class CastorEntityManagerTest {
      * fail.
      */
     @Test(expected = IllegalStateException.class)
-    @Ignore
     public void clearOnClosedEntityManager() {
         EntityManager em = factory.createEntityManager();
         em.close();
@@ -207,7 +205,6 @@ public class CastorEntityManagerTest {
      * which must fail.
      */
     @Test(expected = IllegalStateException.class)
-    @Ignore
     public void containsOnClosedEntityManager() {
         Object entity = new Object();
         EntityManager em = factory.createEntityManager();
@@ -219,7 +216,6 @@ public class CastorEntityManagerTest {
      * Tries to invoke the contains method with an unknown entity type.
      */
     @Test(expected = IllegalArgumentException.class)
-    @Ignore
     public void containsUnknownEntityType() {
         EntityManager em = factory.createEntityManager();
         em.contains(new UnknownType());

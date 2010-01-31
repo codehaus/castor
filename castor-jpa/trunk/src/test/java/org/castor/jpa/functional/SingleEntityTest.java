@@ -633,6 +633,51 @@ public class SingleEntityTest extends AbstractSpringBaseTest {
     }
 
     /**
+     * Verifies that a clear removes an entity from the persistence context.
+     * Simulates a batch processing, which is main use for
+     * {@link EntityManager#clear()} to avoid accumulation of managed entities.
+     * 
+     * @throws SQLException
+     */
+    @Test
+    public void clearUsedInBatchProcessing() throws SQLException {
+        deleteFromTable("book");
+
+        EntityManager em = factory.createEntityManager();
+
+        em.getTransaction().begin();
+
+        // Simulate batch processing.
+        Book book1 = new Book();
+        book1.setIsbn(1L);
+        book1.setTitle("unit-test-title-1");
+
+        // Persist and invoke clear.
+        em.persist(book1);
+        em.clear();
+
+        // Check whether entity has been removed from the persistence context.
+        assertFalse(em.contains(book1));
+
+        // Second batch.
+        Book book2 = new Book();
+        book2.setIsbn(2L);
+        book2.setTitle("unit-test-title-2");
+
+        // Persist and invoke clear.
+        em.persist(book2);
+        em.clear();
+
+        // Check whether entity has been removed from the persistence context.
+        assertFalse(em.contains(book1));
+
+        em.getTransaction().commit();
+
+        verifyPersistentBook(book1);
+        verifyPersistentBook(book2);
+    }
+    
+    /**
      * This helper method verifies a given {@link Book} using JUnit asserts.
      * 
      * @param result
