@@ -20,7 +20,9 @@ import java.sql.SQLException;
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityNotFoundException;
 import javax.persistence.Persistence;
+import javax.persistence.TransactionRequiredException;
 
 import org.castor.jpa.functional.model.Book;
 import org.junit.Before;
@@ -493,6 +495,141 @@ public class SingleEntityTest extends AbstractSpringBaseTest {
         em.getTransaction().commit();
 
         deleteFromTable("book");
+    }
+    
+    /**
+     * Tries to obtain a reference to a non existing entity.
+     * 
+     * @throws SQLException
+     */
+    @Test(expected = EntityNotFoundException.class)
+    public void getReferenceOfUnknownEntity() throws SQLException {
+        deleteFromTable("book");
+
+        EntityManager em = factory.createEntityManager();
+
+        em.getTransaction().begin();
+
+        // Obtain a reference.
+        Book book = em.getReference(Book.class, 1L);
+        assertNotNull(book);
+
+        // Try to access. Should fail.
+        book.getTitle();
+
+        em.getTransaction().commit();
+    }
+
+    /**
+     * Tries to access a reference which has never been accessed in a
+     * transaction.
+     * 
+     * @throws SQLException
+     */
+    @Test(expected = TransactionRequiredException.class)
+    public void accessReferenceOutsideTransactionWithoutLoading() throws SQLException {
+        deleteFromTable("book");
+
+        EntityManager em = factory.createEntityManager();
+
+        em.getTransaction().begin();
+
+        // Obtain a reference.
+        Book book = em.getReference(Book.class, 1L);
+        assertNotNull(book);
+
+        em.getTransaction().commit();
+
+        // Try to access. Should fail.
+        book.getTitle();
+    }
+
+    /**
+     * Tries to access a reference which has never been accessed in a
+     * transaction. EntityManager is closed.
+     * 
+     * @throws SQLException
+     */
+    @Test(expected = IllegalStateException.class)
+    public void accessReferenceEntityManagerClosed() throws SQLException {
+        deleteFromTable("book");
+
+        EntityManager em = factory.createEntityManager();
+
+        em.getTransaction().begin();
+
+        // Obtain a reference.
+        Book book = em.getReference(Book.class, 1L);
+        assertNotNull(book);
+
+        em.getTransaction().commit();
+        em.close();
+
+        // Try to access. Should fail.
+        book.getTitle();
+    }
+
+    /**
+     * Tries to access a reference which has been loaded in a transaction.
+     * EntityManager is closed and Transaction is not active.
+     * 
+     * @throws SQLException
+     */
+    @Test
+    public void accessReferenceWithEverythingClosed() throws SQLException {
+        deleteFromTable("book");
+
+        Long isbn = Long.valueOf(1);
+        String title = "unit-test-book-title-1";
+
+        // Insert test values.
+        executeUpdate("INSERT INTO book (isbn, title, version) VALUES (?, ?, ?)", isbn, title, System.currentTimeMillis());
+
+        EntityManager em = factory.createEntityManager();
+
+        em.getTransaction().begin();
+
+        // Obtain a reference.
+        Book book = em.getReference(Book.class, 1L);
+        assertNotNull(book);
+        assertEquals(title, book.getTitle());
+
+        em.getTransaction().commit();
+        em.close();
+
+        // Try to access title.
+        assertEquals(title, book.getTitle());
+    }
+
+    /**
+     * Tries to access a reference which has been loaded in a transaction.
+     * EntityManager is open.
+     * 
+     * @throws SQLException
+     */
+    @Test
+    public void accessReferenceWithNoTransactionRunning() throws SQLException {
+        deleteFromTable("book");
+
+        Long isbn = Long.valueOf(1);
+        String title = "unit-test-book-title-1";
+
+        // Insert test values.
+        executeUpdate("INSERT INTO book (isbn, title, version) VALUES (?, ?, ?)", isbn, title, System.currentTimeMillis());
+
+        EntityManager em = factory.createEntityManager();
+
+        em.getTransaction().begin();
+
+        // Obtain a reference.
+        Book book = em.getReference(Book.class, 1L);
+        assertNotNull(book);
+        assertEquals(title, book.getTitle());
+
+        em.getTransaction().commit();
+
+        // Try to access title.
+        assertEquals(title, book.getTitle());
     }
 
     /**

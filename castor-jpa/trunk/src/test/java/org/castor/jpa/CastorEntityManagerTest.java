@@ -335,7 +335,6 @@ public class CastorEntityManagerTest {
      * must fail.
      */
     @Test(expected = IllegalStateException.class)
-    @Ignore
     public void getReferenceOnClosedEntityManager() {
         EntityManager em = factory.createEntityManager();
         em.close();
@@ -345,8 +344,7 @@ public class CastorEntityManagerTest {
     /**
      * Tries to obtain a reference from an unknown entity type.
      */
-    @Test(expected = IllegalArgumentException.class)
-    @Ignore
+    @Test(expected = TransactionRequiredException.class)
     public void getReferenceOfUnknownEntityType() {
         EntityManager em = factory.createEntityManager();
         em.getReference(UnknownType.class, Long.valueOf(1));
@@ -356,8 +354,7 @@ public class CastorEntityManagerTest {
      * Tries to obtain a reference from a non existing entity.<br/>
      * TODO lukas.lang: Discuss, whether exception should be thrown immediately.
      */
-    @Test(expected = EntityNotFoundException.class)
-    @Ignore
+    @Test(expected = TransactionRequiredException.class)
     public void getReferenceOfNonExistingEntity() {
         EntityManager em = factory.createEntityManager();
         em.getReference(Book.class, Long.valueOf(1));
@@ -368,7 +365,6 @@ public class CastorEntityManagerTest {
      * which must succeed.
      */
     @Test
-    @Ignore
     public void getTransactionOnClosedEntityManager() {
         EntityManager em = factory.createEntityManager();
         em.close();

@@ -27,10 +27,12 @@ import javax.persistence.TransactionRequiredException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.castor.jpa.proxy.ReferenceProxy;
 import org.exolab.castor.jdo.ClassNotPersistenceCapableException;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.DuplicateIdentityException;
 import org.exolab.castor.jdo.ObjectNotFoundException;
+import org.exolab.castor.persist.spi.Identity;
 
 /**
  * Castor implementation of the {@link EntityManager} interface.
@@ -136,7 +138,7 @@ public final class CastorEntityManager implements EntityManager {
         verifyOpenEntityManager();
 
         // Check whether the entity is persistence capable.
-        verifyPersistenceCapable(entity);
+        verifyPersistenceCapable(entity.getClass());
 
         return this.context.contains(entity);
     }
@@ -246,7 +248,6 @@ public final class CastorEntityManager implements EntityManager {
      *             second argument is not a valid type for that entity's primary
      *             key
      */
-    @SuppressWarnings("unchecked")
     public <T> T find(Class<T> entityClass, Object primaryKey) {
         // Check whether the entity manager is open.
         verifyOpenEntityManager();
@@ -271,18 +272,11 @@ public final class CastorEntityManager implements EntityManager {
             }
             // Do nothing.
         } catch (ClassNotPersistenceCapableException npce) {
-            log
-                    .error("Entity class >" + entityClass.getName() + "< not persistence capable.",
-                            npce);
-            throw new IllegalArgumentException("Entity class >" + entityClass.getName()
-                    + "< not persistence capable.");
-
+            log.error("Entity class >" + entityClass.getName() + "< not persistence capable.", npce);
+            throw new IllegalArgumentException("Entity class >" + entityClass.getName() + "< not persistence capable.");
         } catch (org.exolab.castor.jdo.PersistenceException e) {
-            log
-                    .error("Could not load entity with id >" + primaryKey
-                            + "< from Castor database.", e);
-            throw new IllegalArgumentException("Could not load entity with id >" + primaryKey
-                    + "< from Castor database.", e);
+            log.error("Could not load entity with id >" + primaryKey + "< from Castor database.", e);
+            throw new IllegalArgumentException("Could not load entity with id >" + primaryKey + "< from Castor database.", e);
         }
 
         // Return the object or null.
@@ -344,8 +338,6 @@ public final class CastorEntityManager implements EntityManager {
      * accessed. (The persistence provider runtime is permitted to throw
      * {@link EntityNotFoundException} when {@link #getReference} is called.)
      * 
-     * TODO lukas.lang: Discuss, whether exception should be thrown immediately.
-     * 
      * The application should not expect that the instance state will be
      * available upon detachment, unless it was accessed by the application
      * while the entity manager was open.
@@ -362,12 +354,18 @@ public final class CastorEntityManager implements EntityManager {
      * @throws EntityNotFoundException
      *             if the entity state cannot be accessed
      */
-
     public <T> T getReference(Class<T> entityClass, Object primaryKey) {
         // Check whether the entity manager is open.
         verifyOpenEntityManager();
 
-        throw new UnsupportedOperationException("Not yet implemented!");
+        // Check whether there is a a running transaction.
+        verifyRunningTransaction();
+
+        // Check whether entity type is known.
+        verifyPersistenceCapable(entityClass);
+
+        // Return a proxied instance.
+        return ReferenceProxy.createProxy(entityClass, new Identity(primaryKey), this);
     }
 
     /**
@@ -658,30 +656,16 @@ public final class CastorEntityManager implements EntityManager {
      * Verifies whether a given entity is persistence capable within this
      * {@link EntityManager}.
      * 
-     * TODO lukas.lang: Check should be made via the mapping loader.
-     * 
-     * @param entity
-     *            an entity.
-     * @throws IllegalArgumentException
-     *             in case entity is not persistence capable.
+     * @param type an entities type.
      */
-    private boolean verifyPersistenceCapable(Object entity) {
+    private void verifyPersistenceCapable(Class<?> type) {
         try {
-            // Try to obtain the entity's identity.
-            this.database.getIdentity(entity);
+            // Check whether type is known.
+            this.database.getScope().getClassMolder(type);
             // No exception caught. Class is persistence capable.
-            return true;
         } catch (ClassNotPersistenceCapableException e) {
-            log.error("Entity of type >" + entity.getClass().getName()
-                    + "< not persistence capable!", e);
-            throw new IllegalArgumentException("Entity of type >" + entity.getClass().getName()
-                    + "< not persistence capable!");
-        } catch (org.exolab.castor.jdo.PersistenceException e) {
-            if (log.isInfoEnabled()) {
-                log.info("Could not verify persistence capability of given entity of type >"
-                        + entity.getClass().getName() + "<.");
-            }
-            return false;
+            log.error("Entity of type >" + type.getName() + "< not persistence capable!", e);
+            throw new IllegalArgumentException("Entity of type >" + type.getName() + "< not persistence capable!", e);
         }
     }
 }
