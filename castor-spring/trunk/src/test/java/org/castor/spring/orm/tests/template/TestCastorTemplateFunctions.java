@@ -1,4 +1,5 @@
-package org.castor.spring.orm.tests;
+package org.castor.spring.orm.tests.template;
+
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -17,12 +18,24 @@ import org.exolab.castor.dao.ProductDao;
 import org.exolab.castor.jdo.JDOManager;
 import org.junit.After;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.transaction.TransactionConfiguration;
 
-public abstract class BaseSpringTestCaseAtDAOLevel {
-	
+/**
+ * JUnit test case for Castor's Spring integration.
+ * @author Werner Guttmann  
+ */
+@RunWith(SpringJUnit4ClassRunner.class)
+@TransactionConfiguration(defaultRollback = true)
+@ContextConfiguration
+public class TestCastorTemplateFunctions {
+
 	@Resource(name="myProductDao")
-	public ProductDao productDAO;
+	private ProductDao productDAO;
 	
+
 	@After
 	public void disposeJDOManager() {
 		JDOManager.disposeInstance("test");
@@ -270,5 +283,7 @@ public abstract class BaseSpringTestCaseAtDAOLevel {
         this.productDAO.deleteProducts(productsToDelete);
     
     }
+
+	
 
 }

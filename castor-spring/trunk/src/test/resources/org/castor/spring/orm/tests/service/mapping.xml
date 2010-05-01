@@ -12,6 +12,7 @@
         <query>select p from org.exolab.castor.dao.Product p where name = $1</query>
     </named-query>
     <map-to table="product" xml="product" />
+    <!-- <cache-type type="none" /> -->
     <field name="id" type="integer">
       <sql name="id" type="integer" />
       <bind-xml name="id" node="element"/>

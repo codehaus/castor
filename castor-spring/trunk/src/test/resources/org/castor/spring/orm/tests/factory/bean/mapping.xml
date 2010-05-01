@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<!DOCTYPE databases PUBLIC "-//EXOLAB/Castor Mapping DTD Version 1.0//EN"
+                           "http://castor.exolab.org/mapping.dtd">
+<mapping>
+
+  <!--  Mapping for Product  -->
+  <class name="org.exolab.castor.dao.Product" identity="id">
+    <named-query name="allProducts">
+        <query>select p from org.exolab.castor.dao.Product p</query>
+    </named-query>
+    <named-query name="selectedProducts">
+        <query>select p from org.exolab.castor.dao.Product p where name = $1</query>
+    </named-query>
+    <map-to table="product" xml="product" />
+    <!-- <cache-type type="none" /> -->
+    <field name="id" type="integer">
+      <sql name="id" type="integer" />
+      <bind-xml name="id" node="element"/>
+    </field>
+    <field name="name" type="string">
+      <sql name="name" type="char" />
+      <bind-xml name="name" node="element" />
+    </field>
+  </class>
+</mapping>
+
