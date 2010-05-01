@@ -1,456 +1,463 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.codehaus.castor</groupId>
-	<artifactId>castor-jpa</artifactId>
-	<version>0.5-SNAPSHOT</version>
-	<packaging>jar</packaging>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.codehaus.castor</groupId>
+    <artifactId>castor-jpa</artifactId>
+    <version>0.5-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
-	<name>Castor JPA - An implementation of JPA 3.0</name>
-	<url>http://castor.org</url>
+    <name>Castor JPA - An implementation of JPA 3.0</name>
+    <url>http://castor.org</url>
 
-	<issueManagement>
-		<system>Jira</system>
-		<url>http://jira.codehaus.org/browse/CASTOR</url>
-	</issueManagement>
+    <issueManagement>
+        <system>Jira</system>
+        <url>http://jira.codehaus.org/browse/CASTOR</url>
+    </issueManagement>
 
-	<build>
-		<resources>
-			<!--  instructs Maven to copy .castor.cdr files -->
-			<resource>
-				<directory>${basedir}/target/generated-sources/castor</directory>
-				<includes>
-					<include>**/*.cdr</include>
-				</includes>
-			</resource>
-			<resource>
-				<directory>src/test/resources</directory>
-			</resource>
-			<resource>
-				<directory>src/main/resources</directory>
-			</resource>
-		</resources>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
-				</configuration>
-			</plugin>
+    <build>
+        <resources>
+            <!--  instructs Maven to copy .castor.cdr files -->
+            <resource>
+                <directory>${basedir}/target/generated-sources/castor</directory>
+                <includes>
+                    <include>**/*.cdr</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/test/resources</directory>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
 
-			<!--
-				SQL Maven Plugin runs a defined SQL script before test execution.
-			-->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>sql-maven-plugin</artifactId>
-				<version>1.3</version>
+            <!--
+                SQL Maven Plugin runs a defined SQL script before test
+                execution.
+            -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>sql-maven-plugin</artifactId>
+                <version>1.3</version>
 
-				<dependencies>
-					<!-- specify the dependent jdbc driver here -->
-					<dependency>
-						<groupId>org.apache.derby</groupId>
-						<artifactId>derby</artifactId>
-						<version>10.4.2.0</version>
-					</dependency>
-				</dependencies>
+                <dependencies>
+                    <!-- specify the dependent jdbc driver here -->
+                    <dependency>
+                        <groupId>org.apache.derby</groupId>
+                        <artifactId>derby</artifactId>
+                        <version>10.4.2.0</version>
+                    </dependency>
+                </dependencies>
 
-				<configuration>
-					<username></username>
-					<password></password>
-					<driver>org.apache.derby.jdbc.EmbeddedDriver</driver>
-					<!-- <skip>${maven.test.skip}</skip> -->
-				</configuration>
+                <configuration>
+                    <username></username>
+                    <password></password>
+                    <driver>org.apache.derby.jdbc.EmbeddedDriver</driver>
+                    <!-- <skip>${maven.test.skip}</skip> -->
+                </configuration>
 
-				<executions>
-					<!-- Execute SQL schema before test execution. -->
-					<execution>
-						<id>Create database and tables</id>
-						<phase>process-test-resources</phase>
-						<goals>
-							<goal>execute</goal>
-						</goals>
-						<configuration>
-							<url>jdbc:derby:${basedir}/target/test;create=true</url>
-							<autocommit>true</autocommit>
-							<srcFiles>
-								<srcFile>src/test/resources/org/castor/jpa/functional/schema.sql</srcFile>
-								<srcFile>src/test/resources/create.sql</srcFile>
-							</srcFiles>
-						</configuration>
-					</execution>
-					<!-- Needed to shutdown DB and persist data. -->
-					<execution>
-						<id>Shutdown database</id>
-						<phase>process-test-resources</phase>
-						<goals>
-							<goal>execute</goal>
-						</goals>
-						<configuration>
-							<url>jdbc:derby:${basedir}/target/test;shutdown=true</url>
-							<skipOnConnectionError>true</skipOnConnectionError>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+                <executions>
+                    <!-- Execute SQL schema before test execution. -->
+                    <execution>
+                        <id>Create database and tables</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <url>jdbc:derby:${basedir}/target/test;create=true</url>
+                            <autocommit>true</autocommit>
+                            <srcFiles>
+                                <srcFile>src/test/resources/org/castor/jpa/functional/schema.sql</srcFile>
+                                <srcFile>src/test/resources/create.sql</srcFile>
+                            </srcFiles>
+                        </configuration>
+                    </execution>
+                    <!-- Needed to shutdown DB and persist data. -->
+                    <execution>
+                        <id>Shutdown database</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <url>jdbc:derby:${basedir}/target/test;shutdown=true</url>
+                            <skipOnConnectionError>true</skipOnConnectionError>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-clover-plugin</artifactId>
-				<version>2.1</version>
-				<configuration>
-					<jdk>1.5</jdk>
-					<cloverDatabase>target/clover-db</cloverDatabase>
-					<licenseLocation>${basedir}/src/etc/CLOVER.LICENSE</licenseLocation>
-				</configuration>
-				<executions>
-					<execution>
-						<phase>pre-site</phase>
-						<goals>
-							<goal>instrument</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clover-plugin</artifactId>
+                <version>2.1</version>
+                <configuration>
+                    <jdk>1.5</jdk>
+                    <cloverDatabase>target/clover-db</cloverDatabase>
+                    <licenseLocation>${basedir}/src/etc/CLOVER.LICENSE</licenseLocation>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>pre-site</phase>
+                        <goals>
+                            <goal>instrument</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
-			<!--
-				<plugin> <groupId>org.codehaus.mojo</groupId>
-				<artifactId>castor-maven-plugin</artifactId> <version>1.0</version>
-				<executions> <execution> <goals> <goal>generate</goal> </goals>
-				<configuration>
-				<properties>${basedir}/src/main/castor/castorbuilder.properties</properties>
-				<schema>${basedir}/src/main/castor/mapping.ejb3.xsd</schema>
-				<bindingfile>${basedir}/src/main/castor/mapping-binding.ejb3.xml</bindingfile>
-				<packaging>org.castor.jpa.mapping.xml</packaging> won't be injected
-				as there's no setter
-				<bindingfile>${basedir}/src/schema/binding.xml</bindingfile>
-				<verbose>true</verbose> <warnings>true</warnings> <types>j2</types>
-				</configuration> </execution> </executions> </plugin>
-			-->
+            <!--
+                <plugin> <groupId>org.codehaus.mojo</groupId>
+                <artifactId>castor-maven-plugin</artifactId>
+                <version>1.0</version> <executions> <execution> <goals>
+                <goal>generate</goal> </goals> <configuration>
+                <properties>${basedir}/src/main/castor/castorbuilder.properties</properties>
+                <schema>${basedir}/src/main/castor/mapping.ejb3.xsd</schema>
+                <bindingfile>${basedir}/src/main/castor/mapping-binding.ejb3.xml</bindingfile>
+                <packaging>org.castor.jpa.mapping.xml</packaging> won't
+                be injected as there's no setter
+                <bindingfile>${basedir}/src/schema/binding.xml</bindingfile>
+                <verbose>true</verbose> <warnings>true</warnings>
+                <types>j2</types> </configuration> </execution>
+                </executions> </plugin>
+            -->
 
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>castor-maven-plugin</artifactId>
-				<version>2.0</version>
-				<configuration>
-					<properties>${basedir}/src/main/castor/castorbuilder.properties</properties>
-					<schema>${basedir}/src/main/castor/persistence.xsd</schema>
-					<!--
-						<bindingfile>${basedir}/src/main/castor/bindings.xml</bindingfile>
-					-->
-					<packaging>org.castor.jpa.persistence.xml</packaging>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-					</execution>
-				</executions>
-				<dependencies>
-					<dependency>
-						<groupId>org.codehaus.castor</groupId>
-						<artifactId>castor-codegen</artifactId>
-						<version>1.3rc1</version>
-					</dependency>
-				</dependencies>
-			</plugin>
-			<!--  redundant, once new castor-maven-plugin has been deployed -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>1.1</version>
-				<executions>
-					<execution>
-						<id>add-source</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>add-source</goal>
-						</goals>
-						<configuration>
-							<sources>
-								<source>${basedir}/target/generated-sources/castor</source>
-							</sources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>castor-maven-plugin</artifactId>
+                <version>2.0</version>
+                <configuration>
+                    <properties>${basedir}/src/main/castor/castorbuilder.properties</properties>
+                    <schema>${basedir}/src/main/castor/persistence.xsd</schema>
+                    <!--
+                        <bindingfile>${basedir}/src/main/castor/bindings.xml</bindingfile>
+                    -->
+                    <packaging>org.castor.jpa.persistence.xml</packaging>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.codehaus.castor</groupId>
+                        <artifactId>castor-codegen</artifactId>
+                        <version>1.3.1</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <!--  redundant, once new castor-maven-plugin has been deployed -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.1</version>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${basedir}/target/generated-sources/castor</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
 
-	</build>
+    </build>
 
-	<developers>
-		<developer>
-			<id>wguttmn</id>
-			<name>Werner Guttmann</name>
-			<email>wguttmn@codehaus.org</email>
-			<organization>Indoqa</organization>
-			<roles>
-				<role>Castor JDO Lead</role>
-			</roles>
-			<timezone>+1</timezone>
-		</developer>
+    <developers>
+        <developer>
+            <id>wguttmn</id>
+            <name>Werner Guttmann</name>
+            <email>wguttmn@codehaus.org</email>
+            <organization>Indoqa</organization>
+            <roles>
+                <role>Castor JDO Lead</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
 
-		<developer>
-			<name>Ralf Joachim</name>
-			<email>ralf.joachim@syscon-world.de</email>
-			<organization>Syscon</organization>
-			<roles>
-				<role>Castor JDO committer</role>
-			</roles>
-			<timezone>+1</timezone>
-		</developer>
+        <developer>
+            <name>Ralf Joachim</name>
+            <email>ralf.joachim@syscon-world.de</email>
+            <organization>Syscon</organization>
+            <roles>
+                <role>Castor JDO committer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
 
-		<developer>
-			<name>Lukas Lang</name>
-			<email>lukaslang@codehaus.org</email>
-			<organization>Indoqa</organization>
-			<roles>
-				<role>Castor JDO committer</role>
-			</roles>
-			<timezone>+1</timezone>
-		</developer>
+        <developer>
+            <name>Lukas Lang</name>
+            <email>lukaslang@codehaus.org</email>
+            <organization>Indoqa</organization>
+            <roles>
+                <role>Castor JDO committer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
 
-	</developers>
+    </developers>
 
-	<mailingLists>
-		<mailingList>
-			<name>User mailing list</name>
-			<subscribe>user-subscribe@castor.codehaus.org</subscribe>
-			<unsubscribe>user-unsubscribe@castor.codehaus.org</unsubscribe>
-			<post>user@castor.codehaus.org</post>
-			<archive>http://archive.castor.codehaus.org/user</archive>
-		</mailingList>
-		<mailingList>
-			<name>Development mailing list</name>
-			<subscribe>dev-subscribe@castor.codehaus.org</subscribe>
-			<unsubscribe>dev-unsubscribe@castor.codehaus.org</unsubscribe>
-			<post>dev@castor.codehaus.org</post>
-			<archive>http://archive.castor.codehaus.org/dev</archive>
-		</mailingList>
-		<mailingList>
-			<name>Announcement mailing list</name>
-			<subscribe>announce-subscribe@castor.codehaus.org</subscribe>
-			<unsubscribe>announce-unsubscribe@castor.codehaus.org</unsubscribe>
-			<post>announce@castor.codehaus.org</post>
-			<archive>http://archive.castor.codehaus.org/announce</archive>
-		</mailingList>
-	</mailingLists>
+    <mailingLists>
+        <mailingList>
+            <name>User mailing list</name>
+            <subscribe>user-subscribe@castor.codehaus.org</subscribe>
+            <unsubscribe>user-unsubscribe@castor.codehaus.org</unsubscribe>
+            <post>user@castor.codehaus.org</post>
+            <archive>http://archive.castor.codehaus.org/user</archive>
+        </mailingList>
+        <mailingList>
+            <name>Development mailing list</name>
+            <subscribe>dev-subscribe@castor.codehaus.org</subscribe>
+            <unsubscribe>dev-unsubscribe@castor.codehaus.org</unsubscribe>
+            <post>dev@castor.codehaus.org</post>
+            <archive>http://archive.castor.codehaus.org/dev</archive>
+        </mailingList>
+        <mailingList>
+            <name>Announcement mailing list</name>
+            <subscribe>announce-subscribe@castor.codehaus.org</subscribe>
+            <unsubscribe>announce-unsubscribe@castor.codehaus.org</unsubscribe>
+            <post>announce@castor.codehaus.org</post>
+            <archive>http://archive.castor.codehaus.org/announce</archive>
+        </mailingList>
+    </mailingLists>
 
-	<scm>
-		<connection>scm:svn:http://svn.codehaus.org/castor/castor-jpa/trunk/</connection>
-		<developerConnection>scm:svn:https://svn.codehaus.org/castor/castor-jpa/trunk/</developerConnection>
-		<url>http://svn.castor.codehaus.org/viewrep/castor/castor-jpa</url>
-	</scm>
+    <scm>
+        <connection>scm:svn:http://svn.codehaus.org/castor/castor-jpa/trunk/</connection>
+        <developerConnection>scm:svn:https://svn.codehaus.org/castor/castor-jpa/trunk/</developerConnection>
+        <url>http://svn.castor.codehaus.org/viewrep/castor/castor-jpa</url>
+    </scm>
 
-	<distributionManagement>
-		<repository>
-			<id>codehaus.org</id>
-			<name>Castor Central Distribution Repository</name>
-			<url>dav:https://dav.codehaus.org/repository/castor/</url>
-		</repository>
-		<snapshotRepository>
-			<id>codehaus.org</id>
-			<name>Castor Central Development Repository</name>
-			<url>dav:https://dav.codehaus.org/snapshots.repository/castor/</url>
-		</snapshotRepository>
-		<site>
-			<id>codehaus.org</id>
-			<url>dav:https://dav.codehaus.org/castor/</url>
-		</site>
-	</distributionManagement>
+    <distributionManagement>
+        <repository>
+            <id>codehaus.org</id>
+            <name>Castor Central Distribution Repository</name>
+            <url>dav:https://dav.codehaus.org/repository/castor/</url>
+        </repository>
+        <snapshotRepository>
+            <id>codehaus.org</id>
+            <name>Castor Central Development Repository</name>
+            <url>dav:https://dav.codehaus.org/snapshots.repository/castor/</url>
+        </snapshotRepository>
+        <site>
+            <id>codehaus.org</id>
+            <url>dav:https://dav.codehaus.org/castor/</url>
+        </site>
+    </distributionManagement>
 
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.codehaus.castor</groupId>
-				<artifactId>castor-jdo</artifactId>
-				<version>1.3.1-SNAPSHOT</version>
-			</dependency>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.codehaus.castor</groupId>
+                <artifactId>castor-jdo</artifactId>
+                <version>${castor.version}</version>
+            </dependency>
 
-			<dependency>
-				<groupId>javax.persistence</groupId>
-				<artifactId>persistence-api</artifactId>
-				<version>1.0</version>
-			</dependency>
+            <dependency>
+                <groupId>javax.persistence</groupId>
+                <artifactId>persistence-api</artifactId>
+                <version>1.0</version>
+            </dependency>
 
-			<dependency>
-				<groupId>commons-logging</groupId>
-				<artifactId>commons-logging</artifactId>
-				<version>1.1.1</version>
-			</dependency>
+            <dependency>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+                <version>1.1.1</version>
+            </dependency>
 
-			<dependency>
-				<groupId>junit</groupId>
-				<artifactId>junit</artifactId>
-				<version>4.4</version>
-			</dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.8.1</version>
+            </dependency>
 
-			<dependency>
-				<groupId>log4j</groupId>
-				<artifactId>log4j</artifactId>
-				<version>1.2.13</version>
-			</dependency>
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>1.2.13</version>
+            </dependency>
 
-			<dependency>
-				<groupId>mysql</groupId>
-				<artifactId>mysql-connector-java</artifactId>
-				<version>5.1.6</version>
-			</dependency>
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>5.1.6</version>
+            </dependency>
 
-			<dependency>
-				<groupId>org.apache.derby</groupId>
-				<artifactId>derby</artifactId>
-				<version>10.4.2.0</version>
-			</dependency>
+            <dependency>
+                <groupId>org.apache.derby</groupId>
+                <artifactId>derby</artifactId>
+                <version>10.4.2.0</version>
+            </dependency>
 
-			<dependency>
-				<groupId>commons-dbcp</groupId>
-				<artifactId>commons-dbcp</artifactId>
-				<version>1.2.2</version>
-			</dependency>
+            <dependency>
+                <groupId>commons-dbcp</groupId>
+                <artifactId>commons-dbcp</artifactId>
+                <version>1.2.2</version>
+            </dependency>
 
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-test</artifactId>
-				<version>2.5.6</version>
-			</dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-test</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
 
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-context</artifactId>
-				<version>2.5.6</version>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-beans</artifactId>
-				<version>2.5.6</version>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-jdbc</artifactId>
-				<version>2.5.6</version>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-tx</artifactId>
-				<version>2.5.6</version>
-			</dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-beans</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-jdbc</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-tx</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
 
-		</dependencies>
-	</dependencyManagement>
-	<dependencies>
+        </dependencies>
+    </dependencyManagement>
+    <dependencies>
 
-		<!-- replace with dependency to final release -->
-		<dependency>
-			<groupId>org.codehaus.castor</groupId>
-			<artifactId>castor-jdo</artifactId>
-		</dependency>
+        <!-- replace with dependency to final release -->
+        <dependency>
+            <groupId>org.codehaus.castor</groupId>
+            <artifactId>castor-jdo</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>javax.persistence</groupId>
-			<artifactId>persistence-api</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>javax.persistence</groupId>
+            <artifactId>persistence-api</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
-		</dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
 
-		<!-- Logging dependencies -->
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging</artifactId>
-		</dependency>
+        <!-- Logging dependencies -->
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+        </dependency>
 
-		<!-- Database dependencies -->
-		<dependency>
-			<groupId>org.apache.derby</groupId>
-			<artifactId>derby</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>commons-dbcp</groupId>
-			<artifactId>commons-dbcp</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<scope>test</scope>
-		</dependency>
+        <!-- Database dependencies -->
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-dbcp</groupId>
+            <artifactId>commons-dbcp</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <scope>test</scope>
+        </dependency>
 
-		<!-- Spring test -->
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-beans</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-jdbc</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-tx</artifactId>
-			<scope>test</scope>
-		</dependency>
+        <!-- Spring test -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-tx</artifactId>
+            <scope>test</scope>
+        </dependency>
 
-	</dependencies>
+    </dependencies>
 
-	<reporting>
-		<plugins>
-			<plugin>
-				<artifactId>maven-javadoc-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>jxr-maven-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-			</plugin>
+    <reporting>
+        <plugins>
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jxr-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-report-plugin</artifactId>
-			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+            </plugin>
 
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>taglist-maven-plugin</artifactId>
-			</plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>taglist-maven-plugin</artifactId>
+            </plugin>
 
-			<plugin>
-				<artifactId>maven-clover-plugin</artifactId>
-				<version>2.1</version>
-				<configuration>
-					<jdk>1.5</jdk>
-					<cloverDatabase>target/clover-db</cloverDatabase>
-					<licenseLocation>${basedir}/src/etc/CLOVER.LICENSE</licenseLocation>
-				</configuration>
-			</plugin>
-		</plugins>
-	</reporting>
+            <plugin>
+                <artifactId>maven-clover-plugin</artifactId>
+                <version>2.1</version>
+                <configuration>
+                    <jdk>1.5</jdk>
+                    <cloverDatabase>target/clover-db</cloverDatabase>
+                    <licenseLocation>${basedir}/src/etc/CLOVER.LICENSE</licenseLocation>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
+    
+    <properties>
+        <castor.version>1.3.1</castor.version>
+        <spring.version>3.0.2.RELEASE</spring.version>
+    </properties>
 </project>
