@@ -8,6 +8,8 @@ import org.apache.commons.logging.LogFactory;
 import org.castor.spring.orm.support.ClassDescriptorResolverProxy;
 import org.exolab.castor.jdo.JDOManager;
 import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.persist.spi.CallbackInterceptor;
+import org.exolab.castor.xml.ClassDescriptorResolver;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.FactoryBeanNotInitializedException;
 import org.springframework.beans.factory.InitializingBean;
@@ -63,6 +65,11 @@ public class LocalCastorFactoryBean implements FactoryBean, InitializingBean /*
      * A {@link ClassDescriptorResolverProxy} instance.
      */
     private ClassDescriptorResolverProxy classDescriptorResolverProxy;
+
+    /**
+     * A {@link org.exolab.castor.persist.spi.CallbackInterceptor} instance.
+     */
+    private CallbackInterceptor callbackInterceptor;
 
     /**
      * Return an instance (possibly shared or independent) of the object managed
@@ -195,6 +202,10 @@ public class LocalCastorFactoryBean implements FactoryBean, InitializingBean /*
 
             // set autostore mode
             jdoManagerToBeCreated.setAutoStore(this.autoStore);
+            // set callback interceptor if present
+            if (this.callbackInterceptor != null) {
+                jdoManagerToBeCreated.setCallbackInterceptor(this.callbackInterceptor);
+            }
         } catch (Exception e) {
             LOG.warn("problem", e);
             // ignore, as this cannot happen
@@ -350,6 +361,11 @@ public class LocalCastorFactoryBean implements FactoryBean, InitializingBean /*
     public void setClassDescriptorResolver(
             ClassDescriptorResolverProxy classDescriptorResolver) {
         this.classDescriptorResolverProxy = classDescriptorResolver;
+    }
+
+    public void setCallbackInterceptor(
+            CallbackInterceptor callbackInterceptor) {
+        this.callbackInterceptor = callbackInterceptor;
     }
 
 }
