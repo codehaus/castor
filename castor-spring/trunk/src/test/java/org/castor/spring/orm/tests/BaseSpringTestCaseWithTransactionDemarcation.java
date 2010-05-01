@@ -1,28 +1,31 @@
 package org.castor.spring.orm.tests;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.castor.spring.orm.CastorObjectRetrievalFailureException;
 import org.exolab.castor.dao.Product;
+import org.exolab.castor.jdo.JDOManager;
 import org.exolab.castor.service.ProductService;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.junit.After;
+import org.junit.Test;
 
-public abstract class BaseSpringTestCaseWithTransactionDemarcation extends
-        BaseSpringTestCase {
+public abstract class BaseSpringTestCaseWithTransactionDemarcation {
 
     protected ProductService productService = null;
 
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
+	@After
+	public void disposeJDOManager() {
+		JDOManager.disposeInstance("test");
+	}
 
-    protected ClassPathXmlApplicationContext getApplicationContext() {
-        return new ClassPathXmlApplicationContext("app-config.xml");
-    }
-
+    @Test
     public void testLoadProduct() throws Exception {
         Product product = this.productService.load(1);
         assertNotNull (product);
@@ -30,18 +33,12 @@ public abstract class BaseSpringTestCaseWithTransactionDemarcation extends
         assertEquals("product1", product.getName());
     }
 
+    @Test(expected=org.castor.spring.orm.CastorObjectRetrievalFailureException.class)
     public void testLoadNotExistingProduct() throws Exception {
-        try {
             productService.load(9);
-        }
-        catch (CastorObjectRetrievalFailureException e) {
-            assertEquals(e.getClass().getName(), "org.castor.spring.orm.CastorObjectRetrievalFailureException");
-        }
-        catch (Throwable t) {
-            fail ("Unexpected throwable");
-        }
     }
 
+    @Test
     public void testCreateProduct() throws Exception {
         Product product = new Product();
         product.setId(2);
@@ -56,26 +53,30 @@ public abstract class BaseSpringTestCaseWithTransactionDemarcation extends
         this.productService.delete(productTest);
     }
 
+    @Test
     public void testFindAllProductsNative() throws Exception {
-        Collection products = this.productService.findNative();
+        Collection<Product> products = this.productService.findNative();
         assertNotNull (products);
         assertEquals (1, products.size());
     }
 
+    @Test
     public void testFindAllProducts() throws Exception {
-        Collection products = this.productService.find();
+        Collection<Product> products = this.productService.find();
         assertNotNull (products);
         assertEquals (1, products.size());
     }
 
+    @Test
     public void testFindAllProductsById() throws Exception {
-        Collection products = this.productService.findByName("product1");
+        Collection<Product> products = this.productService.findByName("product1");
         assertNotNull (products);
         assertEquals (1, products.size());
     }
     
+    @Test
     public void testFindAllProductsByNamedQuery() throws Exception {
-        Collection products = this.productService.findByNamedQuery("allProducts");
+        Collection<Product> products = this.productService.findByNamedQuery("allProducts");
         assertNotNull(products);
         assertFalse (products.isEmpty());
         assertEquals(1, products.size());
@@ -86,8 +87,9 @@ public abstract class BaseSpringTestCaseWithTransactionDemarcation extends
         assertEquals("product1", product.getName());
     }
 
+    @Test
     public void testFindSelectedProductsByNamedQuery() throws Exception {
-        Collection products = this.productService.findByNamedQuery("selectedProducts", new Object[] { "product1" });
+        Collection<Product> products = this.productService.findByNamedQuery("selectedProducts", new Object[] { "product1" });
         assertNotNull(products);
         assertFalse (products.isEmpty());
         assertEquals(1, products.size());
@@ -100,6 +102,7 @@ public abstract class BaseSpringTestCaseWithTransactionDemarcation extends
 
     
 
+    @Test
     public void testEvictProductFromCache() throws Exception {
         
         Product product = this.productService.load(1);
@@ -117,6 +120,7 @@ public abstract class BaseSpringTestCaseWithTransactionDemarcation extends
         
     }
 
+    @Test
     public void testEvictAllProductsFromCache() throws Exception {
     
         
@@ -135,6 +139,7 @@ public abstract class BaseSpringTestCaseWithTransactionDemarcation extends
         
     }
 
+    @Test
     public void testCreateProductAndFindAll() throws Exception {
         Product product = new Product();
         product.setId(2);
@@ -146,19 +151,19 @@ public abstract class BaseSpringTestCaseWithTransactionDemarcation extends
         assertEquals (2, productTest.getId());
         assertEquals ("product 2", productTest.getName());
     
-        Collection products = this.productService.find();
+        Collection<Product> products = this.productService.find();
         assertNotNull (products);
         assertFalse(products.isEmpty());
         assertEquals (2, products.size());
     
-        Iterator iter = products.iterator();
+        Iterator<Product> iter = products.iterator();
         
-        product = (Product) iter.next();
+        product = iter.next();
         assertNotNull (product);
         assertEquals (1, product.getId());
         assertEquals ("product1", product.getName());
     
-        product = (Product) iter.next();
+        product = iter.next();
         assertNotNull (product);
         assertEquals (2, product.getId());
         assertEquals ("product 2", product.getName());
@@ -167,6 +172,7 @@ public abstract class BaseSpringTestCaseWithTransactionDemarcation extends
         this.productService.delete (productTest);
     }
 
+    @Test
     public void testIsCached() throws Exception {
         
         Product product = this.productService.load(1);
@@ -179,6 +185,7 @@ public abstract class BaseSpringTestCaseWithTransactionDemarcation extends
         
     }
 
+    @Test
     public void testCreateProductAndRemoveAll() throws Exception {
         Product product = new Product();
         product.setId(2);
@@ -200,29 +207,29 @@ public abstract class BaseSpringTestCaseWithTransactionDemarcation extends
         assertEquals (3, productTest.getId());
         assertEquals ("product 3", productTest.getName());
 
-        Collection products = this.productService.find();
+        Collection<Product> products = this.productService.find();
         assertNotNull (products);
         assertFalse(products.isEmpty());
         assertEquals (3, products.size());
     
-        Iterator iter = products.iterator();
+        Iterator<Product> iter = products.iterator();
         
-        product = (Product) iter.next();
+        product = iter.next();
         assertNotNull (product);
         assertEquals (1, product.getId());
         assertEquals ("product1", product.getName());
     
-        product = (Product) iter.next();
+        product = iter.next();
         assertNotNull (product);
         assertEquals (2, product.getId());
         assertEquals ("product 2", product.getName());
 
-        product = (Product) iter.next();
+        product = iter.next();
         assertNotNull (product);
         assertEquals (3, product.getId());
         assertEquals ("product 3", product.getName());
 
-        List productsToDelete = new ArrayList();
+        List<Product> productsToDelete = new ArrayList<Product>();
         productsToDelete.add(this.productService.load(2));
         productsToDelete.add(this.productService.load(3));
         this.productService.delete(productsToDelete);

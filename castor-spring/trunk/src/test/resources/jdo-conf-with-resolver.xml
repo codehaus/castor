@@ -3,15 +3,14 @@
                            "http://castor.exolab.org/jdo-conf.dtd">
 
 <jdo-conf>
-<!-- 
     <database name="test" engine="mysql" >
-        <driver url="jdbc:mysql://localhost:3307/spring" class-name="org.gjt.mm.mysql.Driver">
+        <driver url="jdbc:mysql://localhost:3306/spring" class-name="org.gjt.mm.mysql.Driver">
             <param name="user" value="test" />
             <param name="password" value="test" />
         </driver>
         <mapping href="mapping-empty.xml" />
     </database>
- -->    
+<!-- 
     <database name="test" engine="${db.dialect}">
         <driver url="${db.url}"
             class-name="${db.driver}">
@@ -20,5 +19,6 @@
         </driver>
         <mapping href="mapping-empty.xml" />
     </database>
+ -->    
     <transaction-demarcation mode="local" />
 </jdo-conf>
