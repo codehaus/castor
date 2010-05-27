@@ -1,6 +1,7 @@
 package org.castor.spring.orm;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.apache.commons.logging.Log;
@@ -111,7 +112,7 @@ public class LocalCastorFactoryBean implements FactoryBean, InitializingBean /*
      *         known at the time of the call
      * @see ListableBeanFactory#getBeansOfType
      */
-    public Class getObjectType() {
+    public Class<?> getObjectType() {
 
         if (this.jdoManager != null) {
             return this.jdoManager.getClass();
@@ -164,9 +165,11 @@ public class LocalCastorFactoryBean implements FactoryBean, InitializingBean /*
                     + configLocation.getURL().toExternalForm());
             this.jdoManager = createJDOManager();
         } catch (IOException e) {
-            throw new IllegalArgumentException(
+            IllegalArgumentException iae = new IllegalArgumentException(
                     "Problem loading JDO configuration file from "
                             + configLocation.getDescription());
+            iae.initCause(e);
+            throw iae;
         }
 
     }
@@ -206,9 +209,14 @@ public class LocalCastorFactoryBean implements FactoryBean, InitializingBean /*
             if (this.callbackInterceptor != null) {
                 jdoManagerToBeCreated.setCallbackInterceptor(this.callbackInterceptor);
             }
-        } catch (Exception e) {
-            LOG.warn("problem", e);
-            // ignore, as this cannot happen
+        } catch (NoSuchMethodException e) {
+            throw new IllegalArgumentException("Problem establishing reference to JDOManager.loadConfiguration() method", e);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Problem passing arguments JDOManager.loadConfiguration() method.", e);
+        } catch (IllegalAccessException e) {
+            throw new IllegalArgumentException("Problem passing arguments JDOManager.loadConfiguration() method.", e);
+        } catch (InvocationTargetException e) {
+            throw new IllegalArgumentException("Problem invoking JDOManager.loadConfiguration() method.", e);
         }
         return jdoManagerToBeCreated;
     }
