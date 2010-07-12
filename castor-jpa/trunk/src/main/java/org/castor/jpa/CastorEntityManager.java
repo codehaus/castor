@@ -160,8 +160,8 @@ public final class CastorEntityManager implements EntityManager {
         // Check whether the entity manager is open.
         verifyOpenEntityManager();
 
-        throw new UnsupportedOperationException("Not yet implemented!");
-    }
+        //throw new UnsupportedOperationException("Not yet implemented!");
+        return new CastorQuery(name,this.database);    }
 
     /**
      * Create an instance of Query for executing a native SQL statement, e.g.,

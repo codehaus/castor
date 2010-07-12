@@ -29,7 +29,7 @@ public class CastorQuery implements Query
     {
         setDatabase(database);
         try {
-            query = this.database.getOQLQuery(ejbqlString);
+            query = this.database.getNamedQuery(ejbqlString);
         } catch (PersistenceException e) {
             throw new javax.persistence.PersistenceException("Problem creating query instance", e);
         }
@@ -63,7 +63,7 @@ public class CastorQuery implements Query
         this.database = database;
     }
     
-    private void bindParameters (OQLQuery query, Map parameters) {
+    private void bindParameters (OQLQuery query, Map parameters) {  //FIXME: Not robust. Parameters must be sorted in the map (same order as in the query itself). Possible: sort parameters first
         if (!parameters.isEmpty()) {
             Iterator values = parameters.values().iterator();
             while (values.hasNext()) {
@@ -76,6 +76,7 @@ public class CastorQuery implements Query
         List results = new ArrayList();
         bindParameters(query, parameters);
         QueryResults queryResults;
+        
         try {
             queryResults = query.execute();
             while (queryResults.hasMore()) {
@@ -137,8 +138,8 @@ public class CastorQuery implements Query
 
     public Query setParameter(String name, Object value)
     {
-        // TODO: Implement !!!
-        throw new UnsupportedOperationException();
+        parameters.put(name, value);
+        return this;
     }
 
     public Query setParameter(String name, Date value, TemporalType temporalType)

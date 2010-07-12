@@ -9,6 +9,8 @@ import javax.persistence.PersistenceException;
 import javax.persistence.spi.PersistenceProvider;
 import javax.persistence.spi.PersistenceUnitInfo;
 
+import org.castor.jdo.conf.Mapping;
+import org.castor.jdo.jpa.info.JPACallbackHandler;
 import org.castor.cpa.util.JDOClassDescriptorResolver;
 import org.castor.cpa.util.JDOClassDescriptorResolverImpl;
 import org.castor.jdo.conf.Database;
@@ -90,24 +92,33 @@ public class CastorPersistenceProvider implements PersistenceProvider {
 
 		JDOClassDescriptorResolver resolver = new JDOClassDescriptorResolverImpl();
 
-		// TODO[WG]: write code to enable persistence class specs through
-		// persistence.xml
-		// for (String className : info.getManagedClassNames()) {
-		// resolver.addClass(Class.forName(className));
-		// }
+		for (String className : info.getManagedClassNames()) {
+			try {
+				resolver.addClass(Class.forName(className));
+			} catch (ClassNotFoundException e) {
+				throw new PersistenceException(String.format(
+						"Problem adding class `%s` to resolver.", className
+				));
+			}
+		}
 
 		for (String mappingFile : info.getMappingFileNames()) {
-			database.addMapping(JDOConfFactory.createMapping(mappingFile));
+                        final Mapping mapping = new Mapping();
+			mapping.setHref(mappingFile);
+			database.addMapping(mapping);
 		}
 		
 		try {
-			JDOManager.loadConfiguration(jdoConf, null);
+			final ClassLoader classLoader = getClass().getClassLoader();
+			final InputSource source = new InputSource(classLoader.getResource(
+					DEFAULT_CONFIGURATION_FILE_NAME).toExternalForm());
+			JDOManager.loadConfiguration(source, null, classLoader, resolver);
 			JDOManager jdoManager = JDOManager.createInstance(info
 					.getPersistenceUnitName());
+			jdoManager.setCallbackInterceptor(new JPACallbackHandler());
 			factory = new CastorEntityManagerFactory(jdoManager);
 		} catch (MappingException e) {
 			// TODO !!!!!!!!!!!!!!!! Investigate exception type
-			// !!!!!!!!!!!!!!!!!!!
 			throw new PersistenceException(
 					"Problem loading Castor JDO configuration", e);
 		}

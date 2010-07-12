@@ -79,6 +79,7 @@
                             <autocommit>true</autocommit>
                             <srcFiles>
                                 <srcFile>src/test/resources/org/castor/jpa/functional/schema.sql</srcFile>
+                                <srcFile>src/test/resources/org/castor/jpa/annotations/schema.sql</srcFile>
                                 <srcFile>src/test/resources/create.sql</srcFile>
                             </srcFiles>
                         </configuration>
@@ -457,7 +458,7 @@
     </reporting>
     
     <properties>
-        <castor.version>1.3.1</castor.version>
+         <castor.version>1.3.2-SNAPSHOT</castor.version>
         <spring.version>3.0.2.RELEASE</spring.version>
     </properties>
 </project>
