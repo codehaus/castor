@@ -6,6 +6,12 @@
 	<version>2.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
+    <parent>
+        <groupId>org.codehaus</groupId>
+        <artifactId>codehaus-parent</artifactId>
+        <version>3</version>
+    </parent>
+
 	<name>Spring ORM implementation for Castor JDO</name>
 	<description>This project provides a Castor JDO-specific implementation of the Spring 
 		ORM interfaces (as described at 
@@ -14,6 +20,13 @@
 		their applications.
 	</description>
 	<url>http://castor.org</url>
+
+    <distributionManagement>
+        <site>
+          <id>codehaus.org</id>
+          <url>dav:https://dav.codehaus.org/castor/</url>
+        </site>
+    </distributionManagement>
 
 	<issueManagement>
 		<system>Jira</system>
@@ -467,6 +480,37 @@
  -->			
 		</plugins>
 	</reporting>
+   
+   <profiles>
+      <profile>
+        <id>release-sign-artifacts</id>
+        <activation>
+          <property>
+            <name>performRelease</name>
+            <value>true</value>
+          </property>
+        </activation>
+        <build>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-gpg-plugin</artifactId>
+              <version>1.1</version>
+              <executions>
+                <execution>
+                  <id>sign-artifacts</id>
+                  <phase>verify</phase>
+                  <goals>
+                    <goal>sign</goal>
+                  </goals>
+                </execution>
+              </executions>
+            </plugin>
+          </plugins>
+        </build>
+      </profile>
+        
+    </profiles>
    
    <properties>
         <spring.version>3.0.2.RELEASE</spring.version>
