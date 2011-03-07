@@ -239,24 +239,6 @@
        <url>http://svn.castor.codehaus.org/browse/castor/castor-spring/trunk</url>
 	</scm>	
 
-    <distributionManagement>
-        <repository>
-          <id>codehaus.org</id>
-          <name>Castor Central Distribution Repository</name>
-          <url>dav:https://dav.codehaus.org/repository/castor/</url>
-        </repository>
-        <snapshotRepository>
-          <id>codehaus.org</id>
-          <name>Castor Central Development Repository</name>
-          <url>dav:https://dav.codehaus.org/snapshots.repository/castor/</url>
-        </snapshotRepository>
-        <site>
-          <id>codehaus.org</id>
-          <url>dav:https://dav.codehaus.org/castor/</url>
-        </site>
-    </distributionManagement>
-
-    
 	<dependencies>
 
 		<dependency>
