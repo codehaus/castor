@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+     http://www.springframework.org/schema/beans 
+     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+     http://www.springframework.org/schema/tx 
+     http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+
+	<bean id="jdoManager" class="org.castor.spring.orm.LocalCastorFactoryBean">
+		<property name="databaseName" value="testService" />
+		<property name="configLocation"
+			value="classpath:/org/castor/spring/orm/tests/service/jdo-conf.xml" />
+	</bean>
+
+	<bean id="transactionManager" class="org.castor.spring.orm.CastorTransactionManager">
+		<property name="JDOManager">
+			<ref bean="jdoManager" />
+		</property>
+	</bean>
+
+	<bean id="productDao" class="org.exolab.castor.dao.ProductDaoImplUsingTemplate">
+		<property name="JDOManager">
+			<ref bean="jdoManager" />
+		</property>
+	</bean>
+
+	<bean id="myProductService"
+		class="org.exolab.castor.service.ProductServiceImplWithProgrammaticTransactionDeclaration">
+		<property name="transactionManager">
+			<ref bean="transactionManager" />
+		</property>
+		<property name="productDao">
+			<ref bean="productDao" />
+		</property>
+	</bean>
+
+</beans>
+
+
