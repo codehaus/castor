@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<!DOCTYPE jdo-conf PUBLIC "-//EXOLAB/Castor JDO Configuration DTD Version 1.0//EN"
+                           "http://castor.exolab.org/jdo-conf.dtd">
+
+<jdo-conf>
+    <!-- 
+    <database name="testBean" engine="mysql" >
+        <driver url="jdbc:mysql://localhost:3306/spring" class-name="org.gjt.mm.mysql.Driver">
+            <param name="user" value="test" />
+            <param name="password" value="test" />
+        </driver>
+        <mapping href="mapping-empty.xml" />
+    </database>
+    -->
+    <database name="testBean" engine="derby">
+        <driver url="jdbc:derby:target/test"
+            class-name="org.apache.derby.jdbc.EmbeddedDriver">
+            <param name="user" value="test" />
+            <param name="password" value="test" />
+        </driver>
+        <mapping href="mapping-empty.xml" />
+    </database>
+    <transaction-demarcation mode="local" />
+</jdo-conf>
