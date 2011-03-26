@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+	
+    <!-- 2PC definitions -->
+	<bean id="jdoManager2PC" class="org.castor.spring.orm.LocalCastorFactoryBean">
+		<property name="databaseName" value="test2PC" />
+		<property name="configLocation" value="classpath:jdo-conf-2pc.xml" />
+	</bean>
+
+	<bean id="my2PCSophisticatedProductDao" class="org.exolab.castor.dao.ProductDaoImplUsingTemplate">
+	  <property name="JDOManager">
+	    <ref bean="jdoManager2PC"/>
+	  </property>
+	</bean>
+
+	<bean id="my2PCProductServiceTarget" class="org.exolab.castor.service.ProductServiceImplWithDeclarativeTransactionDeclaration">
+	  <property name="productDao">
+	    <ref bean="my2PCSophisticatedProductDao"/>
+	  </property>
+	</bean>
+
+    <bean id="jotm" class="org.springframework.transaction.jta.JotmFactoryBean"/>
+
+    <bean id="my2PCTransactionManager" class="org.springframework.transaction.jta.JtaTransactionManager">
+        <property name="userTransaction" ref="jotm"/>
+    </bean>
+
+	<bean id="my2PCProductServiceDeclarativeShortened" 
+          class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+	  <property name="transactionManager">
+	    <ref bean="my2PCTransactionManager"/>
+	  </property>
+	  <property name="target">
+	    <ref bean="my2PCProductServiceTarget"/>
+	  </property>
+	  <property name="transactionAttributes">
+	    <props>
+	      <prop key="create*">PROPAGATION_REQUIRED</prop>
+	      <prop key="load*">PROPAGATION_REQUIRED</prop>
+	      <prop key="delete*">PROPAGATION_REQUIRED</prop>
+	      <prop key="find*">PROPAGATION_REQUIRED</prop>
+	      <prop key="evict*">PROPAGATION_REQUIRED</prop>
+	      <prop key="isCached*">PROPAGATION_REQUIRED</prop>
+	    </props>
+	  </property>
+    </bean>
+
+	
+    <!-- Derby XA sample -->
+<!--	
+	<bean id="derbyDataSource" 
+          class="org.apache.derby.jdbc.ClientXADataSource" destroy-method="close">
+	  <property name="databaseName">
+	    <value>test</value>
+	  </property>
+	  <property name="connectionAttributes">
+	    <value>create</value>
+	  </property>
+	  <property name="serverName">
+	    <value>localhost</value>
+	  </property>
+	  <property name="user">
+	    <value>spring</value>
+	  </property>
+	  <property name="password">
+	    <value>spring</value>
+	  </property>
+	  <property name="retrieveMessageText">
+	    <value>true</value>
+	  </property>
+	</bean>	
+
+	<bean id="jdoManagerDerby2PC" class="org.castor.spring.orm.LocalCastorFactoryBean">
+	  <property name="jdoProperties">
+	    <props>
+	      <prop key="databaseName">testDerby2PC</prop>
+	      <prop key="configLocation">src/test/resources/jdo-conf-derby-2pc.xml</prop>
+	    </props>
+	  </property>
+	</bean>
+
+	<bean id="myDerby2PCSophisticatedProductDao" class="org.exolab.castor.dao.ProductDaoImplUsingTemplate">
+	  <property name="JDOManager">
+	    <ref bean="jdoManagerDerby2PC"/>
+	  </property>
+	</bean>
+
+	<bean id="myDerby2PCProductServiceTarget" class="org.exolab.castor.service.ProductServiceImplWithDeclarativeTransactionDeclaration">
+	  <property name="productDao">
+	    <ref bean="my2PCSophisticatedProductDao"/>
+	  </property>
+	</bean>
+
+	<bean id="myDerby2PCProductServiceDeclarativeShortened" 
+          class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+	  <property name="transactionManager">
+	    <ref bean="my2PCTransactionManager"/>
+	  </property>
+	  <property name="target">
+	    <ref bean="myDerby2PCProductServiceTarget"/>
+	  </property>
+	  <property name="transactionAttributes">
+	    <props>
+	      <prop key="create*">PROPAGATION_REQUIRED</prop>
+	      <prop key="load*">PROPAGATION_REQUIRED</prop>
+	      <prop key="delete*">PROPAGATION_REQUIRED</prop>
+	      <prop key="find*">PROPAGATION_REQUIRED</prop>
+	      <prop key="evict*">PROPAGATION_REQUIRED</prop>
+	      <prop key="isCached*">PROPAGATION_REQUIRED</prop>
+	    </props>
+	  </property>
+    </bean>
+-->
+        
+</beans>

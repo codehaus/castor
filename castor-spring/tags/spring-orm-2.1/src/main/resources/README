@@ -1,0 +1,15 @@
+Spring ORM support for Castor JDO
+=================================
+
+Castor integrates Java objects, XML documents and SQL relational
+databases in a unified model that allows information to be exchanged, 
+persisted and manipulated in a variety of ways.
+
+This project provides the user of Castor with Spring factory beans for Castor JDO
+that fully implement the Spring ORM package, incl. factory beans for JDOManager, a 
+CastorTemplate, etc.
+
+More information is available at http://castor.codehaus.org
+
+
+
