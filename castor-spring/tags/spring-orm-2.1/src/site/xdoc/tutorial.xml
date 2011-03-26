@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document url="http://castor.exolab.org/about.xml">
+  <properties>
+    <title>Spring ORM for (experienced) Castor JDO users - A possible migration</title>
+    <abstract>
+       A migration guide for experienced Castor JDO users
+    </abstract>
+    <status>Final</status>
+  </properties>
+  <body>
+  
+	<p>This guide assumes that you are an experienced Castor JDO users that knows how
+	   to use Castor's interfaces and classes to interact with a database. If 
+	   this is not the case, please familiarize yourself with 
+	   <a href="http://www.castor.org/jdo.html">Castor JDO first</a>. </p> 
+
+	<section name="Sample domain objects">
+	
+		<p>The sample domain objects used in here basically define a <tt>Catalogue</tt>, 
+		   which is a collection of <tt>Product</tt>s. A possible castor JDO mapping could look
+		   as follows:</p>
+		   
+		<source>
+&lt;class name="org.castor.sample.Catalogue"&gt;
+   &lt;map-to table="catalogue"/&gt;
+   &lt;field name="id" type="long"&gt;
+      &lt;sql name="id" type="integer" /&gt;
+   &lt;/field&gt;
+   &lt;field name="products" type="org.castor.sample.Product" collection="arraylist"&gt;
+      &lt;sql many-key="c_id" /&gt;
+   &lt;/field&gt;
+&lt;/class&gt;
+
+&lt;class name="org.castor.sample.Product"&gt;
+   &lt;map-to table="product"/&gt;
+   &lt;field name="id" type="long"&gt;
+      &lt;sql name="id" type="integer" /&gt;
+   &lt;/field&gt;
+   &lt;field name="description" type="string"&gt;
+      &lt;sql name="desc" type="varchar" /&gt;
+   &lt;/field&gt;
+&lt;/class&gt;
+		</source>
+		
+	</section>
+	
+	<section name="Using Castor JDO manually">
+	
+		<p>To e.g. load a given <tt>Catalogue</tt> instance as defined by its identity,
+		   and all its associated <tt>Product</tt> instances, the following code could be used, 
+		   based upon the Castor-specific interfaces <tt>JDOManager</tt> and <tt>Database</tt>.</p>
+		   
+		<source>
+JDOManager.loadConfiguration("jdo-conf.xml");
+JDOManager jdoManager = JDOmanager.createInstance("sample");
+
+Database database = jdoManager.getDatabase();		
+database.begin();
+Catalogue catalogue = database.load(catalogue.class, new Long(1));
+database.commit();
+database.close();
+		</source>
+		
+		<p>For brevity, exception handling has been ommitted completely. But is is quite obvious
+		   that - when using such code fragments to implement various methods of a DAO - 
+		   there's a lot of redundant code that needed to be written again and again - and exception
+		   handling is adding some additional complexity here as well.</p>
+		   
+		<p>Ent0ers Spring ORM for Castor JDO, a small layer that allows usage of Castor JDO
+		   through Spring ORM, with all the known benefits (exception conversion, templates, tx handling).</p>
+		
+	</section>
+	
+	<section name="Using Castor JDO with Spring ORM - Without CastorTemplate">
+	
+		<p>Let's see how one might implement the <tt>loadProduct(int)</tt> of a <tt>ProductDAO</tt>
+		   class with the help of Spring ORM using Castor JDO:</p>
+		   
+		<source>
+public class ProductDaoImpl implements ProductDao {
+
+  private JDOManager jdoManager;
+
+  public void setJDOManager(JDOManager jdoManager) {
+    this.jdoManager = jdoManager;
+  }
+
+  public Product loadProduct(final int id) {
+    CastorTemplate tempate = new CastorTemplate(this.jdoManager);
+    return (Product) template.execute(
+        new CastorCallback() {
+          public Object doInJdo(Database database) throws PersistenceException {
+            return (Product) database.load(Product.class, new Integer (id));
+          }
+        });
+  }
+}		</source>
+
+		<p>Still a lot of code to write, but compared to the above section, the DAO gets
+		   passed a fully configured <tt>JDOManager</tt> instance through Spring's dependency
+		   injection mechanism. All that's required is configuration of Castor's JDOManager
+		   as a Spring bean definition in an Spring application context as 
+		   follows.</p>
+		   
+		<source>
+&lt;bean id="jdoManager" class="org.castor.spring.orm.LocalCastorFactoryBean"&gt;
+  &lt;property name="databaseName" value="test" /&gt;
+  &lt;property name="configLocation" value="classpath:jdo-conf.xml" /&gt;
+&lt;/bean&gt;
+
+&lt;bean id="myProductDao" class="product.ProductDaoImpl"&gt;
+  &lt;property name="JDOManager"&gt;
+    &lt;ref bean="jdoManager"/&gt;
+  &lt;/property&gt;
+&lt;/bean&gt;</source>
+		
+		
+	</section>
+
+	<section name="Using Castor JDO with Spring ORM - With CastorTemplate">
+	
+		<p>Above code is still quite verbous, as it requires you to write short (though complex)
+		   callback functions. To ease life of the Castor JDO user even more, a range of template 
+		   methods have been added to <tt>CastorTemplate</tt>, allowing the implementation of above
+		   <tt>ProductDAO</tt> to be shortened considerably.</p>
+		   
+		<source>
+public class ProductDaoImplUsingTemplate extends CastorTemplate implements ProductDao {
+
+  private JDOManager jdoManager;
+
+  public void setJDOManager(JDOManager jdoManager) {
+    this.jdoManager = jdoManager;
+  }
+
+  public Product loadProduct(final int id) {
+    return (Product) load(Integer.valueOf(id));
+  }
+  
+  ...
+}		</source>
+
+		<p>Changing the bean definition for <tt>myProductDAO</tt> to ...</p>
+		
+		<source>
+&lt;bean id="myProductDao" class="product.ProductDaoImplUsingTemplate"&gt;
+  &lt;property name="JDOManager"&gt;
+    &lt;ref bean="myJdoManager"/&gt;
+  &lt;/property&gt;
+&lt;/bean&gt;</source>
+		
+		<p>loading an instance of <tt>Product</tt> by its identifier is reduced to ...</p>
+		
+		<source>
+ProductDao dao = (ProductDAO) context.getBean ("myProductDAO");
+Product product = dao.load(1);
+		</source>
+	</section>
+
+	<section name="Using Castor JDO with Spring ORM - With CastorDaoSupport">
+	
+		<p>Alernativelky to extending <tt>CastorTemplate</tt>, one could extend the
+		   <tt>CastorDaoSupport</tt> class and implement the <tt>ProductDAO</tt> as 
+		   follows.</p>
+		   
+		<source>
+public class ProductDaoImplUsingDaoSupport extends CastorDaoSupport implements ProductDao {
+
+  private JDOManager jdoManager;
+
+  public void setJDOManager(JDOManager jdoManager) {
+    this.jdoManager = jdoManager;
+  }
+
+  public Product loadProduct(final int id) {
+    return (Product) getCastorTemplate().load(Integer.valueOf(id));
+  }
+  
+  ...
+}		</source>
+
+		<p>Changing the bean definition for <tt>myProductDAO</tt> to ...</p>
+		
+		<source>
+&lt;bean id="myProductDao" class="product.ProductDaoImplUsingDaoSupport"&gt;
+  &lt;property name="JDOManager"&gt;
+    &lt;ref bean="myJdoManager"/&gt;
+  &lt;/property&gt;
+&lt;/bean&gt;</source>
+		
+		<p>the code to load an instance of <tt>Product</tt> still is as shown above.</p>
+		
+	</section>
+
+	</body>
+</document>
