@@ -56,7 +56,10 @@ import org.xml.sax.ContentHandler;
  * @version $Id$
  */
 public class Marshaller implements javax.xml.bind.Marshaller {
-    /** Logger to use. */
+
+    /**
+     * Logger to use.
+     */
     private static final Log LOG = LogFactory.getLog(Marshaller.class);
 
     /**
@@ -91,15 +94,21 @@ public class Marshaller implements javax.xml.bind.Marshaller {
     private InternalContext _internalContext;
 
     /**
-     * Only JAXBCopntext is allowed to instantiate Marshaller.
+     * Creates new instance of {@link JAXBContext}.
+     * </p>
+     * Constructor with package scope prevents from instantiation outside this component.
+     *
      * @param castorMarshaller the Castor Marshaller to use underneath
+     *
+     * @see JAXBContext#createMarshaller()
      */
-    protected Marshaller(final org.exolab.castor.xml.Marshaller castorMarshaller) {
+    Marshaller(final org.exolab.castor.xml.Marshaller castorMarshaller) {
         _castorMarshaller = castorMarshaller;
     }
 
     /**
      * {@inheritDoc}
+     *
      * @see javax.xml.bind.Marshaller#getAdapter(java.lang.Class)
      */
     public < A extends XmlAdapter > A getAdapter(final Class < A > xmlAdapter) {
@@ -108,6 +117,7 @@ public class Marshaller implements javax.xml.bind.Marshaller {
 
     /**
      * {@inheritDoc}
+     *
      * @see javax.xml.bind.Marshaller#getAttachmentMarshaller()
      */
     public AttachmentMarshaller getAttachmentMarshaller() {
@@ -116,6 +126,7 @@ public class Marshaller implements javax.xml.bind.Marshaller {
 
     /**
      * {@inheritDoc}
+     *
      * @see javax.xml.bind.Marshaller#getEventHandler()
      */
     public ValidationEventHandler getEventHandler() throws JAXBException {
@@ -123,7 +134,7 @@ public class Marshaller implements javax.xml.bind.Marshaller {
     }
 
     /**
-     * Returns the listener used... if no listener was previously set null
+     * Returns the listener, if no listener was previously set null
      * is returned.
      * @return the listner set or null
      * @see javax.xml.bind.Marshaller#getListener()
@@ -134,6 +145,7 @@ public class Marshaller implements javax.xml.bind.Marshaller {
 
     /**
      * {@inheritDoc}
+     *
      * @see javax.xml.bind.Marshaller#getNode(java.lang.Object)
      */
     public Node getNode(final Object node) throws JAXBException {
@@ -143,6 +155,7 @@ public class Marshaller implements javax.xml.bind.Marshaller {
 
     /**
      * {@inheritDoc}
+     *
      * @see javax.xml.bind.Marshaller#getProperty(java.lang.String)
      */
     public Object getProperty(final String propertyName) throws PropertyException {
@@ -151,6 +164,7 @@ public class Marshaller implements javax.xml.bind.Marshaller {
 
     /**
      * {@inheritDoc}
+     *
      * @see javax.xml.bind.Marshaller#getSchema()
      */
     public Schema getSchema() {
@@ -159,90 +173,89 @@ public class Marshaller implements javax.xml.bind.Marshaller {
 
     /**
      * {@inheritDoc}
+     *
      * @see javax.xml.bind.Marshaller#marshal(java.lang.Object, javax.xml.transform.Result)
      */
     public void marshal(
-            final Object object, final Result result) 
-    throws JAXBException {
-        if (result == null) {
-            String message = "Argument Result must not be null!";
-            LOG.warn(message + " Throwing IllegalArgumentException.");
-            throw new IllegalArgumentException(message);
-        }
+            final Object object, final Result result) throws JAXBException {
+        // TODO starting from the Castor 1.3.3 this can be replaced
+        Utils.checkNotNull(LOG, result, "stream");
+
         if (result instanceof SAXResult) {
             SAXResult saxResult = (SAXResult) result;
-            marshal(object, saxResult.getHandler());
+
+            if(saxResult.getHandler() != null) {
+                marshal(object, saxResult.getHandler());
+            }
         } else if (result instanceof DOMResult) {
             DOMResult domResult = (DOMResult) result;
-            marshal(object, domResult.getNode());
+
+            if(domResult.getNode() != null) {
+                marshal(object, domResult.getNode());
+                return;
+            }
         } else if (result instanceof StreamResult) {
             StreamResult streamResult = (StreamResult) result;
-            // TODO: if (getWriter != null) {
-            marshal(object, streamResult.getWriter());
-            // TODO: if (getOutputStream() != null) {
-        } else {
-            throw new IllegalArgumentException(
-                    "Illegal Result instance. Not soppurted by Castor");
+
+            if(streamResult.getWriter() != null) {
+                marshal(object, streamResult.getWriter());
+                return;
+            } else if(streamResult.getOutputStream() != null) {
+                marshal(object, streamResult.getWriter());
+                return;
+            }
         }
+
+        throw new JAXBException("Could not unmarshall the passed Result object.");
     }
 
     /**
      * {@inheritDoc}
+     *
      * @see javax.xml.bind.Marshaller#marshal(java.lang.Object, java.io.OutputStream)
      */
     public void marshal(
-            final Object object, final OutputStream stream) 
-    throws JAXBException {
-        if (stream == null) {
-            String message = "OutputStream must not be null!";
-            LOG.warn(message + " Throwing IllegalArgumentException.");
-            throw new IllegalArgumentException(message);
-        }
+            final Object object, final OutputStream stream) throws JAXBException {
+        Utils.checkNotNull(LOG, stream, "stream");
+
         try {
             _castorMarshaller.setWriter(new OutputStreamWriter(stream));
             marshal(object);
             validation();
         } catch (IOException e) {
-            String message = "Failed to wrap OutputStream into OutputStreamWriter with: " + e;
-            LOG.warn(message);
-            throw new JAXBException(message, e);
+            throw Utils.convertToJAXBException(LOG,
+                    "Error occurred when marshalling object from OutputStream.", e);
         }
     }
 
     /**
      * {@inheritDoc}
+     *
      * @see javax.xml.bind.Marshaller#marshal(java.lang.Object, java.io.Writer)
      */
     public void marshal(
-            final Object object, final Writer writer) 
-    throws JAXBException {
-        if (writer == null) {
-            String message = "Writer for marshalling must not be null!";
-            LOG.warn(message + " Throwing IllegalArgumentException.");
-            throw new IllegalArgumentException(message);
-        }
+            final Object object, final Writer writer) throws JAXBException {
+        Utils.checkNotNull(LOG, writer, "writer");
+
         try {
             _castorMarshaller.setWriter(writer);
             marshal(object);
             validation();
         } catch (IOException e) {
-            throw new JAXBException(
-                    "Problem opening the java.util.Writer instance for marshalling " + object);
+            throw Utils.convertToJAXBException(LOG,
+                    "Error occurred when marshalling object from java.util.Writter.", e);
         }
     }
 
     /**
      * {@inheritDoc}
+     *
      * @see javax.xml.bind.Marshaller#marshal(java.lang.Object, org.xml.sax.ContentHandler)
      */
     public void marshal(
-            final Object object, final ContentHandler contentHandler)
-    throws JAXBException {
-        if (contentHandler == null) {
-            String message = "ContentHandler for marshalling must not be null!";
-            LOG.warn(message + " Throwing IllegalArgumentException.");
-            throw new IllegalArgumentException(message);
-        }
+            final Object object, final ContentHandler contentHandler) throws JAXBException {
+        Utils.checkNotNull(LOG, contentHandler, "contentHandler");
+
         _castorMarshaller.setContentHandler(contentHandler);
         marshal(object);
         validation();
@@ -250,55 +263,49 @@ public class Marshaller implements javax.xml.bind.Marshaller {
 
     /**
      * {@inheritDoc}
+     *
      * @see javax.xml.bind.Marshaller#marshal(java.lang.Object, org.w3c.dom.Node)
      */
     public void marshal(
             final Object object, 
-            final Node node) 
-    throws JAXBException {
-        if (node == null) {
-            String message = "Argument 'node' is null.";
-            LOG.warn(message + " Throwing IllegalArgumentException.");
-            throw new IllegalArgumentException(message);
-        }
-        ContentHandler contentHandler = new DocumentHandlerAdapter(new SAX2DOMHandler(node));
-        _castorMarshaller.setContentHandler(contentHandler);
+            final Node node) throws JAXBException {
+        Utils.checkNotNull(LOG, node, "node");
+        _castorMarshaller.setContentHandler(new DocumentHandlerAdapter(new SAX2DOMHandler(node)));
         marshal(object);
         validation();
     }
 
     /**
      * {@inheritDoc}
+     *
      * @see javax.xml.bind.Marshaller#marshal(java.lang.Object, javax.xml.stream.XMLStreamWriter)
      */
     public void marshal(
-            final Object object, final XMLStreamWriter xmlStreamWriter)
-    throws JAXBException {
+            final Object object, final XMLStreamWriter xmlStreamWriter) throws JAXBException {
+        // TODO Castor 1.3.3 will support this out of the box
         throw new UnsupportedOperationException();
     }
 
     /**
      * {@inheritDoc}
+     *
      * @see javax.xml.bind.Marshaller#marshal(java.lang.Object, javax.xml.stream.XMLEventWriter)
      */
     public void marshal(
-            final Object object, final XMLEventWriter xmlEventWriter) 
-    throws JAXBException {
+            final Object object, final XMLEventWriter xmlEventWriter) throws JAXBException {
+        // TODO Castor 1.3.3 will support this out of the box
         throw new UnsupportedOperationException();
     }
 
     /**
      * {@inheritDoc}
+     *
      * @see javax.xml.bind.Marshaller#marshal(java.lang.Object, java.io.File)
      */
     public void marshal(
-            final Object object, final File file) 
-    throws JAXBException {
-        if (file == null) {
-            String message = "Argument 'file' is null.";
-            LOG.warn(message + " Throwing IllegalArgumentException.");
-            throw new IllegalArgumentException(message);
-        }
+            final Object object, final File file) throws JAXBException {
+        Utils.checkNotNull(LOG, file, "file");
+
         try {
             _castorMarshaller.setWriter(new FileWriter(file));
             marshal(object);
@@ -309,7 +316,7 @@ public class Marshaller implements javax.xml.bind.Marshaller {
             throw new JAXBException(message, e);
         }
     }
-    
+
     /**
      * A private marshal method to have the marshalling exception handling only once.
      * @param object the object to marshal
@@ -322,13 +329,9 @@ public class Marshaller implements javax.xml.bind.Marshaller {
             }
             _castorMarshaller.marshal(object);
         } catch (MarshalException e) {
-            String message = "Failed to marshal object: " + object + " with exception: " + e;
-            LOG.warn(message);
-            throw new JAXBException(message, e);
+            throw Utils.convertToJAXBException(LOG, "Error occurred when marshalling object.", e);
         } catch (ValidationException e) {
-            String message = "Failed to marshal object: " + object + " with exception: " + e;
-            LOG.warn(message);
-            throw new JAXBException(message, e);
+            throw Utils.convertToJAXBException(LOG, "Error occurred when marshalling object.", e);
         }
     }
 
@@ -346,6 +349,7 @@ public class Marshaller implements javax.xml.bind.Marshaller {
 
     /**
      * {@inheritDoc}
+     *
      * @see javax.xml.bind.Marshaller#setAdapter(javax.xml.bind.annotation.adapters.XmlAdapter)
      */
     public void setAdapter(final XmlAdapter arg0) {
@@ -354,6 +358,7 @@ public class Marshaller implements javax.xml.bind.Marshaller {
 
     /**
      * {@inheritDoc}
+     *
      * @see javax.xml.bind.Marshaller#setAdapter(java.lang.Class, javax.xml.bind.annotation.adapters.XmlAdapter)
      */
     public < A extends XmlAdapter > void setAdapter(
@@ -363,6 +368,7 @@ public class Marshaller implements javax.xml.bind.Marshaller {
 
     /**
      * {@inheritDoc}
+     *
      * @see javax.xml.bind.Marshaller#setAttachmentMarshaller(javax.xml.bind.attachment.AttachmentMarshaller)
      */
     public void setAttachmentMarshaller(final AttachmentMarshaller arg0) {
@@ -371,6 +377,7 @@ public class Marshaller implements javax.xml.bind.Marshaller {
 
     /**
      * {@inheritDoc}
+     *
      * @see javax.xml.bind.Marshaller#setEventHandler(javax.xml.bind.ValidationEventHandler)
      */
     public void setEventHandler(final ValidationEventHandler validationEventHandler)
@@ -380,6 +387,7 @@ public class Marshaller implements javax.xml.bind.Marshaller {
 
     /**
      * {@inheritDoc}
+     *
      * @see javax.xml.bind.Marshaller#setListener(javax.xml.bind.Marshaller.Listener)
      */
     public void setListener(final Listener listener) {
@@ -392,6 +400,7 @@ public class Marshaller implements javax.xml.bind.Marshaller {
 
     /**
      * {@inheritDoc}
+     *
      * @see javax.xml.bind.Marshaller#setProperty(java.lang.String, java.lang.Object)
      */
     public void setProperty(final String property, final Object value)
@@ -401,6 +410,7 @@ public class Marshaller implements javax.xml.bind.Marshaller {
 
     /**
      * {@inheritDoc}
+     *
      * @see javax.xml.bind.Marshaller#setSchema(javax.xml.validation.Schema)
      */
     public void setSchema(final Schema schema) {
@@ -408,11 +418,13 @@ public class Marshaller implements javax.xml.bind.Marshaller {
     }
 
     /**
-     * To set the Castor XML context to use.
+     * Sets the Castor XML context to use.
+     *
      * @param internalContext the Castor XML Context to use
      */
     protected void setInternalContext(final InternalContext internalContext) {
         _internalContext = internalContext;
+        // TODO doesn't seam reason why this should be set once again
         _castorMarshaller.setInternalContext(_internalContext);
     }
 }
