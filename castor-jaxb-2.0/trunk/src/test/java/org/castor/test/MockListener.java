@@ -1,13 +1,13 @@
 package org.castor.test;
 
-import javax.xml.bind.Unmarshaller.Listener;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class TestListener extends Listener {
+import javax.xml.bind.Unmarshaller.Listener;
+
+public class MockListener extends Listener {
     
-    private static final Log LOG = LogFactory.getLog(TestListener.class);
+    private static final Log LOG = LogFactory.getLog(MockListener.class);
 
     @Override
     public void afterUnmarshal(Object object, Object parent) {

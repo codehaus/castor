@@ -15,19 +15,18 @@
  */
 package org.castor.jaxb.resolver;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
-import junit.framework.Assert;
-import junit.framework.TestCase;
-
 import org.castor.jaxb.reflection.ClassDescriptorBuilder;
 import org.castor.jaxb.reflection.ClassInfoBuilder;
 import org.castor.jaxb.reflection.JAXBClassDescriptorImpl;
 import org.exolab.castor.xml.ResolverException;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Testing the resolver command which is more or less a wrapper of
@@ -39,7 +38,8 @@ import org.exolab.castor.xml.ResolverException;
  * @author Joachim Grueneis, jgrueneis AT codehaus DOT org
  * @version $Id$
  */
-public class JAXBClassResolverCommandTest extends TestCase {
+public class JAXBClassResolverCommandTest {
+
     private JAXBClassResolverCommand _classResolverCommand;
     private Map < String, Object > _propertiesMap = 
         new HashMap < String, Object > ();
@@ -48,6 +48,7 @@ public class JAXBClassResolverCommandTest extends TestCase {
      * Correctly initializes JAXBClassResolverCommand.
      * @see junit.framework.TestCase#setUp()
      */
+    @Before
     public void setUp() {
         _classResolverCommand = new JAXBClassResolverCommand();
         _classResolverCommand.setClassInfoBuilder(new ClassInfoBuilder());
@@ -60,6 +61,7 @@ public class JAXBClassResolverCommandTest extends TestCase {
      * {@link org.castor.jaxb.resolver.JAXBClassResolverCommand#setClassDescriptorBuilder(
      * org.castor.jaxb.reflection.ClassDescriptorBuilder)}.
      */
+    @Test
     public void testSetClassDescriptorBuilderToNull() {
         try {
             _classResolverCommand.setClassDescriptorBuilder(null);
@@ -74,6 +76,7 @@ public class JAXBClassResolverCommandTest extends TestCase {
      * {@link org.castor.jaxb.resolver.JAXBClassResolverCommand#setClassInfoBuilder(
      * org.castor.jaxb.reflection.ClassInfoBuilder)}.
      */
+    @Test
     public void testSetClassInfoBuilderToNull() {
         try {
             _classResolverCommand.setClassInfoBuilder(null);
@@ -88,6 +91,7 @@ public class JAXBClassResolverCommandTest extends TestCase {
      * {@link org.castor.jaxb.resolver.JAXBClassResolverCommand#resolve(
      * java.lang.String, java.util.Map)}.
      */
+    @Test
     public void testResolveNull() {
         try {
             Map descriptorMap = _classResolverCommand.resolve(null, _propertiesMap);
@@ -115,6 +119,7 @@ public class JAXBClassResolverCommandTest extends TestCase {
      * {@link org.castor.jaxb.resolver.JAXBClassResolverCommand#resolve(
      * java.lang.String, java.util.Map)}.
      */
+    @Test
     public void testResolveArtist() {
         try {
             Map descriptorMap = _classResolverCommand.resolve(

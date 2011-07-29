@@ -15,16 +15,14 @@
  */
 package org.castor.jaxb.reflection;
 
-import java.lang.annotation.Annotation;
-
-import javax.xml.bind.annotation.XmlAccessType;
-
-import junit.framework.Assert;
-import junit.framework.TestCase;
-
+import org.junit.Assert;
 import org.castor.jaxb.integrationtests.tests.test1.USAddress;
 import org.castor.jaxb.reflection.info.JaxbPackageNature;
 import org.castor.jaxb.reflection.info.PackageInfo;
+import org.junit.Test;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import java.lang.annotation.Annotation;
 
 /**
  * To test all annotation processings ClassNonnotationProcessingService is capable of.
@@ -34,19 +32,13 @@ import org.castor.jaxb.reflection.info.PackageInfo;
  * @author Joachim Grueneis, jgrueneis_at_gmail_dot_com
  * @version $Id$
  */
-public class PackageAnnotationProcessingServiceTest extends TestCase {
-
-    /**
-     * @param name
-     */
-    public PackageAnnotationProcessingServiceTest(final String name) {
-        super(name);
-    }
+public class PackageAnnotationProcessingServiceTest {
     
     /**
      * Test method for {@link org.castor.jaxb.annoproc.BaseAnnotationProcessingService#processAnnotations(org.castor.jaxb.reflection.info.Info, 
      * java.lang.annotation.Annotation[])}.
      */
+    @Test
     public final void testProcessAnnotations() {
         Class < USAddress > clazz = USAddress.class;
         Package pack = clazz.getPackage();

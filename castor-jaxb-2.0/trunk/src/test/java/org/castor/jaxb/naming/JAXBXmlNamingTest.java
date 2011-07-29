@@ -15,36 +15,41 @@
  */
 package org.castor.jaxb.naming;
 
+import org.junit.Assert;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import junit.framework.Assert;
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Joachim Grueneis, jgrueneis AT codehaus DOT org
  * @version $Id$
  *
  */
-public class JAXBXmlNamingTest extends TestCase {
+public class JAXBXmlNamingTest {
     /** 
      * Logger to be used.
      */
     private static final Log LOG = LogFactory.getLog(JAXBXmlNamingTest.class);
+
     /** Object to test. */
     private JAXBXmlNaming _xmlNaming;
+
     /**
      * {@inheritDoc}
      * @see junit.framework.TestCase#setUp()
      */
-    protected void setUp() {
+    @Before
+    public void setUp() {
         _xmlNaming = new JAXBXmlNaming();
     }
+
     /**
      * The createXMLName is not supported in the JAXB implementation...
      * so we expect to get {@link UnsupportedOperationException} in any
      * case.
      */
+    @Test
     public void testCreateXMLName() {
         try {
             _xmlNaming.createXMLName(null);
@@ -65,6 +70,8 @@ public class JAXBXmlNamingTest extends TestCase {
             // expected exception -> fine!
         }
     }
+
+    @Test
     public void testToXMLName() {
         Assert.assertNull("Null in -> null out", _xmlNaming.toXMLName(null));
         Assert.assertEquals("x", _xmlNaming.toXMLName("x"));
