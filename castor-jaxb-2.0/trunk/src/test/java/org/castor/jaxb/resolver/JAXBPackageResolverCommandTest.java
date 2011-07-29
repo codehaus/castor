@@ -15,26 +15,27 @@
  */
 package org.castor.jaxb.resolver;
 
+import org.junit.Assert;
+import org.exolab.castor.xml.ResolverException;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import org.exolab.castor.xml.ResolverException;
-
-import junit.framework.Assert;
-import junit.framework.TestCase;
 
 /**
  * @author Joachim Grueneis, jgrueneis AT codehaus DOT org
  * @version $Id$
  *
  */
-public class JAXBPackageResolverCommandTest extends TestCase {
+public class JAXBPackageResolverCommandTest {
 
     private JAXBPackageResolverCommand _cmd;
 
     private Map < String, Object > _propertiesMap = 
         new HashMap < String, Object > ();
 
+    @Before
     public void setUp() {
         _cmd = new JAXBPackageResolverCommand();
     }
@@ -43,6 +44,7 @@ public class JAXBPackageResolverCommandTest extends TestCase {
      * Test method for {@link org.castor.jaxb.resolver.JAXBPackageResolverCommand#resolve(
      * java.lang.String, java.util.Map)}.
      */
+    @Test
     public void testResolve() {
         try {
             Map descriptorMap = _cmd.resolve(null, _propertiesMap);
@@ -53,6 +55,7 @@ public class JAXBPackageResolverCommandTest extends TestCase {
         }
     }
 
+    @Test
     public void testYetNotImplemented() {
         try {
             _cmd.resolve("org.castor.jaxb.resolver", _propertiesMap);

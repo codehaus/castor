@@ -15,8 +15,7 @@
  */
 package org.castor.jaxb.sourcegeneration;
 
-import junit.framework.TestCase;
-
+import org.junit.Test;
 import org.xml.sax.InputSource;
 
 /**
@@ -25,8 +24,9 @@ import org.xml.sax.InputSource;
  * @version $Id$
  *
  */
-public class SourceGeneratorTest extends TestCase {
+public class SourceGeneratorTest {
 
+    @Test
     public void testSourceGeneration() throws Exception {
         InputSource inputSource =
             new InputSource(getClass().getClassLoader().getResource("test.xsd").toExternalForm());

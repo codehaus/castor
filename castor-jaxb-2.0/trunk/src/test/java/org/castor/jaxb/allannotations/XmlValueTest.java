@@ -15,22 +15,22 @@
  */
 package org.castor.jaxb.allannotations;
 
-import java.io.StringWriter;
-import java.math.BigDecimal;
+import org.castor.jaxb.JAXBContext;
+import org.junit.Test;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.annotation.XmlValue;
-
-import org.castor.jaxb.JAXBContext;
-
-import junit.framework.TestCase;
+import java.io.StringWriter;
+import java.math.BigDecimal;
 
 /**
  * @author joachim
  *
  */
-public class XmlValueTest extends TestCase {
+public class XmlValueTest {
+
+    @Test
     public void testFullCycle() throws JAXBException {
         javax.xml.bind.JAXBContext context = JAXBContext.newInstance(ForXmlValue.class);
         Marshaller m = context.createMarshaller();
@@ -40,7 +40,7 @@ public class XmlValueTest extends TestCase {
         m.marshal(fxv, sw);
         System.out.println(sw.toString());
     }
-    
+
     private class ForXmlValue {
         @XmlValue
         private BigDecimal content;

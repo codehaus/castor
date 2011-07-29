@@ -15,28 +15,23 @@
  */
 package org.castor.jaxb.reflection;
 
-import java.lang.reflect.Method;
+import org.junit.Assert;
+import org.castor.jaxb.exceptions.AdapterException;
+import org.junit.Before;
+import org.junit.Test;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
-
-import org.castor.jaxb.exceptions.AdapterException;
-
-import junit.framework.Assert;
-import junit.framework.TestCase;
+import java.lang.reflect.Method;
 
 /**
  * @author Joachim Grueneis, jgrueneis AT codehaus DOT org
  * @version $Id$
  *
  */
-public class JAXBFieldHandlerTest extends TestCase {
+public class JAXBFieldHandlerTest {
     private JAXBFieldHandlerImpl _fh;
-    /**
-     * @param name
-     */
-    public JAXBFieldHandlerTest(final String name) {
-        super(name);
-    }
+
+    @Before
     public void setUp() {
         _fh = new JAXBFieldHandlerImpl();
     }
@@ -44,6 +39,7 @@ public class JAXBFieldHandlerTest extends TestCase {
      * Tests that a not initialized field handler does return the expected
      * exception: IllegalStateException.
      */
+    @Test
     public void testNotInitializedNewInstance() {
         Object result = _fh.newInstance(this);
         Assert.assertNull("Uninitialized FieldHandler has to return null", result);
@@ -83,6 +79,7 @@ public class JAXBFieldHandlerTest extends TestCase {
     /**
      * 
      */
+    @Test
     public void testNewInstanceByClassNewInstance() {
         _fh.setType(Artist.class);
         Object result = _fh.newInstance(null);
@@ -92,6 +89,7 @@ public class JAXBFieldHandlerTest extends TestCase {
     /**
      * 
      */
+    @Test
     public void testNewInstanceByWrongObjectFactory() {
         try {
             _fh.setType(Artist.class);
@@ -105,12 +103,15 @@ public class JAXBFieldHandlerTest extends TestCase {
     /**
      * 
      */
+    @Test
     public void testNewInstanceByObjectFactory() {
         _fh.setTypeFactory(ObjectFactory.class, "createArtist");
         Object result = _fh.newInstance(null);
         Assert.assertNotNull(result);
         Assert.assertEquals("expected Class is Artist", Artist.class, result.getClass());
     }
+
+    @Test
     public void testGetValue() {
         Artist a = new Artist();
         a.setName("Hugo");
@@ -121,6 +122,8 @@ public class JAXBFieldHandlerTest extends TestCase {
         Assert.assertNotNull(result);
         Assert.assertEquals("expected Class is Artist", Artist.class, result.getClass());
     }
+
+    @Test
     public void testSetValue() {
         Song s = new Song();
         setMethodsIntoFieldHandler(_fh);
@@ -129,6 +132,7 @@ public class JAXBFieldHandlerTest extends TestCase {
         _fh.setValue(s, a);
         Assert.assertNotNull(s.getArtist());
     }
+
     private static class ArtistAdapter extends XmlAdapter < Artist, String > {
         public ArtistAdapter () {
             super();
@@ -146,6 +150,8 @@ public class JAXBFieldHandlerTest extends TestCase {
         }
         
     }
+
+    @Test
     public void testXmlAdapterSetValue() {
         Song s = new Song();
         setMethodsIntoFieldHandler(_fh);
@@ -153,6 +159,8 @@ public class JAXBFieldHandlerTest extends TestCase {
         _fh.setValue(s, "Hugo");
         Assert.assertNotNull(s.getArtist());
     }
+
+    @Test
     public void testXmlAdapterGetValue() {
         Artist a = new Artist();
         a.setName("Hugo");
@@ -163,6 +171,7 @@ public class JAXBFieldHandlerTest extends TestCase {
         Object result = _fh.getValue(s);
         Assert.assertNotNull(result);
     }
+
     private void setMethodsIntoFieldHandler(
             final JAXBFieldHandlerImpl fh) {
         Method getMethod = null;

@@ -15,7 +15,10 @@
  */
 package org.castor.jaxb.reflection;
 
-import java.lang.annotation.Annotation;
+import org.junit.Assert;
+import org.castor.jaxb.reflection.info.ClassInfo;
+import org.castor.jaxb.reflection.info.JaxbClassNature;
+import org.junit.Test;
 
 import javax.xml.bind.annotation.XmlAccessOrder;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -25,12 +28,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
-
-import junit.framework.Assert;
-import junit.framework.TestCase;
-
-import org.castor.jaxb.reflection.info.ClassInfo;
-import org.castor.jaxb.reflection.info.JaxbClassNature;
+import java.lang.annotation.Annotation;
 
 /**
  * To test all annotation processings ClassNonnotationProcessingService is capable of.
@@ -40,19 +38,13 @@ import org.castor.jaxb.reflection.info.JaxbClassNature;
  * @author Joachim Grueneis, jgrueneis_at_gmail_dot_com
  * @version $Id$
  */
-public class ClassAnnotationProcessingServiceTest extends TestCase {
-
-    /**
-     * @param name
-     */
-    public ClassAnnotationProcessingServiceTest(final String name) {
-        super(name);
-    }
+public class ClassAnnotationProcessingServiceTest {
     
     /**
      * Test method for {@link org.castor.jaxb.annoproc.BaseAnnotationProcessingService#processAnnotations(org.castor.jaxb.reflection.info.Info, 
      * java.lang.annotation.Annotation[])}.
      */
+    @Test
     public final void testProcessAnnotations() {
         Class < WithAnnotations > clazz = WithAnnotations.class;
         Annotation[] annotations = clazz.getAnnotations();
@@ -84,7 +76,8 @@ public class ClassAnnotationProcessingServiceTest extends TestCase {
      * Test method for {@link org.castor.jaxb.annoproc.BaseAnnotationProcessingService#processAnnotations(org.castor.jaxb.reflection.info.Info, 
      * java.lang.annotation.Annotation[])}.
      */
-    public final void testProcessAnnotationsWithXmlTypeAnnotation() {
+    @Test
+    public void testProcessAnnotationsWithXmlTypeAnnotation() {
         Class < WithXmlTypeAnnotation > clazz = WithXmlTypeAnnotation.class;
         Annotation[] annotations = clazz.getAnnotations();
         ClassAnnotationProcessingService caps = new ClassAnnotationProcessingService();
@@ -115,7 +108,9 @@ public class ClassAnnotationProcessingServiceTest extends TestCase {
     private static class WithXmlRootElementAnnotation {
         
     }
-    public final void testProcessAnnotationsWithXmlRootElementAnnotation() {
+
+    @Test
+    public void testProcessAnnotationsWithXmlRootElementAnnotation() {
         Class < WithXmlRootElementAnnotation > clazz = WithXmlRootElementAnnotation.class;
         Annotation[] annotations = clazz.getAnnotations();
         ClassAnnotationProcessingService caps = new ClassAnnotationProcessingService();
@@ -145,6 +140,8 @@ public class ClassAnnotationProcessingServiceTest extends TestCase {
     private static class WithXmlTransientAnnotation {
         
     }
+
+    @Test
     public final void testProcessAnnotationsWithXmlTransientAnnotation() {
         Class < WithXmlTransientAnnotation > clazz = WithXmlTransientAnnotation.class;
         Annotation[] annotations = clazz.getAnnotations();
@@ -175,7 +172,9 @@ public class ClassAnnotationProcessingServiceTest extends TestCase {
     private static class WithXmlSeeAlsoAnnotation {
         
     }
-    public final void testProcessAnnotationsWithXmlSeeAlsoAnnotation() {
+
+    @Test
+    public void testProcessAnnotationsWithXmlSeeAlsoAnnotation() {
         Class < WithXmlSeeAlsoAnnotation > clazz = WithXmlSeeAlsoAnnotation.class;
         Annotation[] annotations = clazz.getAnnotations();
         ClassAnnotationProcessingService caps = new ClassAnnotationProcessingService();
@@ -206,7 +205,9 @@ public class ClassAnnotationProcessingServiceTest extends TestCase {
     private static class WithXmlAccessorOrderAnnotation {
         
     }
-    public final void testProcessAnnotationsWithXmlAccessorOrderAnnotation() {
+
+    @Test
+    public void testProcessAnnotationsWithXmlAccessorOrderAnnotation() {
         Class < WithXmlAccessorOrderAnnotation > clazz = WithXmlAccessorOrderAnnotation.class;
         Annotation[] annotations = clazz.getAnnotations();
         ClassAnnotationProcessingService caps = new ClassAnnotationProcessingService();
@@ -236,7 +237,9 @@ public class ClassAnnotationProcessingServiceTest extends TestCase {
     private static class WithXmlAccessorTypeAnnotation {
         
     }
-    public final void testProcessAnnotationsWithXmlAccessorTypeAnnotation() {
+
+    @Test
+    public void testProcessAnnotationsWithXmlAccessorTypeAnnotation() {
         Class < WithXmlAccessorTypeAnnotation > clazz = WithXmlAccessorTypeAnnotation.class;
         Annotation[] annotations = clazz.getAnnotations();
         ClassAnnotationProcessingService caps = new ClassAnnotationProcessingService();
@@ -266,7 +269,9 @@ public class ClassAnnotationProcessingServiceTest extends TestCase {
     private static class WithXmlAccessorTypeAnnotationNONE {
         
     }
-    public final void testProcessAnnotationsWithXmlAccessorTypeNONEAnnotation() {
+
+    @Test
+    public void testProcessAnnotationsWithXmlAccessorTypeNONEAnnotation() {
         Class < WithXmlAccessorTypeAnnotationNONE > clazz = WithXmlAccessorTypeAnnotationNONE.class;
         Annotation[] annotations = clazz.getAnnotations();
         ClassAnnotationProcessingService caps = new ClassAnnotationProcessingService();
@@ -292,7 +297,8 @@ public class ClassAnnotationProcessingServiceTest extends TestCase {
         Assert.assertEquals(XmlAccessType.NONE, classInfo.getXmlAccessType());
     }
 
-    public final void testProcessAnnotationsWithXmlEnum() {
+    @Test
+    public void testProcessAnnotationsWithXmlEnum() {
         //Assert.fail("Not yet implemented!");
     }
 }

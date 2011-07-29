@@ -15,18 +15,19 @@
  */
 package org.castor.jaxb.resolver;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
+import org.junit.Assert;
+import junit.framework.TestCase;
 import org.castor.jaxb.reflection.ClassDescriptorBuilder;
 import org.castor.jaxb.reflection.ClassInfoBuilder;
 import org.exolab.castor.xml.ResolverException;
 import org.exolab.castor.xml.XMLClassDescriptor;
 import org.exolab.castor.xml.util.ResolverStrategy;
+import org.junit.Before;
+import org.junit.Test;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * To test the resolver strategy for Castor running in JAXB compliance
@@ -45,6 +46,7 @@ public class JAXBResolverStrategyTest extends TestCase {
      * Correctly setup the resolver strategy.
      * @see junit.framework.TestCase#setUp()
      */
+    @Before
     public void setUp() {
         _strategy = new JAXBResolverStrategy();
         JAXBClassResolverCommand classResolverCommand = new JAXBClassResolverCommand();
@@ -59,6 +61,7 @@ public class JAXBResolverStrategyTest extends TestCase {
      * Test method for {@link org.castor.jaxb.resolver.JAXBResolverStrategy#resolveClass(
      * org.exolab.castor.xml.util.ResolverStrategy.ResolverResults, java.lang.String)}.
      */
+    @Test
     public void testResolveClassNullNull() {
         try {
             _strategy.resolveClass(null, null);
@@ -74,6 +77,7 @@ public class JAXBResolverStrategyTest extends TestCase {
      * Test method for {@link org.castor.jaxb.resolver.JAXBResolverStrategy#resolveClass(
      * org.exolab.castor.xml.util.ResolverStrategy.ResolverResults, java.lang.String)}.
      */
+    @Test
     public void testResolveClassMyRRNull() {
         try {
             _strategy.resolveClass(_resolverResults, null);
@@ -89,6 +93,7 @@ public class JAXBResolverStrategyTest extends TestCase {
      * Test method for {@link org.castor.jaxb.resolver.JAXBResolverStrategy#resolvePackage(
      * org.exolab.castor.xml.util.ResolverStrategy.ResolverResults, java.lang.String)}.
      */
+    @Test
     public void testResolvePackageNullNull() {
         try {
             _strategy.resolvePackage(null, null);
@@ -104,6 +109,7 @@ public class JAXBResolverStrategyTest extends TestCase {
      * Test method for {@link org.castor.jaxb.resolver.JAXBResolverStrategy#resolvePackage(
      * org.exolab.castor.xml.util.ResolverStrategy.ResolverResults, java.lang.String)}.
      */
+    @Test
     public void testResolvePackageMyRRNull() {
         try {
             _strategy.resolvePackage(_resolverResults, null);
@@ -114,12 +120,13 @@ public class JAXBResolverStrategyTest extends TestCase {
             // expected exception
         }
     }
-    
-    
+
+
     private class MyTestClass {
-        
+
     }
 
+    @Test
     public void testResolveClass() {
         try {
             _strategy.resolveClass(_resolverResults, MyTestClass.class.getName());
@@ -129,6 +136,7 @@ public class JAXBResolverStrategyTest extends TestCase {
         }
     }
 
+    @Test
     public void testResolvePackage() {
         try {
             _strategy.resolvePackage(_resolverResults, MyTestClass.class.getPackage().getName());
@@ -145,6 +153,7 @@ public class JAXBResolverStrategyTest extends TestCase {
      * Test method for {@link org.castor.jaxb.resolver.JAXBResolverStrategy#setProperty(
      * java.lang.String, java.lang.Object)}.
      */
+    @Test
     public void testSetProperty() {
         //fail("Not yet implemented");
     }

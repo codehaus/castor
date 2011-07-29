@@ -15,15 +15,7 @@
  */
 package org.castor.jaxb.reflection;
 
-import java.util.List;
-
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
-import junit.framework.Assert;
-import junit.framework.TestCase;
-
+import org.junit.Assert;
 import org.castor.jaxb.naming.JAXBJavaNaming;
 import org.castor.jaxb.naming.JAXBXmlNaming;
 import org.castor.jaxb.reflection.info.ClassInfo;
@@ -32,6 +24,13 @@ import org.castor.jaxb.reflection.info.JaxbFieldNature;
 import org.castor.xml.JavaNaming;
 import org.castor.xml.XMLNaming;
 import org.exolab.castor.xml.XMLClassDescriptor;
+import org.junit.Before;
+import org.junit.Test;
+
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.util.List;
 
 /**
  * Tests the ClassDescriptorBuilder.
@@ -39,24 +38,17 @@ import org.exolab.castor.xml.XMLClassDescriptor;
  * @author Joachim Grueneis, jgrueneis_at_gmail_dot_com
  * @version $Id$
  */
-public class ClassDescriptorBuilderTest extends TestCase {
+public class ClassDescriptorBuilderTest {
     private ClassInfoBuilder _ciBuilder;
     /** The ClassDescriptorBuilder to test. */
     private ClassDescriptorBuilder _cdBuilder;
-    
-    /**
-     * Default test constructor.
-     * @param name name
-     */
-    public ClassDescriptorBuilderTest(final String name) {
-        super(name);
-    }
-    
+
     /**
      * Setting up the test. Creates the ClassDescriptorBuilder and fills
      * it with the XMLNaming service to use.
      * @see junit.framework.TestCase#setUp()
      */
+    @Before
     public void setUp() {
         JavaNaming jn = new JAXBJavaNaming();
         XMLNaming xn = new JAXBXmlNaming();
@@ -81,6 +73,7 @@ public class ClassDescriptorBuilderTest extends TestCase {
         }
     }
 
+    @Test
     public void testArtist() {
         ClassInfo ci = _ciBuilder.buildClassInfo(Artist.class);
         XMLClassDescriptor cd = _cdBuilder.buildClassDescriptor(ci, true);
@@ -114,8 +107,9 @@ public class ClassDescriptorBuilderTest extends TestCase {
         private String noElementAnnotation;
         private int _intWithNoAnnotation;
     }
-    
-    public final void testNoXmlElementAnnotations() {
+
+    @Test
+    public void testNoXmlElementAnnotations() {
         JaxbClassNature ci = new JaxbClassNature(_ciBuilder.buildClassInfo(NoXmlElementAnnotations.class));
         Assert.assertNotNull("ClassInfo generated must not be null", ci);
         Assert.assertNull(
@@ -142,8 +136,9 @@ public class ClassDescriptorBuilderTest extends TestCase {
         @XmlAttribute
         private String emptyAttributeAnnotation;
     }
-    
-    public final void testEmptyXmlElementAnnotations() {
+
+    @Test
+    public void testEmptyXmlElementAnnotations() {
         JaxbClassNature ci = new JaxbClassNature(_ciBuilder.buildClassInfo(EmptyXmlElementAnnotations.class));
         Assert.assertNotNull("ClassInfo generated must not be null", ci);
         Assert.assertNull(ci.getRootElementName());
@@ -167,8 +162,9 @@ public class ClassDescriptorBuilderTest extends TestCase {
         @XmlAttribute(name = "NamedAttribute")
         private String namedAttributeAnnotation;
     }
-    
-    public final void testNamedXmlElementAnnotations() {
+
+    @Test
+    public void testNamedXmlElementAnnotations() {
         ClassInfo ci = _ciBuilder.buildClassInfo(NamedXmlElementAnnotations.class);
         XMLClassDescriptor cd = _cdBuilder.buildClassDescriptor(ci, false);
         Assert.assertNotNull("ClassDescriptor generated must not be null", cd);
@@ -185,12 +181,14 @@ public class ClassDescriptorBuilderTest extends TestCase {
         Assert.assertNull("Without XmlElement no element name is set", fis.get(1).getElementName());
         Assert.assertEquals("NamedAttribute", fis.get(1).getAttributeName());
     }
-    
-    public final void testEnumAnnotations() {
+
+    @Test
+    public void testEnumAnnotations() {
         //Assert.fail("Not yet implemented!");
     }
-    
-    public final void testXmlEnumAnnotations() {
+
+    @Test
+    public void testXmlEnumAnnotations() {
         //Assert.fail("Not yet implemented!");
     }
 }

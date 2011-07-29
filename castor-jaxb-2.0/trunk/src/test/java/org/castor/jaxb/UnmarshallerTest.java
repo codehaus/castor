@@ -1,15 +1,6 @@
 package org.castor.jaxb;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.Unmarshaller.Listener;
-
-import junit.framework.TestCase;
-
-import org.castor.test.Child;
-import org.castor.test.Test;
-import org.castor.test.TestListener;
-import org.xml.sax.InputSource;
+import org.junit.Test;
 
 /**
  * This test case should show (and test) a simple situation of
@@ -23,8 +14,9 @@ import org.xml.sax.InputSource;
  * @author Joachim Grueneis, jgrueneis AT codehaus DOT org
  * @version $Id$
  */
-public class UnmarshallerTest extends TestCase {
-    
+public class UnmarshallerTest {
+
+    @Test
     public void testNix() {
         // an empty test until the other two can be enabled again - CASTOR-2578
     }

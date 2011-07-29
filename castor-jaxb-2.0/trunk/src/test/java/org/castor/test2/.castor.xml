@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <mapping>
-	<class name="org.castor.test2.Test">
+	<class name="org.castor.test2.Entity">
 		<map-to xml="aTest" ns-uri="http://www.example.org/test" ns-prefix="test"/>
 		<field name="child" type="org.castor.test2.Child">
 			<bind-xml name="aChild"/>

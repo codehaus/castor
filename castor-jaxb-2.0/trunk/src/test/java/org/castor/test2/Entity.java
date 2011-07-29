@@ -1,6 +1,6 @@
-package org.castor.test;
+package org.castor.test2;
 
-public class Test {
+public class Entity {
 
     private Child child;
 

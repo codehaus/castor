@@ -15,9 +15,10 @@
  */
 package org.castor.jaxb.reflection;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.List;
+import org.junit.Assert;
+import org.castor.jaxb.reflection.info.FieldInfo;
+import org.castor.jaxb.reflection.info.JaxbFieldNature;
+import org.junit.Test;
 
 import javax.xml.bind.annotation.XmlAnyAttribute;
 import javax.xml.bind.annotation.XmlAnyElement;
@@ -38,12 +39,9 @@ import javax.xml.bind.annotation.XmlMimeType;
 import javax.xml.bind.annotation.XmlMixed;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlValue;
-
-import junit.framework.Assert;
-import junit.framework.TestCase;
-
-import org.castor.jaxb.reflection.info.FieldInfo;
-import org.castor.jaxb.reflection.info.JaxbFieldNature;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.List;
 
 /**
  * To test if the annotations are read and all annotation properties are stored.
@@ -51,14 +49,7 @@ import org.castor.jaxb.reflection.info.JaxbFieldNature;
  * @author Joachim Grueneis, jgrueneis_at_codehaus_dot_org
  * @version $Id$
  */
-public class FieldAnnotationProcessingServiceTest extends TestCase {
-
-    /**
-     * @param name
-     */
-    public FieldAnnotationProcessingServiceTest(final String name) {
-        super(name);
-    }
+public class FieldAnnotationProcessingServiceTest {
 
     private static class NotASingleField {  
         @XmlAttribute(name = "Hugo")
@@ -73,7 +64,8 @@ public class FieldAnnotationProcessingServiceTest extends TestCase {
         }
     }
 
-    public final void testProcessAnnotations() {
+    @Test
+    public void testProcessAnnotations() {
         Class < NotASingleField > clazz = NotASingleField.class;
         Assert.assertFalse(clazz.isEnum());
         FieldAnnotationProcessingService faps = new FieldAnnotationProcessingService();
@@ -97,7 +89,8 @@ public class FieldAnnotationProcessingServiceTest extends TestCase {
         public List<? extends Object> anythingInAList;
     }
 
-    public final void testWithXmlElement() {
+    @Test
+    public void testWithXmlElement() {
         Class < WithXmlElement > clazz = WithXmlElement.class;
         Assert.assertFalse(clazz.isEnum());
         FieldAnnotationProcessingService faps = new FieldAnnotationProcessingService();
@@ -122,6 +115,7 @@ public class FieldAnnotationProcessingServiceTest extends TestCase {
         public List<? extends Object> anythingInAList;
     }
 
+    @Test
     public final void testWithXmlAttribute() {
         Class < WithXmlAttribute > clazz = WithXmlAttribute.class;
         Assert.assertFalse(clazz.isEnum());
@@ -145,6 +139,7 @@ public class FieldAnnotationProcessingServiceTest extends TestCase {
         public List<? extends Object> anythingInAList;
     }
 
+    @Test
     public final void testWithXmlElements() {
         Class < WithXmlElements > clazz = WithXmlElements.class;
         Assert.assertFalse(clazz.isEnum());
@@ -175,6 +170,7 @@ public class FieldAnnotationProcessingServiceTest extends TestCase {
         public List<? extends Object> anythingInAList;
     }
 
+    @Test
     public final void testWithXmlElementRef() {
         Class < WithXmlElementRef> clazz = WithXmlElementRef.class;
         Assert.assertFalse(clazz.isEnum());
@@ -199,6 +195,7 @@ public class FieldAnnotationProcessingServiceTest extends TestCase {
         public List<? extends Object> anythingInAList;
     }
 
+    @Test
     public final void testWithXmlElementRefs() {
         Class < WithXmlElementRefs> clazz = WithXmlElementRefs.class;
         Assert.assertFalse(clazz.isEnum());
@@ -221,7 +218,8 @@ public class FieldAnnotationProcessingServiceTest extends TestCase {
         public List<? extends Object> anythingInAList;
     }
 
-    public final void testWithXmlElementWrapper() {
+    @Test
+    public void testWithXmlElementWrapper() {
         Class < WithXmlElementWrapper> clazz = WithXmlElementWrapper.class;
         Assert.assertFalse(clazz.isEnum());
         FieldAnnotationProcessingService faps = new FieldAnnotationProcessingService();
@@ -246,6 +244,7 @@ public class FieldAnnotationProcessingServiceTest extends TestCase {
         public List<? extends Object> anythingInAList;
     }
 
+    @Test
     public final void testWithXmlAnyElement() {
         Class < WithXmlAnyElement> clazz = WithXmlAnyElement.class;
         Assert.assertFalse(clazz.isEnum());
@@ -269,7 +268,8 @@ public class FieldAnnotationProcessingServiceTest extends TestCase {
         public List<? extends Object> anythingInAList;
     }
 
-    public final void testWithXmlAnyAttribute() {
+    @Test
+    public void testWithXmlAnyAttribute() {
         Class < WithXmlAnyAttribute> clazz = WithXmlAnyAttribute.class;
         Assert.assertFalse(clazz.isEnum());
         FieldAnnotationProcessingService faps = new FieldAnnotationProcessingService();
@@ -290,7 +290,8 @@ public class FieldAnnotationProcessingServiceTest extends TestCase {
         public List<? extends Object> anythingInAList;
     }
 
-    public final void testWithXmlTransient() {
+    @Test
+    public void testWithXmlTransient() {
         Class < WithXmlTransient> clazz = WithXmlTransient.class;
         Assert.assertFalse(clazz.isEnum());
         FieldAnnotationProcessingService faps = new FieldAnnotationProcessingService();
@@ -311,6 +312,7 @@ public class FieldAnnotationProcessingServiceTest extends TestCase {
         public List<? extends Object> anythingInAList;
     }
 
+    @Test
     public final void testWithXmlValue() {
         Class < WithXmlValue> clazz = WithXmlValue.class;
         Assert.assertFalse(clazz.isEnum());
@@ -333,6 +335,7 @@ public class FieldAnnotationProcessingServiceTest extends TestCase {
         public List<? extends Object> anythingInAList;
     }
 
+    @Test
     public final void testWithXmlID() {
         Class < WithXmlID> clazz = WithXmlID.class;
         Assert.assertFalse(clazz.isEnum());
@@ -355,6 +358,7 @@ public class FieldAnnotationProcessingServiceTest extends TestCase {
         public List<? extends Object> anythingInAList;
     }
 
+    @Test
     public final void testWithXmlIDREF() {
         Class < WithXmlIDREF> clazz = WithXmlIDREF.class;
         Assert.assertFalse(clazz.isEnum());
@@ -377,6 +381,7 @@ public class FieldAnnotationProcessingServiceTest extends TestCase {
         public List<? extends Object> anythingInAList;
     }
 
+    @Test
     public final void testWithXmlList() {
         Class < WithXmlList> clazz = WithXmlList.class;
         Assert.assertFalse(clazz.isEnum());
@@ -399,6 +404,7 @@ public class FieldAnnotationProcessingServiceTest extends TestCase {
         public List<? extends Object> anythingInAList;
     }
 
+    @Test
     public final void testWithXmlMixed() {
         Class < WithXmlMixed> clazz = WithXmlMixed.class;
         Assert.assertFalse(clazz.isEnum());
@@ -421,7 +427,8 @@ public class FieldAnnotationProcessingServiceTest extends TestCase {
         public List<? extends Object> anythingInAList;
     }
 
-    public final void testWithXmlMimeType() {
+    @Test
+    public void testWithXmlMimeType() {
         Class < WithXmlMimeType> clazz = WithXmlMimeType.class;
         Assert.assertFalse(clazz.isEnum());
         FieldAnnotationProcessingService faps = new FieldAnnotationProcessingService();
@@ -443,6 +450,7 @@ public class FieldAnnotationProcessingServiceTest extends TestCase {
         public List<? extends Object> anythingInAList;
     }
 
+    @Test
     public final void testWithXmlAttachmentRef() {
         Class < WithXmlAttachmentRef> clazz = WithXmlAttachmentRef.class;
         Assert.assertFalse(clazz.isEnum());
@@ -465,7 +473,8 @@ public class FieldAnnotationProcessingServiceTest extends TestCase {
         public List<? extends Object> anythingInAList;
     }
 
-    public final void testWithXmlInlineBinaryData() {
+    @Test
+    public void testWithXmlInlineBinaryData() {
         Class < WithXmlInlineBinaryData> clazz = WithXmlInlineBinaryData.class;
         Assert.assertFalse(clazz.isEnum());
         FieldAnnotationProcessingService faps = new FieldAnnotationProcessingService();
@@ -488,7 +497,8 @@ public class FieldAnnotationProcessingServiceTest extends TestCase {
         @XmlEnumValue("2") TWO;
     }
 
-    public final void testWithEnumValue() {
+    @Test
+    public void testWithEnumValue() {
         Class < WithEnumValue> clazz = WithEnumValue.class;
         Assert.assertTrue(clazz.isEnum());
         FieldAnnotationProcessingService faps = new FieldAnnotationProcessingService();

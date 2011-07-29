@@ -1,6 +1,9 @@
 package org.castor.jaxb;
 
-import java.io.StringWriter;
+import org.castor.test.Child;
+import org.castor.test.MockValidationHandler;
+import org.castor.test2.Entity;
+import org.junit.Test;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -11,24 +14,23 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
+import java.io.StringWriter;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-import org.castor.test.Child;
-import org.castor.test.Test;
-import org.castor.test.TestValidationHandler;
+public class MarshallerTest {
 
-public class MarshallerTest extends TestCase {
-
+    @Test
     public void testCastorMarshallerWithoutMappingInformation() throws Exception {
         StringWriter out = new StringWriter();
 
-        Test test = new Test();
+        org.castor.test.Entity entity = new org.castor.test.Entity();
         Child child = new Child();
         child.setName("werner");
-        test.setChild(child);
+        entity.setChild(child);
 
-        org.exolab.castor.xml.Marshaller.marshal(test, out);
+        org.exolab.castor.xml.Marshaller.marshal(entity, out);
 
         System.out.println(out.toString());
 
@@ -39,18 +41,19 @@ public class MarshallerTest extends TestCase {
         assertTrue(xml.length() > 0);
     }
 
+    @Test
     public void testMarshalToWriter() throws JAXBException {
         javax.xml.bind.JAXBContext context = JAXBContext.newInstance(Test.class);
         javax.xml.bind.Marshaller marshaller = context.createMarshaller();
 
         StringWriter out = new StringWriter();
 
-        Test test = new Test();
+        org.castor.test.Entity entity = new org.castor.test.Entity();
         Child child = new Child();
         child.setName("werner");
-        test.setChild(child);
+        entity.setChild(child);
 
-        marshaller.marshal(test, out);
+        marshaller.marshal(entity, out);
 
         System.out.println(out.toString());
 
@@ -61,19 +64,20 @@ public class MarshallerTest extends TestCase {
         assertTrue(xml.length() > 0);
     }
 
+    @Test
     public void testMarshalTest2ToWriter() throws JAXBException {
 
-        javax.xml.bind.JAXBContext context = JAXBContext.newInstance(org.castor.test2.Test.class);
+        javax.xml.bind.JAXBContext context = JAXBContext.newInstance(Entity.class);
         javax.xml.bind.Marshaller marshaller = context.createMarshaller();
 
         StringWriter out = new StringWriter();
 
-        org.castor.test2.Test test = new org.castor.test2.Test();
+        Entity entity = new Entity();
         org.castor.test2.Child child = new org.castor.test2.Child();
         child.setName("werner");
-        test.setChild(child);
+        entity.setChild(child);
 
-        marshaller.marshal(test, out);
+        marshaller.marshal(entity, out);
 
         System.out.println(out.toString());
 
@@ -84,23 +88,24 @@ public class MarshallerTest extends TestCase {
         assertTrue(xml.length() > 0);
     }
 
+    @Test
     public void testMarshalToWriterWithValidation() throws Exception {
         javax.xml.bind.JAXBContext context = JAXBContext.newInstance(Test.class);
         javax.xml.bind.Marshaller marshaller = context.createMarshaller();
 
         StringWriter out = new StringWriter();
 
-        Test test = new Test();
+        org.castor.test.Entity entity = new org.castor.test.Entity();
         Child child = new Child();
         child.setName("werner");
-        test.setChild(child);
+        entity.setChild(child);
 
         SchemaFactory factory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
         Schema schema = factory.newSchema(new StreamSource(getClass().getClassLoader()
                 .getResourceAsStream("test.xsd")));
         marshaller.setSchema(schema);
-        marshaller.setEventHandler(new TestValidationHandler());
-        marshaller.marshal(test, out);
+        marshaller.setEventHandler(new MockValidationHandler());
+        marshaller.marshal(entity, out);
 
         System.out.println(out.toString());
 
@@ -111,23 +116,24 @@ public class MarshallerTest extends TestCase {
         assertTrue(xml.length() > 0);
     }
 
+    @Test
     public void testMarshalToWriterAlternateWithValidation() throws Exception {
         javax.xml.bind.JAXBContext context = JAXBContext.newInstance(Test.class);
         javax.xml.bind.Marshaller marshaller = context.createMarshaller();
 
         StringWriter out = new StringWriter();
 
-        org.castor.test2.Test test = new org.castor.test2.Test();
+        Entity entity = new Entity();
         org.castor.test2.Child child = new org.castor.test2.Child();
         child.setName("werner");
-        test.setChild(child);
+        entity.setChild(child);
 
         SchemaFactory factory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
         Schema schema = factory.newSchema(new StreamSource(getClass().getClassLoader()
                 .getResourceAsStream("testa.xsd")));
         marshaller.setSchema(schema);
-        marshaller.setEventHandler(new TestValidationHandler());
-        marshaller.marshal(test, out);
+        marshaller.setEventHandler(new MockValidationHandler());
+        marshaller.marshal(entity, out);
 
         System.out.println(out.toString());
 
@@ -140,12 +146,12 @@ public class MarshallerTest extends TestCase {
 
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
-        "stageName",
-        "firstName",
-        "lastName"
+            "stageName",
+            "firstName",
+            "lastName"
     })
     @XmlRootElement(name = "artist")
-    private class Artist {
+    private static class Artist {
 
         @XmlElement(name = "stage-name")
         protected String stageName;
@@ -179,19 +185,20 @@ public class MarshallerTest extends TestCase {
         }
     }
 
+    @Test
     public void testMarshalArtist() throws JAXBException {
-javax.xml.bind.JAXBContext context = JAXBContext.newInstance(Artist.class);
-javax.xml.bind.Marshaller marshaller = context.createMarshaller();
+        javax.xml.bind.JAXBContext context = JAXBContext.newInstance(Artist.class);
+        javax.xml.bind.Marshaller marshaller = context.createMarshaller();
 
-StringWriter out = new StringWriter();
+        StringWriter out = new StringWriter();
 
-Artist a = new Artist();
-a.setStageName("Falco");
-a.setFirstName("Hans");
-a.setLastName("Hšlzel");
+        Artist a = new Artist();
+        a.setStageName("Falco");
+        a.setFirstName("Hans");
+        a.setLastName("Hölzel");
 
-marshaller.marshal(a, out);
+        marshaller.marshal(a, out);
 
-System.out.println(out.toString());
+        System.out.println(out.toString());
     }
 }
