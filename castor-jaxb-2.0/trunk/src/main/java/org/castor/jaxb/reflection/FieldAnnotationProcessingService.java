@@ -37,11 +37,11 @@ import javax.xml.bind.annotation.XmlMixed;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlValue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.castor.core.annotationprocessing.AnnotationProcessor;
 import org.castor.core.nature.BaseNature;
 import org.castor.jaxb.reflection.info.JaxbFieldNature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * To process all field (attribute and method) specific annotations and put the
@@ -53,9 +53,7 @@ import org.castor.jaxb.reflection.info.JaxbFieldNature;
 public class FieldAnnotationProcessingService extends
         XMLBaseAnnotationProcessingService {
 
-    /** Logger to be used. */
-    private static final Log LOG = LogFactory
-            .getLog(FieldAnnotationProcessingService.class);
+    public final Logger LOG = LoggerFactory.getLogger(this.getClass());
     /** XmlElement.name default is ##default. */
     private static final String ELEMENT_NAME_DEFAULT = "##default";
     /** XmlElement.namespace default is empty string. */

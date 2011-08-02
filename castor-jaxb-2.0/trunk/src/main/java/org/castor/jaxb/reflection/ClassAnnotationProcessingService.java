@@ -29,7 +29,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.castor.core.annotationprocessing.AnnotationProcessor;
 import org.castor.core.nature.BaseNature;
+import org.castor.jaxb.JAXBContext;
 import org.castor.jaxb.reflection.info.JaxbClassNature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A class to process all class related annotations and put the results into
@@ -39,8 +42,10 @@ import org.castor.jaxb.reflection.info.JaxbClassNature;
  * @version $Id$
  */
 public class ClassAnnotationProcessingService extends XMLBaseAnnotationProcessingService {
-    /** Logging to use. */
-    private static final Log LOG = LogFactory.getLog(ClassAnnotationProcessingService.class);
+    /**
+     * Logger to use.
+     */
+    public final Logger LOG = LoggerFactory.getLogger(this.getClass());
     /** Default String for name property. */
     private static final String XML_TYPE_NAME_DEFAULT = "##default";
     /** Default String for namespace property. */

@@ -1,6 +1,7 @@
 package org.castor.jaxb;
 
 import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 
 import javax.xml.bind.JAXBException;
 
@@ -21,7 +22,7 @@ class Utils {
      *
      * @throws IllegalArgumentException if param is null
      */
-    static void checkNotNull(Log log, Object param, String paramName) {
+    static void checkNotNull(Logger log, Object param, String paramName) {
 
         if (param == null) {
 
@@ -63,7 +64,7 @@ class Utils {
      *
      * @return JAXBException newly created {@link JAXBException} which wrapps the passed object
      */
-    static JAXBException convertToJAXBException(Log log, String msg, Throwable e) {
+    static JAXBException convertToJAXBException(Logger log, String msg, Throwable e) {
 
         // log error message
         if (log != null) {

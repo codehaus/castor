@@ -23,6 +23,7 @@ import java.util.Collection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.castor.jaxb.JAXBContext;
 import org.castor.jaxb.naming.JAXBJavaNaming;
 import org.castor.jaxb.reflection.info.ClassInfo;
 import org.castor.jaxb.reflection.info.FieldInfo;
@@ -34,6 +35,8 @@ import org.castor.jaxb.reflection.info.OoFieldNature;
 import org.castor.jaxb.reflection.info.OoPackageNature;
 import org.castor.jaxb.reflection.info.PackageInfo;
 import org.castor.xml.JavaNaming;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A service class which is meant to read (interpret) a given class and remember
@@ -45,10 +48,7 @@ import org.castor.xml.JavaNaming;
  * @version $Id$
  */
 public final class ClassInfoBuilder {
-    /**
-     * Logger to use.
-     */
-    private static final Log LOG = LogFactory.getLog(ClassInfoBuilder.class);
+    public final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
     /**
      * The service to process class level annotations.

@@ -17,9 +17,9 @@ package org.castor.jaxb.reflection;
 
 import java.lang.annotation.Annotation;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.castor.core.annotationprocessing.BaseAnnotationProcessingService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An abstract implementation for annotation processing.
@@ -30,9 +30,10 @@ import org.castor.core.annotationprocessing.BaseAnnotationProcessingService;
 public abstract class XMLBaseAnnotationProcessingService extends
         BaseAnnotationProcessingService {
     
-    /** Logger to use. */
-    private static final Log LOG = LogFactory
-            .getLog(XMLBaseAnnotationProcessingService.class);
+    /**
+     * Logger to use.
+     */
+    public final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
     /**
      * To write a debug message when visiting an annotation at the logger
@@ -43,7 +44,7 @@ public abstract class XMLBaseAnnotationProcessingService extends
      * @param annotation
      *            the annotation bisited
      */
-    protected final void annotationVisitMessage(final Log log,
+    protected final void annotationVisitMessage(final Logger log,
             final Annotation annotation) {
         if (log.isDebugEnabled()) {
             log.debug("Annotation: " + annotation.toString() + " visited.");

@@ -21,11 +21,11 @@ import java.lang.reflect.Method;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.castor.jaxb.exceptions.AdapterException;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.ValidityException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This JAXB specific field handler is instantiated for every class
@@ -35,8 +35,7 @@ import org.exolab.castor.mapping.ValidityException;
  * @version $Id$
  */
 public class JAXBFieldHandlerImpl implements FieldHandler {
-    /** Logger to be used. */
-    private static final Log LOG = LogFactory.getLog(JAXBFieldHandlerImpl.class);
+    public final Logger LOG = LoggerFactory.getLogger(this.getClass());
     
     /** The type of the field. */
     private Class < ? > _type;

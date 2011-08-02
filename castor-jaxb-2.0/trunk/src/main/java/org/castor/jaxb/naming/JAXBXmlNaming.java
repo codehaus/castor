@@ -17,10 +17,10 @@ package org.castor.jaxb.naming;
 
 import java.beans.Introspector;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.castor.xml.XMLNaming;
 import org.exolab.castor.xml.util.DefaultNaming;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * JAXB specific implementation of XMLNaming to create names that conform
@@ -32,10 +32,10 @@ import org.exolab.castor.xml.util.DefaultNaming;
  * @version $Id$
  */
 public class JAXBXmlNaming implements XMLNaming {
-    /** 
-     * Logger to be used.
+    /**
+     * Logger to use.
      */
-    private static final Log LOG = LogFactory.getLog(JAXBXmlNaming.class);
+    public final Logger LOG = LoggerFactory.getLogger(this.getClass());
     
     /**
      * The Castor implementation of XMLNaming.
@@ -55,7 +55,6 @@ public class JAXBXmlNaming implements XMLNaming {
 //        return toXMLName(name);
         UnsupportedOperationException e =
             new UnsupportedOperationException("createXMLName(Class) shouldn't be used!");
-        LOG.warn(e);
         throw e;
     }
 

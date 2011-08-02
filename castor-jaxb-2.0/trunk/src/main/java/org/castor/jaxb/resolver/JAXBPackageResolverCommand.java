@@ -18,20 +18,20 @@ package org.castor.jaxb.resolver;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.castor.jaxb.reflection.ClassDescriptorBuilder;
 import org.castor.jaxb.reflection.ClassInfoBuilder;
 import org.exolab.castor.xml.ResolverException;
 import org.exolab.castor.xml.XMLClassDescriptor;
 import org.exolab.castor.xml.util.ResolverPackageCommand;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Joachim Grueneis, jgrueneis AT gmail DOT com
  */
 public class JAXBPackageResolverCommand implements ResolverPackageCommand {
-    /** Logger to be used. */
-    private static final Log LOG = LogFactory.getLog(JAXBPackageResolverCommand.class);
+    public final Logger LOG = LoggerFactory.getLogger(this.getClass());
+    
     /** The Castor JAXB ClassDescriptor builder. */
     private ClassDescriptorBuilder _classDescriptorBuilder;
     /** The Castor JAXB ClassInfo builder. */
@@ -74,7 +74,7 @@ public class JAXBPackageResolverCommand implements ResolverPackageCommand {
      * @return a Map of className and XMLClassDescriptor
      * @throws ResolverException in case that resolving fails fatally
      */
-    public Map resolve(
+    public Map<String, XMLClassDescriptor> resolve(
             final String packageName, final Map properties)
     throws ResolverException {
         HashMap < String, XMLClassDescriptor > hm = new HashMap < String, XMLClassDescriptor > ();
