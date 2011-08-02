@@ -15,10 +15,10 @@
  */
 package org.castor.jaxb.adapters;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.castor.jaxb.Unmarshaller;
 import org.castor.xml.UnmarshalListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An adapter between Castor UnmarshalListener and JAXB UnmarshalListener.
@@ -27,8 +27,11 @@ import org.castor.xml.UnmarshalListener;
  * @version $Id$
  */
 public class UnmarshalListenerAdapter implements UnmarshalListener {
-    /** Logger to use. */
-    private static final Log LOG = LogFactory.getLog(UnmarshalListenerAdapter.class);
+    /**
+     * Logger to use.
+     */
+    public final Logger LOG = LoggerFactory.getLogger(this.getClass());
+    
     /** The JAXB listener to call. */
     private Unmarshaller.Listener _jaxbListener;
 

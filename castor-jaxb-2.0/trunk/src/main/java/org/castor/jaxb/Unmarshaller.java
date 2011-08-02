@@ -39,12 +39,12 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.castor.jaxb.adapters.UnmarshalListenerAdapter;
 import org.castor.xml.InternalContext;
 import org.exolab.castor.xml.MarshalException;
 import org.exolab.castor.xml.ValidationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 
@@ -61,7 +61,7 @@ public class Unmarshaller implements javax.xml.bind.Unmarshaller {
     /**
      * Logger to use.
      */
-    private static final Log LOG = LogFactory.getLog(Unmarshaller.class);
+    public final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
     /**
      * The Castor unmarshaller doing the work.

@@ -35,8 +35,6 @@ import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.validation.Schema;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.castor.jaxb.adapters.MarshalListenerAdapter;
 import org.castor.jaxb.adapters.ValidationEventHandlerAdapter;
 import org.castor.xml.InternalContext;
@@ -44,6 +42,8 @@ import org.exolab.castor.xml.MarshalException;
 import org.exolab.castor.xml.ValidationException;
 import org.exolab.castor.xml.util.DocumentHandlerAdapter;
 import org.exolab.castor.xml.util.SAX2DOMHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import org.xml.sax.ContentHandler;
 
@@ -60,7 +60,7 @@ public class Marshaller implements javax.xml.bind.Marshaller {
     /**
      * Logger to use.
      */
-    private static final Log LOG = LogFactory.getLog(Marshaller.class);
+    public final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
     /**
      * The Castor XML Marshaller instance used for marshalling.

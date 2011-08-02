@@ -23,11 +23,11 @@ import javax.xml.bind.annotation.XmlSchema;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlSchemaTypes;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.castor.core.annotationprocessing.AnnotationProcessor;
 import org.castor.core.nature.BaseNature;
 import org.castor.jaxb.reflection.info.JaxbPackageNature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A service class to precess all package level annotations.
@@ -37,9 +37,8 @@ import org.castor.jaxb.reflection.info.JaxbPackageNature;
  */
 public class PackageAnnotationProcessingService extends
         XMLBaseAnnotationProcessingService {
-    /** The Logger to use. */
-    private static final Log LOG = LogFactory
-            .getLog(PackageAnnotationProcessingService.class);
+    public final Logger LOG = LoggerFactory.getLogger(this.getClass());
+    
     /** Default for names. */
     private static final String ANNOTATION_PROPERTY_NAME_DEFAULT = "##default";
     /** Default for namespace. */

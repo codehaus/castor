@@ -17,8 +17,6 @@ package org.castor.jaxb.reflection;
 
 import javax.xml.bind.annotation.XmlAccessType;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.castor.jaxb.exceptions.ReflectionException;
 import org.castor.jaxb.naming.JAXBXmlNaming;
 import org.castor.jaxb.reflection.info.ClassInfo;
@@ -35,6 +33,8 @@ import org.exolab.castor.mapping.loader.TypeInfo;
 import org.exolab.castor.xml.NodeType;
 import org.exolab.castor.xml.XMLClassDescriptor;
 import org.exolab.castor.xml.XMLFieldDescriptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A service class to build a XMLClassDescriptor instance from ClassInfo. It
@@ -45,11 +45,7 @@ import org.exolab.castor.xml.XMLFieldDescriptor;
  * @version $Id$
  */
 public final class ClassDescriptorBuilder {
-    /**
-     * Logger to use.
-     */
-    private static final Log LOG = LogFactory
-            .getLog(ClassDescriptorBuilder.class);
+    public final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
     /**
      * The naming service to use for build XML names.
@@ -96,7 +92,6 @@ public final class ClassDescriptorBuilder {
         if (classInfo == null) {
             IllegalArgumentException e = new IllegalArgumentException(
                     "Argument classInfo must not be null");
-            LOG.warn(e);
             throw e;
         }
         JAXBClassDescriptorImpl classDescriptor = new JAXBClassDescriptorImpl();
@@ -135,7 +130,6 @@ public final class ClassDescriptorBuilder {
         if (jaxbFieldNature == null) {
             IllegalArgumentException e = new IllegalArgumentException(
                     "Argument fieldInfo must not be null.");
-            LOG.warn(e);
             throw e;
         }
         NodeType nodeType = null;
@@ -186,8 +180,7 @@ public final class ClassDescriptorBuilder {
         if (jaxbFieldNature == null) {
             IllegalArgumentException e = new IllegalArgumentException(
                     "Argument fieldInfo must not be null.");
-            LOG.warn(e);
-            throw e;
+           throw e;
         }
         // TypeInfo typeInfo = buildTypeInfo(fieldInfo);
         JAXBFieldHandlerImpl fieldHandler = new JAXBFieldHandlerImpl();
@@ -249,7 +242,6 @@ public final class ClassDescriptorBuilder {
         if (jaxbFieldNature == null) {
             IllegalArgumentException e = new IllegalArgumentException(
                     "Argument fieldInfo must not be null.");
-            LOG.warn(e);
             throw e;
         }
         CollectionHandler collectionHandler = null;
@@ -292,7 +284,6 @@ public final class ClassDescriptorBuilder {
         if (jaxbClassNature == null) {
             IllegalArgumentException e = new IllegalArgumentException(
                     "getXMLName(null) is illegal.");
-            LOG.warn(e);
             throw e;
         }
         if (jaxbClassNature.getRootElementName() == null
@@ -315,7 +306,6 @@ public final class ClassDescriptorBuilder {
         if (jaxbClassNature == null) {
             IllegalArgumentException e = new IllegalArgumentException(
                     "getNamespaceURI(null) is illegal.");
-            LOG.warn(e);
             throw e;
         }
         if (jaxbClassNature.getRootElementNamespace() == null
@@ -338,7 +328,6 @@ public final class ClassDescriptorBuilder {
         if (jaxbClassNature == null) {
             IllegalArgumentException e = new IllegalArgumentException(
                     "getNamespacePrefix(null) is illegal.");
-            LOG.warn(e);
             throw e;
         }
         if (jaxbClassNature.getRootElementNamespace() == null
@@ -368,7 +357,6 @@ public final class ClassDescriptorBuilder {
         if (jaxbFieldNature == null) {
             IllegalArgumentException e = new IllegalArgumentException(
                     "getXMLName(null) is illegal.");
-            LOG.warn(e);
             throw e;
         }
         String xmlName = null;
@@ -415,7 +403,6 @@ public final class ClassDescriptorBuilder {
         if (jaxbFieldNature == null) {
             IllegalArgumentException e = new IllegalArgumentException(
                     "getType(null) is illegal.");
-            LOG.warn(e);
             throw e;
         }
         Class<?> type = null;
@@ -453,7 +440,6 @@ public final class ClassDescriptorBuilder {
         if (jaxbFieldNature == null) {
             IllegalArgumentException e = new IllegalArgumentException(
                     "getType(null) is illegal.");
-            LOG.warn(e);
             throw e;
         }
         Class<?> type = null;
@@ -465,7 +451,6 @@ public final class ClassDescriptorBuilder {
             ReflectionException e = new ReflectionException(jaxbFieldNature,
                     "Failed to get type of fieldInfo: " + jaxbFieldNature
                             + " no field and no get method known.");
-            LOG.warn(e);
             throw e;
         }
         return type;

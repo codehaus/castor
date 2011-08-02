@@ -18,23 +18,19 @@ package org.castor.jaxb.resolver;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.castor.jaxb.reflection.ClassDescriptorBuilder;
-import org.castor.jaxb.reflection.ClassInfoBuilder;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.xml.ResolverException;
 import org.exolab.castor.xml.XMLClassDescriptor;
 import org.exolab.castor.xml.util.ResolverStrategy;
-import org.exolab.castor.xml.util.resolvers.ByDescriptorClass;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Joachim Grueneis, jgrueneis AT gmail DOT com
  * @version $Id$
  */
 public class JAXBResolverStrategy implements ResolverStrategy {
-    /** Logger to be used. */
-    private static final Log LOG = LogFactory.getLog(JAXBResolverStrategy.class);
+    public final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
     /** The strategy configuration held as map of properties. */
     private Map < String, Object > _properties;

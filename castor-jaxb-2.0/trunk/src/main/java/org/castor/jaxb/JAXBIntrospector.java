@@ -17,12 +17,12 @@ package org.castor.jaxb;
 
 import javax.xml.namespace.QName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.castor.xml.InternalContext;
 import org.exolab.castor.xml.ResolverException;
 import org.exolab.castor.xml.XMLClassDescriptor;
 import org.exolab.castor.xml.XMLClassDescriptorResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The Castor JAXB implementation specific JAXBIntrospector. Used to check
@@ -34,9 +34,9 @@ import org.exolab.castor.xml.XMLClassDescriptorResolver;
 public class JAXBIntrospector extends javax.xml.bind.JAXBIntrospector {
 
     /**
-     * Logger instance to use.
+     * Logger to use.
      */
-    private static final Log LOG = LogFactory.getLog(JAXBIntrospector.class);
+    public final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
     /**
      * A instance of the Castor internal context to look for known descriptors.

@@ -25,8 +25,6 @@ import javax.xml.bind.SchemaOutputResolver;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.Validator;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.castor.jaxb.naming.JAXBXmlNaming;
 import org.castor.jaxb.naming.JAXBJavaNaming;
 import org.castor.jaxb.reflection.ClassDescriptorBuilder;
@@ -41,6 +39,8 @@ import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.xml.ResolverException;
 import org.exolab.castor.xml.XMLContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The JAXB context to use Castor for JAXB. This is where all further JAXB work
@@ -59,7 +59,7 @@ public final class JAXBContext extends javax.xml.bind.JAXBContext {
     /**
      * Logger to use.
      */
-    private static final Log LOG = LogFactory.getLog(JAXBContext.class);
+    public static final Logger LOG = LoggerFactory.getLogger(JAXBContext.class);
 
     /**
      * The Castor XML context.
@@ -135,7 +135,7 @@ public final class JAXBContext extends javax.xml.bind.JAXBContext {
             final String message = new StringBuffer().append(
                     "No context path specified - contextPath: ").append(
                     contextPath).toString();
-            LOG.warn(message);
+            JAXBContext.LOG.warn(message);
             throw new IllegalArgumentException(message);
         }
         JAXBContext jc = new JAXBContext();
