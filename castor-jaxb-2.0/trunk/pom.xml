@@ -29,9 +29,7 @@
 	</issueManagement>
 	<ciManagement>
 		<system>bamboo</system>
-		<url>
-			http://bamboo.ci.codehaus.org/browse/CASTOR-XMLJAXB
-		</url>
+		<url>http://bamboo.ci.codehaus.org/browse/CASTOR-XMLJAXB</url>
 	</ciManagement>
 	<developers>
 		<developer>
@@ -60,45 +58,29 @@
 		<mailingList>
 			<name>User mailing list</name>
 			<subscribe>user-subscribe@castor.codehaus.org</subscribe>
-			<unsubscribe>
-				user-unsubscribe@castor.codehaus.org
-			</unsubscribe>
+			<unsubscribe>user-unsubscribe@castor.codehaus.org</unsubscribe>
 			<post>user@castor.codehaus.org</post>
 			<archive>http://archive.castor.codehaus.org/user</archive>
 		</mailingList>
 		<mailingList>
 			<name>Development mailing list</name>
 			<subscribe>dev-subscribe@castor.codehaus.org</subscribe>
-			<unsubscribe>
-				dev-unsubscribe@castor.codehaus.org
-			</unsubscribe>
+			<unsubscribe>dev-unsubscribe@castor.codehaus.org</unsubscribe>
 			<post>dev@castor.codehaus.org</post>
 			<archive>http://archive.castor.codehaus.org/dev</archive>
 		</mailingList>
 		<mailingList>
 			<name>Announcement mailing list</name>
-			<subscribe>
-				announce-subscribe@castor.codehaus.org
-			</subscribe>
-			<unsubscribe>
-				announce-unsubscribe@castor.codehaus.org
-			</unsubscribe>
+			<subscribe>announce-subscribe@castor.codehaus.org</subscribe>
+			<unsubscribe>announce-unsubscribe@castor.codehaus.org</unsubscribe>
 			<post>announce@castor.codehaus.org</post>
-			<archive>
-				http://archive.castor.codehaus.org/announce
-			</archive>
+			<archive>http://archive.castor.codehaus.org/announce</archive>
 		</mailingList>
 	</mailingLists>
 	<scm>
-		<connection>
-			scm:svn:http://svn.codehaus.org/castor/castor-jaxb-2.0/trunk/
-		</connection>
-		<developerConnection>
-			scm:svn:https://svn.codehaus.org/castor/castor-jaxb-2.0/trunk/
-		</developerConnection>
-		<url>
-			http://svn.castor.codehaus.org/viewrep/castor/castor-jaxb-2.0/trunk
-		</url>
+		<connection>scm:svn:http://svn.codehaus.org/castor/castor-jaxb-2.0/trunk/</connection>
+		<developerConnection>scm:svn:https://svn.codehaus.org/castor/castor-jaxb-2.0/trunk/</developerConnection>
+		<url>http://svn.castor.codehaus.org/viewrep/castor/castor-jaxb-2.0/trunk</url>
 	</scm>
 	<distributionManagement>
 		<repository>
@@ -109,9 +91,7 @@
 		<snapshotRepository>
 			<id>codehaus.org</id>
 			<name>Castor Central Development Repository</name>
-			<url>
-				dav:https://dav.codehaus.org/snapshots.repository/castor/
-			</url>
+			<url>dav:https://dav.codehaus.org/snapshots.repository/castor/</url>
 		</snapshotRepository>
 		<site>
 			<id>codehaus.org</id>
@@ -192,17 +172,13 @@
 		<repository>
 			<id>java.net</id>
 			<name>java.net Maven Repository</name>
-			<url>
-				https://maven-repository.dev.java.net/nonav/repository
-			</url>
+			<url>https://maven-repository.dev.java.net/nonav/repository</url>
 			<layout>legacy</layout>
 		</repository>
 		<repository>
 			<id>maven2-repository.dev.java.net</id>
 			<name>Java.net Repository for Maven 2</name>
-			<url>
-				https://maven2-repository.dev.java.net/nonav/repository
-			</url>
+			<url>https://maven2-repository.dev.java.net/nonav/repository</url>
 			<layout>default</layout>
 		</repository>
 		<repository>
@@ -308,14 +284,10 @@
 					<downloadSources>true</downloadSources>
 					<downloadJavadocs>true</downloadJavadocs>
 					<additionalProjectnatures>
-						<projectnature>
-							com.atlassw.tools.eclipse.checkstyle.CheckstyleNature
-						</projectnature>
+						<projectnature>com.atlassw.tools.eclipse.checkstyle.CheckstyleNature</projectnature>
 					</additionalProjectnatures>
 					<additionalBuildcommands>
-						<buildcommand>
-							com.atlassw.tools.eclipse.checkstyle.CheckstyleBuilder
-						</buildcommand>
+						<buildcommand>com.atlassw.tools.eclipse.checkstyle.CheckstyleBuilder</buildcommand>
 					</additionalBuildcommands>
 					<workspace>${basedir}</workspace>
 					<workspaceCodeStylesURL>src/tools/checkstyle/castor-main-checks.xml</workspaceCodeStylesURL>
