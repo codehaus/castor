@@ -19,39 +19,16 @@ package org.castor.entities;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-/**
- *
- */
 @XmlRootElement(name = "Entity")
 public class Entity {
 
-    /**
-     * Represents the name.
-     */
     @XmlElement(name = "Name")
     private String name;
 
-    /**
-     * Creates new instance of {@link Entity}.
-     */
-    public Entity() {
-        // empty constructor
-    }
-
-    /**
-     * Retrieves the name
-     *
-     * @return the name
-     */
     public String getName() {
         return name;
     }
 
-    /**
-     * Sets the name
-     *
-     * @param name the name
-     */
     public void setName(String name) {
         this.name = name;
     }
