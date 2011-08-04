@@ -392,8 +392,7 @@ public class Marshaller implements javax.xml.bind.Marshaller {
      */
     public void setListener(final Listener listener) {
         if (listener != null) {
-            _marshalListener = new MarshalListenerAdapter();
-            _marshalListener.setJAXBListener(listener);
+            _marshalListener = new MarshalListenerAdapter(listener);
             _castorMarshaller.setMarshalListener(_marshalListener);
         }
     }

@@ -76,8 +76,8 @@ public class JAXBXmlNamingTest {
         Assert.assertNull("Null in -> null out", _xmlNaming.toXMLName(null));
         Assert.assertEquals("x", _xmlNaming.toXMLName("x"));
         Assert.assertEquals("JAXBXmlNamingTest", _xmlNaming.toXMLName("JAXBXmlNamingTest"));
-        Assert.assertEquals("hugo", _xmlNaming.toXMLName("Hugo"));
-        Assert.assertEquals("hugoFranz", _xmlNaming.toXMLName("HugoFranz"));
-        Assert.assertEquals("a", _xmlNaming.toXMLName("A"));
+        Assert.assertEquals("Hugo", _xmlNaming.toXMLName("Hugo"));
+        Assert.assertEquals("HugoFranz", _xmlNaming.toXMLName("HugoFranz"));
+        Assert.assertEquals("A", _xmlNaming.toXMLName("A"));
     }
 }

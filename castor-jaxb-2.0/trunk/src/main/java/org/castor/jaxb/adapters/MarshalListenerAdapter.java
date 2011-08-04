@@ -15,6 +15,7 @@
  */
 package org.castor.jaxb.adapters;
 
+import org.castor.jaxb.CastorJAXBUtils;
 import org.castor.jaxb.Marshaller;
 import org.exolab.castor.xml.MarshalListener;
 
@@ -33,13 +34,17 @@ public class MarshalListenerAdapter implements MarshalListener {
     /**
      * The JAXB Marshaller Listener instance to forward events to.
      */
-    private Marshaller.Listener _jaxbListener;
+    private final Marshaller.Listener _jaxbListener;
 
     /**
-     * Default constructor.
+     * Creates new instance of {@link MarshalListenerAdapter} class with given listener.
+     *
+     * @throws IllegalArgumentException if listener is null
      */
-    public MarshalListenerAdapter() {
-        super();
+    public MarshalListenerAdapter(javax.xml.bind.Marshaller.Listener listener) {
+        CastorJAXBUtils.checkNotNull(listener, "listener");
+
+        _jaxbListener = listener;
     }
 
     /**
@@ -49,16 +54,6 @@ public class MarshalListenerAdapter implements MarshalListener {
      */
     public final Marshaller.Listener getJAXBListener() {
         return _jaxbListener;
-    }
-
-    /**
-     * Sets the Listener to use with the Marshaller instance.
-     * 
-     * @param listener
-     *            the Listener to use with the Marshaller instance
-     */
-    public final void setJAXBListener(final Marshaller.Listener listener) {
-        this._jaxbListener = listener;
     }
 
     /**

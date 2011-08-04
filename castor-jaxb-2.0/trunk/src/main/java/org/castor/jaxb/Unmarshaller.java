@@ -207,8 +207,7 @@ public class Unmarshaller implements javax.xml.bind.Unmarshaller {
      */
     public void setListener(final Listener listener) {
         if (listener != null) {
-            _unmarshalListener = new UnmarshalListenerAdapter();
-            _unmarshalListener.setJAXBListener(listener);
+            _unmarshalListener = new UnmarshalListenerAdapter(listener);
             _castorUnmarshaller.setUnmarshalListener(_unmarshalListener);
         }
     }

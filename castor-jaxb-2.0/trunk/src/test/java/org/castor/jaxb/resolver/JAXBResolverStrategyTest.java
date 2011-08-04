@@ -25,8 +25,10 @@ import org.exolab.castor.xml.util.ResolverStrategy;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -192,6 +194,14 @@ public class JAXBResolverStrategyTest extends TestCase {
         public XMLClassDescriptor getDescriptor(final String className) {
             return _rr.get(className);
         }
-        
+
+        public List<XMLClassDescriptor> getAllDescriptors() {
+            return new ArrayList<XMLClassDescriptor>(_rr.values());
+        }
+
+        public void removeDescriptor(String className) {
+            _rr.remove(className);
+        }
+
     }
 }
