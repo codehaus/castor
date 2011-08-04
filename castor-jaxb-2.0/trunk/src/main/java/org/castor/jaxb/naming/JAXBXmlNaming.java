@@ -63,7 +63,7 @@ public class JAXBXmlNaming implements XMLNaming {
      * @see org.exolab.castor.xml.AbstractXMLNaming#toXMLName(java.lang.String)
      */
     public String toXMLName(final String name) {
-        return Introspector.decapitalize(name);
+        return name;
 //        return _castorImplementation.toXMLName(name);
 //        if (name == null) {
 //            return null;

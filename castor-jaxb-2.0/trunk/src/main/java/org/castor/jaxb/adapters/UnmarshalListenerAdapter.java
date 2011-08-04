@@ -15,6 +15,7 @@
  */
 package org.castor.jaxb.adapters;
 
+import org.castor.jaxb.CastorJAXBUtils;
 import org.castor.jaxb.Unmarshaller;
 import org.castor.xml.UnmarshalListener;
 import org.slf4j.Logger;
@@ -33,13 +34,16 @@ public class UnmarshalListenerAdapter implements UnmarshalListener {
     public final Logger LOG = LoggerFactory.getLogger(this.getClass());
     
     /** The JAXB listener to call. */
-    private Unmarshaller.Listener _jaxbListener;
+    private final Unmarshaller.Listener _jaxbListener;
 
     /**
      * Default constructor.
      */
-    public UnmarshalListenerAdapter() {
-        super();
+    public UnmarshalListenerAdapter(Unmarshaller.Listener listener) {
+        // checks input
+        CastorJAXBUtils.checkNotNull(listener, "listener");
+
+        _jaxbListener = listener;
     }
 
     /**
@@ -103,13 +107,4 @@ public class UnmarshalListenerAdapter implements UnmarshalListener {
     public Unmarshaller.Listener getJAXBListener() {
         return _jaxbListener;
     }
-
-    /**
-     * Sets the Listener to use with the Unmarshaller instance.
-     * @param jaxbListener the JAXB unmarshaller Listener to use with the Unmarshaller instance
-     */
-    public void setJAXBListener(final Unmarshaller.Listener jaxbListener) {
-        this._jaxbListener = jaxbListener;
-    }
-
 }

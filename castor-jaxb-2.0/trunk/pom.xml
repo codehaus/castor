@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.codehaus.castor</groupId>
 	<artifactId>castor-jaxb</artifactId>
-	<version>1.0-beta-1-SNAPSHOT</version>
+	<version>1.0-beta-2-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>Castor JAXB - An implementation of JAXB 2.1</name>
 	<description>
@@ -12,7 +12,7 @@
 		and mapping definition.
 	</description>
     <properties>
-        <castor.version>1.3.2</castor.version>
+        <castor.version>1.3.3-SNAPSHOT</castor.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <url>http://castor.org</url>
@@ -48,6 +48,15 @@
 			<id>jgrueneis</id>
 			<name>Joachim Grueneis</name>
 			<email>jgrueneis@codehaus.org</email>
+			<roles>
+				<role>Castor XML Committer</role>
+			</roles>
+			<timezone>+1</timezone>
+		</developer>
+        <developer>
+			<id>jnarloch</id>
+			<name>Jakub Narloch</name>
+			<email>jmnarloch@gmail.com</email>
 			<roles>
 				<role>Castor XML Committer</role>
 			</roles>
