@@ -26,7 +26,7 @@ import javax.xml.bind.annotation.XmlAccessType;
  * @author joachim
  *
  */
-public class JaxbClassNature extends OoClassNature { //implements Nature {
+public class JaxbClassNature extends OoClassNature implements JaxbClassNatureProperties { //implements Nature {
 
     private ClassInfo classInfo;
     
@@ -50,20 +50,20 @@ public class JaxbClassNature extends OoClassNature { //implements Nature {
      * @return the typeName
      */
     public String getTypeName() {
-        return (String) getProperty(Properties.TYPE_NAME);
+        return (String) getProperty(JaxbClassNatureProperties.TYPE_NAME);
     }
 
     /**
      * @param typeName the typeName to set
      */
     public void setTypeName(final String typeName) {
-        setProperty(Properties.TYPE_NAME, typeName);
+        setProperty(JaxbClassNatureProperties.TYPE_NAME, typeName);
     }
     /**
      * @return the typeProperties
      */
     public List < String > getTypeProperties() {
-        return (List < String > ) getProperty(Properties.TYPE_PROPERTIES);
+        return (List < String > ) getProperty(JaxbClassNatureProperties.TYPE_PROPERTIES);
     }
     /**
      * @param strings the typeProperties to set
@@ -73,91 +73,91 @@ public class JaxbClassNature extends OoClassNature { //implements Nature {
         for (String string : strings) {
             stringList.add(string);
         }
-        setProperty(Properties.TYPE_PROPERTIES, stringList);
+        setProperty(JaxbClassNatureProperties.TYPE_PROPERTIES, stringList);
     }
     /**
      * @return the typeNamespace
      */
     public String getTypeNamespace() {
-        return (String) getProperty(Properties.TYPE_NAMESPACE);
+        return (String) getProperty(JaxbClassNatureProperties.TYPE_NAMESPACE);
     }
     /**
      * @param typeNamespace the typeNamespace to set
      */
     public void setTypeNamespace(final String typeNamespace) {
-        setProperty(Properties.TYPE_NAMESPACE, typeNamespace);
+        setProperty(JaxbClassNatureProperties.TYPE_NAMESPACE, typeNamespace);
     }
     /**
      * @return the typeFactoryClass
      */
     public Class < ? > getTypeFactoryClass() {
-        return (Class < ? > ) getProperty(Properties.TYPE_FACTORY_CLASS);
+        return (Class < ? > ) getProperty(JaxbClassNatureProperties.TYPE_FACTORY_CLASS);
     }
     /**
      * @param typeFactoryClass the typeFactoryClass to set
      */
     public void setTypeFactoryClass(final Class < ? > typeFactoryClass) {
-        setProperty(Properties.TYPE_FACTORY_CLASS, typeFactoryClass);
+        setProperty(JaxbClassNatureProperties.TYPE_FACTORY_CLASS, typeFactoryClass);
     }
     /**
      * @return the typeFactoryMethod
      */
     public String getTypeFactoryMethod() {
-        return (String) getProperty(Properties.TYPE_FACTORY_METHOD);
+        return (String) getProperty(JaxbClassNatureProperties.TYPE_FACTORY_METHOD);
     }
     /**
      * @param typeFactoryMethod the typeFactoryMethod to set
      */
     public void setTypeFactoryMethod(final String typeFactoryMethod) {
-        setProperty(Properties.TYPE_FACTORY_METHOD, typeFactoryMethod);
+        setProperty(JaxbClassNatureProperties.TYPE_FACTORY_METHOD, typeFactoryMethod);
     }
     /**
      * @return the rootElementName
      */
     public String getRootElementName() {
-        return (String) getProperty(Properties.ROOT_ELEMENT_NAME);
+        return (String) getProperty(JaxbClassNatureProperties.ROOT_ELEMENT_NAME);
     }
     /**
      * @param rootElementName the rootElementName to set
      */
     public void setRootElementName(final String rootElementName) {
-        setProperty(Properties.ROOT_ELEMENT_NAME, rootElementName);
+        setProperty(JaxbClassNatureProperties.ROOT_ELEMENT_NAME, rootElementName);
     }
     /**
      * @return the rootElementNamespace
      */
     public String getRootElementNamespace() {
-        return (String) getProperty(Properties.ROOT_ELEMENT_NAMESPACE);
+        return (String) getProperty(JaxbClassNatureProperties.ROOT_ELEMENT_NAMESPACE);
     }
     /**
      * @param rootElementNamespace the rootElementNamespace to set
      */
     public void setRootElementNamespace(final String rootElementNamespace) {
-        setProperty(Properties.ROOT_ELEMENT_NAMESPACE, rootElementNamespace);
+        setProperty(JaxbClassNatureProperties.ROOT_ELEMENT_NAMESPACE, rootElementNamespace);
     }
     /**
      * @return the xmlAccessType
      */
     public XmlAccessType getXmlAccessType() {
-        return (XmlAccessType) getProperty(Properties.XML_ACCESS_TYPE);
+        return (XmlAccessType) getProperty(JaxbClassNatureProperties.XML_ACCESS_TYPE);
     }
     /**
      * @param xmlAccessorType the xmlAccessType to set
      */
     public void setXmlAccessType(final XmlAccessType xmlAccessorType) {
-        setProperty(Properties.XML_ACCESS_TYPE, xmlAccessorType);
+        setProperty(JaxbClassNatureProperties.XML_ACCESS_TYPE, xmlAccessorType);
     }
     /**
      * @return the xmlAccessOrder
      */
     public XmlAccessOrder getXmlAccessOrder() {
-        return (XmlAccessOrder) getProperty(Properties.XML_ACCESS_ORDER);
+        return (XmlAccessOrder) getProperty(JaxbClassNatureProperties.XML_ACCESS_ORDER);
     }
     /**
      * @param xmlAccessOrder the xmlAccessOrder to set
      */
     public void setXmlAccessOrder(final XmlAccessOrder xmlAccessOrder) {
-        setProperty(Properties.XML_ACCESS_ORDER, xmlAccessOrder);
+        setProperty(JaxbClassNatureProperties.XML_ACCESS_ORDER, xmlAccessOrder);
     }
 //    /**
 //     * @param b the transient flag
@@ -185,7 +185,7 @@ public class JaxbClassNature extends OoClassNature { //implements Nature {
             for (int i = 0; i < values.length; i++) {
                 seeAlsoClasses.add(values[i]);
             }
-            setProperty(Properties.SEE_ALSO_CLASSES, seeAlsoClasses);
+            setProperty(JaxbClassNatureProperties.SEE_ALSO_CLASSES, seeAlsoClasses);
         }
     }
     /**
@@ -193,10 +193,10 @@ public class JaxbClassNature extends OoClassNature { //implements Nature {
      * @return the List of Class of the XmlSeeAlso annotation
      */
     public List < Class < ? > > getSeeAlsoClasses() {
-        return (List < Class < ? > > ) getProperty(Properties.SEE_ALSO_CLASSES);
+        return (List < Class < ? > > ) getProperty(JaxbClassNatureProperties.SEE_ALSO_CLASSES);
     }
     public void setEnumClass(Class<?> value) {
-        setProperty(Properties.ENUM_CLASS, value);
+        setProperty(JaxbClassNatureProperties.ENUM_CLASS, value);
     }
     public List<JaxbFieldNature> getFields() {
         ArrayList<JaxbFieldNature> fields = new ArrayList<JaxbFieldNature>();
@@ -211,101 +211,58 @@ public class JaxbClassNature extends OoClassNature { //implements Nature {
     }
 
     public void setXmlType(boolean b) {
-        setProperty(Properties.HAS_XML_TYPE, b);
+        setProperty(JaxbClassNatureProperties.HAS_XML_TYPE, b);
     }
 
     public boolean getXmlType() {
-        return getBooleanPropertyDefaultFalse(Properties.HAS_XML_TYPE);
+        return getBooleanPropertyDefaultFalse(JaxbClassNatureProperties.HAS_XML_TYPE);
     }
 
     public void setXmlRootElement(boolean b) {
-        setProperty(Properties.HAS_XML_ROOT_ELEMENT, b);
+        setProperty(JaxbClassNatureProperties.HAS_XML_ROOT_ELEMENT, b);
     }
 
     public boolean getXmlRootElement() {
-        return getBooleanPropertyDefaultFalse(Properties.HAS_XML_ROOT_ELEMENT);
+        return getBooleanPropertyDefaultFalse(JaxbClassNatureProperties.HAS_XML_ROOT_ELEMENT);
     }
 
     public void setXmlTransient(boolean b) {
-        setProperty(Properties.HAS_XML_TRANSIENT, b);
+        setProperty(JaxbClassNatureProperties.HAS_XML_TRANSIENT, b);
     }
 
     public boolean getXmlTransient() {
-        return getBooleanPropertyDefaultFalse(Properties.HAS_XML_TRANSIENT);
+        return getBooleanPropertyDefaultFalse(JaxbClassNatureProperties.HAS_XML_TRANSIENT);
     }
 
     public void setXmlSeeAlso(boolean b) {
-        setProperty(Properties.HAS_XML_SEE_ALSO, b);
+        setProperty(JaxbClassNatureProperties.HAS_XML_SEE_ALSO, b);
     }
 
     public boolean getXmlSeeAlso() {
-        return getBooleanPropertyDefaultFalse(Properties.HAS_XML_SEE_ALSO);
+        return getBooleanPropertyDefaultFalse(JaxbClassNatureProperties.HAS_XML_SEE_ALSO);
     }
 
     public void setXmlAccessorType(boolean b) {
-        setProperty(Properties.HAS_XML_ACCESSOR_TYPE, b);
+        setProperty(JaxbClassNatureProperties.HAS_XML_ACCESSOR_TYPE, b);
     }
 
     public boolean getXmlAccessorType() {
-        return getBooleanPropertyDefaultFalse(Properties.HAS_XML_ACCESSOR_TYPE);
+        return getBooleanPropertyDefaultFalse(JaxbClassNatureProperties.HAS_XML_ACCESSOR_TYPE);
     }
 
     public void setXmlAccessorOrder(boolean b) {
-        setProperty(Properties.HAS_XML_ACCESSOR_ORDER, b);
+        setProperty(JaxbClassNatureProperties.HAS_XML_ACCESSOR_ORDER, b);
     }
 
     public boolean getXmlAccessorOrder() {
-        return getBooleanPropertyDefaultFalse(Properties.HAS_XML_ACCESSOR_ORDER);
+        return getBooleanPropertyDefaultFalse(JaxbClassNatureProperties.HAS_XML_ACCESSOR_ORDER);
     }
 
     public void setXmlEnum(boolean b) {
-        setProperty(Properties.HAS_XML_ENUM, b);
+        setProperty(JaxbClassNatureProperties.HAS_XML_ENUM, b);
     }
 
     public boolean getXmlEnum() {
-        return getBooleanPropertyDefaultFalse(Properties.HAS_XML_ENUM);
-    }
-    /**
-     * All property names.
-     */
-    static interface Properties {
-        /** . */
-        String ENUM_CLASS = "ENUM_CLASS";
-        /** . */
-        String SEE_ALSO_CLASSES = "SEE_ALSO_CLASSES";
-        /** . */
-        String TRANSIENT = "TRANSIENT";
-        /** . */
-        String XML_ACCESS_ORDER = "XML_ACCESS_ORDER";
-        /** . */
-        String XML_ACCESS_TYPE = "XML_ACCESS_TYPE";
-        /** . */
-        String ROOT_ELEMENT_NAMESPACE = "ROOT_ELEMENT_NAMESPACE";
-        /** . */
-        String ROOT_ELEMENT_NAME = "ROOT_ELEMENT_NAME";
-        /** . */
-        String TYPE_FACTORY_METHOD = "TYPE_FACTORY_METHOD";
-        /** . */
-        String TYPE_FACTORY_CLASS = "TYPE_FACTORY_CLASS";
-        /** . */
-        String TYPE_NAMESPACE = "TYPE_NAMESPACE";
-        /** . */
-        String TYPE_PROPERTIES = "TYPE_PROPERTIES";
-        /** . */
-        String TYPE_NAME = "TYPE_NAME";
-        /** . */
-        String HAS_XML_TYPE = "HAS_XML_TYPE";
-        /** . */
-        String HAS_XML_ROOT_ELEMENT = "HAS_XML_ROOT_ELEMENT";
-        /** . */
-        String HAS_XML_TRANSIENT = "HAS_XML_TRANSIENT";
-        /** . */
-        String HAS_XML_SEE_ALSO = "HAS_XML_SEE_ALSO";
-        /** . */
-        String HAS_XML_ACCESSOR_TYPE = "HAS_XML_ACCESSOR_TYPE";
-        /** . */
-        String HAS_XML_ACCESSOR_ORDER = "HAS_XML_ACCESSOR_ORDER";
-        /** . */
-        String HAS_XML_ENUM = "HAS_XML_ENUM";
+        return getBooleanPropertyDefaultFalse(JaxbClassNatureProperties.HAS_XML_ENUM);
     }
 }

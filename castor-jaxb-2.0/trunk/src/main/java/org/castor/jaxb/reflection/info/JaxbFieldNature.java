@@ -28,7 +28,7 @@ import javax.xml.bind.annotation.DomHandler;
  * 
  * @author Joachim Grueneis, jgrueneis_at_codehaus_dot_org
  */
-public class JaxbFieldNature extends OoFieldNature {
+public class JaxbFieldNature extends OoFieldNature implements JaxbFieldNatureProperties {
     /**
      * @param fieldInfo the holder of the nature properties
      */
@@ -49,7 +49,7 @@ public class JaxbFieldNature extends OoFieldNature {
      *            XmlElement.name
      */
     public void setElementName(final String name) {
-        setProperty(Properties.ELEMENT_NAME, name);
+        setProperty(ELEMENT_NAME, name);
     }
 
     /**
@@ -57,7 +57,7 @@ public class JaxbFieldNature extends OoFieldNature {
      *            XmlElement.nillable
      */
     public void setElementNillable(final boolean nillable) {
-        setProperty(Properties.ELEMENT_NILLABLE, new Boolean(nillable));
+        setProperty(ELEMENT_NILLABLE, new Boolean(nillable));
     }
 
     /**
@@ -65,7 +65,7 @@ public class JaxbFieldNature extends OoFieldNature {
      *            XmlElement.required
      */
     public void setElementRequired(final boolean required) {
-        setProperty(Properties.ELEMENT_REQUIRED, new Boolean(required));
+        setProperty(ELEMENT_REQUIRED, new Boolean(required));
     }
 
     /**
@@ -73,7 +73,7 @@ public class JaxbFieldNature extends OoFieldNature {
      *            XmlElement.namespace
      */
     public void setElementNamespace(final String namespace) {
-        setProperty(Properties.ELEMENT_NAMESPACE, namespace);
+        setProperty(ELEMENT_NAMESPACE, namespace);
     }
 
     /**
@@ -81,7 +81,7 @@ public class JaxbFieldNature extends OoFieldNature {
      *            XmlElement.type
      */
     public void setElementType(final Class < ? > type) {
-        setProperty(Properties.ELEMENT_TYPE, type);
+        setProperty(ELEMENT_TYPE, type);
     }
 
     /**
@@ -89,7 +89,7 @@ public class JaxbFieldNature extends OoFieldNature {
      *            XmlElement.defaultValue
      */
     public void setElementDefaultValue(final String defaultValue) {
-        setProperty(Properties.ELEMENT_DEFAULT_VALUE, defaultValue);
+        setProperty(ELEMENT_DEFAULT_VALUE, defaultValue);
     }
 
     /**
@@ -97,7 +97,7 @@ public class JaxbFieldNature extends OoFieldNature {
      *            XmlRootElement.name
      */
     public void setRootElementName(final String rootElementName) {
-        setProperty(Properties.ROOT_ELEMENT_NAME, rootElementName);
+        setProperty(ROOT_ELEMENT_NAME, rootElementName);
     }
 
     /**
@@ -105,7 +105,7 @@ public class JaxbFieldNature extends OoFieldNature {
      *            XmlRootElement.namespace
      */
     public void setRootElementNamespace(final String rootElementNamespace) {
-        setProperty(Properties.ROOT_ELEMENT_NAMESPACE, rootElementNamespace);
+        setProperty(ROOT_ELEMENT_NAMESPACE, rootElementNamespace);
     }
 
     /**
@@ -113,7 +113,7 @@ public class JaxbFieldNature extends OoFieldNature {
      *            XmlAttribute.name
      */
     public void setAttributeName(final String attributeName) {
-        setProperty(Properties.ATTRIBUTE_NAME, attributeName);
+        setProperty(ATTRIBUTE_NAME, attributeName);
     }
 
     /**
@@ -121,7 +121,7 @@ public class JaxbFieldNature extends OoFieldNature {
      *            XmlAttribute.namespace
      */
     public void setAttributeNamespace(final String attributeNamespace) {
-        setProperty(Properties.ATTRIBUTE_NAMESPACE, attributeNamespace);
+        setProperty(ATTRIBUTE_NAMESPACE, attributeNamespace);
     }
 
     /**
@@ -129,84 +129,84 @@ public class JaxbFieldNature extends OoFieldNature {
      *            XmlElement.required
      */
     public void setAttributeRequired(final boolean attributeRequired) {
-        setProperty(Properties.ATTRIBUTE_REQUIRED, attributeRequired);
+        setProperty(ATTRIBUTE_REQUIRED, attributeRequired);
     }
 
     /**
      * @return the XmlElement.name
      */
     public String getElementName() {
-        return (String) getProperty(Properties.ELEMENT_NAME);
+        return (String) getProperty(ELEMENT_NAME);
     }
 
     /**
      * @return the XmlElement.nillable
      */
     public boolean isElementNillable() {
-        return getBooleanPropertyDefaultFalse(Properties.ELEMENT_NILLABLE);
+        return getBooleanPropertyDefaultFalse(ELEMENT_NILLABLE);
     }
 
     /**
      * @return the XmlElement.required
      */
     public boolean isElementRequired() {
-        return getBooleanPropertyDefaultFalse(Properties.ELEMENT_REQUIRED);
+        return getBooleanPropertyDefaultFalse(ELEMENT_REQUIRED);
     }
 
     /**
      * @return the XmlElement.namespace
      */
     public String getElementNamespace() {
-        return (String) getProperty(Properties.ELEMENT_NAMESPACE);
+        return (String) getProperty(ELEMENT_NAMESPACE);
     }
 
     /**
      * @return the XmlElement.type
      */
     public Class < ? > getElementType() {
-        return (Class < ? > ) getProperty(Properties.ELEMENT_TYPE);
+        return (Class < ? > ) getProperty(ELEMENT_TYPE);
     }
 
     /**
      * @return the XmlElement.DefaultValue
      */
     public String getElementDefaultValue() {
-        return (String) getProperty(Properties.ELEMENT_DEFAULT_VALUE);
+        return (String) getProperty(ELEMENT_DEFAULT_VALUE);
     }
 
     /**
      * @return the XmlRootElement.name
      */
     public String getRootElementName() {
-        return (String) getProperty(Properties.ROOT_ELEMENT_NAME);
+        return (String) getProperty(ROOT_ELEMENT_NAME);
     }
 
     /**
      * @return the XmlRootElement.namespace
      */
     public String getRootElementNamespace() {
-        return (String) getProperty(Properties.ROOT_ELEMENT_NAMESPACE);
+        return (String) getProperty(ROOT_ELEMENT_NAMESPACE);
     }
 
     /**
      * @return the XmlAttribute.name
      */
     public String getAttributeName() {
-        return (String) getProperty(Properties.ATTRIBUTE_NAME);
+        return (String) getProperty(ATTRIBUTE_NAME);
     }
 
     /**
      * @return the XmlAttribute.namespace
      */
     public String getAttributeNamespace() {
-        return (String) getProperty(Properties.ATTRIBUTE_NAMESPACE);
+        return (String) getProperty(ATTRIBUTE_NAMESPACE);
     }
 
     /**
      * @return the XmlAttribute.required
      */
     public boolean isAttributeRequired() {
-        return getBooleanPropertyDefaultFalse(Properties.ATTRIBUTE_REQUIRED);
+        return getBooleanPropertyDefaultFalse(ATTRIBUTE_REQUIRED);
     }
 
 //    /**
@@ -236,14 +236,14 @@ public class JaxbFieldNature extends OoFieldNature {
      *            value of the XmlEnumValue annotation
      */
     public void setEnumValue(final String enumValue) {
-        setProperty(Properties.ENUM_VALUE, enumValue);
+        setProperty(ENUM_VALUE, enumValue);
     }
 
     /**
      * @return the enumValue
      */
     public String getEnumValue() {
-        return (String) getProperty(Properties.ENUM_VALUE);
+        return (String) getProperty(ENUM_VALUE);
     }
 
     private boolean hasAnnotationXy(String property) {
@@ -255,184 +255,184 @@ public class JaxbFieldNature extends OoFieldNature {
     }
 
     public boolean hasXmlElement() {
-        return hasAnnotationXy(Properties.HAS_XML_ELEMENT);
+        return hasAnnotationXy(HAS_XML_ELEMENT);
     }
 
     public boolean hasXmlAttribute() {
-        return hasAnnotationXy(Properties.HAS_XML_ATTRIBUTE);
+        return hasAnnotationXy(HAS_XML_ATTRIBUTE);
     }
 
     public boolean hasXmlElements() {
-        return hasAnnotationXy(Properties.HAS_XML_ELEMENTS);
+        return hasAnnotationXy(HAS_XML_ELEMENTS);
     }
 
     public boolean hasXmlElementRef() {
-        return hasAnnotationXy(Properties.HAS_XML_ELEMENT_REF);
+        return hasAnnotationXy(HAS_XML_ELEMENT_REF);
     }
 
     public boolean hasXmlElementRefs() {
-        return hasAnnotationXy(Properties.HAS_XML_ELEMENT_REFS);
+        return hasAnnotationXy(HAS_XML_ELEMENT_REFS);
     }
 
     public boolean hasXmlElementWrapper() {
-        return hasAnnotationXy(Properties.HAS_XML_ELEMENT_WRAPPER);
+        return hasAnnotationXy(HAS_XML_ELEMENT_WRAPPER);
     }
 
     public boolean hasXmlAnyElement() {
-        return hasAnnotationXy(Properties.HAS_XML_ANY_ELEMENT);
+        return hasAnnotationXy(HAS_XML_ANY_ELEMENT);
     }
 
     public boolean hasXmlAnyAttribute() {
-        return hasAnnotationXy(Properties.HAS_XML_ANY_ATTRIBUTE);
+        return hasAnnotationXy(HAS_XML_ANY_ATTRIBUTE);
     }
 
     public boolean hasXmlTransient() {
-        return hasAnnotationXy(Properties.HAS_XML_TRANSIENT);
+        return hasAnnotationXy(HAS_XML_TRANSIENT);
     }
 
     public boolean hasXmlValue() {
-        return hasAnnotationXy(Properties.HAS_XML_VALUE);
+        return hasAnnotationXy(HAS_XML_VALUE);
     }
 
     public boolean hasXmlID() {
-        return hasAnnotationXy(Properties.HAS_XML_ID);
+        return hasAnnotationXy(HAS_XML_ID);
     }
 
     public boolean hasXmlIDREF() {
-        return hasAnnotationXy(Properties.HAS_XML_IDREF);
+        return hasAnnotationXy(HAS_XML_IDREF);
     }
 
     public boolean hasXmlList() {
-        return hasAnnotationXy(Properties.HAS_XML_LIST);
+        return hasAnnotationXy(HAS_XML_LIST);
     }
 
     public boolean hasXmlMixed() {
-        return hasAnnotationXy(Properties.HAS_XML_MIXED);
+        return hasAnnotationXy(HAS_XML_MIXED);
     }
 
     public boolean hasXmlMimeType() {
-        return hasAnnotationXy(Properties.HAS_XML_MIME_TYPE);
+        return hasAnnotationXy(HAS_XML_MIME_TYPE);
     }
 
     public boolean hasXmlAttachmentRef() {
-        return hasAnnotationXy(Properties.HAS_XML_ATTACHMENT_REF);
+        return hasAnnotationXy(HAS_XML_ATTACHMENT_REF);
     }
 
     public boolean hasXmlInlineBinaryData() {
-        return hasAnnotationXy(Properties.HAS_XML_INLINE_BINARY_DATA);
+        return hasAnnotationXy(HAS_XML_INLINE_BINARY_DATA);
     }
 
     public boolean hasXmlEnumValue() {
-        return hasAnnotationXy(Properties.HAS_XML_ENUM_VALUE);
+        return hasAnnotationXy(HAS_XML_ENUM_VALUE);
     }
 
     public void setXmlElement(final boolean value) {
-        setAnnotationXy(Properties.HAS_XML_ELEMENT, value);
+        setAnnotationXy(HAS_XML_ELEMENT, value);
     }
 
     public void setXmlAttribute(final boolean value) {
-        setAnnotationXy(Properties.HAS_XML_ATTRIBUTE, value);
+        setAnnotationXy(HAS_XML_ATTRIBUTE, value);
     }
 
     public void setXmlElements(final boolean value) {
-        setAnnotationXy(Properties.HAS_XML_ELEMENTS, value);
+        setAnnotationXy(HAS_XML_ELEMENTS, value);
     }
 
     public void setXmlElementRef(final boolean value) {
-        setAnnotationXy(Properties.HAS_XML_ELEMENT_REF, value);
+        setAnnotationXy(HAS_XML_ELEMENT_REF, value);
     }
 
     public void setXmlElementRefs(final boolean value) {
-        setAnnotationXy(Properties.HAS_XML_ELEMENT_REFS, value);
+        setAnnotationXy(HAS_XML_ELEMENT_REFS, value);
     }
 
     public void setXmlElementWrapper(final boolean value) {
-        setAnnotationXy(Properties.HAS_XML_ELEMENT_WRAPPER, value);
+        setAnnotationXy(HAS_XML_ELEMENT_WRAPPER, value);
     }
 
     public void setXmlAnyElement(final boolean value) {
-        setAnnotationXy(Properties.HAS_XML_ANY_ELEMENT, value);
+        setAnnotationXy(HAS_XML_ANY_ELEMENT, value);
     }
 
     public void setXmlAnyAttribute(final boolean value) {
-        setAnnotationXy(Properties.HAS_XML_ANY_ATTRIBUTE, value);
+        setAnnotationXy(HAS_XML_ANY_ATTRIBUTE, value);
     }
 
     public void setXmlTransient(final boolean value) {
-        setAnnotationXy(Properties.HAS_XML_TRANSIENT, value);
+        setAnnotationXy(HAS_XML_TRANSIENT, value);
     }
 
     public void setXmlValue(final boolean value) {
-        setAnnotationXy(Properties.HAS_XML_VALUE, value);
+        setAnnotationXy(HAS_XML_VALUE, value);
     }
 
     public void setXmlID(final boolean value) {
-        setAnnotationXy(Properties.HAS_XML_ID, value);
+        setAnnotationXy(HAS_XML_ID, value);
     }
 
     public void setXmlIDREF(final boolean value) {
-        setAnnotationXy(Properties.HAS_XML_IDREF, value);
+        setAnnotationXy(HAS_XML_IDREF, value);
     }
 
     public void setXmlList(final boolean value) {
-        setAnnotationXy(Properties.HAS_XML_LIST, value);
+        setAnnotationXy(HAS_XML_LIST, value);
     }
 
     public void setXmlMixed(final boolean value) {
-        setAnnotationXy(Properties.HAS_XML_MIXED, value);
+        setAnnotationXy(HAS_XML_MIXED, value);
     }
 
     public void setXmlMimeType(final boolean value) {
-        setAnnotationXy(Properties.HAS_XML_MIME_TYPE, value);
+        setAnnotationXy(HAS_XML_MIME_TYPE, value);
     }
 
     public void setXmlAttachmentRef(final boolean value) {
-        setAnnotationXy(Properties.HAS_XML_ATTACHMENT_REF, value);
+        setAnnotationXy(HAS_XML_ATTACHMENT_REF, value);
     }
 
     public void setXmlInlineBinaryData(final boolean value) {
-        setAnnotationXy(Properties.HAS_XML_INLINE_BINARY_DATA, value);
+        setAnnotationXy(HAS_XML_INLINE_BINARY_DATA, value);
     }
 
     public void setXmlEnumValue(final boolean value) {
-        setAnnotationXy(Properties.HAS_XML_ENUM_VALUE, value);
+        setAnnotationXy(HAS_XML_ENUM_VALUE, value);
     }
 
     public String getElementRefName() {
-        return (String) getProperty(Properties.ELEMENT_REF_NAME);
+        return (String) getProperty(ELEMENT_REF_NAME);
     }
     
     public void setElementRefName(String elementRefName) {
-        setProperty(Properties.ELEMENT_REF_NAME, elementRefName);
+        setProperty(ELEMENT_REF_NAME, elementRefName);
     }
 
     public String getElementRefNamespace() {
-        return (String) getProperty(Properties.ELEMENT_REF_NAMESPACE);
+        return (String) getProperty(ELEMENT_REF_NAMESPACE);
     }
     
     public void setElementRefNamespace(String elementRefNamespace) {
-        setProperty(Properties.ELEMENT_REF_NAMESPACE, elementRefNamespace);
+        setProperty(ELEMENT_REF_NAMESPACE, elementRefNamespace);
     }
 
     public Class getElementRefType() {
-        return (Class) getProperty(Properties.ELEMENT_REF_TYPE);
+        return (Class) getProperty(ELEMENT_REF_TYPE);
     }
     
     public void setElementRefType(Class elementRefType) {
-        setProperty(Properties.ELEMENT_REF_TYPE, elementRefType);
+        setProperty(ELEMENT_REF_TYPE, elementRefType);
     }
 
     public void addElementRefsElementRef(final String name, final String namespace, final Class < ? > type) {
-        List<ElementRef> elementRefs = (List<ElementRef>) getProperty(Properties.ELEMENT_REFS);
+        List<ElementRef> elementRefs = (List<ElementRef>) getProperty(ELEMENT_REFS);
         if (elementRefs == null) {
             elementRefs = new ArrayList<ElementRef>();
-            setProperty(Properties.ELEMENT_REFS, elementRefs);
+            setProperty(ELEMENT_REFS, elementRefs);
         }
         elementRefs.add(new ElementRef(name, namespace, type));
     }
     
     public List<ElementRef> getElementRefs() {
-        return (List<ElementRef>) getProperty(Properties.ELEMENT_REFS);
+        return (List<ElementRef>) getProperty(ELEMENT_REFS);
     }
     
     public class ElementRef {
@@ -456,67 +456,67 @@ public class JaxbFieldNature extends OoFieldNature {
     }
 
     public String getElementWrapperName() {
-        return (String) getProperty(Properties.ELEMENT_WRAPPER_NAME);
+        return (String) getProperty(ELEMENT_WRAPPER_NAME);
     }
 
     public void setElementWrapperName(String elementWrapperName) {
-        setProperty(Properties.ELEMENT_WRAPPER_NAME, elementWrapperName);
+        setProperty(ELEMENT_WRAPPER_NAME, elementWrapperName);
     }
 
     public String getElementWrapperNamespace() {
-        return (String) getProperty(Properties.ELEMENT_WRAPPER_NAMESPACE);
+        return (String) getProperty(ELEMENT_WRAPPER_NAMESPACE);
     }
 
     public void setElementWrapperNamespace(String elementWrapperNamespace) {
-        setProperty(Properties.ELEMENT_WRAPPER_NAMESPACE, elementWrapperNamespace);
+        setProperty(ELEMENT_WRAPPER_NAMESPACE, elementWrapperNamespace);
     }
 
     public boolean getElementWrapperNillable() {
-        return getBooleanPropertyDefaultFalse(Properties.ELEMENT_WRAPPER_NILLABLE);
+        return getBooleanPropertyDefaultFalse(ELEMENT_WRAPPER_NILLABLE);
     }
 
     public void setElementWrapperNillable(boolean elementWrapperNillable) {
-        setProperty(Properties.ELEMENT_WRAPPER_NILLABLE, elementWrapperNillable);
+        setProperty(ELEMENT_WRAPPER_NILLABLE, elementWrapperNillable);
     }
 
     public boolean getElementWrapperRequired() {
-        return getBooleanPropertyDefaultFalse(Properties.ELEMENT_WRAPPER_REQUIRED);
+        return getBooleanPropertyDefaultFalse(ELEMENT_WRAPPER_REQUIRED);
     }
 
     public void setElementWrapperRequired(boolean elementWrapperRequired) {
-        setProperty(Properties.ELEMENT_WRAPPER_REQUIRED, elementWrapperRequired);
+        setProperty(ELEMENT_WRAPPER_REQUIRED, elementWrapperRequired);
     }
 
     public boolean getAnyElementLax() {
-        return getBooleanPropertyDefaultFalse(Properties.ANY_ELEMENT_LAX);
+        return getBooleanPropertyDefaultFalse(ANY_ELEMENT_LAX);
     }
 
     public void setAnyElementLax(boolean lax) {
-        setProperty(Properties.ANY_ELEMENT_LAX, lax);
+        setProperty(ANY_ELEMENT_LAX, lax);
     }
 
     public Class<? extends DomHandler> getAnyElementDomHandler() {
-        return (Class<? extends DomHandler>) getProperty(Properties.ANY_ELEMENT_DOM_HANDLER);
+        return (Class<? extends DomHandler>) getProperty(ANY_ELEMENT_DOM_HANDLER);
     }
 
     public void setAnyElementDomHandler(Class<? extends DomHandler> domHandler) {
-        setProperty(Properties.ANY_ELEMENT_DOM_HANDLER, domHandler);
+        setProperty(ANY_ELEMENT_DOM_HANDLER, domHandler);
     }
 
     public void setMimeType(String mimeType) {
-        setProperty(Properties.MIME_TYPE, mimeType);
+        setProperty(MIME_TYPE, mimeType);
     }
     
     public String getMimtType() {
-        return (String) getProperty(Properties.MIME_TYPE);
+        return (String) getProperty(MIME_TYPE);
     }
 
     public void addElement(final String name, final String namespace, final boolean nillable, final boolean required,
             final Class type, final String defaultValue) {
-        List<Element> elements = (List<Element>) getProperty(Properties.ELEMENTS);
+        List<Element> elements = (List<Element>) getProperty(ELEMENTS);
         if (elements == null) {
             elements = new ArrayList<Element>();
-            setProperty(Properties.ELEMENTS, elements);
+            setProperty(ELEMENTS, elements);
         }
         elements.add(new Element(name, namespace, nillable, required, type, defaultValue));
     }
@@ -556,83 +556,5 @@ public class JaxbFieldNature extends OoFieldNature {
         public String getDefaultValue() {
             return defaultValue;
         }
-    }
-
-    /**
-     * 
-     */
-    interface Properties {
-        String ELEMENTS = "ELEMENTS";
-        String ELEMENT_REFS = "ELEMENT_REFS";
-        /** ENUM_VALUE. */
-        String ENUM_VALUE = "ENUM_VALUE";
-        /** ATTRIBUTE_REQUIRED. */
-        String ATTRIBUTE_REQUIRED = "ATTRIBUTE_REQUIRED";
-        /** ATTRIBUTE_NAMESPACE. */
-        String ATTRIBUTE_NAMESPACE = "ATTRIBUTE_NAMESPACE";
-        /** ATTRIBUTE_NAME. */
-        String ATTRIBUTE_NAME = "ATTRIBUTE_NAME";
-        /** ROOT_ELEMENT_NAMESPACE. */
-        String ROOT_ELEMENT_NAMESPACE = "ROOT_ELEMENT_NAMESPACE";
-        /** ROOT_ELEMENT_NAME. */
-        String ROOT_ELEMENT_NAME = "ROOT_ELEMENT_NAME";
-        /** ELEMENT_DEFAULT_VALUE. */
-        String ELEMENT_DEFAULT_VALUE = "ELEMENT_DEFAULT_VALUE";
-        /** ELEMENT_TYPE. */
-        String ELEMENT_TYPE = "ELEMENT_TYPE";
-        /** ELEMENT_NAMESPACE. */
-        String ELEMENT_NAMESPACE = "ELEMENT_NAMESPACE";
-        /** ELEMENT_REQUIRED. */
-        String ELEMENT_REQUIRED = "ELEMENT_REQUIRED";
-        /** ELEMENT_NILLABLE. */
-        String ELEMENT_NILLABLE = "ELEMENT_NILLABLE";
-        /** ELEMENT_NAME. */
-        String ELEMENT_NAME = "ELEMENT_NAME";
-        /** HAS_XML_ELEMENT. */
-        String HAS_XML_ELEMENT = "HAS_XML_ELEMENT";
-        /** HAS_XML_ATTRIBUTE. */
-        String HAS_XML_ATTRIBUTE = "HAS_XML_ATTRIBUTE";
-        /** HAS_XML_ELEMENTS. */
-        String HAS_XML_ELEMENTS = "HAS_XML_ELEMENTS";
-        /** HAS_XML_ELEMENT_REF. */
-        String HAS_XML_ELEMENT_REF = "HAS_XML_ELEMENT_REF";
-        /** HAS_XML_ELEMENT_REFS. */
-        String HAS_XML_ELEMENT_REFS = "HAS_XML_ELEMENT_REFS";
-        /** HAS_XML_ELEMENT_WRAPPER. */
-        String HAS_XML_ELEMENT_WRAPPER = "HAS_XML_ELEMENT_WRAPPER";
-        /** HAS_XML_ANY_ELEMENT. */
-        String HAS_XML_ANY_ELEMENT = "HAS_XML_ANY_ELEMENT";
-        /** HAS_XML_ANY_ATTRIBUTE. */
-        String HAS_XML_ANY_ATTRIBUTE = "HAS_XML_ANY_ATTRIBUTE";
-        /** HAS_XML_TRANSIENT. */
-        String HAS_XML_TRANSIENT = "HAS_XML_TRANSIENT";
-        /** HAS_XML_VALUE. */
-        String HAS_XML_VALUE = "HAS_XML_VALUE";
-        /** HAS_XML_ID. */
-        String HAS_XML_ID = "HAS_XML_ID";
-        /** HAS_XML_IDREF. */
-        String HAS_XML_IDREF = "HAS_XML_IDREF";
-        /** HAS_XML_LIST. */
-        String HAS_XML_LIST = "HAS_XML_LIST";
-        /** HAS_XML_MIXED. */
-        String HAS_XML_MIXED = "HAS_XML_MIXED";
-        /** HAS_XML_MIME_TYPE. */
-        String HAS_XML_MIME_TYPE = "HAS_XML_MIME_TYPE";
-        /** HAS_XML_ATTACHMENT_REF. */
-        String HAS_XML_ATTACHMENT_REF = "HAS_XML_ATTACHMENT_REF";
-        /** HAS_XML_INLINE_BINARY_DATA. */
-        String HAS_XML_INLINE_BINARY_DATA = "HAS_XML_INLINE_BINARY_DATA";
-        /** HAS_XML_ENUM_VALUE. */
-        String HAS_XML_ENUM_VALUE = "HAS_XML_ENUM_VALUE";
-        String ELEMENT_REF_NAME = "ELEMENT_REF_NAME";
-        String ELEMENT_REF_TYPE = "ELEMENT_REF_TYPE";
-        String ELEMENT_REF_NAMESPACE = "ELEMENT_REF_NAMESPACE";
-        String ELEMENT_WRAPPER_NAME = "ELEMENT_WRAPPER_NAME";
-        String ELEMENT_WRAPPER_NAMESPACE = "ELEMENT_WRAPPER_NAMESPACE";
-        String ELEMENT_WRAPPER_NILLABLE = "ELEMENT_WRAPPER_NILLABLE";
-        String ELEMENT_WRAPPER_REQUIRED = "ELEMENT_WRAPPER_REQUIRED";
-        String ANY_ELEMENT_LAX = "ANY_ELEMENT_LAX";
-        String ANY_ELEMENT_DOM_HANDLER = "ANY_ELEMENT_DOM_HANDLER";
-        String MIME_TYPE = "MIME_TYPE";
     }
 }
