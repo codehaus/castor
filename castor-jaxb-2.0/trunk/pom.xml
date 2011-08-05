@@ -106,61 +106,118 @@
         </site>
     </distributionManagement>
 
-<!-- 
-	<distributionManagement>
-		<repository>
-			<id>codehaus.org</id>
-			<name>Castor Central Distribution Repository</name>
-			<url>dav:https://dav.codehaus.org/repository/castor/</url>
-		</repository>
-		<snapshotRepository>
-			<id>codehaus.org</id>
-			<name>Castor Central Development Repository</name>
-			<url>dav:https://dav.codehaus.org/snapshots.repository/castor/</url>
-		</snapshotRepository>
-		<site>
-			<id>codehaus.org</id>
-			<url>dav:https://dav.codehaus.org/castor/</url>
-		</site>
-	</distributionManagement>
--->    
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.codehaus.castor</groupId>
+                <artifactId>castor-codegen</artifactId>
+                <version>${castor.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.castor</groupId>
+                <artifactId>castor-testsuite-xml-framework</artifactId>
+                <version>${castor.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>1.6.1</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.xml.bind</groupId>
+                <artifactId>jaxb-api</artifactId>
+                <version>2.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-core</artifactId>
+                <version>3.0.5.RELEASE</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.0</version>
+            </dependency>       
+            <!--
+                <dependency> <groupId>javax.xml</groupId>
+                <artifactId>jaxb-xjc</artifactId> <version>2.0EA3</version>
+                </dependency>
+            -->
+            
+            <!-- test dependencies -->
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.8.2</version>
+            </dependency>
+            <dependency>
+                <groupId>xmlunit</groupId>
+                <artifactId>xmlunit</artifactId>
+                <version>1.3</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jcl-over-slf4j</artifactId>
+                <version>1.6.1</version>
+            </dependency>
+            <!-- 
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>log4j-over-slf4j</artifactId>
+                <version>1.6.1</version>
+            </dependency>
+             -->
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>0.9.29</version>
+            </dependency>
+            <dependency>
+                <groupId>org.easymock</groupId>
+                <artifactId>easymock</artifactId>
+                <version>3.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.easymock</groupId>
+                <artifactId>easymockclassextension</artifactId>
+                <version>3.0</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 	<dependencies>
 		<dependency>
 			<groupId>org.codehaus.castor</groupId>
 			<artifactId>castor-codegen</artifactId>
-			<version>${castor.version}</version>
+            <!-- 
             <exclusions>
                 <exclusion>
         			<groupId>commons-logging</groupId>
         			<artifactId>commons-logging</artifactId>
                 </exclusion>
             </exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.codehaus.castor</groupId>
-			<artifactId>castor-testsuite-xml-framework</artifactId>
-			<version>${castor.version}</version>
-			<scope>test</scope>
+            -->
 		</dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.6.1</version>
         </dependency>
 		<dependency>
 			<groupId>javax.xml.bind</groupId>
 			<artifactId>jaxb-api</artifactId>
-			<version>2.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
-			<version>3.0.5.RELEASE</version>
 		</dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.0</version>
         </dependency>		
         <!--
 			<dependency> <groupId>javax.xml</groupId>
@@ -172,84 +229,39 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.8.2</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>xmlunit</groupId>
 			<artifactId>xmlunit</artifactId>
-			<version>1.3</version>
 			<scope>test</scope>
 		</dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
-            <version>1.6.1</version>
+            <scope>test</scope>
         </dependency>
-        <!-- 
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>log4j-over-slf4j</artifactId>
-            <version>1.6.1</version>
-        </dependency>
-         -->
-        <dependency>
+       <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>0.9.29</version>
+            <scope>test</scope>
         </dependency>
-        <!-- 
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.16</version>
-			<scope>test</scope>
-		</dependency>
-         -->
 		<dependency>
 			<groupId>org.easymock</groupId>
 			<artifactId>easymock</artifactId>
-			<version>3.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.easymock</groupId>
 			<artifactId>easymockclassextension</artifactId>
-			<version>3.0</version>
 			<scope>test</scope>
 		</dependency>
+        <dependency>
+            <groupId>org.codehaus.castor</groupId>
+            <artifactId>castor-testsuite-xml-framework</artifactId>
+            <scope>test</scope>
+        </dependency>
 	</dependencies>
-    <!-- 
-	<repositories>
-		<repository>
-			<id>Maven</id>
-			<name>Maven repo1</name>
-			<url>http://repo1.maven.org/maven2</url>
-		</repository>
-		<repository>
-			<id>java.net</id>
-			<name>java.net Maven Repository</name>
-			<url>https://maven-repository.dev.java.net/nonav/repository</url>
-			<layout>legacy</layout>
-		</repository>
-		<repository>
-			<id>maven2-repository.dev.java.net</id>
-			<name>Java.net Repository for Maven 2</name>
-			<url>https://maven2-repository.dev.java.net/nonav/repository</url>
-			<layout>default</layout>
-		</repository>
-		<repository>
-			<id>codehaus.org</id>
-			<name>Maven Codehaus repository</name>
-			<url>http://maven.codehaus.org/maven2/</url>
-		</repository>
-		<repository>
-			<id>codehaus-snapshots</id>
-			<name>Maven Codehaus Snapshots</name>
-			<url>http://snapshots.maven.codehaus.org/maven2/</url>
-		</repository>
-	</repositories>
-        -->
     <pluginRepositories>
         <pluginRepository>
             <id>Maven Codehaus Snapshots</id>
