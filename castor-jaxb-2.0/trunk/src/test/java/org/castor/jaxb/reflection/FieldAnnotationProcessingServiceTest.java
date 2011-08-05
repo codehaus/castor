@@ -68,7 +68,7 @@ public class FieldAnnotationProcessingServiceTest {
     public void testProcessAnnotations() {
         Class < NotASingleField > clazz = NotASingleField.class;
         Assert.assertFalse(clazz.isEnum());
-        FieldAnnotationProcessingService faps = new FieldAnnotationProcessingService();
+        FieldAnnotationProcessingServiceImpl faps = new FieldAnnotationProcessingServiceImpl();
         Assert.assertNotNull(faps);
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
@@ -93,7 +93,7 @@ public class FieldAnnotationProcessingServiceTest {
     public void testWithXmlElement() {
         Class < WithXmlElement > clazz = WithXmlElement.class;
         Assert.assertFalse(clazz.isEnum());
-        FieldAnnotationProcessingService faps = new FieldAnnotationProcessingService();
+        FieldAnnotationProcessingServiceImpl faps = new FieldAnnotationProcessingServiceImpl();
         Assert.assertNotNull(faps);
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
@@ -119,7 +119,7 @@ public class FieldAnnotationProcessingServiceTest {
     public final void testWithXmlAttribute() {
         Class < WithXmlAttribute > clazz = WithXmlAttribute.class;
         Assert.assertFalse(clazz.isEnum());
-        FieldAnnotationProcessingService faps = new FieldAnnotationProcessingService();
+        FieldAnnotationProcessingServiceImpl faps = new FieldAnnotationProcessingServiceImpl();
         Assert.assertNotNull(faps);
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
@@ -143,7 +143,7 @@ public class FieldAnnotationProcessingServiceTest {
     public final void testWithXmlElements() {
         Class < WithXmlElements > clazz = WithXmlElements.class;
         Assert.assertFalse(clazz.isEnum());
-        FieldAnnotationProcessingService faps = new FieldAnnotationProcessingService();
+        FieldAnnotationProcessingServiceImpl faps = new FieldAnnotationProcessingServiceImpl();
         Assert.assertNotNull(faps);
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
@@ -174,7 +174,7 @@ public class FieldAnnotationProcessingServiceTest {
     public final void testWithXmlElementRef() {
         Class < WithXmlElementRef> clazz = WithXmlElementRef.class;
         Assert.assertFalse(clazz.isEnum());
-        FieldAnnotationProcessingService faps = new FieldAnnotationProcessingService();
+        FieldAnnotationProcessingServiceImpl faps = new FieldAnnotationProcessingServiceImpl();
         Assert.assertNotNull(faps);
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
@@ -199,7 +199,7 @@ public class FieldAnnotationProcessingServiceTest {
     public final void testWithXmlElementRefs() {
         Class < WithXmlElementRefs> clazz = WithXmlElementRefs.class;
         Assert.assertFalse(clazz.isEnum());
-        FieldAnnotationProcessingService faps = new FieldAnnotationProcessingService();
+        FieldAnnotationProcessingServiceImpl faps = new FieldAnnotationProcessingServiceImpl();
         Assert.assertNotNull(faps);
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
@@ -222,7 +222,7 @@ public class FieldAnnotationProcessingServiceTest {
     public void testWithXmlElementWrapper() {
         Class < WithXmlElementWrapper> clazz = WithXmlElementWrapper.class;
         Assert.assertFalse(clazz.isEnum());
-        FieldAnnotationProcessingService faps = new FieldAnnotationProcessingService();
+        FieldAnnotationProcessingServiceImpl faps = new FieldAnnotationProcessingServiceImpl();
         Assert.assertNotNull(faps);
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
@@ -248,7 +248,7 @@ public class FieldAnnotationProcessingServiceTest {
     public final void testWithXmlAnyElement() {
         Class < WithXmlAnyElement> clazz = WithXmlAnyElement.class;
         Assert.assertFalse(clazz.isEnum());
-        FieldAnnotationProcessingService faps = new FieldAnnotationProcessingService();
+        FieldAnnotationProcessingServiceImpl faps = new FieldAnnotationProcessingServiceImpl();
         Assert.assertNotNull(faps);
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
@@ -272,7 +272,7 @@ public class FieldAnnotationProcessingServiceTest {
     public void testWithXmlAnyAttribute() {
         Class < WithXmlAnyAttribute> clazz = WithXmlAnyAttribute.class;
         Assert.assertFalse(clazz.isEnum());
-        FieldAnnotationProcessingService faps = new FieldAnnotationProcessingService();
+        FieldAnnotationProcessingServiceImpl faps = new FieldAnnotationProcessingServiceImpl();
         Assert.assertNotNull(faps);
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
@@ -294,7 +294,7 @@ public class FieldAnnotationProcessingServiceTest {
     public void testWithXmlTransient() {
         Class < WithXmlTransient> clazz = WithXmlTransient.class;
         Assert.assertFalse(clazz.isEnum());
-        FieldAnnotationProcessingService faps = new FieldAnnotationProcessingService();
+        FieldAnnotationProcessingServiceImpl faps = new FieldAnnotationProcessingServiceImpl();
         Assert.assertNotNull(faps);
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
@@ -316,7 +316,7 @@ public class FieldAnnotationProcessingServiceTest {
     public final void testWithXmlValue() {
         Class < WithXmlValue> clazz = WithXmlValue.class;
         Assert.assertFalse(clazz.isEnum());
-        FieldAnnotationProcessingService faps = new FieldAnnotationProcessingService();
+        FieldAnnotationProcessingServiceImpl faps = new FieldAnnotationProcessingServiceImpl();
         Assert.assertNotNull(faps);
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
@@ -339,7 +339,7 @@ public class FieldAnnotationProcessingServiceTest {
     public final void testWithXmlID() {
         Class < WithXmlID> clazz = WithXmlID.class;
         Assert.assertFalse(clazz.isEnum());
-        FieldAnnotationProcessingService faps = new FieldAnnotationProcessingService();
+        FieldAnnotationProcessingServiceImpl faps = new FieldAnnotationProcessingServiceImpl();
         Assert.assertNotNull(faps);
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
@@ -362,7 +362,7 @@ public class FieldAnnotationProcessingServiceTest {
     public final void testWithXmlIDREF() {
         Class < WithXmlIDREF> clazz = WithXmlIDREF.class;
         Assert.assertFalse(clazz.isEnum());
-        FieldAnnotationProcessingService faps = new FieldAnnotationProcessingService();
+        FieldAnnotationProcessingServiceImpl faps = new FieldAnnotationProcessingServiceImpl();
         Assert.assertNotNull(faps);
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
@@ -385,7 +385,7 @@ public class FieldAnnotationProcessingServiceTest {
     public final void testWithXmlList() {
         Class < WithXmlList> clazz = WithXmlList.class;
         Assert.assertFalse(clazz.isEnum());
-        FieldAnnotationProcessingService faps = new FieldAnnotationProcessingService();
+        FieldAnnotationProcessingServiceImpl faps = new FieldAnnotationProcessingServiceImpl();
         Assert.assertNotNull(faps);
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
@@ -408,7 +408,7 @@ public class FieldAnnotationProcessingServiceTest {
     public final void testWithXmlMixed() {
         Class < WithXmlMixed> clazz = WithXmlMixed.class;
         Assert.assertFalse(clazz.isEnum());
-        FieldAnnotationProcessingService faps = new FieldAnnotationProcessingService();
+        FieldAnnotationProcessingServiceImpl faps = new FieldAnnotationProcessingServiceImpl();
         Assert.assertNotNull(faps);
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
@@ -431,7 +431,7 @@ public class FieldAnnotationProcessingServiceTest {
     public void testWithXmlMimeType() {
         Class < WithXmlMimeType> clazz = WithXmlMimeType.class;
         Assert.assertFalse(clazz.isEnum());
-        FieldAnnotationProcessingService faps = new FieldAnnotationProcessingService();
+        FieldAnnotationProcessingServiceImpl faps = new FieldAnnotationProcessingServiceImpl();
         Assert.assertNotNull(faps);
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
@@ -454,7 +454,7 @@ public class FieldAnnotationProcessingServiceTest {
     public final void testWithXmlAttachmentRef() {
         Class < WithXmlAttachmentRef> clazz = WithXmlAttachmentRef.class;
         Assert.assertFalse(clazz.isEnum());
-        FieldAnnotationProcessingService faps = new FieldAnnotationProcessingService();
+        FieldAnnotationProcessingServiceImpl faps = new FieldAnnotationProcessingServiceImpl();
         Assert.assertNotNull(faps);
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
@@ -477,7 +477,7 @@ public class FieldAnnotationProcessingServiceTest {
     public void testWithXmlInlineBinaryData() {
         Class < WithXmlInlineBinaryData> clazz = WithXmlInlineBinaryData.class;
         Assert.assertFalse(clazz.isEnum());
-        FieldAnnotationProcessingService faps = new FieldAnnotationProcessingService();
+        FieldAnnotationProcessingServiceImpl faps = new FieldAnnotationProcessingServiceImpl();
         Assert.assertNotNull(faps);
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
@@ -501,7 +501,7 @@ public class FieldAnnotationProcessingServiceTest {
     public void testWithEnumValue() {
         Class < WithEnumValue> clazz = WithEnumValue.class;
         Assert.assertTrue(clazz.isEnum());
-        FieldAnnotationProcessingService faps = new FieldAnnotationProcessingService();
+        FieldAnnotationProcessingServiceImpl faps = new FieldAnnotationProcessingServiceImpl();
         Assert.assertNotNull(faps);
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {

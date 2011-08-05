@@ -10,51 +10,54 @@ import org.castor.jaxb.test.functional.elementWrapper.ElementWithAnnotationWithE
 import org.castor.jaxb.test.functional.elementWrapper.ElementWithAnnotationWithWrapper;
 import org.castor.jaxb.test.functional.elementWrapper.ElementWithWrapper;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.xml.sax.SAXException;
 
+@RunWith(SpringJUnit4ClassRunner.class)
 public class ElementWrapperMarshallingTest extends BaseFunctionalTest {
 
-  @Test
-  public void testElementDefaultWithWrapper() throws JAXBException, SAXException, IOException {
-      final String expectedXml = "<entity><wrapper><name>test</name></wrapper></entity>";
-      
-      ElementWithWrapper element = new ElementWithWrapper();
-      element.setName("test");
+    @Test
+    public void testElementDefaultWithWrapper() throws JAXBException, SAXException, IOException {
+        final String expectedXml = "<entity><wrapper><name>test</name></wrapper></entity>";
 
-      StringWriter writer = new StringWriter();
-      marshaller.marshal(element, new StreamResult(writer));
-      
-      System.out.println(writer.toString());
-      
-      assertXmlEquals("Marshaller written invalid result.", expectedXml, writer.toString());
-  }
+        ElementWithWrapper element = new ElementWithWrapper();
+        element.setName("test");
 
-  @Test
-  public void testElementWithAnnotationWithWrapper() throws JAXBException, SAXException, IOException {
-      final String expectedXml = "<entity><wrapper><name>test</name></wrapper></entity>";
-      
-      ElementWithAnnotationWithWrapper element = new ElementWithAnnotationWithWrapper();
-      element.setName("test");
+        StringWriter writer = new StringWriter();
+        marshaller.marshal(element, new StreamResult(writer));
 
-      StringWriter writer = new StringWriter();
-      marshaller.marshal(element, new StreamResult(writer));
+        System.out.println(writer.toString());
 
-      System.out.println(writer.toString());
+        assertXmlEquals("Marshaller written invalid result.", expectedXml, writer.toString());
+    }
 
-      assertXmlEquals("Marshaller written invalid result.", expectedXml, writer.toString());
-  }
+    @Test
+    public void testElementWithAnnotationWithWrapper() throws JAXBException, SAXException, IOException {
+        final String expectedXml = "<entity><wrapper><name>test</name></wrapper></entity>";
 
-  @Test
-  public void testElementWithAnnotationWithExplicitNameWithWrapper() throws JAXBException, SAXException, IOException {
-      final String expectedXml = "<entity><wrapper><other-name>test</other-name></wrapper></entity>";
-      
-      ElementWithAnnotationWithExplicitNameWithWrapper element = new ElementWithAnnotationWithExplicitNameWithWrapper();
-      element.setName("test");
+        ElementWithAnnotationWithWrapper element = new ElementWithAnnotationWithWrapper();
+        element.setName("test");
 
-      StringWriter writer = new StringWriter();
-      marshaller.marshal(element, new StreamResult(writer));
-      
-      assertXmlEquals("Marshaller written invalid result.", expectedXml, writer.toString());
-  }
+        StringWriter writer = new StringWriter();
+        marshaller.marshal(element, new StreamResult(writer));
+
+        System.out.println(writer.toString());
+
+        assertXmlEquals("Marshaller written invalid result.", expectedXml, writer.toString());
+    }
+
+    @Test
+    public void testElementWithAnnotationWithExplicitNameWithWrapper() throws JAXBException, SAXException, IOException {
+        final String expectedXml = "<entity><wrapper><other-name>test</other-name></wrapper></entity>";
+
+        ElementWithAnnotationWithExplicitNameWithWrapper element = new ElementWithAnnotationWithExplicitNameWithWrapper();
+        element.setName("test");
+
+        StringWriter writer = new StringWriter();
+        marshaller.marshal(element, new StreamResult(writer));
+
+        assertXmlEquals("Marshaller written invalid result.", expectedXml, writer.toString());
+    }
 
 }

@@ -16,38 +16,41 @@
 package org.castor.jaxb.reflection;
 
 import org.castor.core.annotationprocessing.BaseAnnotationProcessingService;
-import org.castor.jaxb.reflection.processor.packagge.XmlAccessorOrderProcessor;
-import org.castor.jaxb.reflection.processor.packagge.XmlAccessorTypeProcessor;
-import org.castor.jaxb.reflection.processor.packagge.XmlSchemaProcessor;
-import org.castor.jaxb.reflection.processor.packagge.XmlSchemaTypeProcessor;
-import org.castor.jaxb.reflection.processor.packagge.XmlSchemaTypesProcessor;
+import org.castor.jaxb.reflection.info.ClassInfo;
+import org.castor.jaxb.reflection.processor.clazz.XmlAccessorOrderProcessor;
+import org.castor.jaxb.reflection.processor.clazz.XmlAccessorTypeProcessor;
+import org.castor.jaxb.reflection.processor.clazz.XmlEnumProcessor;
+import org.castor.jaxb.reflection.processor.clazz.XmlRootElementProcessor;
+import org.castor.jaxb.reflection.processor.clazz.XmlSeeAlsoProcessor;
+import org.castor.jaxb.reflection.processor.clazz.XmlTransientProcessor;
+import org.castor.jaxb.reflection.processor.clazz.XmlTypeProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 /**
- * A service class to precess all package level annotations.
+ * A class to process all class related annotations and put the results into a
+ * {@link ClassInfo} instance.
  * 
  * @author Joachim Grueneis, jgrueneis_at_codehaus_dot_com
  * @version $Id$
  */
-public class PackageAnnotationProcessingService extends BaseAnnotationProcessingService {
+@Service("classAnnotationProcessingService")
+public class ClassAnnotationProcessingServiceImpl extends BaseAnnotationProcessingService {
 
     public final Logger LOG = LoggerFactory.getLogger(this.getClass());
-
-    /** Default for names. */
-    private static final String ANNOTATION_PROPERTY_NAME_DEFAULT = "##default";
-    /** Default for namespace. */
-    private static final String ANNOTATION_PROPERTY_NAMESPACE_DEFAULT = "##default";
 
     /**
      * Constructs a AnnotationProcessingService what means to register all
      * available AnnotationProcessing classes.
      */
-    public PackageAnnotationProcessingService() {
-        addAnnotationProcessor(new XmlSchemaProcessor());
+    public ClassAnnotationProcessingServiceImpl() {
+        addAnnotationProcessor(new XmlTypeProcessor());
+        addAnnotationProcessor(new XmlRootElementProcessor());
+        addAnnotationProcessor(new XmlTransientProcessor());
+        addAnnotationProcessor(new XmlSeeAlsoProcessor());
         addAnnotationProcessor(new XmlAccessorTypeProcessor());
         addAnnotationProcessor(new XmlAccessorOrderProcessor());
-        addAnnotationProcessor(new XmlSchemaTypeProcessor());
-        addAnnotationProcessor(new XmlSchemaTypesProcessor());
+        addAnnotationProcessor(new XmlEnumProcessor());
     }
 }

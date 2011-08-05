@@ -43,7 +43,7 @@ public class PackageAnnotationProcessingServiceTest {
         Class < USAddress > clazz = USAddress.class;
         Package pack = clazz.getPackage();
         Annotation[] annotations = pack.getAnnotations();
-        PackageAnnotationProcessingService paps = new PackageAnnotationProcessingService();
+        PackageAnnotationProcessingServiceImpl paps = new PackageAnnotationProcessingServiceImpl();
         JaxbPackageNature packageInfo = new JaxbPackageNature(new PackageInfo(pack.getName()));
         paps.processAnnotations(packageInfo, annotations);
         Assert.assertEquals(XmlAccessType.PROPERTY, packageInfo.getAccessType());

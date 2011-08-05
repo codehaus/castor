@@ -1,25 +1,20 @@
 package org.castor.jaxb.test.functional;
 
-import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
-
 import java.io.IOException;
 import java.io.StringWriter;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.transform.stream.StreamResult;
 
-import org.castor.jaxb.test.functional.attribute.Attribute;
-import org.castor.jaxb.test.functional.attribute.AttributeWithExplicitName;
 import org.castor.jaxb.test.functional.element.Element;
 import org.castor.jaxb.test.functional.element.ElementWithAnnotation;
 import org.castor.jaxb.test.functional.element.ElementWithAnnotationWithExplicitName;
-import org.castor.jaxb.test.functional.elementWrapper.ElementWithAnnotationWithExplicitNameWithWrapper;
-import org.castor.jaxb.test.functional.elementWrapper.ElementWithAnnotationWithWrapper;
-import org.castor.jaxb.test.functional.elementWrapper.ElementWithWrapper;
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.xml.sax.SAXException;
 
+@RunWith(SpringJUnit4ClassRunner.class)
 public class ElementMarshallingTest extends BaseFunctionalTest {
 
     @Test
