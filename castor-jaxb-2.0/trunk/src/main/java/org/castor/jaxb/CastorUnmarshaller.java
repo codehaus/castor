@@ -519,8 +519,12 @@ public class CastorUnmarshaller implements Unmarshaller {
             descriptor = resolver.resolve(clazz.getName());
 
             if (descriptor != null) {
-                return new QName(descriptor.getNameSpaceURI(), descriptor.getXMLName(),
+                if(descriptor.getNameSpacePrefix() != null) {
+                    return new QName(descriptor.getNameSpaceURI(), descriptor.getXMLName(),
                         descriptor.getNameSpacePrefix());
+                }
+
+                return new QName(descriptor.getNameSpaceURI(), descriptor.getXMLName());
             }
         } catch (ResolverException e) {
             // ignores exception
