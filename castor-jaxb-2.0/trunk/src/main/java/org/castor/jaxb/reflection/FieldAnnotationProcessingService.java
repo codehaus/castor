@@ -37,6 +37,7 @@ import javax.xml.bind.annotation.XmlMixed;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlValue;
 
+import org.apache.commons.lang3.StringUtils;
 import org.castor.core.annotationprocessing.AnnotationProcessor;
 import org.castor.core.nature.BaseNature;
 import org.castor.jaxb.reflection.info.JaxbFieldNature;
@@ -336,6 +337,14 @@ public class FieldAnnotationProcessingService extends
                 if (!ELEMENT_WRAPPER_NAME_DEFAULT.equals(xmlElementWrapper
                         .name())) {
                     fieldInfo.setElementWrapperName(xmlElementWrapper.name());
+                } else {
+                    //TODO[WG]: nit sure this is the right place
+                    // default naming handling
+                    String xmlElementName = fieldInfo.getElementName();
+                    if (StringUtils.isNotEmpty(xmlElementName)) {
+                        fieldInfo.setElementWrapperName(xmlElementName);
+                    }
+                    
                 }
                 fieldInfo.setElementWrapperNillable(xmlElementWrapper
                         .nillable());
