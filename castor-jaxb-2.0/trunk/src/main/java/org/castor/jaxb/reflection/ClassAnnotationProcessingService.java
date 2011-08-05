@@ -15,53 +15,32 @@
  */
 package org.castor.jaxb.reflection;
 
-import java.lang.annotation.Annotation;
-
-import javax.xml.bind.annotation.XmlAccessorOrder;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlEnum;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlSeeAlso;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.XmlType;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.castor.core.annotationprocessing.AnnotationProcessor;
-import org.castor.core.nature.BaseNature;
-import org.castor.jaxb.JAXBContext;
-import org.castor.jaxb.reflection.info.JaxbClassNature;
+import org.castor.core.annotationprocessing.BaseAnnotationProcessingService;
+import org.castor.jaxb.reflection.info.ClassInfo;
+import org.castor.jaxb.reflection.processor.clazz.XmlEnumProcessor;
+import org.castor.jaxb.reflection.processor.clazz.XmlRootElementProcessor;
+import org.castor.jaxb.reflection.processor.clazz.XmlSeeAlsoProcessor;
+import org.castor.jaxb.reflection.processor.clazz.XmlTypeProcessor;
+import org.castor.jaxb.reflection.processor.clazz.XmlTransientProcessor;
+import org.castor.jaxb.reflection.processor.clazz.XmlAccessorOrderProcessor;
+import org.castor.jaxb.reflection.processor.clazz.XmlAccessorTypeProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A class to process all class related annotations and put the results into
- * a ClassInfo instance.
+ * A class to process all class related annotations and put the results into a
+ * {@link ClassInfo} instance.
  * 
  * @author Joachim Grueneis, jgrueneis_at_codehaus_dot_com
  * @version $Id$
  */
-public class ClassAnnotationProcessingService extends XMLBaseAnnotationProcessingService {
-    /**
-     * Logger to use.
-     */
+public class ClassAnnotationProcessingService extends BaseAnnotationProcessingService {
+
     public final Logger LOG = LoggerFactory.getLogger(this.getClass());
-    /** Default String for name property. */
-    private static final String XML_TYPE_NAME_DEFAULT = "##default";
-    /** Default String for namespace property. */
-    private static final String XML_TYPE_NAMESPACE_DEFAULT = "##default";
-    /** XmlType.propOrder default value. */
-    private static final String[] XML_TYPE_PROP_ORDER_DEFAUL = {""};
-    /** XmlType.factoryMethod default value. */
-    private static final String XML_TYPE_FACTORY_METHOD = "";
-    /** XmlRootElement.name default value. */
-    private static final String ROOT_ELEMENT_NAME_DEFAULT = "##default";
-    /** XmlRootElement.namespace default value. */
-    private static final String ROOT_ELEMENT_NAMESPACE_DEFAULT = "##default";
 
     /**
-     * Constructs a AnnotationProcessingService what means to register all available
-     * AnnotationProcessing classes.
+     * Constructs a AnnotationProcessingService what means to register all
+     * available AnnotationProcessing classes.
      */
     public ClassAnnotationProcessingService() {
         addAnnotationProcessor(new XmlTypeProcessor());
@@ -72,261 +51,4 @@ public class ClassAnnotationProcessingService extends XMLBaseAnnotationProcessin
         addAnnotationProcessor(new XmlAccessorOrderProcessor());
         addAnnotationProcessor(new XmlEnumProcessor());
     }
-
-    /**
-     * Annotation processor for XMLType.
-     * 
-     * @author Joachim Grueneis, jgrueneis_at_gmail_dot_com
-     * @version $Id$
-     */
-    class XmlTypeProcessor implements AnnotationProcessor {
-        /**
-         * {@inheritDoc}
-         * @see org.castor.annoproc.AnnotationProcessor#
-         * processAnnotation(org.castor.xml.introspection.BaseNature, java.lang.annotation.Annotation)
-         */
-        public final < I extends BaseNature, A extends Annotation > 
-        boolean processAnnotation(final I info, final A annotation) {
-            if ((annotation instanceof XmlType) && (info instanceof JaxbClassNature)) {
-                XmlType xmlType = (XmlType) annotation;
-                JaxbClassNature classInfo = (JaxbClassNature) info;
-                annotationVisitMessage(LOG, xmlType);
-                //
-                classInfo.setXmlType(true);
-                if (!XML_TYPE_NAME_DEFAULT.equals(xmlType.name())) {
-                    classInfo.setTypeName(xmlType.name());
-                }
-                if (!XML_TYPE_PROP_ORDER_DEFAUL.equals(xmlType.propOrder())) {
-                    classInfo.setTypeProperties(xmlType.propOrder());
-                }
-                if (!XML_TYPE_NAMESPACE_DEFAULT.equals(xmlType.namespace())) {
-                    classInfo.setTypeNamespace(xmlType.namespace());
-                }
-                if (!XmlType.DEFAULT.class.equals(xmlType.factoryClass())) {
-                    classInfo.setTypeFactoryClass(xmlType.factoryClass());
-                }
-                if (!XML_TYPE_FACTORY_METHOD.equals(xmlType.factoryMethod())) {
-                    classInfo.setTypeFactoryMethod(xmlType.factoryMethod());
-                }
-                return true;
-            }
-            return false;
-        } //-- processAnnotation
-
-        /**
-         * {@inheritDoc}
-         * @see AnnotationProcessor#forAnnotationClass()
-         */
-        public Class < ? extends Annotation > forAnnotationClass() {
-            return XmlType.class;
-        } //-- forAnnotationClass
-    } //-- XmlTypeProcessor
-
-    /**
-     * Annotation processor for XMLRootElement.
-     * 
-     * @author Joachim Grueneis, jgrueneis_at_gmail_dot_com
-     * @version $Id$
-     */
-    class XmlRootElementProcessor implements AnnotationProcessor {
-        /**
-         * {@inheritDoc}
-         * @see org.castor.annoproc.AnnotationProcessor#
-         * processAnnotation(org.castor.xml.introspection.BaseNature, java.lang.annotation.Annotation)
-         */
-        public final < I extends BaseNature, A extends Annotation > 
-        boolean processAnnotation(final I info, final A annotation) {
-            if ((annotation instanceof XmlRootElement) && (info instanceof JaxbClassNature)) {
-                XmlRootElement xmlRootElement = (XmlRootElement) annotation;
-                JaxbClassNature classInfo = (JaxbClassNature) info;
-                annotationVisitMessage(LOG, xmlRootElement);
-                classInfo.setXmlRootElement(true);
-                if (!ROOT_ELEMENT_NAME_DEFAULT.equals(xmlRootElement.name())) {
-                    classInfo.setRootElementName(xmlRootElement.name());
-                }
-                if (!ROOT_ELEMENT_NAMESPACE_DEFAULT.equals(xmlRootElement.namespace())) {
-                    classInfo.setRootElementNamespace(xmlRootElement.namespace());
-                }
-                return true;
-            }
-            return false;
-        } //-- processAnnotation
-
-        /**
-         * {@inheritDoc}
-         * @see AnnotationProcessor#forAnnotationClass()
-         */
-        public Class < ? extends Annotation > forAnnotationClass() {
-            return XmlRootElement.class;
-        } //-- forAnnotationClass
-    } //-- XmlRootElementProcessor
-
-    /**
-     * Annotation processor for XmlTransient.
-     * 
-     * @author Joachim Grueneis, jgrueneis_at_gmail_dot_com
-     * @version $Id$
-     */
-    class XmlTransientProcessor implements AnnotationProcessor {
-        /**
-         * {@inheritDoc}
-         * @see org.castor.annoproc.AnnotationProcessor#
-         * processAnnotation(org.castor.xml.introspection.BaseNature, java.lang.annotation.Annotation)
-         */
-        public final < I extends BaseNature, A extends Annotation > 
-        boolean processAnnotation(final I info, final A annotation) {
-            if ((annotation instanceof XmlTransient) && (info instanceof JaxbClassNature)) {
-                XmlTransient xmlTransient = (XmlTransient) annotation;
-                JaxbClassNature classInfo = (JaxbClassNature) info;
-                annotationVisitMessage(LOG, xmlTransient);
-                classInfo.setXmlTransient(true);
-                // no annotation properties
-                return true;
-            }
-            return false;
-        } //-- processAnnotation
-
-        /**
-         * {@inheritDoc}
-         * @see AnnotationProcessor#forAnnotationClass()
-         */
-        public Class < ? extends Annotation > forAnnotationClass() {
-            return XmlTransient.class;
-        } //-- forAnnotationClass
-    } //-- XmlTransientProcessor
-
-    /**
-     * Annotation processor for XmlSeeAlso.
-     * 
-     * @author Joachim Grueneis, jgrueneis_at_gmail_dot_com
-     * @version $Id$
-     */
-    class XmlSeeAlsoProcessor implements AnnotationProcessor {
-        /**
-         * {@inheritDoc}
-         * @see org.castor.annoproc.AnnotationProcessor#
-         * processAnnotation(org.castor.xml.introspection.BaseNature, java.lang.annotation.Annotation)
-         */
-        public final < I extends BaseNature, A extends Annotation > 
-        boolean processAnnotation(final I info, final A annotation) {
-            if ((annotation instanceof XmlSeeAlso) && (info instanceof JaxbClassNature)) {
-                XmlSeeAlso xmlSeeAlso = (XmlSeeAlso) annotation;
-                JaxbClassNature classInfo = (JaxbClassNature) info;
-                annotationVisitMessage(LOG, xmlSeeAlso);
-                classInfo.setXmlSeeAlso(true);
-                classInfo.setSeeAlsoClasses(xmlSeeAlso.value());
-                return true;
-            }
-            return false;
-        } //-- processAnnotation
-
-        /**
-         * {@inheritDoc}
-         * @see AnnotationProcessor#forAnnotationClass()
-         */
-        public Class < ? extends Annotation > forAnnotationClass() {
-            return XmlSeeAlso.class;
-        } //-- forAnnotationClass
-    } //-- XmlSeeAlsoProcessor
-
-    /**
-     * Annotation processor for XmlAccessorType.
-     * 
-     * @author Joachim Grueneis, jgrueneis_at_gmail_dot_com
-     * @version $Id$
-     */
-    class XmlAccessorTypeProcessor implements AnnotationProcessor {
-        /**
-         * {@inheritDoc}
-         * @see org.castor.annoproc.AnnotationProcessor#
-         * processAnnotation(org.castor.xml.introspection.BaseNature, java.lang.annotation.Annotation)
-         */
-        public final < I extends BaseNature, A extends Annotation > 
-        boolean processAnnotation(final I info, final A annotation) {
-            if ((annotation instanceof XmlAccessorType) && (info instanceof JaxbClassNature)) {
-                XmlAccessorType xmlAccessorType = (XmlAccessorType) annotation;
-                JaxbClassNature classInfo = (JaxbClassNature) info;
-                annotationVisitMessage(LOG, xmlAccessorType);
-                classInfo.setXmlAccessorType(true);
-                classInfo.setXmlAccessType(xmlAccessorType.value());
-                return true;
-            }
-            return false;
-        } //-- processAnnotation
-        /**
-         * {@inheritDoc}
-         * @see AnnotationProcessor#forAnnotationClass()
-         */
-        public Class < ? extends Annotation > forAnnotationClass() {
-            return XmlAccessorType.class;
-        } //-- forAnnotationClass
-    } //-- XmlAccessorTypeProcessor
-
-    /**
-     * Annotation processor for XmlAccessorOrder.
-     * 
-     * @author Joachim Grueneis, jgrueneis_at_gmail_dot_com
-     * @version $Id$
-     */
-    class XmlAccessorOrderProcessor implements AnnotationProcessor {
-        /**
-         * {@inheritDoc}
-         * @see org.castor.annoproc.AnnotationProcessor#
-         * processAnnotation(org.castor.xml.introspection.BaseNature, java.lang.annotation.Annotation)
-         */
-        public final < I extends BaseNature, A extends Annotation > 
-        boolean processAnnotation(final I info, final A annotation) {
-            if ((annotation instanceof XmlAccessorOrder) && (info instanceof JaxbClassNature)) {
-                XmlAccessorOrder xmlAccessorOrder = (XmlAccessorOrder) annotation;
-                JaxbClassNature classInfo = (JaxbClassNature) info;
-                annotationVisitMessage(LOG, xmlAccessorOrder);
-                classInfo.setXmlAccessorOrder(true);
-                classInfo.setXmlAccessOrder(xmlAccessorOrder.value());
-                return true;
-            }
-            return false;
-        } //-- processAnnotation
-        /**
-         * {@inheritDoc}
-         * @see AnnotationProcessor#forAnnotationClass()
-         */
-        public Class < ? extends Annotation > forAnnotationClass() {
-            return XmlAccessorOrder.class;
-        }
-    }
-
-    /**
-     * Annotation processor for XmlEnum.
-     * 
-     * @author Joachim Grueneis, jgrueneis_at_gmail_dot_com
-     * @version $Id$
-     */
-    class XmlEnumProcessor implements AnnotationProcessor {
-        /**
-         * {@inheritDoc}
-         * @see org.castor.annoproc.AnnotationProcessor#
-         * processAnnotation(org.castor.xml.introspection.BaseNature, java.lang.annotation.Annotation)
-         */
-        public final < I extends BaseNature, A extends Annotation > 
-        boolean processAnnotation(final I info, final A annotation) {
-            if ((annotation instanceof XmlEnum) && (info instanceof JaxbClassNature)) {
-                XmlEnum xmlEnum = (XmlEnum) annotation;
-                JaxbClassNature classInfo = (JaxbClassNature) info;
-                annotationVisitMessage(LOG, xmlEnum);
-                classInfo.setXmlEnum(true);
-                classInfo.setEnumClass(xmlEnum.value());
-                return true;
-            }
-            return false;
-        } //-- processAnnotation
-
-        /**
-         * {@inheritDoc}
-         * @see org.castor.annoproc.EnumAnnotationProcessingService
-         * .AnnotationProcessor#forAnnotationClass()
-         */
-        public Class < ? extends Annotation > forAnnotationClass() {
-            return XmlEnum.class;
-        }
-    }
-} //-- AnnotationProcessingService
+}
