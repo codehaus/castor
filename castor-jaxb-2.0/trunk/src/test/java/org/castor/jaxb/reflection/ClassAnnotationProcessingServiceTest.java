@@ -31,22 +31,23 @@ import javax.xml.bind.annotation.XmlType;
 import java.lang.annotation.Annotation;
 
 /**
- * To test all annotation processings ClassNonnotationProcessingService is capable of.
- * these are: XMLType, XmlRootElement, XmlTransient, XmlSeeAlso, XmlAccessorType and
- * XmlAccessorOrder.
+ * To test all annotation processings ClassNonnotationProcessingService is
+ * capable of. these are: XMLType, XmlRootElement, XmlTransient, XmlSeeAlso,
+ * XmlAccessorType and XmlAccessorOrder.
  * 
  * @author Joachim Grueneis, jgrueneis_at_gmail_dot_com
  * @version $Id$
  */
 public class ClassAnnotationProcessingServiceTest {
-    
+
     /**
-     * Test method for {@link org.castor.jaxb.annoproc.BaseAnnotationProcessingService#processAnnotations(org.castor.jaxb.reflection.info.Info, 
-     * java.lang.annotation.Annotation[])}.
+     * Test method for
+     * {@link org.castor.jaxb.annoproc.BaseAnnotationProcessingService#processAnnotations(org.castor.jaxb.reflection.info.Info, java.lang.annotation.Annotation[])}
+     * .
      */
     @Test
     public final void testProcessAnnotations() {
-        Class < WithAnnotations > clazz = WithAnnotations.class;
+        Class<WithAnnotations> clazz = WithAnnotations.class;
         Annotation[] annotations = clazz.getAnnotations();
         ClassAnnotationProcessingService caps = new ClassAnnotationProcessingService();
         JaxbClassNature classInfo = new JaxbClassNature(new ClassInfo("Franz"));
@@ -58,27 +59,30 @@ public class ClassAnnotationProcessingServiceTest {
     }
 
     private static class WithoutAnnotations {
-        
+
     }
 
-    @XmlType(name = "Franz") //, namespace="", propOrder="", factoryClass="", factoryMethod=""
+    @XmlType(name = "Franz")
+    // , namespace="", propOrder="", factoryClass="", factoryMethod=""
     @XmlRootElement(name = "Hugo")
     private static class WithAnnotations {
-        
+
     }
-    
-    @XmlType(name = "Franz") //, namespace="", propOrder="", factoryClass="", factoryMethod=""
+
+    @XmlType(name = "Franz")
+    // , namespace="", propOrder="", factoryClass="", factoryMethod=""
     private static class WithXmlTypeAnnotation {
-        
+
     }
-    
+
     /**
-     * Test method for {@link org.castor.jaxb.annoproc.BaseAnnotationProcessingService#processAnnotations(org.castor.jaxb.reflection.info.Info, 
-     * java.lang.annotation.Annotation[])}.
+     * Test method for
+     * {@link org.castor.jaxb.annoproc.BaseAnnotationProcessingService#processAnnotations(org.castor.jaxb.reflection.info.Info, java.lang.annotation.Annotation[])}
+     * .
      */
     @Test
     public void testProcessAnnotationsWithXmlTypeAnnotation() {
-        Class < WithXmlTypeAnnotation > clazz = WithXmlTypeAnnotation.class;
+        Class<WithXmlTypeAnnotation> clazz = WithXmlTypeAnnotation.class;
         Annotation[] annotations = clazz.getAnnotations();
         ClassAnnotationProcessingService caps = new ClassAnnotationProcessingService();
         JaxbClassNature classInfo = new JaxbClassNature(new ClassInfo(WithXmlTypeAnnotation.class.getName()));
@@ -106,12 +110,12 @@ public class ClassAnnotationProcessingServiceTest {
 
     @XmlRootElement(name = "Hugo")
     private static class WithXmlRootElementAnnotation {
-        
+
     }
 
     @Test
     public void testProcessAnnotationsWithXmlRootElementAnnotation() {
-        Class < WithXmlRootElementAnnotation > clazz = WithXmlRootElementAnnotation.class;
+        Class<WithXmlRootElementAnnotation> clazz = WithXmlRootElementAnnotation.class;
         Annotation[] annotations = clazz.getAnnotations();
         ClassAnnotationProcessingService caps = new ClassAnnotationProcessingService();
         JaxbClassNature classInfo = new JaxbClassNature(new ClassInfo(WithXmlRootElementAnnotation.class.getName()));
@@ -138,12 +142,12 @@ public class ClassAnnotationProcessingServiceTest {
 
     @XmlTransient()
     private static class WithXmlTransientAnnotation {
-        
+
     }
 
     @Test
     public final void testProcessAnnotationsWithXmlTransientAnnotation() {
-        Class < WithXmlTransientAnnotation > clazz = WithXmlTransientAnnotation.class;
+        Class<WithXmlTransientAnnotation> clazz = WithXmlTransientAnnotation.class;
         Annotation[] annotations = clazz.getAnnotations();
         ClassAnnotationProcessingService caps = new ClassAnnotationProcessingService();
         JaxbClassNature classInfo = new JaxbClassNature(new ClassInfo(WithXmlRootElementAnnotation.class.getName()));
@@ -170,12 +174,12 @@ public class ClassAnnotationProcessingServiceTest {
 
     @XmlSeeAlso(WithXmlTransientAnnotation.class)
     private static class WithXmlSeeAlsoAnnotation {
-        
+
     }
 
     @Test
     public void testProcessAnnotationsWithXmlSeeAlsoAnnotation() {
-        Class < WithXmlSeeAlsoAnnotation > clazz = WithXmlSeeAlsoAnnotation.class;
+        Class<WithXmlSeeAlsoAnnotation> clazz = WithXmlSeeAlsoAnnotation.class;
         Annotation[] annotations = clazz.getAnnotations();
         ClassAnnotationProcessingService caps = new ClassAnnotationProcessingService();
         JaxbClassNature classInfo = new JaxbClassNature(new ClassInfo(WithXmlRootElementAnnotation.class.getName()));
@@ -203,12 +207,12 @@ public class ClassAnnotationProcessingServiceTest {
 
     @XmlAccessorOrder()
     private static class WithXmlAccessorOrderAnnotation {
-        
+
     }
 
     @Test
     public void testProcessAnnotationsWithXmlAccessorOrderAnnotation() {
-        Class < WithXmlAccessorOrderAnnotation > clazz = WithXmlAccessorOrderAnnotation.class;
+        Class<WithXmlAccessorOrderAnnotation> clazz = WithXmlAccessorOrderAnnotation.class;
         Annotation[] annotations = clazz.getAnnotations();
         ClassAnnotationProcessingService caps = new ClassAnnotationProcessingService();
         JaxbClassNature classInfo = new JaxbClassNature(new ClassInfo(WithXmlAccessorOrderAnnotation.class.getName()));
@@ -235,12 +239,12 @@ public class ClassAnnotationProcessingServiceTest {
 
     @XmlAccessorType()
     private static class WithXmlAccessorTypeAnnotation {
-        
+
     }
 
     @Test
     public void testProcessAnnotationsWithXmlAccessorTypeAnnotation() {
-        Class < WithXmlAccessorTypeAnnotation > clazz = WithXmlAccessorTypeAnnotation.class;
+        Class<WithXmlAccessorTypeAnnotation> clazz = WithXmlAccessorTypeAnnotation.class;
         Annotation[] annotations = clazz.getAnnotations();
         ClassAnnotationProcessingService caps = new ClassAnnotationProcessingService();
         JaxbClassNature classInfo = new JaxbClassNature(new ClassInfo(WithXmlAccessorTypeAnnotation.class.getName()));
@@ -267,15 +271,16 @@ public class ClassAnnotationProcessingServiceTest {
 
     @XmlAccessorType(XmlAccessType.NONE)
     private static class WithXmlAccessorTypeAnnotationNONE {
-        
+
     }
 
     @Test
     public void testProcessAnnotationsWithXmlAccessorTypeNONEAnnotation() {
-        Class < WithXmlAccessorTypeAnnotationNONE > clazz = WithXmlAccessorTypeAnnotationNONE.class;
+        Class<WithXmlAccessorTypeAnnotationNONE> clazz = WithXmlAccessorTypeAnnotationNONE.class;
         Annotation[] annotations = clazz.getAnnotations();
         ClassAnnotationProcessingService caps = new ClassAnnotationProcessingService();
-        JaxbClassNature classInfo = new JaxbClassNature(new ClassInfo(WithXmlAccessorTypeAnnotationNONE.class.getName()));
+        JaxbClassNature classInfo = new JaxbClassNature(
+                new ClassInfo(WithXmlAccessorTypeAnnotationNONE.class.getName()));
         caps.processAnnotations(classInfo, annotations);
 
         // XmlRootElement annotations
@@ -299,6 +304,6 @@ public class ClassAnnotationProcessingServiceTest {
 
     @Test
     public void testProcessAnnotationsWithXmlEnum() {
-        //Assert.fail("Not yet implemented!");
+        // Assert.fail("Not yet implemented!");
     }
 }

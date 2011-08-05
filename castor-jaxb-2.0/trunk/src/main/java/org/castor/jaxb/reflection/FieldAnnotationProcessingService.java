@@ -16,6 +16,7 @@
 package org.castor.jaxb.reflection;
 
 
+import org.castor.core.annotationprocessing.BaseAnnotationProcessingService;
 import org.castor.jaxb.reflection.processor.field.XmlAnyAttributeProcessor;
 import org.castor.jaxb.reflection.processor.field.XmlAnyElementProcessor;
 import org.castor.jaxb.reflection.processor.field.XmlAttachmentRefProcessor;
@@ -44,8 +45,7 @@ import org.slf4j.LoggerFactory;
  * @author Joachim Grueneis, jgrueneis_at_codehaus_dot_com
  * @version $Id$
  */
-public class FieldAnnotationProcessingService extends
-        XMLBaseAnnotationProcessingService {
+public class FieldAnnotationProcessingService extends BaseAnnotationProcessingService {
 
     public final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
