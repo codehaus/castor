@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package org.castor.jaxb.test.functional.elementWrapper;
+package org.castor.jaxb.test.functional.elementWrapperDefault;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "entity")
-public class ElementWithAnnotationWithDefaultWrapper {
+public class ElementWithAnnotationWithExplicitNameWithDefaultWrapper {
 
     @XmlElementWrapper
-    @XmlElement
+    @XmlElement(name = "other-name")
     private String name;
 
     public String getName() {
