@@ -1,11 +1,19 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+
+    <modelVersion>4.0.0</modelVersion>
 	<groupId>org.codehaus.castor</groupId>
 	<artifactId>castor-jaxb</artifactId>
 	<version>1.0-beta-2-SNAPSHOT</version>
 	<packaging>jar</packaging>
+
+	<parent>
+        <groupId>org.codehaus</groupId>
+        <artifactId>codehaus-parent</artifactId>
+        <version>3</version>
+    </parent>
+    
 	<name>Castor JAXB - An implementation of JAXB 2.1</name>
 	<description>
 		A layer to use Castor underneath and JAXB standard compliant API
@@ -91,6 +99,14 @@
 		<developerConnection>scm:svn:https://svn.codehaus.org/castor/castor-jaxb-2.0/trunk/</developerConnection>
 		<url>http://svn.castor.codehaus.org/viewrep/castor/castor-jaxb-2.0/trunk</url>
 	</scm>
+    <distributionManagement>
+        <site>
+          <id>codehaus.org</id>
+          <url>https://nexus.codehaus.org/content/repositories/releases/</url>
+        </site>
+    </distributionManagement>
+
+<!-- 
 	<distributionManagement>
 		<repository>
 			<id>codehaus.org</id>
@@ -107,6 +123,7 @@
 			<url>dav:https://dav.codehaus.org/castor/</url>
 		</site>
 	</distributionManagement>
+-->    
 	<dependencies>
 		<dependency>
 			<groupId>org.codehaus.castor</groupId>
@@ -202,6 +219,7 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+    <!-- 
 	<repositories>
 		<repository>
 			<id>Maven</id>
@@ -231,6 +249,19 @@
 			<url>http://snapshots.maven.codehaus.org/maven2/</url>
 		</repository>
 	</repositories>
+        -->
+    <pluginRepositories>
+        <pluginRepository>
+            <id>Maven Codehaus Snapshots</id>
+            <url>http://nexus.codehaus.org/snapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
 	<build>
         <pluginManagement>
             <plugins>
