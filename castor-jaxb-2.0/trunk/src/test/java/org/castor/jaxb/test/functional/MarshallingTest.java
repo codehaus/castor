@@ -8,8 +8,12 @@ import java.io.StringWriter;
 import javax.xml.bind.JAXBException;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.lang3.StringUtils;
 import org.castor.jaxb.test.functional.attribute.Attribute;
 import org.castor.jaxb.test.functional.attribute.AttributeWithExplicitName;
+import org.castor.jaxb.test.functional.element.Element;
+import org.castor.jaxb.test.functional.element.ElementWithAnnotation;
+import org.castor.jaxb.test.functional.element.ElementWithAnnotationWithExplicitName;
 import org.junit.Before;
 import org.junit.Test;
 import org.xml.sax.SAXException;
@@ -26,8 +30,7 @@ public class MarshallingTest {
 
     @Test
     public void testAttributeDefault() throws JAXBException, SAXException, IOException {
-        final String expectedXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-        "<entity name=\"test\"></entity>";
+        final String expectedXml = "<entity name=\"test\"></entity>";
         
         Attribute attribute = new Attribute();
         attribute.setName("test");
@@ -35,13 +38,12 @@ public class MarshallingTest {
         StringWriter writer = new StringWriter();
         marshaller.marshal(attribute, new StreamResult(writer));
         
-        assertXMLEqual("Marshaller written invalid result.", expectedXml, writer.toString());
+        assertXmlEquals("Marshaller written invalid result.", expectedXml, writer.toString());
     }
 
     @Test
     public void testAttributeWithExplicitName() throws JAXBException, SAXException, IOException {
-        final String expectedXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-        "<entity other-name=\"test\"></entity>";
+        final String expectedXml = "<entity other-name=\"test\"></entity>";
         
         AttributeWithExplicitName attributeWithExplicitName = new AttributeWithExplicitName();
         attributeWithExplicitName.setName("test");
@@ -51,6 +53,50 @@ public class MarshallingTest {
         
         assertXMLEqual("Marshaller written invalid result.", expectedXml, writer.toString());
     }
+    
+    private void assertXmlEquals(String message, String expected, String actual) throws SAXException, IOException {
+        String body = StringUtils.removeStart(actual, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+        assertXMLEqual(message, expected, body);
+    }
 
+
+    @Test
+    public void testElementDefault() throws JAXBException, SAXException, IOException {
+        final String expectedXml = "<entity><name>test</name></entity>";
+        
+        Element element = new Element();
+        element.setName("test");
+
+        StringWriter writer = new StringWriter();
+        marshaller.marshal(element, new StreamResult(writer));
+        
+        assertXmlEquals("Marshaller written invalid result.", expectedXml, writer.toString());
+    }
+
+    @Test
+    public void testElementWithAnnotation() throws JAXBException, SAXException, IOException {
+        final String expectedXml = "<entity><name>test</name></entity>";
+        
+        ElementWithAnnotation element = new ElementWithAnnotation();
+        element.setName("test");
+
+        StringWriter writer = new StringWriter();
+        marshaller.marshal(element, new StreamResult(writer));
+        
+        assertXmlEquals("Marshaller written invalid result.", expectedXml, writer.toString());
+    }
+
+    @Test
+    public void testElementWithAnnotationWithExplicitName() throws JAXBException, SAXException, IOException {
+        final String expectedXml = "<entity><other-name>test</other-name></entity>";
+        
+        ElementWithAnnotationWithExplicitName element = new ElementWithAnnotationWithExplicitName();
+        element.setName("test");
+
+        StringWriter writer = new StringWriter();
+        marshaller.marshal(element, new StreamResult(writer));
+        
+        assertXmlEquals("Marshaller written invalid result.", expectedXml, writer.toString());
+    }
 
 }
