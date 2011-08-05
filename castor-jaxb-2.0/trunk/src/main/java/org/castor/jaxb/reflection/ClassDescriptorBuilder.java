@@ -16,6 +16,7 @@
 package org.castor.jaxb.reflection;
 
 import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import org.castor.jaxb.exceptions.ReflectionException;
 import org.castor.jaxb.naming.JAXBXmlNaming;
@@ -160,6 +161,11 @@ public final class ClassDescriptorBuilder {
         FieldHandler fieldHandler = buildFieldHandler(jaxbFieldNature,
                 saveMapKeys);
         fieldDescriptor.setHandler(fieldHandler);
+        
+        if (jaxbFieldNature.hasXmlElementWrapper()) {
+            String location = jaxbFieldNature.getElementWrapperName(); 
+            fieldDescriptor.setLocationPath(location);
+        }
         return fieldDescriptor;
     }
 
@@ -347,7 +353,7 @@ public final class ClassDescriptorBuilder {
 
     /**
      * To get the XML name for the class. This is either the name specified in
-     * the RootElememnt annotation of derived from the class name.
+     * the {@link XmlRootElement} annotation of derived from the class name.
      * 
      * @param jaxbFieldNature
      *            the FieldInfo for which a XML name is wanted

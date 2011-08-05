@@ -14,6 +14,9 @@ import org.castor.jaxb.test.functional.attribute.AttributeWithExplicitName;
 import org.castor.jaxb.test.functional.element.Element;
 import org.castor.jaxb.test.functional.element.ElementWithAnnotation;
 import org.castor.jaxb.test.functional.element.ElementWithAnnotationWithExplicitName;
+import org.castor.jaxb.test.functional.elementWrapper.ElementWithAnnotationWithExplicitNameWithWrapper;
+import org.castor.jaxb.test.functional.elementWrapper.ElementWithAnnotationWithWrapper;
+import org.castor.jaxb.test.functional.elementWrapper.ElementWithWrapper;
 import org.castor.jaxb.test.functional.elementWrapperDefault.ElementWithAnnotationWithDefaultWrapper;
 import org.castor.jaxb.test.functional.elementWrapperDefault.ElementWithDefaultWrapper;
 import org.junit.Before;
@@ -143,5 +146,48 @@ public class MarshallingTest {
 //        
 //        assertXmlEquals("Marshaller written invalid result.", expectedXml, writer.toString());
 //    }
-    
+
+  @Test
+  public void testElementDefaultWithWrapper() throws JAXBException, SAXException, IOException {
+      final String expectedXml = "<entity><wrapper><name>test</name></wrapper></entity>";
+      
+      ElementWithWrapper element = new ElementWithWrapper();
+      element.setName("test");
+
+      StringWriter writer = new StringWriter();
+      marshaller.marshal(element, new StreamResult(writer));
+      
+      System.out.println(writer.toString());
+      
+      assertXmlEquals("Marshaller written invalid result.", expectedXml, writer.toString());
+  }
+
+  @Test
+  public void testElementWithAnnotationWithWrapper() throws JAXBException, SAXException, IOException {
+      final String expectedXml = "<entity><wrapper><name>test</name></wrapper></entity>";
+      
+      ElementWithAnnotationWithWrapper element = new ElementWithAnnotationWithWrapper();
+      element.setName("test");
+
+      StringWriter writer = new StringWriter();
+      marshaller.marshal(element, new StreamResult(writer));
+
+      System.out.println(writer.toString());
+
+      assertXmlEquals("Marshaller written invalid result.", expectedXml, writer.toString());
+  }
+
+  @Test
+  public void testElementWithAnnotationWithExplicitNameWithWrapper() throws JAXBException, SAXException, IOException {
+      final String expectedXml = "<entity><wrapper><other-name>test</other-name></wrapper></entity>";
+      
+      ElementWithAnnotationWithExplicitNameWithWrapper element = new ElementWithAnnotationWithExplicitNameWithWrapper();
+      element.setName("test");
+
+      StringWriter writer = new StringWriter();
+      marshaller.marshal(element, new StreamResult(writer));
+      
+      assertXmlEquals("Marshaller written invalid result.", expectedXml, writer.toString());
+  }
+
 }
