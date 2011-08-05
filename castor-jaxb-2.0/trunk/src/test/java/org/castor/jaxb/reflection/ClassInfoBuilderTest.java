@@ -51,9 +51,9 @@ public class ClassInfoBuilderTest {
     @Before
     public final void setUp() {
         _builder = new ClassInfoBuilder();
-        _builder.setPackageAnnotationProcessingService(new PackageAnnotationProcessingService());
-        _builder.setClassAnnotationProcessingService(new ClassAnnotationProcessingService());
-        _builder.setFieldAnnotationProcessingService(new FieldAnnotationProcessingService());
+        _builder.setPackageAnnotationProcessingService(new PackageAnnotationProcessingServiceImpl());
+        _builder.setClassAnnotationProcessingService(new ClassAnnotationProcessingServiceImpl());
+        _builder.setFieldAnnotationProcessingService(new FieldAnnotationProcessingServiceImpl());
         _builder.setJavaNaming(new JAXBJavaNaming());
     }
 

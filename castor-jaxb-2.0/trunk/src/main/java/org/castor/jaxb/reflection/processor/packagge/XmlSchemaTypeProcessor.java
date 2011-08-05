@@ -6,7 +6,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 
 import org.castor.core.annotationprocessing.AnnotationProcessor;
 import org.castor.core.nature.BaseNature;
-import org.castor.jaxb.reflection.PackageAnnotationProcessingService;
+import org.castor.jaxb.reflection.PackageAnnotationProcessingServiceImpl;
 import org.castor.jaxb.reflection.info.JaxbPackageNature;
 import org.castor.jaxb.reflection.processor.BaseFieldProcessor;
 

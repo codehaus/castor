@@ -37,6 +37,7 @@ import org.castor.jaxb.reflection.processor.field.XmlTransientProcessor;
 import org.castor.jaxb.reflection.processor.field.XmlValueProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 /**
  * To process all field (attribute and method) specific annotations and put the
@@ -45,7 +46,8 @@ import org.slf4j.LoggerFactory;
  * @author Joachim Grueneis, jgrueneis_at_codehaus_dot_com
  * @version $Id$
  */
-public class FieldAnnotationProcessingService extends BaseAnnotationProcessingService {
+@Service("fieldAnnotationProcessingService")
+public class FieldAnnotationProcessingServiceImpl extends BaseAnnotationProcessingService {
 
     public final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
@@ -53,7 +55,7 @@ public class FieldAnnotationProcessingService extends BaseAnnotationProcessingSe
      * Constructs a AnnotationProcessingService what means to register all
      * available AnnotationProcessing classes.
      */
-    public FieldAnnotationProcessingService() {
+    public FieldAnnotationProcessingServiceImpl() {
         super();
         addAnnotationProcessor(new XmlElementProcessor());
         // no root element on a field!! addAnnotationProcessor(new

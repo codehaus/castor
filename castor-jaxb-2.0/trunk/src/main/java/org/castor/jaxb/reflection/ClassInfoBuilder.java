@@ -21,9 +21,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.castor.jaxb.JAXBContext;
+import org.castor.core.annotationprocessing.AnnotationProcessingService;
 import org.castor.jaxb.naming.JAXBJavaNaming;
 import org.castor.jaxb.reflection.info.ClassInfo;
 import org.castor.jaxb.reflection.info.FieldInfo;
@@ -37,6 +35,7 @@ import org.castor.jaxb.reflection.info.PackageInfo;
 import org.castor.xml.JavaNaming;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * A service class which is meant to read (interpret) a given class and remember
@@ -53,17 +52,20 @@ public final class ClassInfoBuilder {
     /**
      * The service to process class level annotations.
      */
-    private PackageAnnotationProcessingService _packageAnnotationProcessingService;
+    @Autowired
+    private AnnotationProcessingService _packageAnnotationProcessingService;
 
     /**
      * The service to process class level annotations.
      */
-    private ClassAnnotationProcessingService _classAnnotationProcessingService;
+    @Autowired
+    private AnnotationProcessingService _classAnnotationProcessingService;
 
     /**
      * The service to process field level annotations.
      */
-    private FieldAnnotationProcessingService _fieldAnnotationProcessingService;
+    @Autowired
+    private AnnotationProcessingService _fieldAnnotationProcessingService;
 
     /**
      * Which JavaNaming service to use for interpreting Java method, field or
@@ -76,9 +78,9 @@ public final class ClassInfoBuilder {
      */
     public ClassInfoBuilder() {
         super();
-        _packageAnnotationProcessingService = new PackageAnnotationProcessingService();
-        _classAnnotationProcessingService = new ClassAnnotationProcessingService();
-        _fieldAnnotationProcessingService = new FieldAnnotationProcessingService();
+        _packageAnnotationProcessingService = new PackageAnnotationProcessingServiceImpl();
+        _classAnnotationProcessingService = new ClassAnnotationProcessingServiceImpl();
+        _fieldAnnotationProcessingService = new FieldAnnotationProcessingServiceImpl();
         _javaNaming = new JAXBJavaNaming();
     }
 
@@ -385,7 +387,7 @@ public final class ClassInfoBuilder {
     /**
      * @return the PackageAnnotationProcessingService in use
      */
-    public PackageAnnotationProcessingService getPackageAnnotationProcessingService() {
+    public AnnotationProcessingService getPackageAnnotationProcessingService() {
         return _packageAnnotationProcessingService;
     }
 
@@ -394,14 +396,14 @@ public final class ClassInfoBuilder {
      *            the PackageAnnotationProcessingService to set
      */
     public void setPackageAnnotationProcessingService(
-            final PackageAnnotationProcessingService packageAnnotationProcessingService) {
+            final AnnotationProcessingService packageAnnotationProcessingService) {
         _packageAnnotationProcessingService = packageAnnotationProcessingService;
     }
 
     /**
      * @return the ClassAnnotationProcessingService in use.
      */
-    public ClassAnnotationProcessingService getClassAnnotationProcessingService() {
+    public AnnotationProcessingService getClassAnnotationProcessingService() {
         return _classAnnotationProcessingService;
     }
 
@@ -410,14 +412,14 @@ public final class ClassInfoBuilder {
      *            the classAnnotationProcessingService to set
      */
     public void setClassAnnotationProcessingService(
-            final ClassAnnotationProcessingService classAnnotationProcessingService) {
+            final AnnotationProcessingService classAnnotationProcessingService) {
         _classAnnotationProcessingService = classAnnotationProcessingService;
     }
 
     /**
      * @return the FieldAnnotationProcessingService in use.
      */
-    public FieldAnnotationProcessingService getFieldAnnotationProcessingService() {
+    public AnnotationProcessingService getFieldAnnotationProcessingService() {
         return _fieldAnnotationProcessingService;
     }
 
@@ -426,7 +428,7 @@ public final class ClassInfoBuilder {
      *            the fieldAnnotationProcessingService to set
      */
     public void setFieldAnnotationProcessingService(
-            final FieldAnnotationProcessingService fieldAnnotationProcessingService) {
+            final AnnotationProcessingService fieldAnnotationProcessingService) {
         _fieldAnnotationProcessingService = fieldAnnotationProcessingService;
     }
 

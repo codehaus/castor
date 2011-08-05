@@ -12,8 +12,11 @@ import org.castor.jaxb.test.functional.attribute.Attribute;
 import org.castor.jaxb.test.functional.attribute.AttributeWithExplicitName;
 import org.castor.jaxb.test.functional.element.Element;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.xml.sax.SAXException;
 
+@RunWith(SpringJUnit4ClassRunner.class)
 public class AttributeMarshallingTest extends BaseFunctionalTest {
 
     @Test
