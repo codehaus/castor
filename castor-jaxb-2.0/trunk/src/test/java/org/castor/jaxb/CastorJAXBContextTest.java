@@ -50,12 +50,6 @@ public class CastorJAXBContextTest {
     private JAXBContext context;
 
     /**
-     * Represents the expected xml.
-     */
-    private static final String EXPECTED_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-            + "<Entity><Name>Test</Name></Entity>";
-
-    /**
      * Sets up the test environment.
      *
      * @throws javax.xml.bind.JAXBException
