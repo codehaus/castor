@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+
 package org.castor.entities;
 
 import javax.xml.bind.annotation.XmlElement;

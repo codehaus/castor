@@ -69,7 +69,8 @@ public class CastorUnmarshallerTest {
      */
     @Before
     public void setUp() throws JAXBException {
-        JAXBContext context = JAXBContext.newInstance(Entity.class);
+
+        JAXBContext context = JAXBContext.newInstance("org.castor.entities");
         unmarshaller = context.createUnmarshaller();
     }
 

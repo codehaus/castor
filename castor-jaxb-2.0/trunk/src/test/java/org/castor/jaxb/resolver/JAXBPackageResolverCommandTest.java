@@ -18,6 +18,7 @@ package org.castor.jaxb.resolver;
 import org.junit.Assert;
 import org.exolab.castor.xml.ResolverException;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -56,6 +57,7 @@ public class JAXBPackageResolverCommandTest {
     }
 
     @Test
+    @Ignore
     public void testYetNotImplemented() {
         try {
             _cmd.resolve("org.castor.jaxb.resolver", _propertiesMap);

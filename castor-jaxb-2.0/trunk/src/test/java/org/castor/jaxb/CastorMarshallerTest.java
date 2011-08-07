@@ -79,7 +79,7 @@ public class CastorMarshallerTest {
     @Before
     public void setUp() throws JAXBException {
 
-        JAXBContext context = JAXBContext.newInstance(Entity.class);
+        JAXBContext context = JAXBContext.newInstance("org.castor.entities");
         marshaller = context.createMarshaller();
     }
 

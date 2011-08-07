@@ -112,10 +112,9 @@ public class CastorJAXBContextFactoryTest {
      *             if any error occurs during test
      */
     @Test
-    @Ignore("This functionality does not yet work.")
     public void testCreateContextContextPath() throws Exception {
 
-        JAXBContext jaxbContext = CastorJAXBContextFactory.createContext("org.castor.jaxb.entities",
+        JAXBContext jaxbContext = CastorJAXBContextFactory.createContext("org.castor.entities",
                 ClassLoader.getSystemClassLoader(), new HashMap<String, Object>());
 
         assertNotNull("CastorJAXBContextFactory created null context.", jaxbContext);

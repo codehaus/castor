@@ -23,6 +23,7 @@ import org.exolab.castor.xml.ResolverException;
 import org.exolab.castor.xml.XMLClassDescriptor;
 import org.exolab.castor.xml.util.ResolverStrategy;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ import java.util.Map;
  * @version $Id$
  *
  */
-public class JAXBResolverStrategyTest extends TestCase {
+public class JAXBResolverStrategyTest {
 
     private JAXBResolverStrategy _strategy;
     private MyResolverResults _resolverResults;
@@ -139,6 +140,7 @@ public class JAXBResolverStrategyTest extends TestCase {
     }
 
     @Test
+    @Ignore
     public void testResolvePackage() {
         try {
             _strategy.resolvePackage(_resolverResults, MyTestClass.class.getPackage().getName());
