@@ -26,6 +26,7 @@ import org.castor.jaxb.reflection.processor.clazz.XmlTransientProcessor;
 import org.castor.jaxb.reflection.processor.clazz.XmlTypeProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 /**
@@ -35,7 +36,7 @@ import org.springframework.stereotype.Service;
  * @author Joachim Grueneis, jgrueneis_at_codehaus_dot_com
  * @version $Id$
  */
-@Service("classAnnotationProcessingService")
+@Component("classAnnotationProcessingService")
 public class ClassAnnotationProcessingServiceImpl extends BaseAnnotationProcessingService {
 
     public final Logger LOG = LoggerFactory.getLogger(this.getClass());

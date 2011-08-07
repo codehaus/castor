@@ -21,6 +21,7 @@ import org.castor.jaxb.reflection.info.JaxbPackageNature;
 import org.castor.jaxb.reflection.info.PackageInfo;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -38,7 +39,10 @@ import java.lang.annotation.Annotation;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath:/castor-jaxb-test-context.xml" })
 public class PackageAnnotationProcessingServiceTest {
-    
+
+    @Autowired
+    private PackageAnnotationProcessingServiceImpl paps;
+
     /**
      * Test method for {@link org.castor.jaxb.annoproc.BaseAnnotationProcessingService#processAnnotations(org.castor.jaxb.reflection.info.Info, 
      * java.lang.annotation.Annotation[])}.
@@ -48,7 +52,6 @@ public class PackageAnnotationProcessingServiceTest {
         Class < USAddress > clazz = USAddress.class;
         Package pack = clazz.getPackage();
         Annotation[] annotations = pack.getAnnotations();
-        PackageAnnotationProcessingServiceImpl paps = new PackageAnnotationProcessingServiceImpl();
         JaxbPackageNature packageInfo = new JaxbPackageNature(new PackageInfo(pack.getName()));
         paps.processAnnotations(packageInfo, annotations);
         Assert.assertEquals(XmlAccessType.PROPERTY, packageInfo.getAccessType());

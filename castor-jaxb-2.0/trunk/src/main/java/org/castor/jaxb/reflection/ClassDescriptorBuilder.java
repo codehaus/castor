@@ -36,6 +36,7 @@ import org.exolab.castor.xml.XMLClassDescriptor;
 import org.exolab.castor.xml.XMLFieldDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -53,21 +54,22 @@ public final class ClassDescriptorBuilder {
     /**
      * The naming service to use for build XML names.
      */
-    private XMLNaming _xmlNaming;
+    @Autowired
+    private XMLNaming xmlNaming;
 
     /**
      * Default constructor.
      */
     public ClassDescriptorBuilder() {
         super();
-        _xmlNaming = new JAXBXmlNaming();
+        xmlNaming = new JAXBXmlNaming();
     }
 
     /**
      * @return the XMLNaming in use.
      */
     public XMLNaming getXMLNaming() {
-        return _xmlNaming;
+        return xmlNaming;
     }
 
     /**
@@ -77,7 +79,7 @@ public final class ClassDescriptorBuilder {
      *            XMLNaming service to use
      */
     public void setXMLNaming(final XMLNaming xmlNaming) {
-        _xmlNaming = xmlNaming;
+        this.xmlNaming = xmlNaming;
     }
 
     /**
@@ -296,7 +298,7 @@ public final class ClassDescriptorBuilder {
         }
         if (jaxbClassNature.getRootElementName() == null
                 || jaxbClassNature.getRootElementName().length() == 0) {
-            return _xmlNaming.toXMLName(jaxbClassNature.getClassName());
+            return xmlNaming.toXMLName(jaxbClassNature.getClassName());
         } else {
             return jaxbClassNature.getRootElementName();
         }
@@ -396,7 +398,7 @@ public final class ClassDescriptorBuilder {
             }
             xmlName = jaxbFieldNature.getFieldName();
         }
-        return _xmlNaming.toXMLName(xmlName);
+        return xmlNaming.toXMLName(xmlName);
     }
 
     /**

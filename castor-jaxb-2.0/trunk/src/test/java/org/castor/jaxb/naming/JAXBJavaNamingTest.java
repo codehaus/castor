@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -39,8 +40,11 @@ public class JAXBJavaNamingTest {
      * Logger to be used.
      */
     private static final Log LOG = LogFactory.getLog(JAXBJavaNamingTest.class);
+    
     /** Object to test. */
+    @Autowired
     private JAXBJavaNaming _javaNaming;
+    
     private Field _fieldWithoutLeadingUnderscore;
     private Field _fieldWithLeadingUnderscore;
     private Method _anythingGetMethod;
@@ -59,7 +63,7 @@ public class JAXBJavaNamingTest {
      */
     @Before
     public void setUp() throws Exception {
-        _javaNaming = new JAXBJavaNaming();
+//        _javaNaming = new JAXBJavaNaming();
         _fieldWithoutLeadingUnderscore = SampleClass.class.getField("withoutLeadingUnderscore");
         _fieldWithLeadingUnderscore = SampleClass.class.getField("_withLeadingUnderscore");
         _anythingGetMethod = SampleClass.class.getMethod("getAnything", new Class[] {});

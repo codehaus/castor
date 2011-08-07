@@ -15,25 +15,22 @@
  */
 package org.castor.jaxb.reflection;
 
-import org.junit.Assert;
-import org.castor.jaxb.naming.JAXBJavaNaming;
-import org.castor.jaxb.naming.JAXBXmlNaming;
-import org.castor.jaxb.reflection.info.ClassInfo;
-import org.castor.jaxb.reflection.info.JaxbClassNature;
-import org.castor.jaxb.reflection.info.JaxbFieldNature;
-import org.castor.xml.JavaNaming;
-import org.castor.xml.XMLNaming;
-import org.exolab.castor.xml.XMLClassDescriptor;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.List;
+
+import org.castor.jaxb.reflection.info.ClassInfo;
+import org.castor.jaxb.reflection.info.JaxbClassNature;
+import org.castor.jaxb.reflection.info.JaxbFieldNature;
+import org.exolab.castor.xml.XMLClassDescriptor;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Tests the ClassDescriptorBuilder.
@@ -44,24 +41,13 @@ import java.util.List;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath:/castor-jaxb-test-context.xml" })
 public class ClassDescriptorBuilderTest {
-    private ClassInfoBuilder _ciBuilder;
+    
+    @Autowired
+    private ClassInfoBuilder classInfoBuilder;
+    
     /** The ClassDescriptorBuilder to test. */
-    private ClassDescriptorBuilder _cdBuilder;
-
-    /**
-     * Setting up the test. Creates the ClassDescriptorBuilder and fills
-     * it with the XMLNaming service to use.
-     * @see junit.framework.TestCase#setUp()
-     */
-    @Before
-    public void setUp() {
-        JavaNaming jn = new JAXBJavaNaming();
-        XMLNaming xn = new JAXBXmlNaming();
-        _ciBuilder = new ClassInfoBuilder();
-        _ciBuilder.setJavaNaming(jn);
-        _cdBuilder = new ClassDescriptorBuilder();
-        _cdBuilder.setXMLNaming(xn);
-    }
+    @Autowired
+    private ClassDescriptorBuilder classDescriptorBuilder;
 
     /**
      * A private class to introspect.
@@ -80,8 +66,8 @@ public class ClassDescriptorBuilderTest {
 
     @Test
     public void testArtist() {
-        ClassInfo ci = _ciBuilder.buildClassInfo(Artist.class);
-        XMLClassDescriptor cd = _cdBuilder.buildClassDescriptor(ci, true);
+        ClassInfo ci = classInfoBuilder.buildClassInfo(Artist.class);
+        XMLClassDescriptor cd = classDescriptorBuilder.buildClassDescriptor(ci, true);
         Assert.assertNotNull(cd);
         Assert.assertEquals(Artist.class, cd.getJavaClass());
         Assert.assertEquals("Artist", cd.getXMLName());
@@ -115,7 +101,7 @@ public class ClassDescriptorBuilderTest {
 
     @Test
     public void testNoXmlElementAnnotations() {
-        JaxbClassNature ci = new JaxbClassNature(_ciBuilder.buildClassInfo(NoXmlElementAnnotations.class));
+        JaxbClassNature ci = new JaxbClassNature(classInfoBuilder.buildClassInfo(NoXmlElementAnnotations.class));
         Assert.assertNotNull("ClassInfo generated must not be null", ci);
         Assert.assertNull(
                 "Without XmlRootElement annotation this has to be null", ci.getRootElementName());
@@ -144,7 +130,7 @@ public class ClassDescriptorBuilderTest {
 
     @Test
     public void testEmptyXmlElementAnnotations() {
-        JaxbClassNature ci = new JaxbClassNature(_ciBuilder.buildClassInfo(EmptyXmlElementAnnotations.class));
+        JaxbClassNature ci = new JaxbClassNature(classInfoBuilder.buildClassInfo(EmptyXmlElementAnnotations.class));
         Assert.assertNotNull("ClassInfo generated must not be null", ci);
         Assert.assertNull(ci.getRootElementName());
         Assert.assertNull(ci.getRootElementNamespace());
@@ -170,8 +156,8 @@ public class ClassDescriptorBuilderTest {
 
     @Test
     public void testNamedXmlElementAnnotations() {
-        ClassInfo ci = _ciBuilder.buildClassInfo(NamedXmlElementAnnotations.class);
-        XMLClassDescriptor cd = _cdBuilder.buildClassDescriptor(ci, false);
+        ClassInfo ci = classInfoBuilder.buildClassInfo(NamedXmlElementAnnotations.class);
+        XMLClassDescriptor cd = classDescriptorBuilder.buildClassDescriptor(ci, false);
         Assert.assertNotNull("ClassDescriptor generated must not be null", cd);
         Assert.assertEquals("NamedXmlElement", cd.getXMLName());
         Assert.assertNull(cd.getNameSpacePrefix());
