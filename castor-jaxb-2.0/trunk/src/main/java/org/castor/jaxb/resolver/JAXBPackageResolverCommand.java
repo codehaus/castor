@@ -16,7 +16,6 @@
 package org.castor.jaxb.resolver;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -34,21 +33,23 @@ import org.exolab.castor.xml.XMLClassDescriptor;
 import org.exolab.castor.xml.util.ResolverPackageCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Joachim Grueneis, jgrueneis AT gmail DOT com
  */
+@Component
 public class JAXBPackageResolverCommand implements ResolverPackageCommand {
     public final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
     /**
      * The Castor JAXB ClassDescriptor builder.
      */
-    private ClassDescriptorBuilder _classDescriptorBuilder;
+    private ClassDescriptorBuilder classDescriptorBuilder;
     /**
      * The Castor JAXB ClassInfo builder.
      */
-    private ClassInfoBuilder _classInfoBuilder;
+    private ClassInfoBuilder classInfoBuilder;
 
     /**
      * Empty default constructor.
@@ -64,7 +65,7 @@ public class JAXBPackageResolverCommand implements ResolverPackageCommand {
         if (classDescriptorBuilder == null) {
             throw new IllegalArgumentException("ClassDescriptorBuilder must not be set to null.");
         }
-        _classDescriptorBuilder = classDescriptorBuilder;
+        this.classDescriptorBuilder = classDescriptorBuilder;
     }
 
     /**
@@ -74,7 +75,7 @@ public class JAXBPackageResolverCommand implements ResolverPackageCommand {
         if (classInfoBuilder == null) {
             throw new IllegalArgumentException("ClassInfoBuilder must not be set to null.");
         }
-        _classInfoBuilder = classInfoBuilder;
+        this.classInfoBuilder = classInfoBuilder;
     }
 
     /**
@@ -136,8 +137,8 @@ public class JAXBPackageResolverCommand implements ResolverPackageCommand {
                             clazz = Class.forName(className);
 
                             XMLClassDescriptor descriptor =
-                                    _classDescriptorBuilder.buildClassDescriptor(
-                                            _classInfoBuilder.buildClassInfo(clazz), false);
+                                    classDescriptorBuilder.buildClassDescriptor(
+                                            classInfoBuilder.buildClassInfo(clazz), false);
 
                             result.put(className, descriptor);
                         }

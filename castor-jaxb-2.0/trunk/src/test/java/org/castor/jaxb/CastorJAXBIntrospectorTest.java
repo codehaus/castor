@@ -16,22 +16,23 @@
 
 package org.castor.jaxb;
 
-import org.castor.entities.Entity;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.JAXBIntrospector;
-import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import org.castor.entities.Entity;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Tests the {@link CastorJAXBContext} class.
@@ -39,6 +40,8 @@ import static org.junit.Assert.assertTrue;
  * @author Jakub Narloch, jmnarloch AT gmail DOT org
  * @version 1.0
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = { "classpath:/castor-jaxb-test-context.xml" })
 public class CastorJAXBIntrospectorTest {
 
      /**

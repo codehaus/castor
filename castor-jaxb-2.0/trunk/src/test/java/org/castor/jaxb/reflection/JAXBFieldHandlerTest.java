@@ -19,6 +19,9 @@ import org.junit.Assert;
 import org.castor.jaxb.exceptions.AdapterException;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import java.lang.reflect.Method;
@@ -28,6 +31,8 @@ import java.lang.reflect.Method;
  * @version $Id$
  *
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = { "classpath:/castor-jaxb-test-context.xml" })
 public class JAXBFieldHandlerTest {
     private JAXBFieldHandlerImpl _fh;
 

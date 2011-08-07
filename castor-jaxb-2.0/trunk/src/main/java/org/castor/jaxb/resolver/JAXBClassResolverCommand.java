@@ -25,18 +25,24 @@ import org.exolab.castor.xml.XMLClassDescriptor;
 import org.exolab.castor.xml.util.ResolverClassCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Joachim Grueneis, jgrueneis AT gmail DOT com
  * @version $Id$
  */
+@Component 
 public class JAXBClassResolverCommand implements ResolverClassCommand {
     public final Logger LOG = LoggerFactory.getLogger(this.getClass());
     
     /** The Castor JAXB ClassDescriptor builder. */
-    private ClassDescriptorBuilder _classDescriptorBuilder;
+    @Autowired
+    private ClassDescriptorBuilder classDescriptorBuilder;
+    
     /** The Castor JAXB ClassInfo builder. */
-    private ClassInfoBuilder _classInfoBuilder;
+    @Autowired
+    private ClassInfoBuilder classInfoBuilder;
 
     /**
      * Default constructor.
@@ -52,7 +58,7 @@ public class JAXBClassResolverCommand implements ResolverClassCommand {
         if (classDescriptorBuilder == null) {
             throw new IllegalArgumentException("ClassDescriptorBuilder must not be set to null.");
         }
-        _classDescriptorBuilder = classDescriptorBuilder;
+        this.classDescriptorBuilder = classDescriptorBuilder;
     }
     
     /**
@@ -62,7 +68,7 @@ public class JAXBClassResolverCommand implements ResolverClassCommand {
         if (classInfoBuilder == null) {
             throw new IllegalArgumentException("ClassInfoBuilder must not be set to null.");
         }
-        _classInfoBuilder = classInfoBuilder;
+        this.classInfoBuilder = classInfoBuilder;
     }
     
     /**
@@ -87,8 +93,8 @@ public class JAXBClassResolverCommand implements ResolverClassCommand {
         try {
             clazz = Class.forName(clazzName);
             XMLClassDescriptor cd = 
-                _classDescriptorBuilder.buildClassDescriptor(
-                        _classInfoBuilder.buildClassInfo(clazz), false);
+                classDescriptorBuilder.buildClassDescriptor(
+                        classInfoBuilder.buildClassInfo(clazz), false);
             hm.put(clazzName, cd);
         } catch (ClassNotFoundException e) {
             String message = "Unable to load class for introspection. Exception: " + e;

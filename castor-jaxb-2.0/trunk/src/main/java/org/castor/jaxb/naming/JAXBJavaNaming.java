@@ -20,6 +20,7 @@ import java.lang.reflect.Method;
 
 import org.castor.xml.JavaNaming;
 import org.castor.xml.JavaNamingImpl;
+import org.springframework.stereotype.Component;
 
 /**
  * JAXB specific implementation of JavaNaming which provides all rules to build
@@ -28,6 +29,7 @@ import org.castor.xml.JavaNamingImpl;
  * @author Joachim Grueneis, jgrueneis_at_codehaus_dot_com
  * @version $Id$
  */
+@Component("jaxbJavaNaming")
 public class JAXBJavaNaming implements JavaNaming {
     /**
      * For all stuff that doesn't differ from Castor implementation this

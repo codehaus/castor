@@ -36,6 +36,7 @@ import org.exolab.castor.xml.XMLClassDescriptor;
 import org.exolab.castor.xml.XMLFieldDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * A service class to build a XMLClassDescriptor instance from ClassInfo. It
@@ -45,6 +46,7 @@ import org.slf4j.LoggerFactory;
  * @author Joachim Grueneis, jgrueneis_at_codehaus_dot_com
  * @version $Id$
  */
+@Component
 public final class ClassDescriptorBuilder {
     public final Logger LOG = LoggerFactory.getLogger(this.getClass());
 

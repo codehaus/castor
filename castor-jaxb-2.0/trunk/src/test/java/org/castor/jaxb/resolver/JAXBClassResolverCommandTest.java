@@ -15,18 +15,20 @@
  */
 package org.castor.jaxb.resolver;
 
-import org.castor.jaxb.reflection.ClassDescriptorBuilder;
-import org.castor.jaxb.reflection.ClassInfoBuilder;
-import org.castor.jaxb.reflection.JAXBClassDescriptorImpl;
-import org.exolab.castor.xml.ResolverException;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.HashMap;
-import java.util.Map;
+
+import org.castor.jaxb.reflection.JAXBClassDescriptorImpl;
+import org.exolab.castor.xml.ResolverException;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Testing the resolver command which is more or less a wrapper of
@@ -38,23 +40,15 @@ import java.util.Map;
  * @author Joachim Grueneis, jgrueneis AT codehaus DOT org
  * @version $Id$
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = { "classpath:/castor-jaxb-test-context.xml" })
 public class JAXBClassResolverCommandTest {
 
-    private JAXBClassResolverCommand _classResolverCommand;
+    @Autowired
+    private JAXBClassResolverCommand classResolverCommand;
+    
     private Map < String, Object > _propertiesMap = 
         new HashMap < String, Object > ();
-
-    /**
-     * Correctly initializes JAXBClassResolverCommand.
-     * @see junit.framework.TestCase#setUp()
-     */
-    @Before
-    public void setUp() {
-        _classResolverCommand = new JAXBClassResolverCommand();
-        _classResolverCommand.setClassInfoBuilder(new ClassInfoBuilder());
-        _classResolverCommand
-                .setClassDescriptorBuilder(new ClassDescriptorBuilder());
-    }
 
     /**
      * Setting ClassDescriptorBuilder to null should fail.
@@ -64,7 +58,7 @@ public class JAXBClassResolverCommandTest {
     @Test
     public void testSetClassDescriptorBuilderToNull() {
         try {
-            _classResolverCommand.setClassDescriptorBuilder(null);
+            classResolverCommand.setClassDescriptorBuilder(null);
             Assert.fail("Setting ClassDescriptorBuilder to null should fail");
         } catch (IllegalArgumentException e) {
             // expected exception
@@ -79,7 +73,7 @@ public class JAXBClassResolverCommandTest {
     @Test
     public void testSetClassInfoBuilderToNull() {
         try {
-            _classResolverCommand.setClassInfoBuilder(null);
+            classResolverCommand.setClassInfoBuilder(null);
             Assert.fail("Setting ClassInfoBuilder to null should fail");
         } catch (IllegalArgumentException e) {
             // expected exception
@@ -94,7 +88,7 @@ public class JAXBClassResolverCommandTest {
     @Test
     public void testResolveNull() {
         try {
-            Map descriptorMap = _classResolverCommand.resolve(null, _propertiesMap);
+            Map descriptorMap = classResolverCommand.resolve(null, _propertiesMap);
             Assert.assertTrue("Resolving null should lead to an empty map", 
                     descriptorMap.isEmpty());
         } catch (ResolverException e) {
@@ -122,7 +116,7 @@ public class JAXBClassResolverCommandTest {
     @Test
     public void testResolveArtist() {
         try {
-            Map descriptorMap = _classResolverCommand.resolve(
+            Map descriptorMap = classResolverCommand.resolve(
                     Artist.class.getName(), _propertiesMap);
             Assert.assertFalse("Resolving Artist should lead to a non empty map", 
                     descriptorMap.isEmpty());

@@ -42,6 +42,9 @@ import javax.xml.transform.stream.StreamSource;
 import org.castor.entities.Entity;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
@@ -49,6 +52,8 @@ import org.xml.sax.XMLReader;
 /**
  * Tests the {@link CastorUnmarshaller} class.
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = { "classpath:/castor-jaxb-test-context.xml" })
 public class CastorUnmarshallerTest {
 
     /**

@@ -16,9 +16,14 @@
 package org.castor.jaxb.reflection;
 
 import org.junit.Assert;
+import org.castor.core.annotationprocessing.AnnotationProcessingService;
 import org.castor.jaxb.reflection.info.FieldInfo;
 import org.castor.jaxb.reflection.info.JaxbFieldNature;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.xml.bind.annotation.XmlAnyAttribute;
 import javax.xml.bind.annotation.XmlAnyElement;
@@ -49,7 +54,12 @@ import java.util.List;
  * @author Joachim Grueneis, jgrueneis_at_codehaus_dot_org
  * @version $Id$
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = { "classpath:/castor-jaxb-test-context.xml" })
 public class FieldAnnotationProcessingServiceTest {
+
+    @Autowired
+    private AnnotationProcessingService fieldAnnotationProcessingService;
 
     private static class NotASingleField {  
         @XmlAttribute(name = "Hugo")
@@ -68,19 +78,18 @@ public class FieldAnnotationProcessingServiceTest {
     public void testProcessAnnotations() {
         Class < NotASingleField > clazz = NotASingleField.class;
         Assert.assertFalse(clazz.isEnum());
-        FieldAnnotationProcessingServiceImpl faps = new FieldAnnotationProcessingServiceImpl();
-        Assert.assertNotNull(faps);
+        Assert.assertNotNull(fieldAnnotationProcessingService);
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
             Field field = fields[i];
             JaxbFieldNature fi = new JaxbFieldNature(new FieldInfo(field.getName()));
-            faps.processAnnotations(fi, field.getAnnotations());
+            fieldAnnotationProcessingService.processAnnotations(fi, field.getAnnotations());
         }
         Method[] methods = clazz.getDeclaredMethods();
         for (int i = 0; i < methods.length; i++) {
             Method method = methods[i];
             JaxbFieldNature fi = new JaxbFieldNature(new FieldInfo(method.getName()));
-            faps.processAnnotations(fi, method.getAnnotations());
+            fieldAnnotationProcessingService.processAnnotations(fi, method.getAnnotations());
         }
     }
 
@@ -93,13 +102,12 @@ public class FieldAnnotationProcessingServiceTest {
     public void testWithXmlElement() {
         Class < WithXmlElement > clazz = WithXmlElement.class;
         Assert.assertFalse(clazz.isEnum());
-        FieldAnnotationProcessingServiceImpl faps = new FieldAnnotationProcessingServiceImpl();
-        Assert.assertNotNull(faps);
+        Assert.assertNotNull(fieldAnnotationProcessingService);
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
             Field field = fields[i];
             JaxbFieldNature fi = new JaxbFieldNature(new FieldInfo(field.getName()));
-            faps.processAnnotations(fi, field.getAnnotations());
+            fieldAnnotationProcessingService.processAnnotations(fi, field.getAnnotations());
             if ("anythingInAList".equals(field.getName())) {
                 Assert.assertTrue(fi.hasXmlElement());
                 Assert.assertEquals("Franz", fi.getElementName());
@@ -119,13 +127,12 @@ public class FieldAnnotationProcessingServiceTest {
     public final void testWithXmlAttribute() {
         Class < WithXmlAttribute > clazz = WithXmlAttribute.class;
         Assert.assertFalse(clazz.isEnum());
-        FieldAnnotationProcessingServiceImpl faps = new FieldAnnotationProcessingServiceImpl();
-        Assert.assertNotNull(faps);
+        Assert.assertNotNull(fieldAnnotationProcessingService);
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
             Field field = fields[i];
             JaxbFieldNature fi = new JaxbFieldNature(new FieldInfo(field.getName()));
-            faps.processAnnotations(fi, field.getAnnotations());
+            fieldAnnotationProcessingService.processAnnotations(fi, field.getAnnotations());
             if ("anythingInAList".equals(field.getName())) {
                 Assert.assertTrue(fi.hasXmlAttribute());
                 Assert.assertEquals("Franz", fi.getAttributeName());
@@ -143,13 +150,12 @@ public class FieldAnnotationProcessingServiceTest {
     public final void testWithXmlElements() {
         Class < WithXmlElements > clazz = WithXmlElements.class;
         Assert.assertFalse(clazz.isEnum());
-        FieldAnnotationProcessingServiceImpl faps = new FieldAnnotationProcessingServiceImpl();
-        Assert.assertNotNull(faps);
+        Assert.assertNotNull(fieldAnnotationProcessingService);
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
             Field field = fields[i];
             JaxbFieldNature fi = new JaxbFieldNature(new FieldInfo(field.getName()));
-            faps.processAnnotations(fi, field.getAnnotations());
+            fieldAnnotationProcessingService.processAnnotations(fi, field.getAnnotations());
             if ("anythingInAList".equals(field.getName())) {
                 Assert.assertTrue(fi.hasXmlElements());
 //                List<XmlElement> xmlElements = fi.getXmlElements();
@@ -161,7 +167,7 @@ public class FieldAnnotationProcessingServiceTest {
         for (int i = 0; i < methods.length; i++) {
             Method method = methods[i];
             JaxbFieldNature fi = new JaxbFieldNature(new FieldInfo(method.getName()));
-            faps.processAnnotations(fi, method.getAnnotations());
+            fieldAnnotationProcessingService.processAnnotations(fi, method.getAnnotations());
         }
     }
 
@@ -174,13 +180,12 @@ public class FieldAnnotationProcessingServiceTest {
     public final void testWithXmlElementRef() {
         Class < WithXmlElementRef> clazz = WithXmlElementRef.class;
         Assert.assertFalse(clazz.isEnum());
-        FieldAnnotationProcessingServiceImpl faps = new FieldAnnotationProcessingServiceImpl();
-        Assert.assertNotNull(faps);
+        Assert.assertNotNull(fieldAnnotationProcessingService);
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
             Field field = fields[i];
             JaxbFieldNature fi = new JaxbFieldNature(new FieldInfo(field.getName()));
-            faps.processAnnotations(fi, field.getAnnotations());
+            fieldAnnotationProcessingService.processAnnotations(fi, field.getAnnotations());
             if ("anythingInAList".equals(field.getName())) {
                 Assert.assertTrue(fi.hasXmlElementRef());
                 Assert.assertEquals("Franz", fi.getElementRefName());
@@ -199,13 +204,12 @@ public class FieldAnnotationProcessingServiceTest {
     public final void testWithXmlElementRefs() {
         Class < WithXmlElementRefs> clazz = WithXmlElementRefs.class;
         Assert.assertFalse(clazz.isEnum());
-        FieldAnnotationProcessingServiceImpl faps = new FieldAnnotationProcessingServiceImpl();
-        Assert.assertNotNull(faps);
+        Assert.assertNotNull(fieldAnnotationProcessingService);
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
             Field field = fields[i];
             JaxbFieldNature fi = new JaxbFieldNature(new FieldInfo(field.getName()));
-            faps.processAnnotations(fi, field.getAnnotations());
+            fieldAnnotationProcessingService.processAnnotations(fi, field.getAnnotations());
             if ("anythingInAList".equals(field.getName())) {
                 Assert.assertTrue(fi.hasXmlElementRefs());
             }
@@ -222,13 +226,12 @@ public class FieldAnnotationProcessingServiceTest {
     public void testWithXmlElementWrapper() {
         Class < WithXmlElementWrapper> clazz = WithXmlElementWrapper.class;
         Assert.assertFalse(clazz.isEnum());
-        FieldAnnotationProcessingServiceImpl faps = new FieldAnnotationProcessingServiceImpl();
-        Assert.assertNotNull(faps);
+        Assert.assertNotNull(fieldAnnotationProcessingService);
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
             Field field = fields[i];
             JaxbFieldNature fi = new JaxbFieldNature(new FieldInfo(field.getName()));
-            faps.processAnnotations(fi, field.getAnnotations());
+            fieldAnnotationProcessingService.processAnnotations(fi, field.getAnnotations());
             if ("anythingInAList".equals(field.getName())) {
                 Assert.assertTrue(fi.hasXmlElementWrapper());
                 Assert.assertEquals("theWrapper", fi.getElementWrapperName());
@@ -248,13 +251,12 @@ public class FieldAnnotationProcessingServiceTest {
     public final void testWithXmlAnyElement() {
         Class < WithXmlAnyElement> clazz = WithXmlAnyElement.class;
         Assert.assertFalse(clazz.isEnum());
-        FieldAnnotationProcessingServiceImpl faps = new FieldAnnotationProcessingServiceImpl();
-        Assert.assertNotNull(faps);
+        Assert.assertNotNull(fieldAnnotationProcessingService);
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
             Field field = fields[i];
             JaxbFieldNature fi = new JaxbFieldNature(new FieldInfo(field.getName()));
-            faps.processAnnotations(fi, field.getAnnotations());
+            fieldAnnotationProcessingService.processAnnotations(fi, field.getAnnotations());
             if ("anythingInAList".equals(field.getName())) {
                 Assert.assertTrue(fi.hasXmlAnyElement());
                 Assert.assertTrue(fi.getAnyElementLax());
@@ -272,13 +274,12 @@ public class FieldAnnotationProcessingServiceTest {
     public void testWithXmlAnyAttribute() {
         Class < WithXmlAnyAttribute> clazz = WithXmlAnyAttribute.class;
         Assert.assertFalse(clazz.isEnum());
-        FieldAnnotationProcessingServiceImpl faps = new FieldAnnotationProcessingServiceImpl();
-        Assert.assertNotNull(faps);
+        Assert.assertNotNull(fieldAnnotationProcessingService);
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
             Field field = fields[i];
             JaxbFieldNature fi = new JaxbFieldNature(new FieldInfo(field.getName()));
-            faps.processAnnotations(fi, field.getAnnotations());
+            fieldAnnotationProcessingService.processAnnotations(fi, field.getAnnotations());
             if ("anythingInAList".equals(field.getName())) {
                 Assert.assertTrue(fi.hasXmlAnyAttribute());
             }
@@ -294,13 +295,12 @@ public class FieldAnnotationProcessingServiceTest {
     public void testWithXmlTransient() {
         Class < WithXmlTransient> clazz = WithXmlTransient.class;
         Assert.assertFalse(clazz.isEnum());
-        FieldAnnotationProcessingServiceImpl faps = new FieldAnnotationProcessingServiceImpl();
-        Assert.assertNotNull(faps);
+        Assert.assertNotNull(fieldAnnotationProcessingService);
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
             Field field = fields[i];
             JaxbFieldNature fi = new JaxbFieldNature(new FieldInfo(field.getName()));
-            faps.processAnnotations(fi, field.getAnnotations());
+            fieldAnnotationProcessingService.processAnnotations(fi, field.getAnnotations());
             if ("anythingInAList".equals(field.getName())) {
                 Assert.assertTrue(fi.hasXmlTransient());
             }
@@ -316,13 +316,12 @@ public class FieldAnnotationProcessingServiceTest {
     public final void testWithXmlValue() {
         Class < WithXmlValue> clazz = WithXmlValue.class;
         Assert.assertFalse(clazz.isEnum());
-        FieldAnnotationProcessingServiceImpl faps = new FieldAnnotationProcessingServiceImpl();
-        Assert.assertNotNull(faps);
+        Assert.assertNotNull(fieldAnnotationProcessingService);
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
             Field field = fields[i];
             JaxbFieldNature fi = new JaxbFieldNature(new FieldInfo(field.getName()));
-            faps.processAnnotations(fi, field.getAnnotations());
+            fieldAnnotationProcessingService.processAnnotations(fi, field.getAnnotations());
             if ("anythingInAList".equals(field.getName())) {
                 Assert.assertTrue(fi.hasXmlValue());
                 
@@ -339,13 +338,12 @@ public class FieldAnnotationProcessingServiceTest {
     public final void testWithXmlID() {
         Class < WithXmlID> clazz = WithXmlID.class;
         Assert.assertFalse(clazz.isEnum());
-        FieldAnnotationProcessingServiceImpl faps = new FieldAnnotationProcessingServiceImpl();
-        Assert.assertNotNull(faps);
+        Assert.assertNotNull(fieldAnnotationProcessingService);
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
             Field field = fields[i];
             JaxbFieldNature fi = new JaxbFieldNature(new FieldInfo(field.getName()));
-            faps.processAnnotations(fi, field.getAnnotations());
+            fieldAnnotationProcessingService.processAnnotations(fi, field.getAnnotations());
             if ("anythingInAList".equals(field.getName())) {
                 Assert.assertTrue(fi.hasXmlID());
                 
@@ -362,13 +360,12 @@ public class FieldAnnotationProcessingServiceTest {
     public final void testWithXmlIDREF() {
         Class < WithXmlIDREF> clazz = WithXmlIDREF.class;
         Assert.assertFalse(clazz.isEnum());
-        FieldAnnotationProcessingServiceImpl faps = new FieldAnnotationProcessingServiceImpl();
-        Assert.assertNotNull(faps);
+        Assert.assertNotNull(fieldAnnotationProcessingService);
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
             Field field = fields[i];
             JaxbFieldNature fi = new JaxbFieldNature(new FieldInfo(field.getName()));
-            faps.processAnnotations(fi, field.getAnnotations());
+            fieldAnnotationProcessingService.processAnnotations(fi, field.getAnnotations());
             if ("anythingInAList".equals(field.getName())) {
                 Assert.assertTrue(fi.hasXmlIDREF());
                 
@@ -385,13 +382,12 @@ public class FieldAnnotationProcessingServiceTest {
     public final void testWithXmlList() {
         Class < WithXmlList> clazz = WithXmlList.class;
         Assert.assertFalse(clazz.isEnum());
-        FieldAnnotationProcessingServiceImpl faps = new FieldAnnotationProcessingServiceImpl();
-        Assert.assertNotNull(faps);
+        Assert.assertNotNull(fieldAnnotationProcessingService);
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
             Field field = fields[i];
             JaxbFieldNature fi = new JaxbFieldNature(new FieldInfo(field.getName()));
-            faps.processAnnotations(fi, field.getAnnotations());
+            fieldAnnotationProcessingService.processAnnotations(fi, field.getAnnotations());
             if ("anythingInAList".equals(field.getName())) {
                 Assert.assertTrue(fi.hasXmlList());
                 
@@ -408,13 +404,12 @@ public class FieldAnnotationProcessingServiceTest {
     public final void testWithXmlMixed() {
         Class < WithXmlMixed> clazz = WithXmlMixed.class;
         Assert.assertFalse(clazz.isEnum());
-        FieldAnnotationProcessingServiceImpl faps = new FieldAnnotationProcessingServiceImpl();
-        Assert.assertNotNull(faps);
+        Assert.assertNotNull(fieldAnnotationProcessingService);
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
             Field field = fields[i];
             JaxbFieldNature fi = new JaxbFieldNature(new FieldInfo(field.getName()));
-            faps.processAnnotations(fi, field.getAnnotations());
+            fieldAnnotationProcessingService.processAnnotations(fi, field.getAnnotations());
             if ("anythingInAList".equals(field.getName())) {
                 Assert.assertTrue(fi.hasXmlMixed());
                 
@@ -431,13 +426,12 @@ public class FieldAnnotationProcessingServiceTest {
     public void testWithXmlMimeType() {
         Class < WithXmlMimeType> clazz = WithXmlMimeType.class;
         Assert.assertFalse(clazz.isEnum());
-        FieldAnnotationProcessingServiceImpl faps = new FieldAnnotationProcessingServiceImpl();
-        Assert.assertNotNull(faps);
+        Assert.assertNotNull(fieldAnnotationProcessingService);
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
             Field field = fields[i];
             JaxbFieldNature fi = new JaxbFieldNature(new FieldInfo(field.getName()));
-            faps.processAnnotations(fi, field.getAnnotations());
+            fieldAnnotationProcessingService.processAnnotations(fi, field.getAnnotations());
             if ("anythingInAList".equals(field.getName())) {
                 Assert.assertTrue(fi.hasXmlMimeType());
                 Assert.assertEquals("text/xml", fi.getMimtType());
@@ -454,13 +448,12 @@ public class FieldAnnotationProcessingServiceTest {
     public final void testWithXmlAttachmentRef() {
         Class < WithXmlAttachmentRef> clazz = WithXmlAttachmentRef.class;
         Assert.assertFalse(clazz.isEnum());
-        FieldAnnotationProcessingServiceImpl faps = new FieldAnnotationProcessingServiceImpl();
-        Assert.assertNotNull(faps);
+        Assert.assertNotNull(fieldAnnotationProcessingService);
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
             Field field = fields[i];
             JaxbFieldNature fi = new JaxbFieldNature(new FieldInfo(field.getName()));
-            faps.processAnnotations(fi, field.getAnnotations());
+            fieldAnnotationProcessingService.processAnnotations(fi, field.getAnnotations());
             if ("anythingInAList".equals(field.getName())) {
                 Assert.assertTrue(fi.hasXmlAttachmentRef());
                 
@@ -477,13 +470,12 @@ public class FieldAnnotationProcessingServiceTest {
     public void testWithXmlInlineBinaryData() {
         Class < WithXmlInlineBinaryData> clazz = WithXmlInlineBinaryData.class;
         Assert.assertFalse(clazz.isEnum());
-        FieldAnnotationProcessingServiceImpl faps = new FieldAnnotationProcessingServiceImpl();
-        Assert.assertNotNull(faps);
+        Assert.assertNotNull(fieldAnnotationProcessingService);
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
             Field field = fields[i];
             JaxbFieldNature fi = new JaxbFieldNature(new FieldInfo(field.getName()));
-            faps.processAnnotations(fi, field.getAnnotations());
+            fieldAnnotationProcessingService.processAnnotations(fi, field.getAnnotations());
             if ("anythingInAList".equals(field.getName())) {
                 Assert.assertTrue(fi.hasXmlInlineBinaryData());
                 
@@ -501,13 +493,12 @@ public class FieldAnnotationProcessingServiceTest {
     public void testWithEnumValue() {
         Class < WithEnumValue> clazz = WithEnumValue.class;
         Assert.assertTrue(clazz.isEnum());
-        FieldAnnotationProcessingServiceImpl faps = new FieldAnnotationProcessingServiceImpl();
-        Assert.assertNotNull(faps);
+        Assert.assertNotNull(fieldAnnotationProcessingService);
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
             Field field = fields[i];
             JaxbFieldNature fi = new JaxbFieldNature(new FieldInfo(field.getName()));
-            faps.processAnnotations(fi, field.getAnnotations());
+            fieldAnnotationProcessingService.processAnnotations(fi, field.getAnnotations());
             if ("ONE".equals(field.getName())) {
                 Assert.assertTrue(fi.hasXmlEnumValue());
                 

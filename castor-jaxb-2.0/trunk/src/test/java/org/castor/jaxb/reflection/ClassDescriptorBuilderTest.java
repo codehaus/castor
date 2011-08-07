@@ -26,6 +26,9 @@ import org.castor.xml.XMLNaming;
 import org.exolab.castor.xml.XMLClassDescriptor;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -38,6 +41,8 @@ import java.util.List;
  * @author Joachim Grueneis, jgrueneis_at_gmail_dot_com
  * @version $Id$
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = { "classpath:/castor-jaxb-test-context.xml" })
 public class ClassDescriptorBuilderTest {
     private ClassInfoBuilder _ciBuilder;
     /** The ClassDescriptorBuilder to test. */
