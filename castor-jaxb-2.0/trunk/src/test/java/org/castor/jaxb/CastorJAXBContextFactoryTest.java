@@ -20,6 +20,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.xml.bind.JAXBContext;
@@ -38,6 +39,8 @@ import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
  * @author Jakub Narloch, jmnarloch AT gmail DOT org
  * @version 1.0
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = { "classpath:/castor-jaxb-test-context.xml" })
 public class CastorJAXBContextFactoryTest {
 
     /**

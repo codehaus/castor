@@ -20,6 +20,9 @@ import org.castor.jaxb.integrationtests.tests.test1.USAddress;
 import org.castor.jaxb.reflection.info.JaxbPackageNature;
 import org.castor.jaxb.reflection.info.PackageInfo;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import java.lang.annotation.Annotation;
@@ -32,6 +35,8 @@ import java.lang.annotation.Annotation;
  * @author Joachim Grueneis, jgrueneis_at_gmail_dot_com
  * @version $Id$
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = { "classpath:/castor-jaxb-test-context.xml" })
 public class PackageAnnotationProcessingServiceTest {
     
     /**

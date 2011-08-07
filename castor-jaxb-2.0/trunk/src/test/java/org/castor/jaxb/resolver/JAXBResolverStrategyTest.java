@@ -15,22 +15,23 @@
  */
 package org.castor.jaxb.resolver;
 
-import org.junit.Assert;
-import junit.framework.TestCase;
-import org.castor.jaxb.reflection.ClassDescriptorBuilder;
-import org.castor.jaxb.reflection.ClassInfoBuilder;
-import org.exolab.castor.xml.ResolverException;
-import org.exolab.castor.xml.XMLClassDescriptor;
-import org.exolab.castor.xml.util.ResolverStrategy;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.exolab.castor.xml.ResolverException;
+import org.exolab.castor.xml.XMLClassDescriptor;
+import org.exolab.castor.xml.util.ResolverStrategy;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * To test the resolver strategy for Castor running in JAXB compliance
@@ -40,9 +41,13 @@ import java.util.Map;
  * @version $Id$
  *
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = { "classpath:/castor-jaxb-test-context.xml" })
 public class JAXBResolverStrategyTest {
 
+    @Autowired
     private JAXBResolverStrategy _strategy;
+    
     private MyResolverResults _resolverResults;
 
     /**
@@ -51,12 +56,6 @@ public class JAXBResolverStrategyTest {
      */
     @Before
     public void setUp() {
-        _strategy = new JAXBResolverStrategy();
-        JAXBClassResolverCommand classResolverCommand = new JAXBClassResolverCommand();
-        classResolverCommand.setClassDescriptorBuilder(new ClassDescriptorBuilder());
-        classResolverCommand.setClassInfoBuilder(new ClassInfoBuilder());
-        _strategy.setClassResolverCommand(classResolverCommand);
-        _strategy.setPackageResolverCommand(new JAXBPackageResolverCommand());
         _resolverResults = new MyResolverResults();
     }
 

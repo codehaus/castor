@@ -24,20 +24,25 @@ import org.exolab.castor.xml.XMLClassDescriptor;
 import org.exolab.castor.xml.util.ResolverStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Joachim Grueneis, jgrueneis AT gmail DOT com
  * @version $Id$
  */
+@Component
 public class JAXBResolverStrategy implements ResolverStrategy {
     public final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
     /** The strategy configuration held as map of properties. */
     private Map < String, Object > _properties;
+
+    @Autowired
+    private JAXBClassResolverCommand classResolverCommand;
     
-    private JAXBClassResolverCommand _classResolverCommand;
-    
-    private JAXBPackageResolverCommand _packageResolverCommand;
+    @Autowired
+    private JAXBPackageResolverCommand packageResolverCommand;
     
     /**
      * 
@@ -72,7 +77,7 @@ public class JAXBResolverStrategy implements ResolverStrategy {
 //        }
 
         resolverResults.addAllDescriptors(
-                _classResolverCommand.resolve(className, _properties));
+                classResolverCommand.resolve(className, _properties));
         descriptor = resolverResults.getDescriptor(className);
 
         return descriptor;
@@ -95,7 +100,7 @@ public class JAXBResolverStrategy implements ResolverStrategy {
             throw new IllegalArgumentException(message);
         }
         resolverResults.addAllDescriptors(
-                _packageResolverCommand.resolve(packageName, _properties));
+                packageResolverCommand.resolve(packageName, _properties));
     }
 
     /**
@@ -106,10 +111,10 @@ public class JAXBResolverStrategy implements ResolverStrategy {
     }
     
     public void setClassResolverCommand(JAXBClassResolverCommand classResolverCommand) {
-        _classResolverCommand = classResolverCommand;
+        this.classResolverCommand = classResolverCommand;
     }
     
     public void setPackageResolverCommand(JAXBPackageResolverCommand packageResolverCommand) {
-        _packageResolverCommand = packageResolverCommand;
+        this.packageResolverCommand = packageResolverCommand;
     }
 }
