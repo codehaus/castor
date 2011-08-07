@@ -18,9 +18,9 @@ package org.castor.jaxb;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import java.util.Map;
-import java.util.logging.LogManager;
 
 /**
  * This is a factory class that will registered within jaxb.properties file and will responsible for creating the {@link
@@ -50,9 +50,10 @@ public class CastorJAXBContextFactory {
      *
      * @return the newly created {@link JAXBContext}
      *
+     * @throws IllegalArgumentException if contextPath is null or empty or classLoader or properites are null
      * @throws JAXBException if any error occurs when creating the {@link JAXBContext}
      */
-    public static javax.xml.bind.JAXBContext createContext(String contextPath, ClassLoader classLoader,
+    public static JAXBContext createContext(String contextPath, ClassLoader classLoader,
                                                            Map<String, Object> properties) throws JAXBException {
         try {
             // checks input
@@ -89,9 +90,10 @@ public class CastorJAXBContextFactory {
      *
      * @return the newly created {@link JAXBContext}
      *
+     * @throws IllegalArgumentException if classes or properties are null
      * @throws JAXBException if any error occurs when creating the {@link JAXBContext}
      */
-    public static javax.xml.bind.JAXBContext createContext(Class[] classes, Map<String, Object> properties)
+    public static JAXBContext createContext(Class[] classes, Map<String, Object> properties)
             throws JAXBException {
 
         try {

@@ -30,6 +30,7 @@ import org.exolab.castor.xml.XMLContext;
 import org.w3c.dom.Node;
 
 import javax.xml.bind.Binder;
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.JAXBIntrospector;
 import javax.xml.bind.Marshaller;
@@ -46,7 +47,7 @@ import java.util.Map;
  * @author Jakub Narloch, jmnarloch AT gmail DOT org
  * @version 1.0
  */
-public class CastorJAXBContext extends javax.xml.bind.JAXBContext {
+public class CastorJAXBContext extends JAXBContext {
 
     /**
      * Represents the {@link XMLContext} instance used for configuring the backend marshalling framework.

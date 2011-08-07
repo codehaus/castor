@@ -16,8 +16,9 @@
 package org.castor.jaxb.adapters;
 
 import org.castor.jaxb.CastorJAXBUtils;
-import org.castor.jaxb.Marshaller;
 import org.exolab.castor.xml.MarshalListener;
+
+import javax.xml.bind.Marshaller;
 
 /**
  * Implements the Castor MarshalListener and translates each Castor listener

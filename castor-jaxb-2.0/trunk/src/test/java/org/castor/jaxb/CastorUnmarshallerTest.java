@@ -24,8 +24,10 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.UnmarshallerHandler;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -52,7 +54,7 @@ public class CastorUnmarshallerTest {
     /**
      * Represents the instance of the tested class.
      */
-    private javax.xml.bind.Unmarshaller unmarshaller;
+    private Unmarshaller unmarshaller;
 
     /**
      * Represents the input xml.
@@ -67,7 +69,7 @@ public class CastorUnmarshallerTest {
      */
     @Before
     public void setUp() throws JAXBException {
-        javax.xml.bind.JAXBContext context = javax.xml.bind.JAXBContext.newInstance(Entity.class);
+        JAXBContext context = JAXBContext.newInstance(Entity.class);
         unmarshaller = context.createUnmarshaller();
     }
 

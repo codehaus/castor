@@ -15,9 +15,9 @@
  */
 package org.castor.jaxb.allannotations;
 
-import org.castor.jaxb.JAXBContext;
 import org.junit.Test;
 
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.annotation.XmlValue;
@@ -32,17 +32,12 @@ public class XmlValueTest {
 
     @Test
     public void testFullCycle() throws JAXBException {
-        javax.xml.bind.JAXBContext context = JAXBContext.newInstance(ForXmlValue.class);
+        JAXBContext context = JAXBContext.newInstance(ForXmlValue.class);
         Marshaller m = context.createMarshaller();
         StringWriter sw = new StringWriter();
         ForXmlValue fxv = new ForXmlValue();
         fxv.content = new BigDecimal(4711);
         m.marshal(fxv, sw);
         System.out.println(sw.toString());
-    }
-
-    private class ForXmlValue {
-        @XmlValue
-        private BigDecimal content;
     }
 }

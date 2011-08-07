@@ -69,7 +69,7 @@ public class CastorUnmarshaller implements Unmarshaller {
     /**
      * Represents the unmarshalling listener.
      */
-    private Listener listener;
+    private Unmarshaller.Listener listener;
 
     /**
      * Creates new instance of {@link CastorUnmarshaller} with the given {@link org.exolab.castor.xml.Unmarshaller}
@@ -473,7 +473,7 @@ public class CastorUnmarshaller implements Unmarshaller {
     /**
      * {@inheritDoc}
      */
-    public void setListener(Listener listener) {
+    public void setListener(Unmarshaller.Listener listener) {
 
         this.listener = listener;
         unmarshaller.setUnmarshalListener(new UnmarshalListenerAdapter(listener));
