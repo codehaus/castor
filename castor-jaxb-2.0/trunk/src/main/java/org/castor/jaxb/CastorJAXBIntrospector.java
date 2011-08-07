@@ -15,12 +15,12 @@
  */
 package org.castor.jaxb;
 
+import javax.xml.bind.JAXBIntrospector;
+import javax.xml.namespace.QName;
+
 import org.exolab.castor.xml.ResolverException;
 import org.exolab.castor.xml.XMLClassDescriptor;
 import org.exolab.castor.xml.XMLClassDescriptorResolver;
-
-import javax.xml.bind.JAXBIntrospector;
-import javax.xml.namespace.QName;
 
 /**
  * The implementation of {@link JAXBIntrospector} which delegates to {@link XMLClassDescriptorResolver} in other

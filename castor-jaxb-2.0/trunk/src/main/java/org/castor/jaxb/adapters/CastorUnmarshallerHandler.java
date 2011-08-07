@@ -18,6 +18,7 @@ package org.castor.jaxb.adapters;
 
 import org.castor.jaxb.CastorJAXBUtils;
 import org.exolab.castor.xml.UnmarshalHandler;
+import org.springframework.stereotype.Component;
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;

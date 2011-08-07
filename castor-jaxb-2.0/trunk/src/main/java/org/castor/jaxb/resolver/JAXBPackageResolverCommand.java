@@ -43,23 +43,17 @@ public class JAXBPackageResolverCommand implements ResolverPackageCommand {
     public final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
     /**
-     * The Castor JAXB ClassDescriptor builder.
+     * Castor JAXB ClassDescriptor builder.
      */
     private ClassDescriptorBuilder classDescriptorBuilder;
     /**
-     * The Castor JAXB ClassInfo builder.
+     * Castor JAXB ClassInfo builder.
      */
     private ClassInfoBuilder classInfoBuilder;
 
     /**
-     * Empty default constructor.
-     */
-    public JAXBPackageResolverCommand() {
-        super();
-    }
-
-    /**
-     * @param classDescriptorBuilder The Castor JAXB ClassDescriptor builder.
+     * @param classDescriptorBuilder
+     *            The Castor JAXB ClassDescriptor builder.
      */
     public void setClassDescriptorBuilder(final ClassDescriptorBuilder classDescriptorBuilder) {
         if (classDescriptorBuilder == null) {
@@ -69,7 +63,8 @@ public class JAXBPackageResolverCommand implements ResolverPackageCommand {
     }
 
     /**
-     * @param classInfoBuilder The Castor JAXB ClassInfo builder.
+     * @param classInfoBuilder
+     *            The Castor JAXB ClassInfo builder.
      */
     public void setClassInfoBuilder(final ClassInfoBuilder classInfoBuilder) {
         if (classInfoBuilder == null) {
@@ -79,18 +74,21 @@ public class JAXBPackageResolverCommand implements ResolverPackageCommand {
     }
 
     /**
-     * The one and only purpose resolver commands are good for ;-) . It can be called with className and clazz set, so
-     * the command decides which suites it best or at least one of the two arguments set.
-     *
-     * @param packageName the name of the package to resolve
-     * @param properties  the Properties to be used at resolve
-     *
+     * The one and only purpose resolver commands are good for ;-) . It can be
+     * called with className and clazz set, so the command decides which suites
+     * it best or at least one of the two arguments set.
+     * 
+     * @param packageName
+     *            the name of the package to resolve
+     * @param properties
+     *            the Properties to be used at resolve
+     * 
      * @return a Map of className and XMLClassDescriptor
-     *
-     * @throws ResolverException in case that resolving fails fatally
+     * 
+     * @throws ResolverException
+     *             in case that resolving fails fatally
      */
-    public Map<String, XMLClassDescriptor> resolve(
-            final String packageName, final Map properties)
+    public Map<String, XMLClassDescriptor> resolve(final String packageName, final Map properties)
             throws ResolverException {
 
         String className;
@@ -128,17 +126,13 @@ public class JAXBPackageResolverCommand implements ResolverPackageCommand {
 
                         if (file.getName().endsWith(".class")) {
                             fileName = file.getName();
-                            className = new StringBuffer()
-                                    .append(packageName)
-                                    .append('.')
-                                    .append(fileName.substring(0, fileName.length() - 6))
-                                    .toString();
+                            className = new StringBuffer().append(packageName).append('.')
+                                    .append(fileName.substring(0, fileName.length() - 6)).toString();
 
                             clazz = Class.forName(className);
 
-                            XMLClassDescriptor descriptor =
-                                    classDescriptorBuilder.buildClassDescriptor(
-                                            classInfoBuilder.buildClassInfo(clazz), false);
+                            XMLClassDescriptor descriptor = classDescriptorBuilder.buildClassDescriptor(
+                                    classInfoBuilder.buildClassInfo(clazz), false);
 
                             result.put(className, descriptor);
                         }

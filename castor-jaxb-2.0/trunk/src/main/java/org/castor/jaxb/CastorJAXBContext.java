@@ -143,8 +143,6 @@ public class CastorJAXBContext extends JAXBContext {
      */
     @Override
     public Marshaller createMarshaller() throws JAXBException {
-
-        // creates new instance of CastorMarshaller
         return new CastorMarshaller(xmlContext.createMarshaller());
     }
 
@@ -153,8 +151,6 @@ public class CastorJAXBContext extends JAXBContext {
      */
     @Override
     public Unmarshaller createUnmarshaller() throws JAXBException {
-
-        // creates new instance of CastorUnmarshaller
         return new CastorUnmarshaller(xmlContext.createUnmarshaller());
     }
 
@@ -191,7 +187,6 @@ public class CastorJAXBContext extends JAXBContext {
      */
     @Override
     public JAXBIntrospector createJAXBIntrospector() {
-
         return new CastorJAXBIntrospector(xmlContext.getInternalContext().getXMLClassDescriptorResolver());
     }
 

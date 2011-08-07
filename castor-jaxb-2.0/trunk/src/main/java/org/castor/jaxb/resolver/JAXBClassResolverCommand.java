@@ -32,27 +32,25 @@ import org.springframework.stereotype.Component;
  * @author Joachim Grueneis, jgrueneis AT gmail DOT com
  * @version $Id$
  */
-@Component 
+@Component
 public class JAXBClassResolverCommand implements ResolverClassCommand {
     public final Logger LOG = LoggerFactory.getLogger(this.getClass());
-    
-    /** The Castor JAXB ClassDescriptor builder. */
+
+    /**
+     * Castor JAXB ClassDescriptor builder.
+     */
     @Autowired
     private ClassDescriptorBuilder classDescriptorBuilder;
-    
-    /** The Castor JAXB ClassInfo builder. */
+
+    /**
+     * Castor JAXB ClassInfo builder.
+     */
     @Autowired
     private ClassInfoBuilder classInfoBuilder;
 
     /**
-     * Default constructor.
-     */
-    public JAXBClassResolverCommand() {
-        super();
-    }
-    
-    /**
-     * @param classDescriptorBuilder The Castor JAXB ClassDescriptor builder.
+     * @param classDescriptorBuilder
+     *            The Castor JAXB ClassDescriptor builder.
      */
     public void setClassDescriptorBuilder(final ClassDescriptorBuilder classDescriptorBuilder) {
         if (classDescriptorBuilder == null) {
@@ -60,9 +58,10 @@ public class JAXBClassResolverCommand implements ResolverClassCommand {
         }
         this.classDescriptorBuilder = classDescriptorBuilder;
     }
-    
+
     /**
-     * @param classInfoBuilder The Castor JAXB ClassInfo builder.
+     * @param classInfoBuilder
+     *            The Castor JAXB ClassInfo builder.
      */
     public void setClassInfoBuilder(final ClassInfoBuilder classInfoBuilder) {
         if (classInfoBuilder == null) {
@@ -70,31 +69,33 @@ public class JAXBClassResolverCommand implements ResolverClassCommand {
         }
         this.classInfoBuilder = classInfoBuilder;
     }
-    
+
     /**
-     * The one and only purpose resolver commands are good for ;-) . It can
-     * be called with className and clazz set, so the command decides which
-     * suites it best or at least one of the two arguments set.
+     * The one and only purpose resolver commands are good for ;-) . It can be
+     * called with className and clazz set, so the command decides which suites
+     * it best or at least one of the two arguments set.
      * 
-     * @param clazzName the class to resolve
-     * @param properties the Properties to be used at resolve
+     * @param clazzName
+     *            the class to resolve
+     * @param properties
+     *            the Properties to be used at resolve
      * @return a Map of className and XMLClassDescriptor
-     * @throws ResolverException in case that resolving fails fatally
-     * @see org.exolab.castor.xml.util.ResolverClassCommand#resolve(java.lang.String, java.util.Map)
+     * @throws ResolverException
+     *             in case that resolving fails fatally
+     * @see org.exolab.castor.xml.util.ResolverClassCommand#resolve(java.lang.String,
+     *      java.util.Map)
      */
-    public Map<String, XMLClassDescriptor> resolve(
-            final String clazzName, final Map properties) 
-    throws ResolverException {
-        HashMap < String, XMLClassDescriptor > hm = new HashMap < String, XMLClassDescriptor > ();
+    public Map<String, XMLClassDescriptor> resolve(final String clazzName, final Map properties)
+            throws ResolverException {
+        HashMap<String, XMLClassDescriptor> hm = new HashMap<String, XMLClassDescriptor>();
         if (clazzName == null || clazzName.length() == 0) {
             return hm;
         }
-        Class < ? > clazz;
+        Class<?> clazz;
         try {
             clazz = Class.forName(clazzName);
-            XMLClassDescriptor cd = 
-                classDescriptorBuilder.buildClassDescriptor(
-                        classInfoBuilder.buildClassInfo(clazz), false);
+            XMLClassDescriptor cd = classDescriptorBuilder.buildClassDescriptor(classInfoBuilder.buildClassInfo(clazz),
+                    false);
             hm.put(clazzName, cd);
         } catch (ClassNotFoundException e) {
             String message = "Unable to load class for introspection. Exception: " + e;
