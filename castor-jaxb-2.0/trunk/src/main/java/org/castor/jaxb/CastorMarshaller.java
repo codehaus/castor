@@ -40,8 +40,8 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 
 /**
- * The implementation of {@link org.exolab.castor.xml.Marshaller} which wraps the Castor
- * {@link org.exolab.castor.xml.Marshaller} and uses it internally for marshaling.
+ * The implementation of {@link org.exolab.castor.xml.Marshaller} which wraps the Castor {@link
+ * org.exolab.castor.xml.Marshaller} and uses it internally for marshaling.
  *
  * @author Joachim Grueneis, jgrueneis AT codehaus DOT org
  * @author Jakub Narloch, jmnarloch AT gmail DOT org
@@ -214,8 +214,18 @@ public class CastorMarshaller implements Marshaller {
      */
     public void setProperty(String name, Object value) throws PropertyException {
 
-        // sets the property for the internal context
-        marshaller.getInternalContext().setProperty(name, value);
+        if (JAXB_ENCODING.equals(name)) {
+            marshaller.setEncoding(String.valueOf(value));
+        } else if (JAXB_SCHEMA_LOCATION.equals(name)) {
+            marshaller.setSchemaLocation(String.valueOf(value));
+        } else if (JAXB_NO_NAMESPACE_SCHEMA_LOCATION.equals(name)) {
+            marshaller.setNoNamespaceSchemaLocation(String.valueOf(value));
+        } else if (JAXB_FRAGMENT.equals(name)) {
+            marshaller.setMarshalAsDocument(false);
+        } else {
+            // sets the property for the internal context
+            marshaller.getInternalContext().setProperty(name, value);
+        }
     }
 
     /**
