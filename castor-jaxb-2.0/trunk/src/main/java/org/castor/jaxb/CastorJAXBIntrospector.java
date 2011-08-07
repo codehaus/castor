@@ -19,6 +19,7 @@ import org.exolab.castor.xml.ResolverException;
 import org.exolab.castor.xml.XMLClassDescriptor;
 import org.exolab.castor.xml.XMLClassDescriptorResolver;
 
+import javax.xml.bind.JAXBIntrospector;
 import javax.xml.namespace.QName;
 
 /**
@@ -29,7 +30,7 @@ import javax.xml.namespace.QName;
  * @author Jakub Narloch, jmnarloch AT gmail DOT org
  * @version 1.0
  */
-public class CastorJAXBIntrospector extends javax.xml.bind.JAXBIntrospector {
+public class CastorJAXBIntrospector extends JAXBIntrospector {
 
     /**
      * Represents the {@link XMLClassDescriptorResolver} instance used for resolving the objects.
@@ -64,8 +65,12 @@ public class CastorJAXBIntrospector extends javax.xml.bind.JAXBIntrospector {
             descriptor = (XMLClassDescriptor) classDescriptorResolver.resolve(obj.getClass());
 
             if(descriptor != null) {
-                return new QName(descriptor.getNameSpaceURI(), descriptor.getXMLName(),
+                if(descriptor.getNameSpacePrefix() != null) {
+                    return new QName(descriptor.getNameSpaceURI(), descriptor.getXMLName(),
                         descriptor.getNameSpacePrefix());
+                }
+
+                return new QName(descriptor.getNameSpacePrefix(), descriptor.getXMLName());
             }
         } catch (ResolverException e) {
             // ignores exception
