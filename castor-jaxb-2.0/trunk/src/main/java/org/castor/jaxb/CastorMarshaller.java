@@ -51,6 +51,7 @@ public class CastorMarshaller implements Marshaller {
 
     /**
      * Represents the instance of Castor marshaller used for
+     * marshalling.
      */
     private final org.exolab.castor.xml.Marshaller marshaller;
 

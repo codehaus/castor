@@ -35,22 +35,16 @@ import org.springframework.stereotype.Component;
 public class JAXBResolverStrategy implements ResolverStrategy {
     public final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
-    /** The strategy configuration held as map of properties. */
-    private Map < String, Object > _properties;
+    /** 
+     * The strategy configuration held as map of properties.
+     */
+    private Map <String, Object> properties = new HashMap <String, Object>();
 
     @Autowired
     private JAXBClassResolverCommand classResolverCommand;
     
     @Autowired
     private JAXBPackageResolverCommand packageResolverCommand;
-    
-    /**
-     * 
-     */
-    public JAXBResolverStrategy() {
-        super();
-        _properties = new HashMap < String, Object > ();
-    }
 
     /**
      * {@inheritDoc}
@@ -77,7 +71,7 @@ public class JAXBResolverStrategy implements ResolverStrategy {
 //        }
 
         resolverResults.addAllDescriptors(
-                classResolverCommand.resolve(className, _properties));
+                classResolverCommand.resolve(className, properties));
         descriptor = resolverResults.getDescriptor(className);
 
         return descriptor;
@@ -100,14 +94,14 @@ public class JAXBResolverStrategy implements ResolverStrategy {
             throw new IllegalArgumentException(message);
         }
         resolverResults.addAllDescriptors(
-                packageResolverCommand.resolve(packageName, _properties));
+                packageResolverCommand.resolve(packageName, properties));
     }
 
     /**
      * {@inheritDoc}
      */
     public void setProperty(final String key, final Object value) {
-        _properties.put(key, value);
+        properties.put(key, value);
     }
     
     public void setClassResolverCommand(JAXBClassResolverCommand classResolverCommand) {
