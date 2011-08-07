@@ -15,8 +15,17 @@
  */
 package org.castor.jaxb.resolver;
 
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import org.castor.jaxb.reflection.ClassDescriptorBuilder;
 import org.castor.jaxb.reflection.ClassInfoBuilder;
@@ -31,19 +40,23 @@ import org.slf4j.LoggerFactory;
  */
 public class JAXBPackageResolverCommand implements ResolverPackageCommand {
     public final Logger LOG = LoggerFactory.getLogger(this.getClass());
-    
-    /** The Castor JAXB ClassDescriptor builder. */
+
+    /**
+     * The Castor JAXB ClassDescriptor builder.
+     */
     private ClassDescriptorBuilder _classDescriptorBuilder;
-    /** The Castor JAXB ClassInfo builder. */
+    /**
+     * The Castor JAXB ClassInfo builder.
+     */
     private ClassInfoBuilder _classInfoBuilder;
-    
+
     /**
      * Empty default constructor.
      */
     public JAXBPackageResolverCommand() {
         super();
     }
-    
+
     /**
      * @param classDescriptorBuilder The Castor JAXB ClassDescriptor builder.
      */
@@ -53,7 +66,7 @@ public class JAXBPackageResolverCommand implements ResolverPackageCommand {
         }
         _classDescriptorBuilder = classDescriptorBuilder;
     }
-    
+
     /**
      * @param classInfoBuilder The Castor JAXB ClassInfo builder.
      */
@@ -65,27 +78,83 @@ public class JAXBPackageResolverCommand implements ResolverPackageCommand {
     }
 
     /**
-     * The one and only purpose resolver commands are good for ;-) . It can
-     * be called with className and clazz set, so the command decides which
-     * suites it best or at least one of the two arguments set.
-     * 
+     * The one and only purpose resolver commands are good for ;-) . It can be called with className and clazz set, so
+     * the command decides which suites it best or at least one of the two arguments set.
+     *
      * @param packageName the name of the package to resolve
-     * @param properties the Properties to be used at resolve
+     * @param properties  the Properties to be used at resolve
+     *
      * @return a Map of className and XMLClassDescriptor
+     *
      * @throws ResolverException in case that resolving fails fatally
      */
     public Map<String, XMLClassDescriptor> resolve(
             final String packageName, final Map properties)
-    throws ResolverException {
-        HashMap < String, XMLClassDescriptor > hm = new HashMap < String, XMLClassDescriptor > ();
+            throws ResolverException {
+
+        String className;
+        String fileName;
+        String dirName;
+        String packageToken;
+        Class clazz;
+        Enumeration<URL> resources;
+        Map<String, XMLClassDescriptor> result = new HashMap<String, XMLClassDescriptor>();
+
         if ((packageName == null) || (packageName.length() == 0)) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Package to load descriptors from is null or empty - nothing done.");
             }
-            return hm;
+            return result;
         }
-        // load the JAXB package info file...
-        throw new UnsupportedOperationException("Not yet implemented");
-//        return hm;
+
+        try {
+            StringTokenizer packages = new StringTokenizer(packageName, ":");
+            ClassLoader classLoader = getClass().getClassLoader();
+            while (packages.hasMoreTokens()) {
+                packageToken = packages.nextToken();
+                dirName = packageToken.replace('.', '/');
+
+                resources = classLoader.getResources(dirName);
+
+                List<File> dirs = new ArrayList<File>();
+                while (resources.hasMoreElements()) {
+                    URL resourceUrl = resources.nextElement();
+                    dirs.add(new File(resourceUrl.toURI()));
+                }
+
+                for (File dir : dirs) {
+                    for (File file : dir.listFiles()) {
+
+                        if (file.getName().endsWith(".class")) {
+                            fileName = file.getName();
+                            className = new StringBuffer()
+                                    .append(packageName)
+                                    .append('.')
+                                    .append(fileName.substring(0, fileName.length() - 6))
+                                    .toString();
+
+                            clazz = Class.forName(className);
+
+                            XMLClassDescriptor descriptor =
+                                    _classDescriptorBuilder.buildClassDescriptor(
+                                            _classInfoBuilder.buildClassInfo(clazz), false);
+
+                            result.put(className, descriptor);
+                        }
+                    }
+                }
+            }
+
+            return result;
+        } catch (IOException e) {
+
+            throw new ResolverException("Exception occurred when resolving package: " + packageName, e);
+        } catch (URISyntaxException e) {
+
+            throw new ResolverException("Exception occurred when resolving package: " + packageName, e);
+        } catch (ClassNotFoundException e) {
+
+            throw new ResolverException("Exception occurred when resolving package: " + packageName, e);
+        }
     }
 }

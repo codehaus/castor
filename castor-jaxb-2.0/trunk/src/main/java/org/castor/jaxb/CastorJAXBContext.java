@@ -75,6 +75,8 @@ public class CastorJAXBContext extends JAXBContext {
         cib.setJavaNaming(javaNaming);
 
         JAXBPackageResolverCommand packageResolverCommand = new JAXBPackageResolverCommand();
+        packageResolverCommand.setClassDescriptorBuilder(cdb);
+        packageResolverCommand.setClassInfoBuilder(cib);
 
         JAXBClassResolverCommand classResolverCommand = new JAXBClassResolverCommand();
         classResolverCommand.setClassDescriptorBuilder(cdb);
