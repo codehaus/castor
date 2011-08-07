@@ -15,12 +15,11 @@
  */
 package org.castor.jaxb.naming;
 
-import java.beans.Introspector;
-
 import org.castor.xml.XMLNaming;
 import org.exolab.castor.xml.util.DefaultNaming;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * JAXB specific implementation of XMLNaming to create names that conform
@@ -31,6 +30,7 @@ import org.slf4j.LoggerFactory;
  * @author Joachim Grueneis, jgrueneis_at_codehaus_dot_com
  * @version $Id$
  */
+@Component("jaxbXmlNaming")
 public class JAXBXmlNaming implements XMLNaming {
     /**
      * Logger to use.

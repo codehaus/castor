@@ -22,7 +22,6 @@ import java.lang.reflect.Modifier;
 import java.util.Collection;
 
 import org.castor.core.annotationprocessing.AnnotationProcessingService;
-import org.castor.jaxb.naming.JAXBJavaNaming;
 import org.castor.jaxb.reflection.info.ClassInfo;
 import org.castor.jaxb.reflection.info.FieldInfo;
 import org.castor.jaxb.reflection.info.JaxbClassNature;
@@ -89,7 +88,6 @@ public final class ClassInfoBuilder {
         packageAnnotationProcessingService = new PackageAnnotationProcessingServiceImpl();
         classAnnotationProcessingService = new ClassAnnotationProcessingServiceImpl();
         fieldAnnotationProcessingService = new FieldAnnotationProcessingServiceImpl();
-//        javaNaming = new JAXBJavaNaming();
     }
 
     /**

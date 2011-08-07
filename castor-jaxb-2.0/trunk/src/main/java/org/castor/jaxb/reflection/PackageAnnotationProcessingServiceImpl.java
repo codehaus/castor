@@ -23,7 +23,7 @@ import org.castor.jaxb.reflection.processor.packagge.XmlSchemaTypeProcessor;
 import org.castor.jaxb.reflection.processor.packagge.XmlSchemaTypesProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 /**
  * A service class to precess all package level annotations.
@@ -31,7 +31,7 @@ import org.springframework.stereotype.Service;
  * @author Joachim Grueneis, jgrueneis_at_codehaus_dot_com
  * @version $Id$
  */
-@Service("packageAnnotationProcessingService")
+@Component("packageAnnotationProcessingService")
 public class PackageAnnotationProcessingServiceImpl extends BaseAnnotationProcessingService {
 
     public final Logger LOG = LoggerFactory.getLogger(this.getClass());

@@ -15,23 +15,23 @@
  */
 package org.castor.jaxb.reflection;
 
-import org.junit.Assert;
-import org.castor.jaxb.naming.JAXBJavaNaming;
-import org.castor.jaxb.reflection.info.ClassInfo;
-import org.castor.jaxb.reflection.info.JaxbClassNature;
-import org.castor.jaxb.reflection.info.JaxbFieldNature;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import java.util.Date;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.Date;
-import java.util.List;
+
+import org.castor.jaxb.reflection.info.ClassInfo;
+import org.castor.jaxb.reflection.info.JaxbClassNature;
+import org.castor.jaxb.reflection.info.JaxbFieldNature;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * @author Joachim Grueneis, jgrueneis_at_gmail_dot_com
@@ -40,32 +40,17 @@ import java.util.List;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath:/castor-jaxb-test-context.xml" })
 public class ClassInfoBuilderTest {
-    /** 
-     * Logger to use. 
-     */
-    //private static final Log LOG = LogFactory.getLog(ClassInfoBuilderTest.class);
     
     /**
      * Object under test.
      */
-    private ClassInfoBuilder _builder;
-
-    /**
-     * @see junit.framework.TestCase#setUp()
-     */
-    @Before
-    public final void setUp() {
-        _builder = new ClassInfoBuilder();
-        _builder.setPackageAnnotationProcessingService(new PackageAnnotationProcessingServiceImpl());
-        _builder.setClassAnnotationProcessingService(new ClassAnnotationProcessingServiceImpl());
-        _builder.setFieldAnnotationProcessingService(new FieldAnnotationProcessingServiceImpl());
-        _builder.setJavaNaming(new JAXBJavaNaming());
-    }
+    @Autowired
+    private ClassInfoBuilder classInfoBuilder;
 
     @Test
     public final void testNull() {
         try {
-            _builder.buildClassInfo(null);
+            classInfoBuilder.buildClassInfo(null);
             Assert.fail("'null' cannot be turned into a ClassInfo");
         } catch (IllegalArgumentException e) {
             // right as expected
@@ -75,7 +60,7 @@ public class ClassInfoBuilderTest {
     @Test
     public final void testObject() {
         try {
-            ClassInfo ci = _builder.buildClassInfo(Object.class);
+            ClassInfo ci = classInfoBuilder.buildClassInfo(Object.class);
             Assert.assertNull("'Object.class' cannot be turned into a ClassInfo", ci);
         } catch (IllegalArgumentException e) {
             // right as expected
@@ -112,7 +97,7 @@ public class ClassInfoBuilderTest {
 
     @Test
     public final void testArtist() {
-        JaxbClassNature ci = new JaxbClassNature(_builder.buildClassInfo(Artist.class));
+        JaxbClassNature ci = new JaxbClassNature(classInfoBuilder.buildClassInfo(Artist.class));
         Assert.assertNotNull("ClassInfo generated must not be null", ci);
         Assert.assertEquals("Artist", ci.getRootElementName());
         Assert.assertEquals(Artist.class, ci.getType());
@@ -143,7 +128,7 @@ public class ClassInfoBuilderTest {
 
     @Test
     public void testNoXmlElementAnnotations() {
-        JaxbClassNature ci = new JaxbClassNature(_builder.buildClassInfo(NoXmlElementAnnotations.class));
+        JaxbClassNature ci = new JaxbClassNature(classInfoBuilder.buildClassInfo(NoXmlElementAnnotations.class));
         Assert.assertNotNull("ClassInfo generated must not be null", ci);
         Assert.assertNull(
                 "Without XmlRootElement annotation this has to be null", ci.getRootElementName());
@@ -172,7 +157,7 @@ public class ClassInfoBuilderTest {
 
     @Test
     public void testEmptyXmlElementAnnotations() {
-        JaxbClassNature ci = new JaxbClassNature(_builder.buildClassInfo(EmptyXmlElementAnnotations.class));
+        JaxbClassNature ci = new JaxbClassNature(classInfoBuilder.buildClassInfo(EmptyXmlElementAnnotations.class));
         Assert.assertNotNull("ClassInfo generated must not be null", ci);
         Assert.assertNull(ci.getRootElementName());
         Assert.assertNull(ci.getRootElementNamespace());
@@ -198,7 +183,7 @@ public class ClassInfoBuilderTest {
 
     @Test
     public void testNamedXmlElementAnnotations() {
-        JaxbClassNature ci = new JaxbClassNature(_builder.buildClassInfo(NamedXmlElementAnnotations.class));
+        JaxbClassNature ci = new JaxbClassNature(classInfoBuilder.buildClassInfo(NamedXmlElementAnnotations.class));
         Assert.assertNotNull("ClassInfo generated must not be null", ci);
         Assert.assertEquals("NamedXmlElement", ci.getRootElementName());
         Assert.assertNull(ci.getRootElementNamespace());
@@ -226,7 +211,7 @@ public class ClassInfoBuilderTest {
 
     @Test
     public void testEnumNoAnnotations() {
-        ClassInfo ci = _builder.buildClassInfo(FranzWithoutAnnotations.class);
+        ClassInfo ci = classInfoBuilder.buildClassInfo(FranzWithoutAnnotations.class);
         JaxbClassNature jcn = new JaxbClassNature(ci);
         Assert.assertNotNull("ClassInfo generated must not be null", jcn);
         Assert.assertNull(jcn.getRootElementName());
@@ -251,7 +236,7 @@ public class ClassInfoBuilderTest {
 
     @Test
     public void testEnumWithAnnotations() {
-        ClassInfo ci = _builder.buildClassInfo(FranzWithAnnotations.class);
+        ClassInfo ci = classInfoBuilder.buildClassInfo(FranzWithAnnotations.class);
         JaxbClassNature jcn = new JaxbClassNature(ci);
         Assert.assertNotNull("ClassInfo generated must not be null", jcn);
         Assert.assertNull(jcn.getRootElementName());
