@@ -57,7 +57,7 @@ public class CastorMarshaller implements Marshaller {
     /**
      * Represents the marshall listener.
      */
-    private Listener listener;
+    private Marshaller.Listener listener;
 
     /**
      * Creates new instance of {@link CastorMarshaller} with the given {@link org.exolab.castor.xml.Marshaller}

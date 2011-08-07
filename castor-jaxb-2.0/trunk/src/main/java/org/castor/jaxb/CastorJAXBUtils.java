@@ -54,6 +54,7 @@ public class CastorJAXBUtils {
      * @throws IllegalArgumentException if param is null or empty
      */
     public static void checkNotEmpty(String param, String paramName) {
+        checkNotNull(param, paramName);
 
         if (param.trim().length() == 0) {
 

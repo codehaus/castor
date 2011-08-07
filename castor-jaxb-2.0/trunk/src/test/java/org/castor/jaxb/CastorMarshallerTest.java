@@ -23,8 +23,10 @@ import java.io.OutputStream;
 import java.io.StringWriter;
 import java.io.Writer;
 
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -60,7 +62,7 @@ public class CastorMarshallerTest {
     /**
      * Represents the instance of the tested class.
      */
-    private javax.xml.bind.Marshaller marshaller;
+    private Marshaller marshaller;
 
     /**
      * Represents the expected xml.
@@ -77,7 +79,7 @@ public class CastorMarshallerTest {
     @Before
     public void setUp() throws JAXBException {
 
-        javax.xml.bind.JAXBContext context = javax.xml.bind.JAXBContext.newInstance(Entity.class);
+        JAXBContext context = JAXBContext.newInstance(Entity.class);
         marshaller = context.createMarshaller();
     }
 

@@ -16,10 +16,11 @@
 package org.castor.jaxb.adapters;
 
 import org.castor.jaxb.CastorJAXBUtils;
-import org.castor.jaxb.Unmarshaller;
 import org.castor.xml.UnmarshalListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.xml.bind.Unmarshaller;
 
 /**
  * An adapter between Castor UnmarshalListener and JAXB UnmarshalListener.
