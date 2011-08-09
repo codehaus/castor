@@ -15,9 +15,17 @@
  */
 package org.castor.jaxb.reflection;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import javax.xml.bind.annotation.XmlAccessOrder;
 import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorOrder;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.apache.commons.lang3.StringUtils;
 import org.castor.jaxb.exceptions.ReflectionException;
 import org.castor.jaxb.naming.JAXBXmlNaming;
 import org.castor.jaxb.reflection.info.ClassInfo;
@@ -106,7 +114,35 @@ public final class ClassDescriptorBuilder {
         classDescriptor.setXMLName(getXMLName(jaxbClassNature));
         classDescriptor.setNameSpacePrefix(getNamespacePrefix(jaxbClassNature));
         classDescriptor.setNameSpaceURI(getNamespaceURI(jaxbClassNature));
-        for (JaxbFieldNature jaxbFieldNature : jaxbClassNature.getFields()) {
+        
+        List<JaxbFieldNature> fields = new ArrayList<JaxbFieldNature>();
+        fields.addAll(jaxbClassNature.getFields());
+        
+        // TODO: respect accessor order as defined by annotation
+        if (jaxbClassNature.getXmlAccessorOrder()) {
+            XmlAccessOrder accessOrder = jaxbClassNature.getXmlAccessOrder();
+            if (accessOrder.equals(XmlAccessOrder.ALPHABETICAL)) {
+                Collections.sort(fields, new Comparator<JaxbFieldNature>() {
+
+                    public int compare(JaxbFieldNature fieldNature1, JaxbFieldNature fieldNature2) {
+                        return getName(fieldNature1).compareTo(getName(fieldNature2));
+                    }
+
+                    private String getName(JaxbFieldNature fieldNature) {
+                        String name = "";
+                        if (StringUtils.isNotEmpty(fieldNature.getElementName())) {
+                            name = fieldNature.getElementName(); 
+                        }
+                        if (StringUtils.isNotEmpty(fieldNature.getAttributeName())) {
+                            name = fieldNature.getAttributeName();
+                        }
+                        return name;
+                    }
+                });
+            }
+        }
+        
+        for (JaxbFieldNature jaxbFieldNature : fields) {
             LOG.info("Field info: " + jaxbFieldNature + " now used");
             XMLFieldDescriptor fieldDescriptor = buildFieldDescriptor(
                     jaxbFieldNature, jaxbClassNature.getXmlAccessType(),
