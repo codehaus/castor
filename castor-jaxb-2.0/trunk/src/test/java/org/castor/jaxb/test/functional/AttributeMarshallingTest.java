@@ -26,10 +26,9 @@ public class AttributeMarshallingTest extends BaseFunctionalTest {
         Attribute attribute = new Attribute();
         attribute.setName("test");
 
-        StringWriter writer = new StringWriter();
-        marshaller.marshal(attribute, new StreamResult(writer));
-        
-        assertXmlEquals("Marshaller written invalid result.", expectedXml, writer.toString());
+        String actualXml = marshal(attribute);
+
+        assertXmlEquals("Marshaller written invalid result.", expectedXml, actualXml);
     }
 
     @Test
@@ -39,23 +38,9 @@ public class AttributeMarshallingTest extends BaseFunctionalTest {
         AttributeWithExplicitName attributeWithExplicitName = new AttributeWithExplicitName();
         attributeWithExplicitName.setName("test");
 
-        StringWriter writer = new StringWriter();
-        marshaller.marshal(attributeWithExplicitName, new StreamResult(writer));
+        String actualXml = marshal(attributeWithExplicitName);
         
-        assertXMLEqual("Marshaller written invalid result.", expectedXml, writer.toString());
-    }
-
-    @Test
-    public void testElementDefault() throws JAXBException, SAXException, IOException {
-        final String expectedXml = "<entity><name>test</name></entity>";
-        
-        Element element = new Element();
-        element.setName("test");
-
-        StringWriter writer = new StringWriter();
-        marshaller.marshal(element, new StreamResult(writer));
-        
-        assertXmlEquals("Marshaller written invalid result.", expectedXml, writer.toString());
+        assertXMLEqual("Marshaller written invalid result.", expectedXml, actualXml);
     }
 
 }
