@@ -113,6 +113,12 @@ public final class ClassDescriptorBuilder {
                     saveMapKeys);
             classDescriptor.addFieldDescriptor(fieldDescriptor);
         }
+
+        // TODO: add support for transient at the class level
+//        if (jaxbClassNature.getXmlTransient()) {
+//            classDescriptor.setTransient(true);
+//        }
+        
         return classDescriptor;
     }
 
@@ -169,6 +175,10 @@ public final class ClassDescriptorBuilder {
         if (jaxbFieldNature.hasXmlElementWrapper()) {
             String location = jaxbFieldNature.getElementWrapperName(); 
             fieldDescriptor.setLocationPath(location);
+        }
+        
+        if (jaxbFieldNature.hasXmlTransient()) {
+            fieldDescriptor.setTransient(true);
         }
         return fieldDescriptor;
     }

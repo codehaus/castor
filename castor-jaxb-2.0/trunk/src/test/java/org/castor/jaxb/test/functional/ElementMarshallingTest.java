@@ -24,10 +24,9 @@ public class ElementMarshallingTest extends BaseFunctionalTest {
         Element element = new Element();
         element.setName("test");
 
-        StringWriter writer = new StringWriter();
-        marshaller.marshal(element, new StreamResult(writer));
-        
-        assertXmlEquals("Marshaller written invalid result.", expectedXml, writer.toString());
+        String actualXml = marshal(element);
+
+        assertXmlEquals("Marshaller written invalid result.", expectedXml, actualXml);
     }
 
     @Test
@@ -37,10 +36,9 @@ public class ElementMarshallingTest extends BaseFunctionalTest {
         ElementWithAnnotation element = new ElementWithAnnotation();
         element.setName("test");
 
-        StringWriter writer = new StringWriter();
-        marshaller.marshal(element, new StreamResult(writer));
-        
-        assertXmlEquals("Marshaller written invalid result.", expectedXml, writer.toString());
+        String actualXml = marshal(element);
+
+        assertXmlEquals("Marshaller written invalid result.", expectedXml, actualXml);
     }
 
     @Test
@@ -50,9 +48,8 @@ public class ElementMarshallingTest extends BaseFunctionalTest {
         ElementWithAnnotationWithExplicitName element = new ElementWithAnnotationWithExplicitName();
         element.setName("test");
 
-        StringWriter writer = new StringWriter();
-        marshaller.marshal(element, new StreamResult(writer));
-        
-        assertXmlEquals("Marshaller written invalid result.", expectedXml, writer.toString());
+        String actualXml = marshal(element);
+
+        assertXmlEquals("Marshaller written invalid result.", expectedXml, actualXml);
     }
 }

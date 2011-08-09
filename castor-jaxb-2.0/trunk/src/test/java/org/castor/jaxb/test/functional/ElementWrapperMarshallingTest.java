@@ -24,12 +24,9 @@ public class ElementWrapperMarshallingTest extends BaseFunctionalTest {
         ElementWithWrapper element = new ElementWithWrapper();
         element.setName("test");
 
-        StringWriter writer = new StringWriter();
-        marshaller.marshal(element, new StreamResult(writer));
+        String actualXml = marshal(element);
 
-        System.out.println(writer.toString());
-
-        assertXmlEquals("Marshaller written invalid result.", expectedXml, writer.toString());
+        assertXmlEquals("Marshaller written invalid result.", expectedXml, actualXml);
     }
 
     @Test
@@ -39,12 +36,9 @@ public class ElementWrapperMarshallingTest extends BaseFunctionalTest {
         ElementWithAnnotationWithWrapper element = new ElementWithAnnotationWithWrapper();
         element.setName("test");
 
-        StringWriter writer = new StringWriter();
-        marshaller.marshal(element, new StreamResult(writer));
+        String actualXml = marshal(element);
 
-        System.out.println(writer.toString());
-
-        assertXmlEquals("Marshaller written invalid result.", expectedXml, writer.toString());
+        assertXmlEquals("Marshaller written invalid result.", expectedXml, actualXml);
     }
 
     @Test
@@ -54,10 +48,9 @@ public class ElementWrapperMarshallingTest extends BaseFunctionalTest {
         ElementWithAnnotationWithExplicitNameWithWrapper element = new ElementWithAnnotationWithExplicitNameWithWrapper();
         element.setName("test");
 
-        StringWriter writer = new StringWriter();
-        marshaller.marshal(element, new StreamResult(writer));
+        String actualXml = marshal(element);
 
-        assertXmlEquals("Marshaller written invalid result.", expectedXml, writer.toString());
+        assertXmlEquals("Marshaller written invalid result.", expectedXml, actualXml);
     }
 
 }
