@@ -9,6 +9,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.lang3.StringUtils;
+import org.castor.jaxb.test.functional.accessOrderClassLavel.EntityWithUndefinedOrder;
 import org.castor.jaxb.test.functional.attribute.Attribute;
 import org.castor.jaxb.test.functional.attribute.AttributeWithExplicitName;
 import org.castor.jaxb.test.functional.fieldTransient.EntityWithTransientField;
@@ -23,7 +24,14 @@ public class BaseFunctionalTest {
 
     @Before
     public void setUp() throws JAXBException {
-        javax.xml.bind.JAXBContext context = javax.xml.bind.JAXBContext.newInstance(Attribute.class, AttributeWithExplicitName.class, EntityWithTransientField.class);
+        StringBuilder builder = new StringBuilder();
+        builder.append("org.castor.jaxb.test.functional.accessOrderClassLevel:");
+        builder.append("org.castor.jaxb.test.functional.attribute:");
+        builder.append("org.castor.jaxb.test.functional.element:");
+        builder.append("org.castor.jaxb.test.functional.elementWrapper:");
+        builder.append("org.castor.jaxb.test.functional.elementWrapperDefault:");
+        builder.append("org.castor.jaxb.test.functional.fieldTransient");
+        javax.xml.bind.JAXBContext context = javax.xml.bind.JAXBContext.newInstance(builder.toString());
         marshaller = context.createMarshaller();
     }
 
