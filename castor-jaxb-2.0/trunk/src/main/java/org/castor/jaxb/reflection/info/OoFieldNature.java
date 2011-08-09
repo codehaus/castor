@@ -208,6 +208,10 @@ public class OoFieldNature extends BaseNature {
         return (getMethodGet() == null && getMethodSet() == null);
     }
 
+    public FieldInfo getFieldInfo() {
+        return _fieldInfo;
+    }
+    
     /**
      * An interface holding the string constants for properties.
      */

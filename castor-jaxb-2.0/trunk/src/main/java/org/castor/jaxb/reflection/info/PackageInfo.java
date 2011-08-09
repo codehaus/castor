@@ -16,12 +16,6 @@
 
 package org.castor.jaxb.reflection.info;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import org.castor.core.nature.PropertyHolder;
 
 /**
  * Class PacakgeInfo.<br/>
@@ -29,22 +23,12 @@ import org.castor.core.nature.PropertyHolder;
  * 
  * @author Joachim Grueneis, jgr uen eisATg mailDOTcom
  */
-public class PackageInfo implements PropertyHolder {
+public class PackageInfo extends BaseInfo {
     /**
      * The name of the package.
      */
     private String _packageName;
     
-    /**
-     * Map holding the properties set and read by Natures.
-     */
-    private Map < String, Object > _properties = new HashMap < String, Object > ();
-    
-    /**
-     * Set holding applicable natures.
-     */
-    private Set < String > _natures = new HashSet < String > ();
-
     /**
      * A package info instance has to have a package name.
      * @param packageName the package name
@@ -63,39 +47,4 @@ public class PackageInfo implements PropertyHolder {
     public String getPackageName() {
         return _packageName;
     }
-    /**
-     * @param name the name of the property to read
-     * @return the property
-     * @see org.castor.core.nature.PropertyHolder#getProperty(java.lang.String)
-     */
-    public final Object getProperty(final String name) {
-        return _properties.get(name);
-    }
-
-    /**
-     * @param name the name of the property to set
-     * @param value the value to set the property to
-     * @see org.castor.core.nature.PropertyHolder#setProperty(java.lang.String, java.lang.Object)
-     */
-    public final void setProperty(final String name, final Object value) {
-        _properties.put(name, value);
-    }
-
-    /**
-     * @param nature the name of the Nature to register
-     * @see org.castor.core.nature.NatureExtendable#addNature(java.lang.String)
-     */
-    public final void addNature(final String nature) {
-        _natures.add(nature);
-    }
-
-    /**
-     * @param nature the name of the Nature to check
-     * @return true if the Nature was registered before
-     * @see org.castor.core.nature.NatureExtendable#hasNature(java.lang.String)
-     */
-    public final boolean hasNature(final String nature) {
-        return _natures.contains(nature);
-    }
-
 }

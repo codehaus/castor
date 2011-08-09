@@ -29,6 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.castor.jaxb.exceptions.ReflectionException;
 import org.castor.jaxb.naming.JAXBXmlNaming;
 import org.castor.jaxb.reflection.info.ClassInfo;
+import org.castor.jaxb.reflection.info.FieldInfo;
 import org.castor.jaxb.reflection.info.JaxbClassNature;
 import org.castor.jaxb.reflection.info.JaxbFieldNature;
 import org.castor.jaxb.reflection.info.JaxbPackageNature;
@@ -117,8 +118,10 @@ public final class ClassDescriptorBuilder {
         
         List<JaxbFieldNature> fields = new ArrayList<JaxbFieldNature>();
         fields.addAll(jaxbClassNature.getFields());
-        
-        // TODO: respect accessor order as defined by annotation
+
+        if (jaxbClassNature.getXmlTransient()) {
+            classDescriptor.setTransientClass(true);
+        }
         if (jaxbClassNature.getXmlAccessorOrder()) {
             XmlAccessOrder accessOrder = jaxbClassNature.getXmlAccessOrder();
             if (accessOrder.equals(XmlAccessOrder.ALPHABETICAL)) {
@@ -150,11 +153,6 @@ public final class ClassDescriptorBuilder {
             classDescriptor.addFieldDescriptor(fieldDescriptor);
         }
 
-        // TODO: add support for transient at the class level
-//        if (jaxbClassNature.getXmlTransient()) {
-//            classDescriptor.setTransient(true);
-//        }
-        
         return classDescriptor;
     }
 
@@ -197,6 +195,7 @@ public final class ClassDescriptorBuilder {
             nodeType = NodeType.Element;
             xmlName = getXMLName(jaxbFieldNature); // fieldInfo.getElementName();
         }
+        
         JAXBFieldDescriptorImpl fieldDescriptor = new JAXBFieldDescriptorImpl(
                 getType(jaxbFieldNature), fieldName, xmlName, nodeType);
         fieldDescriptor.setMultivalued(jaxbFieldNature.isMultivalue());
@@ -216,6 +215,17 @@ public final class ClassDescriptorBuilder {
         if (jaxbFieldNature.hasXmlTransient()) {
             fieldDescriptor.setTransient(true);
         }
+
+        // TODO: refactor as it does not resolve class transitivity
+        // TODO: problem is that we do not have informtion about the ClassInfo of the decöard type
+        ClassInfo owningClassInfo = jaxbFieldNature.getFieldInfo().getParentClassInfo();
+        if (owningClassInfo.hasNature(JaxbClassNature.class.getName())) {
+            JaxbClassNature classNature = new JaxbClassNature(owningClassInfo);
+            if (classNature.getXmlTransient()) {
+                fieldDescriptor.setContainer(true);
+            }
+        }
+        
         return fieldDescriptor;
     }
 

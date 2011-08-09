@@ -20,6 +20,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 import java.util.Collection;
 
 import org.castor.core.annotationprocessing.AnnotationProcessingService;
@@ -81,15 +82,18 @@ public final class ClassInfoBuilder {
     @Qualifier("jaxbJavaNaming")
     private JavaNaming javaNaming;
 
-//    /**
-//     * Creates the required annotation processing services.
-//     */
-//    public ClassInfoBuilder() {
-//        super();
-////        packageAnnotationProcessingService = new PackageAnnotationProcessingServiceImpl();
-////        classAnnotationProcessingService = new ClassAnnotationProcessingServiceImpl();
-////        fieldAnnotationProcessingService = new FieldAnnotationProcessingServiceImpl();
-//    }
+    // /**
+    // * Creates the required annotation processing services.
+    // */
+    // public ClassInfoBuilder() {
+    // super();
+    // // packageAnnotationProcessingService = new
+    // PackageAnnotationProcessingServiceImpl();
+    // // classAnnotationProcessingService = new
+    // ClassAnnotationProcessingServiceImpl();
+    // // fieldAnnotationProcessingService = new
+    // FieldAnnotationProcessingServiceImpl();
+    // }
 
     /**
      * Build the ClassInfo representation for a Class.
@@ -106,8 +110,7 @@ public final class ClassInfoBuilder {
         }
         if (!isDescribeable(type)) {
             if (LOG.isDebugEnabled()) {
-                String message = "Class: " + type
-                        + " cannot be described using this builder.";
+                String message = "Class: " + type + " cannot be described using this builder.";
                 LOG.debug(message);
             }
             return null;
@@ -124,18 +127,17 @@ public final class ClassInfoBuilder {
         jaxbClassNature.setInterfaces(type.getInterfaces());
         jaxbClassNature.setHasPublicEmptyConstructor(hasPublicEmptyConstructor(type));
 
-        Annotation[] unprocessedAnnotations = this.classAnnotationProcessingService.processAnnotations(jaxbClassNature,
-                type.getAnnotations());
+        Annotation[] unprocessedClassAnnotations = this.classAnnotationProcessingService.processAnnotations(
+                jaxbClassNature, type.getAnnotations());
         for (Field field : type.getDeclaredFields()) {
             if (LOG.isInfoEnabled()) {
                 LOG.info("Now evaluating field: " + field);
             }
             if (isDescribeable(type, field)) {
-                classInfo = buildFieldInfo(classInfo, field);
+                buildFieldInfo(classInfo, field);
             } else {
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug("Ignoring field: " + field + " of type: "
-                            + type.getName()
+                    LOG.debug("Ignoring field: " + field + " of type: " + type.getName()
                             + " it is not useable for mapping.");
                 }
             }
@@ -145,11 +147,10 @@ public final class ClassInfoBuilder {
                 LOG.info("Now evaluating method: " + method);
             }
             if (isDescribeable(type, method)) {
-                classInfo = buildFieldInfo(classInfo, method);
+                buildFieldInfo(classInfo, method);
             } else {
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug("Ignoring method: " + method + " of type: "
-                            + type.getName()
+                    LOG.debug("Ignoring method: " + method + " of type: " + type.getName()
                             + " it is not useable for mapping.");
                 }
             }
@@ -175,13 +176,13 @@ public final class ClassInfoBuilder {
             cnstrctr = type.getConstructor();
         } catch (SecurityException e) {
             if (LOG.isDebugEnabled()) {
-                LOG.debug("Failed to get empty public constructor for: " + type
-                        + " with exception: " + e + " - ingoring exception!");
+                LOG.debug("Failed to get empty public constructor for: " + type + " with exception: " + e
+                        + " - ingoring exception!");
             }
         } catch (NoSuchMethodException e) {
             if (LOG.isDebugEnabled()) {
-                LOG.debug("Failed to get empty public constructor for: " + type
-                        + " with exception: " + e + " - ingoring exception!");
+                LOG.debug("Failed to get empty public constructor for: " + type + " with exception: " + e
+                        + " - ingoring exception!");
             }
         }
         return (cnstrctr != null);
@@ -195,8 +196,7 @@ public final class ClassInfoBuilder {
      * @return true if Class can be described
      */
     private boolean isDescribeable(final Class<?> type) {
-        if (Object.class.equals(type) || Void.class.equals(type)
-                || Class.class.equals(type)) {
+        if (Object.class.equals(type) || Void.class.equals(type) || Class.class.equals(type)) {
             return false;
         }
         return true;
@@ -214,8 +214,7 @@ public final class ClassInfoBuilder {
     private boolean isDescribeable(final Class<?> type, final Method method) {
         boolean isDescribeable = true;
         Class<?> declaringClass = method.getDeclaringClass();
-        if ((declaringClass != null) && !type.equals(declaringClass)
-                && (!declaringClass.isInterface())) {
+        if ((declaringClass != null) && !type.equals(declaringClass) && (!declaringClass.isInterface())) {
             isDescribeable = false;
         }
         if (method.isSynthetic()) {
@@ -227,11 +226,8 @@ public final class ClassInfoBuilder {
         if (Modifier.isTransient(method.getModifiers())) {
             isDescribeable &= false;
         }
-        if (!(javaNaming.isAddMethod(method)
-                || javaNaming.isCreateMethod(method)
-                || javaNaming.isGetMethod(method)
-                || javaNaming.isIsMethod(method) || javaNaming
-                .isSetMethod(method))) {
+        if (!(javaNaming.isAddMethod(method) || javaNaming.isCreateMethod(method) || javaNaming.isGetMethod(method)
+                || javaNaming.isIsMethod(method) || javaNaming.isSetMethod(method))) {
             isDescribeable = false;
         }
         return isDescribeable;
@@ -250,8 +246,7 @@ public final class ClassInfoBuilder {
     private boolean isDescribeable(final Class<?> type, final Field field) {
         boolean isDescribeable = true;
         Class<?> declaringClass = field.getDeclaringClass();
-        if ((declaringClass != null) && !type.equals(declaringClass)
-                && (!declaringClass.isInterface())) {
+        if ((declaringClass != null) && !type.equals(declaringClass) && (!declaringClass.isInterface())) {
             isDescribeable = false;
         }
         if (Modifier.isStatic(field.getModifiers())) {
@@ -275,23 +270,23 @@ public final class ClassInfoBuilder {
      *            the Field to describe
      * @return the ClassInfo containing the FieldInfo build
      */
-    private ClassInfo buildFieldInfo(final ClassInfo classInfo, final Field field) {
+    private void buildFieldInfo(final ClassInfo classInfo, final Field field) {
         if (classInfo == null) {
             String message = "Argument classInfo must not be null.";
             LOG.warn(message);
             throw new IllegalArgumentException(message);
         }
-        ClassInfo returnClassInfo = classInfo;
         if (field == null) {
             String message = "Argument field must not be null.";
             LOG.warn(message);
             throw new IllegalArgumentException(message);
         }
         String fieldName = javaNaming.extractFieldNameFromField(field);
-        FieldInfo fieldInfo = returnClassInfo.getFieldInfo(fieldName);
+        FieldInfo fieldInfo = classInfo.getFieldInfo(fieldName);
         if (fieldInfo == null) {
             fieldInfo = createFieldInfo(fieldName);
-            returnClassInfo.addFieldInfo(fieldInfo);
+            classInfo.addFieldInfo(fieldInfo);
+            fieldInfo.setParentClassInfo(classInfo);
         }
         JaxbFieldNature jaxbFieldNature = new JaxbFieldNature(fieldInfo);
         jaxbFieldNature.setField(field);
@@ -300,9 +295,7 @@ public final class ClassInfoBuilder {
             jaxbFieldNature.setMultivalued(true);
         }
         jaxbFieldNature.setGenericType(field.getGenericType());
-        fieldAnnotationProcessingService.processAnnotations(jaxbFieldNature,
-                field.getAnnotations());
-        return returnClassInfo;
+        fieldAnnotationProcessingService.processAnnotations(jaxbFieldNature, field.getAnnotations());
     }
 
     /**
@@ -314,23 +307,23 @@ public final class ClassInfoBuilder {
      *            the Method to describe
      * @return the ClassInfo containing the FieldInfo build
      */
-    private ClassInfo buildFieldInfo(final ClassInfo classInfo, final Method method) {
+    private void buildFieldInfo(final ClassInfo classInfo, final Method method) {
         if (classInfo == null) {
             String message = "Argument classInfo must not be null.";
             LOG.warn(message);
             throw new IllegalArgumentException(message);
         }
-        ClassInfo returnClassInfo = classInfo;
         if (method == null) {
             String message = "Argument method must not be null.";
             LOG.warn(message);
             throw new IllegalArgumentException(message);
         }
         String fieldName = javaNaming.extractFieldNameFromMethod(method);
-        FieldInfo fieldInfo = returnClassInfo.getFieldInfo(fieldName);
+        FieldInfo fieldInfo = classInfo.getFieldInfo(fieldName);
         if (fieldInfo == null) {
             fieldInfo = createFieldInfo(fieldName);
-            returnClassInfo.addFieldInfo(fieldInfo);
+            classInfo.addFieldInfo(fieldInfo);
+            fieldInfo.setParentClassInfo(classInfo);
         }
         JaxbFieldNature jaxbFieldNature = new JaxbFieldNature(fieldInfo);
         if (javaNaming.isAddMethod(method)) {
@@ -340,42 +333,35 @@ public final class ClassInfoBuilder {
             jaxbFieldNature.setMethodCreate(method);
         } else if (javaNaming.isGetMethod(method)) {
             jaxbFieldNature.setMethodGet(method);
-            Class<?> fieldType = method.getReturnType();
-            if (fieldType.isArray()
-                    || fieldType.isAssignableFrom(Collection.class)
-                    || Collection.class.isAssignableFrom(fieldType)) {
-                jaxbFieldNature.setGenericType(method.getGenericReturnType());
-                jaxbFieldNature.setMultivalued(true);
-            }
+            handleMultivaluedness(method.getReturnType(), jaxbFieldNature, method.getGenericReturnType());
         } else if (javaNaming.isSetMethod(method)) {
             jaxbFieldNature.setMethodSet(method);
             Class<?>[] parameterTypes = method.getParameterTypes();
             if (parameterTypes.length == 1) {
-                Class<?> fieldType = parameterTypes[0];
-                if (fieldType.isArray()
-                        || fieldType.isAssignableFrom(Collection.class)
-                        || Collection.class.isAssignableFrom(fieldType)) {
-                    jaxbFieldNature.setMultivalued(true);
-                    jaxbFieldNature.setGenericType(method
-                            .getGenericParameterTypes()[0]);
-                }
+                handleMultivaluedness(parameterTypes[0], jaxbFieldNature, method.getGenericParameterTypes()[0]);
             }
         } else if (javaNaming.isIsMethod(method)) {
             jaxbFieldNature.setMethodIs(method);
         } else {
             if (LOG.isDebugEnabled()) {
-                String message = "Method: " + method
-                        + " is of unsupported type and ignored.";
+                String message = "Method: " + method + " is of unsupported type and ignored.";
                 LOG.debug(message);
             }
         }
-        fieldAnnotationProcessingService.processAnnotations(jaxbFieldNature,
-                method.getAnnotations());
-        return returnClassInfo;
+        fieldAnnotationProcessingService.processAnnotations(jaxbFieldNature, method.getAnnotations());
+    }
+
+    private void handleMultivaluedness(Class<?> fieldType, JaxbFieldNature fieldNature, Type type) {
+        if (fieldType.isArray() || fieldType.isAssignableFrom(Collection.class)
+                || Collection.class.isAssignableFrom(fieldType)) {
+            fieldNature.setGenericType(type);
+            fieldNature.setMultivalued(true);
+        }
+
     }
 
     /**
-     * Build the PackageInfo for a Package.
+     * Build the {@link PackageInfo} for a {@link Package}.
      * 
      * @param pkg
      *            the Package to describe
@@ -385,76 +371,45 @@ public final class ClassInfoBuilder {
         PackageInfo packageInfo = createPackageInfo(pkg.getName());
         OoPackageNature ooPackageNature = new OoPackageNature(packageInfo);
         ooPackageNature.setPackage(pkg);
-        packageAnnotationProcessingService.processAnnotations(
-                new JaxbPackageNature(packageInfo), pkg.getAnnotations());
+        packageAnnotationProcessingService.processAnnotations(new JaxbPackageNature(packageInfo), pkg.getAnnotations());
         return packageInfo;
     }
 
-    /**
-     * @return the PackageAnnotationProcessingService in use
-     */
     public AnnotationProcessingService getPackageAnnotationProcessingService() {
         return packageAnnotationProcessingService;
     }
 
-    /**
-     * @param packageAnnotationProcessingService
-     *            the PackageAnnotationProcessingService to set
-     */
     public void setPackageAnnotationProcessingService(
             final AnnotationProcessingService packageAnnotationProcessingService) {
         this.packageAnnotationProcessingService = packageAnnotationProcessingService;
     }
 
-    /**
-     * @return the ClassAnnotationProcessingService in use.
-     */
     public AnnotationProcessingService getClassAnnotationProcessingService() {
         return classAnnotationProcessingService;
     }
 
-    /**
-     * @param classAnnotationProcessingService
-     *            the classAnnotationProcessingService to set
-     */
-    public void setClassAnnotationProcessingService(
-            final AnnotationProcessingService classAnnotationProcessingService) {
+    public void setClassAnnotationProcessingService(final AnnotationProcessingService classAnnotationProcessingService) {
         this.classAnnotationProcessingService = classAnnotationProcessingService;
     }
 
-    /**
-     * @return the FieldAnnotationProcessingService in use.
-     */
     public AnnotationProcessingService getFieldAnnotationProcessingService() {
         return fieldAnnotationProcessingService;
     }
 
-    /**
-     * @param fieldAnnotationProcessingService
-     *            the fieldAnnotationProcessingService to set
-     */
-    public void setFieldAnnotationProcessingService(
-            final AnnotationProcessingService fieldAnnotationProcessingService) {
+    public void setFieldAnnotationProcessingService(final AnnotationProcessingService fieldAnnotationProcessingService) {
         this.fieldAnnotationProcessingService = fieldAnnotationProcessingService;
     }
 
-    /**
-     * @return the JavaNaming in use.
-     */
     public JavaNaming getJavaNaming() {
         return javaNaming;
     }
 
-    /**
-     * @param javaNaming
-     *            the javaNaming to set
-     */
     public void setJavaNaming(final JavaNaming javaNaming) {
         this.javaNaming = javaNaming;
     }
 
     /**
-     * Creates a new ClassInfo with all Nature's registered.
+     * Creates a new {@link ClassInfo} with all Nature's registered.
      * 
      * @param className
      *            the name of the class
@@ -468,7 +423,7 @@ public final class ClassInfoBuilder {
     }
 
     /**
-     * Creates a new FieldInfo with all Nature's registered.
+     * Creates a new {@link FieldInfo} with all Nature's registered.
      * 
      * @param fieldName
      *            the name of the field
@@ -482,7 +437,7 @@ public final class ClassInfoBuilder {
     }
 
     /**
-     * Creates a new PackageInfo with all Nature's registered.
+     * Creates a new {@link PackageInfo} with all Nature's registered.
      * 
      * @param packageName
      *            the name of the package

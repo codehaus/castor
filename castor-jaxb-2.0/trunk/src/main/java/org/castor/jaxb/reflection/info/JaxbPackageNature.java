@@ -165,7 +165,7 @@ public final class JaxbPackageNature extends OoPackageNature {
     /**
      * @return Collection of SchemaTypes
      */
-    public Collection < SchemaTypeInfo > getSchemaTypes() {
+    public Collection <SchemaTypeInfo> getSchemaTypes() {
         Collection < SchemaTypeInfo > schemaTypes =
             (Collection < SchemaTypeInfo > ) getProperty(Properties.SCHEMA_TYPES);
         if (schemaTypes == null) {
@@ -179,7 +179,7 @@ public final class JaxbPackageNature extends OoPackageNature {
      * To set the Schema-Types property.
      * @param schemaTypes the Schema-Types collection to set to
      */
-    private void setSchemaTypes(final Collection < SchemaTypeInfo > schemaTypes) {
+    private void setSchemaTypes(final Collection <SchemaTypeInfo> schemaTypes) {
         setProperty(Properties.SCHEMA_TYPES, schemaTypes);
     }
 

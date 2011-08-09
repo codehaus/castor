@@ -33,4 +33,15 @@ public class JAXBClassDescriptorImpl extends XMLClassDescriptorImpl implements X
     JAXBClassDescriptorImpl() {
         super();
     }
+    
+    private boolean transientClass;
+
+    public boolean isTransientClass() {
+        return transientClass;
+    }
+
+    public void setTransientClass(boolean transientClass) {
+        this.transientClass = transientClass;
+    }
+    
 }
