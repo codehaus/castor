@@ -8,6 +8,7 @@ import org.castor.core.annotationprocessing.AnnotationProcessor;
 import org.castor.core.nature.BaseNature;
 import org.castor.jaxb.reflection.info.JaxbClassNature;
 import org.castor.jaxb.reflection.processor.BaseFieldProcessor;
+import org.springframework.stereotype.Component;
 
 /**
  * Annotation processor for XMLRootElement.
@@ -15,6 +16,7 @@ import org.castor.jaxb.reflection.processor.BaseFieldProcessor;
  * @author Joachim Grueneis, jgrueneis_at_gmail_dot_com
  * @version $Id$
  */
+@Component("xmlRootElementClassProcessor")
 public class XmlRootElementProcessor extends BaseFieldProcessor {
 
     /** XmlRootElement.name default value. */
