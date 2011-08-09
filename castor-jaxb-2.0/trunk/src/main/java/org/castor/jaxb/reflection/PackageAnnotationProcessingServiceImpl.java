@@ -15,20 +15,19 @@
  */
 package org.castor.jaxb.reflection;
 
+import java.util.List;
+
+import org.castor.core.annotationprocessing.AnnotationProcessor;
 import org.castor.core.annotationprocessing.BaseAnnotationProcessingService;
-import org.castor.jaxb.reflection.processor.packagge.XmlAccessorOrderProcessor;
-import org.castor.jaxb.reflection.processor.packagge.XmlAccessorTypeProcessor;
-import org.castor.jaxb.reflection.processor.packagge.XmlSchemaProcessor;
-import org.castor.jaxb.reflection.processor.packagge.XmlSchemaTypeProcessor;
-import org.castor.jaxb.reflection.processor.packagge.XmlSchemaTypesProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * A service class to precess all package level annotations.
+ * A service class to process all package level annotations.
  * 
  * @author Joachim Grueneis, jgrueneis_at_codehaus_dot_com
+ * @author <a href="mailto:wguttmn AT codehaus DOT org">Werner Guttmann</a>
  * @version $Id$
  */
 @Component("packageAnnotationProcessingService")
@@ -41,15 +40,9 @@ public class PackageAnnotationProcessingServiceImpl extends BaseAnnotationProces
     /** Default for namespace. */
     private static final String ANNOTATION_PROPERTY_NAMESPACE_DEFAULT = "##default";
 
-    /**
-     * Constructs a AnnotationProcessingService what means to register all
-     * available AnnotationProcessing classes.
-     */
-    public PackageAnnotationProcessingServiceImpl() {
-        addAnnotationProcessor(new XmlSchemaProcessor());
-        addAnnotationProcessor(new XmlAccessorTypeProcessor());
-        addAnnotationProcessor(new XmlAccessorOrderProcessor());
-        addAnnotationProcessor(new XmlSchemaTypeProcessor());
-        addAnnotationProcessor(new XmlSchemaTypesProcessor());
+    public void setPackageAnnotationProcessors(List<AnnotationProcessor> packageAnnotationProcessors) {
+        for (AnnotationProcessor annotationProcessor : packageAnnotationProcessors) {
+            addAnnotationProcessor(annotationProcessor);
+        }
     }
 }

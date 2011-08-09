@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
  * {@link ClassInfo} instance.
  * 
  * @author Joachim Grueneis, jgrueneis_at_codehaus_dot_com
+ * @author <a href="mailto:wguttmn AT codehaus DOT org">Werner Guttmann</a>
  * @version $Id$
  */
 public class ClassAnnotationProcessingServiceImpl extends BaseAnnotationProcessingService {

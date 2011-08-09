@@ -26,4 +26,41 @@
     </property>
   </bean>
 
+  <bean id="fieldAnnotationProcessingService" class="org.castor.jaxb.reflection.FieldAnnotationProcessingServiceImpl">
+    <property name="fieldAnnotationProcessors">
+        <list>
+            <ref bean="xmlElementFieldProcessor"/>
+            <ref bean="xmlElementsFieldProcessor"/>
+            <ref bean="xmlElementRefFieldProcessor"/>
+            <ref bean="xmlElementRefsFieldProcessor"/>
+            <ref bean="xmlElementWrapperFieldProcessor"/>
+            <ref bean="xmlAnyElementFieldProcessor"/>
+            <ref bean="xmlAttributeFieldProcessor"/>
+            <ref bean="xmlAnyAttributeFieldProcessor"/>
+            <ref bean="xmlTransientFieldProcessor"/>
+            <ref bean="xmlValueFieldProcessor"/>
+            <ref bean="xmlIDFieldProcessor"/>
+            <ref bean="xmlIDREFFieldProcessor"/>
+            <ref bean="xmlListFieldProcessor"/>
+            <ref bean="xmlMixedFieldProcessor"/>
+            <ref bean="xmlMimeTypeFieldProcessor"/>
+            <ref bean="xmlAttachmentRefFieldProcessor"/>
+            <ref bean="xmlInlineBinaryDataFieldProcessor"/>
+            <ref bean="xmlEnumValueFieldProcessor"/>
+        </list>
+    </property>
+  </bean>
+
+  <bean id="packageAnnotationProcessingService" class="org.castor.jaxb.reflection.PackageAnnotationProcessingServiceImpl">
+    <property name="packageAnnotationProcessors">
+        <list>
+            <ref bean="xmlSchemaPackageProcessor"/>
+            <ref bean="xmlAccessorTypePackageProcessor"/>
+            <ref bean="xmlAccessorOrderPackageProcessor"/>
+            <ref bean="xmlSchemaTypePackageProcessor"/>
+            <ref bean="xmlSchemaTypesPackageProcessor"/>
+        </list>
+    </property>
+  </bean>
+
 </beans>
