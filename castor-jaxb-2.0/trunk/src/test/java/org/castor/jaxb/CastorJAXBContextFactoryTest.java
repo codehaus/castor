@@ -32,6 +32,7 @@ import java.util.HashMap;
 
 import static junit.framework.Assert.assertNotNull;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests the {@link CastorJAXBContextFactory} class.
@@ -167,5 +168,23 @@ public class CastorJAXBContextFactoryTest {
                 CastorJAXBContextFactory.createContext(new Class[] {Entity.class}, new HashMap<String, Object>());
 
         assertNotNull("CastorJAXBContextFactory created null context.", jaxbContext);
+    }
+
+    /**
+     * Tests the {@link CastorJAXBContextFactory#createContext(Class[], java.util.Map)}
+     * method.
+     *
+     * @throws Exception
+     *             if any error occurs during test
+     */
+    @Test
+    public void testRegisterContextFactory() throws Exception {
+
+        CastorJAXBContextFactory.registerContextFactory();
+
+        JAXBContext jaxbContext = JAXBContext.newInstance(NotMappedEntity.class);
+
+        assertNotNull("CastorJAXBContextFactory created null context.", jaxbContext);
+        assertTrue("CastorJAXBContextFactory was not registered.", jaxbContext instanceof CastorJAXBContext);
     }
 }

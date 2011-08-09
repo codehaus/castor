@@ -20,6 +20,8 @@ import org.apache.commons.logging.LogFactory;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Map;
 
 /**
@@ -32,9 +34,14 @@ import java.util.Map;
 public class CastorJAXBContextFactory {
 
     /**
-     * Represents the separator used for splitting the classes in context path.
+     * Represents the name of the property that allows to register the context factory used by {@link JAXBContext}.
      */
-    private static final String SEPARATOR = ":";
+    private static final String JAXBCONTEXT_PROPERTY_NAME = "javax.xml.bind.JAXBContext";
+
+    /**
+     * Represents the name of this context factory class.
+     */
+    private static final String CASTOR_JAXBCONTEXT_FACTORY = "org.castor.jaxb.CastorJAXBContextFactory";
 
     /**
      * Logger used by this class.
@@ -119,5 +126,16 @@ public class CastorJAXBContextFactory {
         }
     }
 
+    /**
+     * Registers the {@link CastorJAXBContextFactory} as the default JAXB provider.
+     */
+    public static void registerContextFactory() {
 
+        AccessController.doPrivileged(new PrivilegedAction<Object>() {
+            public Object run() {
+                System.setProperty(JAXBCONTEXT_PROPERTY_NAME, CASTOR_JAXBCONTEXT_FACTORY);
+                return null;
+            }
+        });
+    }
 }
