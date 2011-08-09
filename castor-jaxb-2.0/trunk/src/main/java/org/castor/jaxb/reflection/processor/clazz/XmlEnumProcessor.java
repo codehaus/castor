@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlEnum;
 import org.castor.core.nature.BaseNature;
 import org.castor.jaxb.reflection.info.JaxbClassNature;
 import org.castor.jaxb.reflection.processor.BaseFieldProcessor;
+import org.springframework.stereotype.Component;
 
 /**
  * Annotation processor for XmlEnum.
@@ -14,6 +15,7 @@ import org.castor.jaxb.reflection.processor.BaseFieldProcessor;
  * @author Joachim Grueneis, jgrueneis_at_gmail_dot_com
  * @version $Id$
  */
+@Component("xmlEnumClassProcessor")
 public class XmlEnumProcessor extends BaseFieldProcessor {
     /**
      * {@inheritDoc}

@@ -15,19 +15,13 @@
  */
 package org.castor.jaxb.reflection;
 
+import java.util.List;
+
+import org.castor.core.annotationprocessing.AnnotationProcessor;
 import org.castor.core.annotationprocessing.BaseAnnotationProcessingService;
 import org.castor.jaxb.reflection.info.ClassInfo;
-import org.castor.jaxb.reflection.processor.clazz.XmlAccessorOrderProcessor;
-import org.castor.jaxb.reflection.processor.clazz.XmlAccessorTypeProcessor;
-import org.castor.jaxb.reflection.processor.clazz.XmlEnumProcessor;
-import org.castor.jaxb.reflection.processor.clazz.XmlRootElementProcessor;
-import org.castor.jaxb.reflection.processor.clazz.XmlSeeAlsoProcessor;
-import org.castor.jaxb.reflection.processor.clazz.XmlTransientProcessor;
-import org.castor.jaxb.reflection.processor.clazz.XmlTypeProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 /**
  * A class to process all class related annotations and put the results into a
@@ -36,22 +30,14 @@ import org.springframework.stereotype.Service;
  * @author Joachim Grueneis, jgrueneis_at_codehaus_dot_com
  * @version $Id$
  */
-@Component("classAnnotationProcessingService")
 public class ClassAnnotationProcessingServiceImpl extends BaseAnnotationProcessingService {
 
     public final Logger LOG = LoggerFactory.getLogger(this.getClass());
-
-    /**
-     * Constructs a AnnotationProcessingService what means to register all
-     * available AnnotationProcessing classes.
-     */
-    public ClassAnnotationProcessingServiceImpl() {
-        addAnnotationProcessor(new XmlTypeProcessor());
-        addAnnotationProcessor(new XmlRootElementProcessor());
-        addAnnotationProcessor(new XmlTransientProcessor());
-        addAnnotationProcessor(new XmlSeeAlsoProcessor());
-        addAnnotationProcessor(new XmlAccessorTypeProcessor());
-        addAnnotationProcessor(new XmlAccessorOrderProcessor());
-        addAnnotationProcessor(new XmlEnumProcessor());
+    
+    public void setClassAnnotationProcessors(List<AnnotationProcessor> classAnnotationProcessors) {
+        for (AnnotationProcessor annotationProcessor : classAnnotationProcessors) {
+            addAnnotationProcessor(annotationProcessor);
+        }
     }
+
 }

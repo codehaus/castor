@@ -11,5 +11,19 @@
 
   <context:component-scan base-package="org.castor.jaxb" />
   <context:component-scan base-package="org.castor.jaxb.resolver" />
+  
+  <bean id="classAnnotationProcessingService" class="org.castor.jaxb.reflection.ClassAnnotationProcessingServiceImpl">
+    <property name="classAnnotationProcessors">
+        <list>
+            <ref bean="xmlTypeClassProcessor" />
+            <ref bean="xmlRootElementClassProcessor" />
+            <ref bean="xmlTransientClassProcessor" />
+            <ref bean="xmlSeeAlsoClassProcessor" />
+            <ref bean="xmlAccessorTypeClassProcessor" />
+            <ref bean="xmlAccessorOrderClassProcessor" />
+            <ref bean="xmlEnumClassProcessor" />
+        </list>
+    </property>
+  </bean>
 
 </beans>

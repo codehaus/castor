@@ -26,7 +26,9 @@ import org.castor.xml.InternalContext;
 import org.castor.xml.JavaNaming;
 import org.castor.xml.XMLNaming;
 import org.exolab.castor.xml.ResolverException;
+import org.exolab.castor.xml.XMLClassDescriptorResolver;
 import org.exolab.castor.xml.XMLContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.w3c.dom.Node;
 
 import javax.xml.bind.Binder;
@@ -62,34 +64,19 @@ public class CastorJAXBContext extends JAXBContext {
         xmlContext = new XMLContext();
         InternalContext internalContext = xmlContext.getInternalContext();
 
-        JavaNaming javaNaming = new JAXBJavaNaming();
-        XMLNaming xmlNaming = new JAXBXmlNaming();
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("classpath:/castor-jaxb-context.xml");
+        
+        JavaNaming javaNaming = context.getBean("jaxbJavaNaming", JAXBJavaNaming.class);
+        XMLNaming xmlNaming = context.getBean("jaxbXmlNaming", JAXBXmlNaming.class);
 
         internalContext.setJavaNaming(javaNaming);
         internalContext.setXMLNaming(xmlNaming);
 
-        ClassDescriptorBuilder cdb = new ClassDescriptorBuilder();
-        cdb.setXMLNaming(xmlNaming);
-
-        ClassInfoBuilder cib = new ClassInfoBuilder();
-        cib.setJavaNaming(javaNaming);
-
-        JAXBPackageResolverCommand packageResolverCommand = new JAXBPackageResolverCommand();
-        packageResolverCommand.setClassDescriptorBuilder(cdb);
-        packageResolverCommand.setClassInfoBuilder(cib);
-
-        JAXBClassResolverCommand classResolverCommand = new JAXBClassResolverCommand();
-        classResolverCommand.setClassDescriptorBuilder(cdb);
-        classResolverCommand.setClassInfoBuilder(cib);
-
-        JAXBResolverStrategy resolverStrategy = new JAXBResolverStrategy();
-        resolverStrategy.setClassResolverCommand(classResolverCommand);
-        resolverStrategy.setPackageResolverCommand(packageResolverCommand);
+        JAXBResolverStrategy resolverStrategy = context.getBean("jaxbResolverStrategy", JAXBResolverStrategy.class);
 
         internalContext.setResolverStrategy(resolverStrategy);
-
-        internalContext.getXMLClassDescriptorResolver().setResolverStrategy(
-                resolverStrategy);
+        XMLClassDescriptorResolver classDescriptorResolver = internalContext.getXMLClassDescriptorResolver();
+        classDescriptorResolver.setResolverStrategy(resolverStrategy);
     }
 
     /**

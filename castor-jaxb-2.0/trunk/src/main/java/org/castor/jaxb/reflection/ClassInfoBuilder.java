@@ -15,6 +15,7 @@
  */
 package org.castor.jaxb.reflection;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -47,7 +48,7 @@ import org.springframework.stereotype.Component;
  * @author Joachim Grueneis, jgrueneis_at_codehaus_dot_com
  * @version $Id$
  */
-@Component 
+@Component("classInfoBuilder")
 public final class ClassInfoBuilder {
     public final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
@@ -80,15 +81,15 @@ public final class ClassInfoBuilder {
     @Qualifier("jaxbJavaNaming")
     private JavaNaming javaNaming;
 
-    /**
-     * Creates the required annotation processing services.
-     */
-    public ClassInfoBuilder() {
-        super();
-        packageAnnotationProcessingService = new PackageAnnotationProcessingServiceImpl();
-        classAnnotationProcessingService = new ClassAnnotationProcessingServiceImpl();
-        fieldAnnotationProcessingService = new FieldAnnotationProcessingServiceImpl();
-    }
+//    /**
+//     * Creates the required annotation processing services.
+//     */
+//    public ClassInfoBuilder() {
+//        super();
+////        packageAnnotationProcessingService = new PackageAnnotationProcessingServiceImpl();
+////        classAnnotationProcessingService = new ClassAnnotationProcessingServiceImpl();
+////        fieldAnnotationProcessingService = new FieldAnnotationProcessingServiceImpl();
+//    }
 
     /**
      * Build the ClassInfo representation for a Class.
@@ -121,10 +122,9 @@ public final class ClassInfoBuilder {
         jaxbClassNature.setType(type);
         jaxbClassNature.setSupertype(type.getSuperclass());
         jaxbClassNature.setInterfaces(type.getInterfaces());
-        jaxbClassNature
-                .setHasPublicEmptyConstructor(hasPublicEmptyConstructor(type));
+        jaxbClassNature.setHasPublicEmptyConstructor(hasPublicEmptyConstructor(type));
 
-        classAnnotationProcessingService.processAnnotations(jaxbClassNature,
+        Annotation[] unprocessedAnnotations = this.classAnnotationProcessingService.processAnnotations(jaxbClassNature,
                 type.getAnnotations());
         for (Field field : type.getDeclaredFields()) {
             if (LOG.isInfoEnabled()) {

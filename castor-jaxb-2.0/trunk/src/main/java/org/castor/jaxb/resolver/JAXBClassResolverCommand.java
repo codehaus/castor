@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
  * @author Joachim Grueneis, jgrueneis AT gmail DOT com
  * @version $Id$
  */
-@Component
+@Component("jaxbClassResolverCommand")
 public class JAXBClassResolverCommand implements ResolverClassCommand {
     public final Logger LOG = LoggerFactory.getLogger(this.getClass());
 

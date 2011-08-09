@@ -59,7 +59,6 @@ public class ClassAnnotationProcessingServiceTest {
     public final void testProcessAnnotations() {
         Class<WithAnnotations> clazz = WithAnnotations.class;
         Annotation[] annotations = clazz.getAnnotations();
-        classAnnotationProcessingService = new ClassAnnotationProcessingServiceImpl();
         JaxbClassNature classInfo = new JaxbClassNature(new ClassInfo("Franz"));
         classAnnotationProcessingService.processAnnotations(classInfo, annotations);
         Assert.assertEquals("Hugo", classInfo.getRootElementName());
@@ -282,10 +281,9 @@ public class ClassAnnotationProcessingServiceTest {
     public void testProcessAnnotationsWithXmlAccessorTypeNONEAnnotation() {
         Class<WithXmlAccessorTypeAnnotationNONE> clazz = WithXmlAccessorTypeAnnotationNONE.class;
         Annotation[] annotations = clazz.getAnnotations();
-        ClassAnnotationProcessingServiceImpl caps = new ClassAnnotationProcessingServiceImpl();
         JaxbClassNature classInfo = new JaxbClassNature(
                 new ClassInfo(WithXmlAccessorTypeAnnotationNONE.class.getName()));
-        caps.processAnnotations(classInfo, annotations);
+        classAnnotationProcessingService.processAnnotations(classInfo, annotations);
 
         // XmlRootElement annotations
         Assert.assertNull(classInfo.getRootElementName());

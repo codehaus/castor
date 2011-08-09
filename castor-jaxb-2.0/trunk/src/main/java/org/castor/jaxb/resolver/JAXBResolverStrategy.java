@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
  * @author Joachim Grueneis, jgrueneis AT gmail DOT com
  * @version $Id$
  */
-@Component
+@Component("jaxbResolverStrategy")
 public class JAXBResolverStrategy implements ResolverStrategy {
     public final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
