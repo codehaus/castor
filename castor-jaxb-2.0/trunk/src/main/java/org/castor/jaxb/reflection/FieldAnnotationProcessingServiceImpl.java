@@ -15,26 +15,10 @@
  */
 package org.castor.jaxb.reflection;
 
+import java.util.List;
 
+import org.castor.core.annotationprocessing.AnnotationProcessor;
 import org.castor.core.annotationprocessing.BaseAnnotationProcessingService;
-import org.castor.jaxb.reflection.processor.field.XmlAnyAttributeProcessor;
-import org.castor.jaxb.reflection.processor.field.XmlAnyElementProcessor;
-import org.castor.jaxb.reflection.processor.field.XmlAttachmentRefProcessor;
-import org.castor.jaxb.reflection.processor.field.XmlAttributeProcessor;
-import org.castor.jaxb.reflection.processor.field.XmlElementProcessor;
-import org.castor.jaxb.reflection.processor.field.XmlElementRefProcessor;
-import org.castor.jaxb.reflection.processor.field.XmlElementRefsProcessor;
-import org.castor.jaxb.reflection.processor.field.XmlElementWrapperProcessor;
-import org.castor.jaxb.reflection.processor.field.XmlElementsProcessor;
-import org.castor.jaxb.reflection.processor.field.XmlEnumValueProcessor;
-import org.castor.jaxb.reflection.processor.field.XmlIDProcessor;
-import org.castor.jaxb.reflection.processor.field.XmlIDREFProcessor;
-import org.castor.jaxb.reflection.processor.field.XmlInlineBinaryDataProcessor;
-import org.castor.jaxb.reflection.processor.field.XmlListProcessor;
-import org.castor.jaxb.reflection.processor.field.XmlMimeTypeProcessor;
-import org.castor.jaxb.reflection.processor.field.XmlMixedProcessor;
-import org.castor.jaxb.reflection.processor.field.XmlTransientProcessor;
-import org.castor.jaxb.reflection.processor.field.XmlValueProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -44,6 +28,7 @@ import org.springframework.stereotype.Component;
  * results info FieldInfo instances.
  * 
  * @author Joachim Grueneis, jgrueneis_at_codehaus_dot_com
+ * @author <a href="mailto:wguttmn AT codehaus DOT org">Werner Guttmann</a>
  * @version $Id$
  */
 @Component("fieldAnnotationProcessingService")
@@ -51,31 +36,10 @@ public class FieldAnnotationProcessingServiceImpl extends BaseAnnotationProcessi
 
     public final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
-    /**
-     * Constructs a AnnotationProcessingService what means to register all
-     * available AnnotationProcessing classes.
-     */
-    public FieldAnnotationProcessingServiceImpl() {
-        super();
-        addAnnotationProcessor(new XmlElementProcessor());
-        // no root element on a field!! addAnnotationProcessor(new
-        // XmlRootElementProcessor());
-        addAnnotationProcessor(new XmlElementsProcessor());
-        addAnnotationProcessor(new XmlElementRefProcessor());
-        addAnnotationProcessor(new XmlElementRefsProcessor());
-        addAnnotationProcessor(new XmlElementWrapperProcessor());
-        addAnnotationProcessor(new XmlAnyElementProcessor());
-        addAnnotationProcessor(new XmlAttributeProcessor());
-        addAnnotationProcessor(new XmlAnyAttributeProcessor());
-        addAnnotationProcessor(new XmlTransientProcessor());
-        addAnnotationProcessor(new XmlValueProcessor());
-        addAnnotationProcessor(new XmlIDProcessor());
-        addAnnotationProcessor(new XmlIDREFProcessor());
-        addAnnotationProcessor(new XmlListProcessor());
-        addAnnotationProcessor(new XmlMixedProcessor());
-        addAnnotationProcessor(new XmlMimeTypeProcessor());
-        addAnnotationProcessor(new XmlAttachmentRefProcessor());
-        addAnnotationProcessor(new XmlInlineBinaryDataProcessor());
-        addAnnotationProcessor(new XmlEnumValueProcessor());
+    public void setFieldAnnotationProcessors(List<AnnotationProcessor> fieldAnnotationProcessors) {
+        for (AnnotationProcessor annotationProcessor : fieldAnnotationProcessors) {
+            addAnnotationProcessor(annotationProcessor);
+        }
     }
+
 }
