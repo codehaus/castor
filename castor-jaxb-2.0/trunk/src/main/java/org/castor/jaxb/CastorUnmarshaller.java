@@ -37,6 +37,9 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import java.io.File;
 import java.io.FileInputStream;
@@ -60,11 +63,6 @@ public class CastorUnmarshaller implements Unmarshaller {
      * Represents the instance of Castor marshaller used for
      */
     private org.exolab.castor.xml.Unmarshaller unmarshaller;
-
-    /**
-     * Represents whether the unmarshaller perform validation.
-     */
-    private boolean validating;
 
     /**
      * Represents the unmarshalling listener.
@@ -96,7 +94,7 @@ public class CastorUnmarshaller implements Unmarshaller {
 
         try {
             // unmarshalls object
-            return unmarshal(new FileInputStream(f));
+            return unmarshalSource(new StreamSource(new FileInputStream(f)));
         } catch (FileNotFoundException e) {
             // wraps and throws exception
             throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
@@ -111,7 +109,7 @@ public class CastorUnmarshaller implements Unmarshaller {
         CastorJAXBUtils.checkNotNull(is, "is");
 
         // unmarshalls object
-        return unmarshal(new InputSource(is));
+        return unmarshalSource(new StreamSource(is));
     }
 
     /**
@@ -121,16 +119,7 @@ public class CastorUnmarshaller implements Unmarshaller {
         // checks input
         CastorJAXBUtils.checkNotNull(reader, "reader");
 
-        try {
-            // unmarshalls object
-            return unmarshaller.unmarshal(reader);
-        } catch (MarshalException e) {
-            // wraps and throws exception
-            throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
-        } catch (ValidationException e) {
-            // wraps and throws exception
-            throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
-        }
+        return unmarshalSource(new StreamSource(reader));
     }
 
     /**
@@ -141,8 +130,7 @@ public class CastorUnmarshaller implements Unmarshaller {
         CastorJAXBUtils.checkNotNull(url, "url");
 
         try {
-            // unmarshalls object
-            return unmarshal(url.openStream());
+            return unmarshalSource(new StreamSource(url.openStream()));
         } catch (IOException e) {
             // wraps and throws exception
             throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
@@ -156,16 +144,7 @@ public class CastorUnmarshaller implements Unmarshaller {
         // checks input
         CastorJAXBUtils.checkNotNull(source, "source");
 
-        try {
-            // unmarshalls object
-            return unmarshaller.unmarshal(source);
-        } catch (MarshalException e) {
-            // wraps and throws exception
-            throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
-        } catch (ValidationException e) {
-            // wraps and throws exception
-            throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
-        }
+        return unmarshalSource(new SAXSource(source));
     }
 
     /**
@@ -175,16 +154,7 @@ public class CastorUnmarshaller implements Unmarshaller {
         // checks input
         CastorJAXBUtils.checkNotNull(node, "node");
 
-        try {
-            // unmarshalls object
-            return unmarshaller.unmarshal(node);
-        } catch (MarshalException e) {
-            // wraps and throws exception
-            throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
-        } catch (ValidationException e) {
-            // wraps and throws exception
-            throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
-        }
+        return unmarshalSource(new DOMSource(node));
     }
 
     /**
@@ -196,23 +166,7 @@ public class CastorUnmarshaller implements Unmarshaller {
         CastorJAXBUtils.checkNotNull(node, "node");
         CastorJAXBUtils.checkNotNull(declaredType, "declaredType");
 
-        try {
-            // sets the expected class
-            unmarshaller.setClass(declaredType);
-            // unmarshalls object
-            T result = (T) unmarshaller.unmarshal(node);
-            // converts the result into JAXBElement
-            return createJAXBElement(declaredType, result);
-        } catch (ClassCastException e) {
-            // wraps and throws exception
-            throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
-        } catch (MarshalException e) {
-            // wraps and throws exception
-            throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
-        } catch (ValidationException e) {
-            // wraps and throws exception
-            throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
-        }
+        return unmarshalSource(new DOMSource(node), declaredType);
     }
 
     /**
@@ -222,43 +176,19 @@ public class CastorUnmarshaller implements Unmarshaller {
         // checks input
         CastorJAXBUtils.checkNotNull(source, "source");
 
-        try {
-            // unmarshalls object
-            return unmarshaller.unmarshal(source);
-        } catch (MarshalException e) {
-            // wraps and throws exception
-            throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
-        } catch (ValidationException e) {
-            // wraps and throws exception
-            throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
-        }
+        return unmarshalSource(source);
     }
 
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("unchecked")
     public <T> JAXBElement<T> unmarshal(Source source, Class<T> declaredType) throws JAXBException {
         // checks input
         CastorJAXBUtils.checkNotNull(source, "source");
         CastorJAXBUtils.checkNotNull(declaredType, "declaredType");
 
-        try {
-            // sets the expected class
-            unmarshaller.setClass(declaredType);
-            // unmarshalls object
-            T result = (T) unmarshaller.unmarshal(source);
-            // converts the result into JAXBElement
-            return createJAXBElement(declaredType, result);
-        } catch (ClassCastException e) {
-            // wraps and throws exception
-            throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
-        } catch (MarshalException e) {
-            // wraps and throws exception
-            throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
-        } catch (ValidationException e) {
-            // wraps and throws exception
-            throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
-        }
+        return unmarshalSource(source, declaredType);
     }
 
     /**
@@ -283,6 +213,7 @@ public class CastorUnmarshaller implements Unmarshaller {
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("unchecked")
     public <T> JAXBElement<T> unmarshal(XMLStreamReader reader, Class<T> declaredType) throws JAXBException {
         // checks input
         CastorJAXBUtils.checkNotNull(reader, "reader");
@@ -329,6 +260,7 @@ public class CastorUnmarshaller implements Unmarshaller {
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("unchecked")
     public <T> JAXBElement<T> unmarshal(XMLEventReader reader, Class<T> declaredType) throws JAXBException {
         // checks input
         CastorJAXBUtils.checkNotNull(reader, "reader");
@@ -366,18 +298,18 @@ public class CastorUnmarshaller implements Unmarshaller {
      * {@inheritDoc}
      */
     public void setValidating(boolean validating) throws JAXBException {
+        // TODO the setValidating method has been detracted in JAXB 2
 
-        // sets the validating field
-        this.validating = validating;
+        // does nothing
     }
 
     /**
      * {@inheritDoc}
      */
     public boolean isValidating() throws JAXBException {
+        // TODO the setValidating method has been detracted in JAXB 2
 
-        // returns the validating field
-        return validating;
+        return false;
     }
 
     /**
@@ -401,7 +333,7 @@ public class CastorUnmarshaller implements Unmarshaller {
      */
     public void setProperty(String name, Object value) throws PropertyException {
 
-        // retrieves the property value
+        // sets the property value
         unmarshaller.getInternalContext().setProperty(name, value);
     }
 
@@ -418,6 +350,7 @@ public class CastorUnmarshaller implements Unmarshaller {
      * {@inheritDoc}
      */
     public void setSchema(Schema schema) {
+
         // TODO implement
         throw new UnsupportedOperationException("Unmarshaller.setSchema method is unsupported.");
     }
@@ -426,6 +359,7 @@ public class CastorUnmarshaller implements Unmarshaller {
      * {@inheritDoc}
      */
     public Schema getSchema() {
+
         // TODO implement
         throw new UnsupportedOperationException("Unmarshaller.getSchema method is unsupported.");
     }
@@ -476,7 +410,7 @@ public class CastorUnmarshaller implements Unmarshaller {
     public void setListener(Unmarshaller.Listener listener) {
 
         this.listener = listener;
-        unmarshaller.setUnmarshalListener(new UnmarshalListenerAdapter(listener));
+        unmarshaller.setUnmarshalListener(listener != null ? new UnmarshalListenerAdapter(listener) : null);
     }
 
     /**
@@ -485,6 +419,51 @@ public class CastorUnmarshaller implements Unmarshaller {
     public Listener getListener() {
 
         return listener;
+    }
+
+    /**
+     * Unmarshalls the given {@link Source} instance.
+     *
+     * @param source the {@link Source} instance to unmarshall
+     * @return the unmarshalled object
+     * @throws JAXBException if any error occurs during unmarshalling
+     */
+    private Object unmarshalSource(Source source) throws JAXBException {
+
+        try {
+            // unmarshalls the object
+            return unmarshaller.unmarshal(source);
+        } catch (MarshalException e) {
+            // wraps and throws exception
+            throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
+        } catch (ValidationException e) {
+            // wraps and throws exception
+            throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
+        }
+    }
+
+    /**
+     * Unmarshalls the given {@link Source} into a well know type.
+     *
+     * @param source the {@link Source} to use for unmarshalling
+     * @param declaredType the expected class of the unmarshalled object
+     * @param <T> the type of expected object
+     * @return the unmarshalled object
+     * @throws JAXBException if any error occurs during unmarshalling
+     */
+    @SuppressWarnings("unchecked")
+    private <T> JAXBElement<T> unmarshalSource(Source source, Class<T> declaredType) throws JAXBException {
+
+        try {
+            // TODO thread safety issue - possible race condition issue with setClass
+            // sets the expected class
+            unmarshaller.setClass(declaredType);
+            // unmarshalls object and converts the result into JAXBElement
+            return createJAXBElement(declaredType, (T) unmarshalSource(source));
+        } catch (ClassCastException e) {
+            // wraps and throws exception
+            throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
+        }
     }
 
     /**
@@ -519,9 +498,9 @@ public class CastorUnmarshaller implements Unmarshaller {
             descriptor = resolver.resolve(clazz.getName());
 
             if (descriptor != null) {
-                if(descriptor.getNameSpacePrefix() != null) {
+                if (descriptor.getNameSpacePrefix() != null) {
                     return new QName(descriptor.getNameSpaceURI(), descriptor.getXMLName(),
-                        descriptor.getNameSpacePrefix());
+                            descriptor.getNameSpacePrefix());
                 }
 
                 return new QName(descriptor.getNameSpaceURI(), descriptor.getXMLName());
