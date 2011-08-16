@@ -24,6 +24,7 @@ import org.exolab.castor.xml.XMLClassDescriptor;
 import org.exolab.castor.xml.XMLClassDescriptorResolver;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -70,6 +71,11 @@ public class CastorUnmarshaller implements Unmarshaller {
     private Unmarshaller.Listener listener;
 
     /**
+     * Represents the {@link Schema} instance used for validating the input.
+     */
+    private Schema schema;
+
+    /**
      * Creates new instance of {@link CastorUnmarshaller} with the given {@link org.exolab.castor.xml.Unmarshaller}
      * instance.
      *
@@ -94,7 +100,7 @@ public class CastorUnmarshaller implements Unmarshaller {
 
         try {
             // unmarshalls object
-            return unmarshalSource(new StreamSource(new FileInputStream(f)));
+            return unmarshalAndValidateSource(new StreamSource(new FileInputStream(f)));
         } catch (FileNotFoundException e) {
             // wraps and throws exception
             throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
@@ -109,7 +115,7 @@ public class CastorUnmarshaller implements Unmarshaller {
         CastorJAXBUtils.checkNotNull(is, "is");
 
         // unmarshalls object
-        return unmarshalSource(new StreamSource(is));
+        return unmarshalAndValidateSource(new StreamSource(is));
     }
 
     /**
@@ -119,7 +125,7 @@ public class CastorUnmarshaller implements Unmarshaller {
         // checks input
         CastorJAXBUtils.checkNotNull(reader, "reader");
 
-        return unmarshalSource(new StreamSource(reader));
+        return unmarshalAndValidateSource(new StreamSource(reader));
     }
 
     /**
@@ -130,7 +136,7 @@ public class CastorUnmarshaller implements Unmarshaller {
         CastorJAXBUtils.checkNotNull(url, "url");
 
         try {
-            return unmarshalSource(new StreamSource(url.openStream()));
+            return unmarshalAndValidateSource(new StreamSource(url.openStream()));
         } catch (IOException e) {
             // wraps and throws exception
             throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
@@ -144,7 +150,7 @@ public class CastorUnmarshaller implements Unmarshaller {
         // checks input
         CastorJAXBUtils.checkNotNull(source, "source");
 
-        return unmarshalSource(new SAXSource(source));
+        return unmarshalAndValidateSource(new SAXSource(source));
     }
 
     /**
@@ -154,7 +160,7 @@ public class CastorUnmarshaller implements Unmarshaller {
         // checks input
         CastorJAXBUtils.checkNotNull(node, "node");
 
-        return unmarshalSource(new DOMSource(node));
+        return unmarshalAndValidateSource(new DOMSource(node));
     }
 
     /**
@@ -166,7 +172,7 @@ public class CastorUnmarshaller implements Unmarshaller {
         CastorJAXBUtils.checkNotNull(node, "node");
         CastorJAXBUtils.checkNotNull(declaredType, "declaredType");
 
-        return unmarshalSource(new DOMSource(node), declaredType);
+        return unmarshalAndValidateSource(new DOMSource(node), declaredType);
     }
 
     /**
@@ -176,7 +182,7 @@ public class CastorUnmarshaller implements Unmarshaller {
         // checks input
         CastorJAXBUtils.checkNotNull(source, "source");
 
-        return unmarshalSource(source);
+        return unmarshalAndValidateSource(source);
     }
 
     /**
@@ -188,7 +194,7 @@ public class CastorUnmarshaller implements Unmarshaller {
         CastorJAXBUtils.checkNotNull(source, "source");
         CastorJAXBUtils.checkNotNull(declaredType, "declaredType");
 
-        return unmarshalSource(source, declaredType);
+        return unmarshalAndValidateSource(source, declaredType);
     }
 
     /**
@@ -351,8 +357,7 @@ public class CastorUnmarshaller implements Unmarshaller {
      */
     public void setSchema(Schema schema) {
 
-        // TODO implement
-        throw new UnsupportedOperationException("Unmarshaller.setSchema method is unsupported.");
+        this.schema = schema;
     }
 
     /**
@@ -360,8 +365,7 @@ public class CastorUnmarshaller implements Unmarshaller {
      */
     public Schema getSchema() {
 
-        // TODO implement
-        throw new UnsupportedOperationException("Unmarshaller.getSchema method is unsupported.");
+        return schema;
     }
 
     /**
@@ -422,15 +426,17 @@ public class CastorUnmarshaller implements Unmarshaller {
     }
 
     /**
-     * Unmarshalls the given {@link Source} instance.
+     * Unmarshalls and validates the given {@link Source} instance.
      *
      * @param source the {@link Source} instance to unmarshall
      * @return the unmarshalled object
      * @throws JAXBException if any error occurs during unmarshalling
      */
-    private Object unmarshalSource(Source source) throws JAXBException {
+    private Object unmarshalAndValidateSource(Source source) throws JAXBException {
 
         try {
+            // validates the source
+            validateSource(source);
             // unmarshalls the object
             return unmarshaller.unmarshal(source);
         } catch (MarshalException e) {
@@ -439,11 +445,15 @@ public class CastorUnmarshaller implements Unmarshaller {
         } catch (ValidationException e) {
             // wraps and throws exception
             throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
+        } catch (SAXException e) {
+            throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
+        } catch (IOException e) {
+            throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
         }
     }
 
     /**
-     * Unmarshalls the given {@link Source} into a well know type.
+     * Unmarshalls and validates the given {@link Source} into a well know type.
      *
      * @param source the {@link Source} to use for unmarshalling
      * @param declaredType the expected class of the unmarshalled object
@@ -452,17 +462,37 @@ public class CastorUnmarshaller implements Unmarshaller {
      * @throws JAXBException if any error occurs during unmarshalling
      */
     @SuppressWarnings("unchecked")
-    private <T> JAXBElement<T> unmarshalSource(Source source, Class<T> declaredType) throws JAXBException {
+    private <T> JAXBElement<T> unmarshalAndValidateSource(Source source, Class<T> declaredType) throws JAXBException {
 
         try {
             // TODO thread safety issue - possible race condition issue with setClass
+            // validates the source
+            validateSource(source);
             // sets the expected class
             unmarshaller.setClass(declaredType);
             // unmarshalls object and converts the result into JAXBElement
-            return createJAXBElement(declaredType, (T) unmarshalSource(source));
+            return createJAXBElement(declaredType, (T) unmarshalAndValidateSource(source));
         } catch (ClassCastException e) {
             // wraps and throws exception
             throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
+        } catch (SAXException e) {
+            throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
+        } catch (IOException e) {
+            throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
+        }
+    }
+
+    /**
+     * Validates the passed {@link Source} instance, against the specified schema.
+     *
+     * @throws IOException if any error occurs during IO operation
+     * @throws SAXException if any error occurs during validation
+     */
+    private void validateSource(Source source) throws IOException, SAXException {
+
+        if(schema != null) {
+
+            schema.newValidator().validate(source);
         }
     }
 
