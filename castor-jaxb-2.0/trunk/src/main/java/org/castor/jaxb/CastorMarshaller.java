@@ -38,6 +38,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The implementation of {@link org.exolab.castor.xml.Marshaller} which wraps the Castor {@link
@@ -50,10 +52,14 @@ import java.io.Writer;
 public class CastorMarshaller implements Marshaller {
 
     /**
-     * Represents the instance of Castor marshaller used for
-     * marshalling.
+     * Represents the instance of {@link CastorJAXBContext} that created this marshaller.
      */
-    private final org.exolab.castor.xml.Marshaller marshaller;
+    private final CastorJAXBContext context;
+
+    /**
+     * Represents the instance of map of marshaller propeties.
+     */
+    private final Map<String, Object> properties = new HashMap<String, Object>();
 
     /**
      * Represents the marshall listener.
@@ -61,19 +67,24 @@ public class CastorMarshaller implements Marshaller {
     private Marshaller.Listener listener;
 
     /**
-     * Creates new instance of {@link CastorMarshaller} with the given {@link org.exolab.castor.xml.Marshaller}
+     * Represents the {@link Schema} instance against which marshalled result will be validated.
+     */
+    private Schema schema;
+
+    /**
+     * Creates new instance of {@link CastorMarshaller} with the given {@link CastorJAXBContext}
      * instance.
      *
-     * @param marshaller the marshaller to use
-     *
+     * @param context the {@link CastorJAXBContext} to use
      * @throws IllegalArgumentException if marshaller is null
      */
-    CastorMarshaller(org.exolab.castor.xml.Marshaller marshaller) {
+    CastorMarshaller(CastorJAXBContext context) {
         // checks input
-        CastorJAXBUtils.checkNotNull(marshaller, "marshaller");
+        CastorJAXBUtils.checkNotNull(context, "context");
 
         // assigns the namesake field
-        this.marshaller = marshaller;
+        this.context = context;
+
     }
 
     /**
@@ -84,10 +95,12 @@ public class CastorMarshaller implements Marshaller {
         CastorJAXBUtils.checkNotNull(result, "result");
 
         try {
+            // creates the instance of marshaller
+            org.exolab.castor.xml.Marshaller marshaller = createMarshaller();
             // sets the output
             marshaller.setResult(result);
             // marshals the object
-            marshal(jaxbElement);
+            validateAndMarshal(marshaller, jaxbElement);
         } catch (IOException e) {
             // wraps and throws exception
             throw CastorJAXBUtils.convertToJAXBException("Exception occurred when marshalling object.", e);
@@ -102,10 +115,12 @@ public class CastorMarshaller implements Marshaller {
         CastorJAXBUtils.checkNotNull(os, "os");
 
         try {
+            // creates the instance of marshaller
+            org.exolab.castor.xml.Marshaller marshaller = createMarshaller();
             // sets the output
             marshaller.setWriter(new OutputStreamWriter(os));
             // marshals the object
-            marshal(jaxbElement);
+            validateAndMarshal(marshaller, jaxbElement);
         } catch (IOException e) {
             // wraps and throws exception
             throw CastorJAXBUtils.convertToJAXBException("Exception occurred when marshalling object.", e);
@@ -120,10 +135,12 @@ public class CastorMarshaller implements Marshaller {
         CastorJAXBUtils.checkNotNull(output, "output");
 
         try {
+            // creates the instance of marshaller
+            org.exolab.castor.xml.Marshaller marshaller = createMarshaller();
             // sets the output
             marshaller.setWriter(new FileWriter(output));
             // marshals the object
-            marshal(jaxbElement);
+            validateAndMarshal(marshaller, jaxbElement);
         } catch (IOException e) {
             // wraps and throws exception
             throw CastorJAXBUtils.convertToJAXBException("Exception occurred when marshalling object.", e);
@@ -138,10 +155,12 @@ public class CastorMarshaller implements Marshaller {
         CastorJAXBUtils.checkNotNull(writer, "writer");
 
         try {
+            // creates the instance of marshaller
+            org.exolab.castor.xml.Marshaller marshaller = createMarshaller();
             // sets the output
             marshaller.setWriter(writer);
             // marshals the object
-            marshal(jaxbElement);
+            validateAndMarshal(marshaller, jaxbElement);
         } catch (IOException e) {
             // wraps and throws exception
             throw CastorJAXBUtils.convertToJAXBException("Exception occurred when marshalling object.", e);
@@ -155,10 +174,12 @@ public class CastorMarshaller implements Marshaller {
         // checks the input
         CastorJAXBUtils.checkNotNull(handler, "handler");
 
+        // creates the instance of marshaller
+        org.exolab.castor.xml.Marshaller marshaller = createMarshaller();
         // sets the output
         marshaller.setContentHandler(handler);
         // marshals the object
-        marshal(jaxbElement);
+        validateAndMarshal(marshaller, jaxbElement);
     }
 
     /**
@@ -168,10 +189,12 @@ public class CastorMarshaller implements Marshaller {
         // checks the input
         CastorJAXBUtils.checkNotNull(node, "node");
 
+        // creates the instance of marshaller
+        org.exolab.castor.xml.Marshaller marshaller = createMarshaller();
         // sets the output
         marshaller.setNode(node);
         // marshals the object
-        marshal(jaxbElement);
+        validateAndMarshal(marshaller, jaxbElement);
     }
 
     /**
@@ -181,10 +204,12 @@ public class CastorMarshaller implements Marshaller {
         // checks the input
         CastorJAXBUtils.checkNotNull(writer, "writer");
 
+        // creates the instance of marshaller
+        org.exolab.castor.xml.Marshaller marshaller = createMarshaller();
         // sets the output
         marshaller.setXmlStreamWriter(writer);
         // marshals the object
-        marshal(jaxbElement);
+        validateAndMarshal(marshaller, jaxbElement);
     }
 
     /**
@@ -194,10 +219,12 @@ public class CastorMarshaller implements Marshaller {
         // checks the input
         CastorJAXBUtils.checkNotNull(writer, "writer");
 
+        // creates the instance of marshaller
+        org.exolab.castor.xml.Marshaller marshaller = createMarshaller();
         // sets the output
         marshaller.setXmlEventWriter(writer);
         // marshals the object
-        marshal(jaxbElement);
+        validateAndMarshal(marshaller, jaxbElement);
     }
 
     /**
@@ -215,18 +242,8 @@ public class CastorMarshaller implements Marshaller {
      */
     public void setProperty(String name, Object value) throws PropertyException {
 
-        if (JAXB_ENCODING.equals(name)) {
-            marshaller.setEncoding(String.valueOf(value));
-        } else if (JAXB_SCHEMA_LOCATION.equals(name)) {
-            marshaller.setSchemaLocation(String.valueOf(value));
-        } else if (JAXB_NO_NAMESPACE_SCHEMA_LOCATION.equals(name)) {
-            marshaller.setNoNamespaceSchemaLocation(String.valueOf(value));
-        } else if (JAXB_FRAGMENT.equals(name)) {
-            marshaller.setMarshalAsDocument(false);
-        } else {
-            // sets the property for the internal context
-            marshaller.getInternalContext().setProperty(name, value);
-        }
+        // adds the property to map
+        properties.put(name, value);
     }
 
     /**
@@ -235,7 +252,7 @@ public class CastorMarshaller implements Marshaller {
     public Object getProperty(String name) throws PropertyException {
 
         // gets the property from the internal context
-        return marshaller.getInternalContext().getProperty(name);
+        return properties.get(name);
     }
 
     /**
@@ -306,8 +323,7 @@ public class CastorMarshaller implements Marshaller {
      */
     public void setSchema(Schema schema) {
 
-        // TODO implement
-        throw new UnsupportedOperationException("Marshaller.setSchema method is unsupported.");
+        this.schema = schema;
     }
 
     /**
@@ -315,8 +331,7 @@ public class CastorMarshaller implements Marshaller {
      */
     public Schema getSchema() {
 
-        // TODO implement
-        throw new UnsupportedOperationException("Marshaller.getSchema method is unsupported.");
+        return schema;
     }
 
     /**
@@ -326,8 +341,6 @@ public class CastorMarshaller implements Marshaller {
 
         // sets the listener
         this.listener = listener;
-        // if the passed listener is null then it simply unregisters the existing one
-        marshaller.setMarshalListener(listener != null ? new MarshalListenerAdapter(listener) : null);
     }
 
     /**
@@ -342,18 +355,23 @@ public class CastorMarshaller implements Marshaller {
     /**
      * Marshals the given object.
      *
+     * @param marshaller  the marshaller to use
      * @param jaxbElement the object to marshall
-     *
      * @throws IllegalArgumentException if the argument is null
      * @throws JAXBException            if any error occurs during marshalling
      */
-    private void marshal(Object jaxbElement) throws JAXBException {
+    private void validateAndMarshal(org.exolab.castor.xml.Marshaller marshaller,
+                                    Object jaxbElement) throws JAXBException {
         // checks the input parameter
         CastorJAXBUtils.checkNotNull(jaxbElement, "jaxbElement");
 
         try {
+            Object jaxbObj = unwrapJAXBElement(jaxbElement);
+
+            validate(jaxbObj);
+
             // marshals the object
-            marshaller.marshal(unwrapJAXBElement(jaxbElement));
+            marshaller.marshal(jaxbObj);
 
         } catch (MarshalException e) {
             // wraps and throws exception
@@ -365,10 +383,27 @@ public class CastorMarshaller implements Marshaller {
     }
 
     /**
+     * Validates the result of the given object against the specified schema.
+     *
+     * @param jaxbElement the object to validate
+     *
+     * @throws MarshalException if any error occurs during marshalling
+     * @throws ValidationException if any error occurs during valdation
+     */
+    private void validate(Object jaxbElement) throws MarshalException, ValidationException {
+
+        if (schema != null) {
+
+            org.exolab.castor.xml.Marshaller marshaller = createMarshaller();
+            marshaller.setContentHandler(schema.newValidatorHandler());
+            marshaller.marshal(jaxbElement);
+        }
+    }
+
+    /**
      * This utility method checks if the passed object is instance of {@link JAXBElement}.
      *
      * @param jaxbElement the object to process
-     *
      * @return the passed object
      */
     private static Object unwrapJAXBElement(Object jaxbElement) {
@@ -380,7 +415,65 @@ public class CastorMarshaller implements Marshaller {
             return ((JAXBElement<?>) jaxbElement).getValue();
         }
 
-        // otherwise simply retrieves the object
+        // otherwise simply returns the object
         return jaxbElement;
+    }
+
+    /**
+     * Creates new instance of {@link org.exolab.castor.xml.Marshaller} that is used internally
+     * as marshaling framework.
+     * <p/>
+     * Creating each time the marshaller instance prevents from race conditions and other thread-safety issues.
+     *
+     * @return newly created {@link org.exolab.castor.xml.Marshaller} instance
+     */
+    private org.exolab.castor.xml.Marshaller createMarshaller() {
+
+        org.exolab.castor.xml.Marshaller marshaller = context.createCastorMarshaller();
+
+        configureMarshaller(marshaller);
+
+        return marshaller;
+    }
+
+    /**
+     * Sets the properties for the passed {@link org.exolab.castor.xml.Marshaller} instance.
+     *
+     * @param marshaller the {@link org.exolab.castor.xml.Marshaller} instance for which the properties will be set
+     */
+    private void configureMarshaller(org.exolab.castor.xml.Marshaller marshaller) {
+
+        if(listener != null) {
+            marshaller.setMarshalListener(new MarshalListenerAdapter(listener));
+        }
+
+        for (Map.Entry<String, Object> property : properties.entrySet()) {
+
+            setMarshallerProperty(marshaller, property.getKey(), property.getValue());
+        }
+    }
+
+    /**
+     * Sets the single property for the marshaller.
+     *
+     * @param marshaller the marshaller to configure
+     * @param name       the property name
+     * @param value      the property value
+     */
+    private void setMarshallerProperty(org.exolab.castor.xml.Marshaller marshaller,
+                                       String name, Object value) {
+
+        if (JAXB_ENCODING.equals(name)) {
+            marshaller.setEncoding(String.valueOf(value));
+        } else if (JAXB_SCHEMA_LOCATION.equals(name)) {
+            marshaller.setSchemaLocation(String.valueOf(value));
+        } else if (JAXB_NO_NAMESPACE_SCHEMA_LOCATION.equals(name)) {
+            marshaller.setNoNamespaceSchemaLocation(String.valueOf(value));
+        } else if (JAXB_FRAGMENT.equals(name)) {
+            marshaller.setMarshalAsDocument(false);
+        } else {
+            // sets the property for the internal context
+            marshaller.getInternalContext().setProperty(name, value);
+        }
     }
 }

@@ -49,6 +49,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The implementation of {@link org.exolab.castor.xml.Marshaller} which wraps the Castor {@link
@@ -61,9 +63,14 @@ import java.net.URL;
 public class CastorUnmarshaller implements Unmarshaller {
 
     /**
-     * Represents the instance of Castor marshaller used for
+     * Represents the instance of {@link CastorJAXBContext}.
      */
-    private org.exolab.castor.xml.Unmarshaller unmarshaller;
+    private CastorJAXBContext context;
+
+    /**
+     * Represents the instance of map of unmarshaller propeties.
+     */
+    private final Map<String, Object> properties = new HashMap<String, Object>();
 
     /**
      * Represents the unmarshalling listener.
@@ -76,19 +83,18 @@ public class CastorUnmarshaller implements Unmarshaller {
     private Schema schema;
 
     /**
-     * Creates new instance of {@link CastorUnmarshaller} with the given {@link org.exolab.castor.xml.Unmarshaller}
+     * Creates new instance of {@link CastorUnmarshaller} with the given {@link CastorJAXBContext}
      * instance.
      *
-     * @param unmarshaller the unmarshaller to use
-     *
+     * @param context the {@link CastorJAXBContext} to use
      * @throws IllegalArgumentException if unmarshaller is null
      */
-    CastorUnmarshaller(org.exolab.castor.xml.Unmarshaller unmarshaller) {
+    CastorUnmarshaller(CastorJAXBContext context) {
         // checks input
-        CastorJAXBUtils.checkNotNull(unmarshaller, "unmarshaller");
+        CastorJAXBUtils.checkNotNull(context, "context");
 
         // assigns the namesake field
-        this.unmarshaller = unmarshaller;
+        this.context = context;
     }
 
     /**
@@ -206,7 +212,7 @@ public class CastorUnmarshaller implements Unmarshaller {
 
         try {
             // unmarshalls object
-            return unmarshaller.unmarshal(reader);
+            return createUnmarshaller().unmarshal(reader);
         } catch (MarshalException e) {
             // wraps and throws exception
             throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
@@ -226,12 +232,14 @@ public class CastorUnmarshaller implements Unmarshaller {
         CastorJAXBUtils.checkNotNull(declaredType, "declaredType");
 
         try {
+            // create unmarshaller instance
+            org.exolab.castor.xml.Unmarshaller unmarshaller = createUnmarshaller();
             // sets the expected class
             unmarshaller.setClass(declaredType);
             // unmarshalls object
             T result = (T) unmarshaller.unmarshal(reader);
             // converts the result into JAXBElement
-            return createJAXBElement(declaredType, result);
+            return createJAXBElement(unmarshaller, declaredType, result);
         } catch (ClassCastException e) {
             // wraps and throws exception
             throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
@@ -253,7 +261,7 @@ public class CastorUnmarshaller implements Unmarshaller {
 
         try {
             // unmarshalls object
-            return unmarshaller.unmarshal(reader);
+            return createUnmarshaller().unmarshal(reader);
         } catch (MarshalException e) {
             // wraps and throws exception
             throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
@@ -273,12 +281,14 @@ public class CastorUnmarshaller implements Unmarshaller {
         CastorJAXBUtils.checkNotNull(declaredType, "declaredType");
 
         try {
+            // create unmarshaller instance
+            org.exolab.castor.xml.Unmarshaller unmarshaller = createUnmarshaller();
             // sets the expected class
             unmarshaller.setClass(declaredType);
             // unmarshalls object
             T result = (T) unmarshaller.unmarshal(reader);
             // converts the result into JAXBElement
-            return createJAXBElement(declaredType, result);
+            return createJAXBElement(unmarshaller, declaredType, result);
         } catch (ClassCastException e) {
             // wraps and throws exception
             throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
@@ -297,7 +307,7 @@ public class CastorUnmarshaller implements Unmarshaller {
     public UnmarshallerHandler getUnmarshallerHandler() {
 
         // creates new castor unmarshaller handler
-        return new CastorUnmarshallerHandler(unmarshaller.createHandler());
+        return new CastorUnmarshallerHandler(createUnmarshaller().createHandler());
     }
 
     /**
@@ -340,7 +350,7 @@ public class CastorUnmarshaller implements Unmarshaller {
     public void setProperty(String name, Object value) throws PropertyException {
 
         // sets the property value
-        unmarshaller.getInternalContext().setProperty(name, value);
+        properties.put(name, value);
     }
 
     /**
@@ -349,7 +359,7 @@ public class CastorUnmarshaller implements Unmarshaller {
     public Object getProperty(String name) throws PropertyException {
 
         // retrieves the property value
-        return unmarshaller.getInternalContext().getProperty(name);
+        return properties.get(name);
     }
 
     /**
@@ -414,7 +424,6 @@ public class CastorUnmarshaller implements Unmarshaller {
     public void setListener(Unmarshaller.Listener listener) {
 
         this.listener = listener;
-        unmarshaller.setUnmarshalListener(listener != null ? new UnmarshalListenerAdapter(listener) : null);
     }
 
     /**
@@ -438,7 +447,7 @@ public class CastorUnmarshaller implements Unmarshaller {
             // validates the source
             validateSource(source);
             // unmarshalls the object
-            return unmarshaller.unmarshal(source);
+            return createUnmarshaller().unmarshal(source);
         } catch (MarshalException e) {
             // wraps and throws exception
             throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
@@ -455,9 +464,9 @@ public class CastorUnmarshaller implements Unmarshaller {
     /**
      * Unmarshalls and validates the given {@link Source} into a well know type.
      *
-     * @param source the {@link Source} to use for unmarshalling
+     * @param source       the {@link Source} to use for unmarshalling
      * @param declaredType the expected class of the unmarshalled object
-     * @param <T> the type of expected object
+     * @param <T>          the type of expected object
      * @return the unmarshalled object
      * @throws JAXBException if any error occurs during unmarshalling
      */
@@ -465,13 +474,14 @@ public class CastorUnmarshaller implements Unmarshaller {
     private <T> JAXBElement<T> unmarshalAndValidateSource(Source source, Class<T> declaredType) throws JAXBException {
 
         try {
-            // TODO thread safety issue - possible race condition issue with setClass
+            // create unmarshaller instance
+            org.exolab.castor.xml.Unmarshaller unmarshaller = createUnmarshaller();
             // validates the source
             validateSource(source);
             // sets the expected class
             unmarshaller.setClass(declaredType);
             // unmarshalls object and converts the result into JAXBElement
-            return createJAXBElement(declaredType, (T) unmarshalAndValidateSource(source));
+            return createJAXBElement(unmarshaller, declaredType, (T) unmarshalAndValidateSource(source));
         } catch (ClassCastException e) {
             // wraps and throws exception
             throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
@@ -485,12 +495,13 @@ public class CastorUnmarshaller implements Unmarshaller {
     /**
      * Validates the passed {@link Source} instance, against the specified schema.
      *
-     * @throws IOException if any error occurs during IO operation
+     * @param source the {@link Source} to validate
+     * @throws IOException  if any error occurs during IO operation
      * @throws SAXException if any error occurs during validation
      */
     private void validateSource(Source source) throws IOException, SAXException {
 
-        if(schema != null) {
+        if (schema != null) {
 
             schema.newValidator().validate(source);
         }
@@ -499,26 +510,27 @@ public class CastorUnmarshaller implements Unmarshaller {
     /**
      * Creates a instance of {@link JAXBElement} that wraps the passed object.</p>
      *
-     * @param clazz the class of the wrapped object
-     * @param obj   the object to wrap
-     * @param <T>   the type of the wrapped object
-     *
+     * @param unmarshaller the unmarshaller to use
+     * @param clazz        the class of the wrapped object
+     * @param obj          the object to wrap
+     * @param <T>          the type of the wrapped object
      * @return the newly created instance of {@link JAXBElement} that wrapps the passed object
      */
-    private <T> JAXBElement<T> createJAXBElement(Class<T> clazz, T obj) {
+    private <T> JAXBElement<T> createJAXBElement(org.exolab.castor.xml.Unmarshaller unmarshaller,
+                                                 Class<T> clazz, T obj) {
 
-        return new JAXBElement<T>(getQNameForClass(clazz), clazz, obj);
+        return new JAXBElement<T>(getQNameForClass(unmarshaller, clazz), clazz, obj);
     }
 
     /**
      * Creates a {@link QName} for the passed class.
      *
-     * @param clazz the class for which the {@link QName} will be created
-     * @param <T>   the type of object
-     *
+     * @param unmarshaller the {@link org.exolab.castor.xml.Unmarshaller} to use
+     * @param clazz        the class for which the {@link QName} will be created
+     * @param <T>          the type of object
      * @return the {@link QName} for the passed class
      */
-    private <T> QName getQNameForClass(Class<T> clazz) {
+    private <T> QName getQNameForClass(org.exolab.castor.xml.Unmarshaller unmarshaller, Class<T> clazz) {
 
         XMLClassDescriptorResolver resolver;
         XMLClassDescriptor descriptor;
@@ -540,5 +552,39 @@ public class CastorUnmarshaller implements Unmarshaller {
         }
 
         return new QName("");
+    }
+
+    /**
+     * Creates new instance of {@link org.exolab.castor.xml.Unmarshaller} that is used internally
+     * as marshaling framework.
+     * <p/>
+     * Creating each time the unmarshaller instance prevents from race conditions and other thread-safety issues.
+     *
+     * @return newly created {@link org.exolab.castor.xml.Unmarshaller} instance
+     */
+    private org.exolab.castor.xml.Unmarshaller createUnmarshaller() {
+
+        org.exolab.castor.xml.Unmarshaller unmarshaller = context.createCastorUnmarshaller();
+
+        configureUnmarshaller(unmarshaller);
+
+        return unmarshaller;
+    }
+
+    /**
+     * Sets the properties for the passed {@link org.exolab.castor.xml.Unmarshaller} instance.
+     *
+     * @param unmarshaller the {@link org.exolab.castor.xml.Unmarshaller} instance for which the properties will be set
+     */
+    private void configureUnmarshaller(org.exolab.castor.xml.Unmarshaller unmarshaller) {
+
+        if (listener != null) {
+            unmarshaller.setUnmarshalListener(new UnmarshalListenerAdapter(listener));
+        }
+
+        for (Map.Entry<String, Object> property : properties.entrySet()) {
+
+            unmarshaller.getInternalContext().setProperty(property.getKey(), property.getValue());
+        }
     }
 }
