@@ -130,7 +130,7 @@ public class CastorJAXBContext extends JAXBContext {
      */
     @Override
     public Marshaller createMarshaller() throws JAXBException {
-        return new CastorMarshaller(xmlContext.createMarshaller());
+        return new CastorMarshaller(this);
     }
 
     /**
@@ -138,7 +138,7 @@ public class CastorJAXBContext extends JAXBContext {
      */
     @Override
     public Unmarshaller createUnmarshaller() throws JAXBException {
-        return new CastorUnmarshaller(xmlContext.createUnmarshaller());
+        return new CastorUnmarshaller(this);
     }
 
     /**
@@ -184,5 +184,23 @@ public class CastorJAXBContext extends JAXBContext {
     public void generateSchema(SchemaOutputResolver outputResolver) throws IOException {
         // TODO implement
         super.generateSchema(outputResolver);
+    }
+
+    /**
+     * Creates new instance of {@link org.exolab.castor.xml.Marshaller} class.
+     * @return the new instance of {@link org.exolab.castor.xml.Marshaller}
+     */
+    org.exolab.castor.xml.Marshaller createCastorMarshaller() {
+
+        return xmlContext.createMarshaller();
+    }
+
+    /**
+     * Creates new instance of {@link org.exolab.castor.xml.Unmarshaller} class.
+     * @return the new instance of {@link org.exolab.castor.xml.Unmarshaller}
+     */
+    org.exolab.castor.xml.Unmarshaller createCastorUnmarshaller() {
+
+        return xmlContext.createUnmarshaller();
     }
 }
