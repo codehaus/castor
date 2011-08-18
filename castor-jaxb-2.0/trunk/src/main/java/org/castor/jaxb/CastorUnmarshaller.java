@@ -37,11 +37,18 @@ import javax.xml.bind.attachment.AttachmentUnmarshaller;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.Result;
 import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -444,10 +451,12 @@ public class CastorUnmarshaller implements Unmarshaller {
     private Object unmarshalAndValidateSource(Source source) throws JAXBException {
 
         try {
+            // reads the content of the input
+            byte[] content = readSourceToByteArray(source);
             // validates the source
-            validateSource(source);
+            validateSource(createSource(content));
             // unmarshalls the object
-            return createUnmarshaller().unmarshal(source);
+            return createUnmarshaller().unmarshal(createSource(content));
         } catch (MarshalException e) {
             // wraps and throws exception
             throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
@@ -455,8 +464,13 @@ public class CastorUnmarshaller implements Unmarshaller {
             // wraps and throws exception
             throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
         } catch (SAXException e) {
+            // wraps and throws exception
             throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
         } catch (IOException e) {
+            // wraps and throws exception
+            throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
+        } catch (TransformerException e) {
+            // wraps and throws exception
             throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
         }
     }
@@ -474,20 +488,33 @@ public class CastorUnmarshaller implements Unmarshaller {
     private <T> JAXBElement<T> unmarshalAndValidateSource(Source source, Class<T> declaredType) throws JAXBException {
 
         try {
+            // reads the content of the input
+            byte[] content = readSourceToByteArray(source);
             // create unmarshaller instance
             org.exolab.castor.xml.Unmarshaller unmarshaller = createUnmarshaller();
             // validates the source
-            validateSource(source);
+            validateSource(createSource(content));
             // sets the expected class
             unmarshaller.setClass(declaredType);
             // unmarshalls object and converts the result into JAXBElement
-            return createJAXBElement(unmarshaller, declaredType, (T) unmarshalAndValidateSource(source));
+            return createJAXBElement(unmarshaller, declaredType, (T) unmarshaller.unmarshal(createSource(content)));
         } catch (ClassCastException e) {
             // wraps and throws exception
             throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
         } catch (SAXException e) {
+            // wraps and throws exception
             throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
         } catch (IOException e) {
+            // wraps and throws exception
+            throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
+        } catch (TransformerException e) {
+            // wraps and throws exception
+            throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
+        } catch (MarshalException e) {
+            // wraps and throws exception
+            throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
+        } catch (ValidationException e) {
+            // wraps and throws exception
             throw CastorJAXBUtils.convertToJAXBException("Error occurred when unmarshalling object.", e);
         }
     }
@@ -586,5 +613,30 @@ public class CastorUnmarshaller implements Unmarshaller {
 
             unmarshaller.getInternalContext().setProperty(property.getKey(), property.getValue());
         }
+    }
+
+     /**
+     * Reads the entire content of the passed {@link Source} instance and returns the result as a byte array.
+     * @param source the {@link Source} instance to read
+     * @return the content of the {@link Source} as byte array
+     * @throws javax.xml.transform.TransformerException if any error occurs during the transformation
+     */
+    private static byte[] readSourceToByteArray(Source source) throws TransformerException {
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        Result output = new StreamResult(byteArrayOutputStream);
+        transformer.transform(source, output);
+
+        return byteArrayOutputStream.toByteArray();
+    }
+
+    /**
+     * Creates new instance of {@link StreamSource} from passed byte array.
+     * @param content the byte array containing the data to be unmarshalled
+     * @return the {@link StreamSource} created from the byte array
+     */
+    private static Source createSource(byte[] content) {
+        return new StreamSource(new ByteArrayInputStream(content));
     }
 }

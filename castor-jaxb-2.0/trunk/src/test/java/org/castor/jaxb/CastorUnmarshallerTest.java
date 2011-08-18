@@ -16,14 +16,18 @@
 
 package org.castor.jaxb;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.castor.entities.Entity;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
-
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -38,23 +42,35 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
 
-import org.castor.entities.Entity;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
-import org.xml.sax.XMLReader;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Tests the {@link CastorUnmarshaller} class.
+ *
+ * @author Jakub Narloch, jmnarloch AT gmail DOT org
+ * @version 1.0
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "classpath:/castor-jaxb-test-context.xml" })
+@ContextConfiguration(locations = {"classpath:/castor-jaxb-test-context.xml"})
 public class CastorUnmarshallerTest {
+
+    /**
+     * Represents the path to the schema file.
+     */
+    private static final String SCHEMA_FILE = "/org/castor/entities/Entity.xsd";
+
+    /**
+     * Represents the path to the schema file.
+     */
+    private static final String INVALID_SCHEMA_FILE = "/org/castor/entities/InvalidEntity.xsd";
 
     /**
      * Represents the instance of the tested class.
@@ -102,6 +118,31 @@ public class CastorUnmarshallerTest {
     }
 
     /**
+     * Tests the {@link CastorUnmarshaller#unmarshal(java.io.Reader)} method.
+     *
+     * @throws Exception if any error occurs during test
+     */
+    @Test
+    public void testUnmarshalReaderWithValidation() throws Exception {
+        unmarshaller.setSchema(loadSchema(SCHEMA_FILE));
+        Entity entity = (Entity) unmarshaller.unmarshal(new StringReader(INPUT_XML));
+        testEntity(entity);
+    }
+
+    /**
+     * Tests the {@link CastorUnmarshaller#unmarshal(java.io.Reader)} method when validation fails. <p/> {@link
+     * JAXBException} is expected.
+     *
+     * @throws Exception if any error occurs during test
+     */
+    @Test(expected = JAXBException.class)
+    public void testUnmarshalReaderWithValidationError() throws Exception {
+        unmarshaller.setSchema(loadSchema(INVALID_SCHEMA_FILE));
+        Entity entity = (Entity) unmarshaller.unmarshal(new StringReader(INPUT_XML));
+        testEntity(entity);
+    }
+
+    /**
      * Tests the {@link CastorUnmarshaller#unmarshal(java.io.InputStream)} method when inputStream is null. </p> {@link
      * IllegalArgumentException} is expected.
      *
@@ -119,6 +160,31 @@ public class CastorUnmarshallerTest {
      */
     @Test
     public void testUnmarshalInputStream() throws Exception {
+        Entity entity = (Entity) unmarshaller.unmarshal(new ByteArrayInputStream(INPUT_XML.getBytes()));
+        testEntity(entity);
+    }
+
+    /**
+     * Tests the {@link CastorUnmarshaller#unmarshal(java.io.InputStream)} method.
+     *
+     * @throws Exception if any error occurs during test
+     */
+    @Test
+    public void testUnmarshalInputStreamWithValidation() throws Exception {
+        unmarshaller.setSchema(loadSchema(SCHEMA_FILE));
+        Entity entity = (Entity) unmarshaller.unmarshal(new ByteArrayInputStream(INPUT_XML.getBytes()));
+        testEntity(entity);
+    }
+
+    /**
+     * Tests the {@link CastorUnmarshaller#unmarshal(java.io.InputStream)} method when validation fails. <p/> {@link
+     * JAXBException} is expected.
+     *
+     * @throws Exception if any error occurs during test
+     */
+    @Test(expected = JAXBException.class)
+    public void testUnmarshalInputStreamWithValidationError() throws Exception {
+        unmarshaller.setSchema(loadSchema(INVALID_SCHEMA_FILE));
         Entity entity = (Entity) unmarshaller.unmarshal(new ByteArrayInputStream(INPUT_XML.getBytes()));
         testEntity(entity);
     }
@@ -146,6 +212,31 @@ public class CastorUnmarshallerTest {
     }
 
     /**
+     * Tests the {@link CastorUnmarshaller#unmarshal(InputSource)} method.
+     *
+     * @throws Exception if any error occurs during test
+     */
+    @Test
+    public void testUnmarshalInputSourceWithValidation() throws Exception {
+        unmarshaller.setSchema(loadSchema(SCHEMA_FILE));
+        Entity entity = (Entity) unmarshaller.unmarshal(new InputSource(new StringReader(INPUT_XML)));
+        testEntity(entity);
+    }
+
+    /**
+     * Tests the {@link CastorUnmarshaller#unmarshal(InputSource)} method when validation fails. <p/> {@link
+     * JAXBException} is expected.
+     *
+     * @throws Exception if any error occurs during test
+     */
+    @Test(expected = JAXBException.class)
+    public void testUnmarshalInputSourceWithValidationError() throws Exception {
+        unmarshaller.setSchema(loadSchema(INVALID_SCHEMA_FILE));
+        Entity entity = (Entity) unmarshaller.unmarshal(new InputSource(new StringReader(INPUT_XML)));
+        testEntity(entity);
+    }
+
+    /**
      * Tests the {@link CastorUnmarshaller#unmarshal(Node)} method when node is null. </p> {@link
      * IllegalArgumentException} is expected.
      *
@@ -167,6 +258,39 @@ public class CastorUnmarshallerTest {
         DocumentBuilder builder = factory.newDocumentBuilder();
         Node document = builder.parse(new InputSource(new StringReader(INPUT_XML)));
 
+        Entity entity = (Entity) unmarshaller.unmarshal(document);
+        testEntity(entity);
+    }
+
+    /**
+     * Tests the {@link CastorUnmarshaller#unmarshal(Node)} method.
+     *
+     * @throws Exception if any error occurs during test
+     */
+    @Test
+    public void testUnmarshalNodeWithValidation() throws Exception {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Node document = builder.parse(new InputSource(new StringReader(INPUT_XML)));
+
+        unmarshaller.setSchema(loadSchema(SCHEMA_FILE));
+        Entity entity = (Entity) unmarshaller.unmarshal(document);
+        testEntity(entity);
+    }
+
+    /**
+     * Tests the {@link CastorUnmarshaller#unmarshal(Node)} method when validation fails. <p/> {@link JAXBException} is
+     * expected.
+     *
+     * @throws Exception if any error occurs during test
+     */
+    @Test(expected = JAXBException.class)
+    public void testUnmarshalNodeWithValidationError() throws Exception {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Node document = builder.parse(new InputSource(new StringReader(INPUT_XML)));
+
+        unmarshaller.setSchema(loadSchema(INVALID_SCHEMA_FILE));
         Entity entity = (Entity) unmarshaller.unmarshal(document);
         testEntity(entity);
     }
@@ -206,6 +330,39 @@ public class CastorUnmarshallerTest {
         DocumentBuilder builder = factory.newDocumentBuilder();
         Node document = builder.parse(new InputSource(new StringReader(INPUT_XML)));
 
+        JAXBElement<Entity> jaxbElement = unmarshaller.unmarshal(document, Entity.class);
+        testJAXBElement(jaxbElement);
+    }
+
+    /**
+     * Tests the {@link CastorUnmarshaller#unmarshal(org.w3c.dom.Node, Class)} method.
+     *
+     * @throws Exception if any error occurs during test
+     */
+    @Test
+    public void testUnmarshalNodeJAXBElementWithValidation() throws Exception {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Node document = builder.parse(new InputSource(new StringReader(INPUT_XML)));
+
+        unmarshaller.setSchema(loadSchema(SCHEMA_FILE));
+        JAXBElement<Entity> jaxbElement = unmarshaller.unmarshal(document, Entity.class);
+        testJAXBElement(jaxbElement);
+    }
+
+    /**
+     * Tests the {@link CastorUnmarshaller#unmarshal(org.w3c.dom.Node, Class)} method when validation fails. <p/> {@link
+     * JAXBException} is expected.
+     *
+     * @throws Exception if any error occurs during test
+     */
+    @Test(expected = JAXBException.class)
+    public void testUnmarshalNodeJAXBElementWithValidationError() throws Exception {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Node document = builder.parse(new InputSource(new StringReader(INPUT_XML)));
+
+        unmarshaller.setSchema(loadSchema(INVALID_SCHEMA_FILE));
         JAXBElement<Entity> jaxbElement = unmarshaller.unmarshal(document, Entity.class);
         testJAXBElement(jaxbElement);
     }
@@ -370,6 +527,39 @@ public class CastorUnmarshallerTest {
      * @throws Exception if any error occurs during test
      */
     @Test
+    public void testUnmarshalDOMSourceWithValidation() throws Exception {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Node document = builder.parse(new InputSource(new StringReader(INPUT_XML)));
+
+        unmarshaller.setSchema(loadSchema(SCHEMA_FILE));
+        Entity entity = (Entity) unmarshaller.unmarshal(new DOMSource(document));
+        testEntity(entity);
+    }
+
+    /**
+     * Tests the {@link CastorUnmarshaller#unmarshal(Source)} method when validation fails. <p/> {@link JAXBException}
+     * is expected.
+     *
+     * @throws Exception if any error occurs during test
+     */
+    @Test(expected = JAXBException.class)
+    public void testUnmarshalDOMSourceWithValidationError() throws Exception {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Node document = builder.parse(new InputSource(new StringReader(INPUT_XML)));
+
+        unmarshaller.setSchema(loadSchema(INVALID_SCHEMA_FILE));
+        Entity entity = (Entity) unmarshaller.unmarshal(new DOMSource(document));
+        testEntity(entity);
+    }
+
+    /**
+     * Tests the {@link CastorUnmarshaller#unmarshal(Source)} method.
+     *
+     * @throws Exception if any error occurs during test
+     */
+    @Test
     public void testUnmarshalStreamSourceReader() throws Exception {
         Entity entity = (Entity) unmarshaller.unmarshal(new StreamSource(new StringReader(INPUT_XML)));
         testEntity(entity);
@@ -381,7 +571,59 @@ public class CastorUnmarshallerTest {
      * @throws Exception if any error occurs during test
      */
     @Test
+    public void testUnmarshalStreamSourceReaderWithValidation() throws Exception {
+        unmarshaller.setSchema(loadSchema(SCHEMA_FILE));
+        Entity entity = (Entity) unmarshaller.unmarshal(new StreamSource(new StringReader(INPUT_XML)));
+        testEntity(entity);
+    }
+
+    /**
+     * Tests the {@link CastorUnmarshaller#unmarshal(Source)} method when validation fails.
+     * <p/>
+     * {@link JAXBException} is expected.
+     *
+     * @throws Exception if any error occurs during test
+     */
+    @Test(expected = JAXBException.class)
+    public void testUnmarshalStreamSourceReaderWithValidationError() throws Exception {
+        unmarshaller.setSchema(loadSchema(INVALID_SCHEMA_FILE));
+        Entity entity = (Entity) unmarshaller.unmarshal(new StreamSource(new StringReader(INPUT_XML)));
+        testEntity(entity);
+    }
+
+    /**
+     * Tests the {@link CastorUnmarshaller#unmarshal(Source)} method.
+     *
+     * @throws Exception if any error occurs during test
+     */
+    @Test
     public void testUnmarshalStreamSourceInputStream() throws Exception {
+        Entity entity = (Entity) unmarshaller.unmarshal(new ByteArrayInputStream(INPUT_XML.getBytes()));
+        testEntity(entity);
+    }
+
+    /**
+     * Tests the {@link CastorUnmarshaller#unmarshal(Source)} method.
+     *
+     * @throws Exception if any error occurs during test
+     */
+    @Test
+    public void testUnmarshalStreamSourceInputStreamWithValidation() throws Exception {
+        unmarshaller.setSchema(loadSchema(SCHEMA_FILE));
+        Entity entity = (Entity) unmarshaller.unmarshal(new ByteArrayInputStream(INPUT_XML.getBytes()));
+        testEntity(entity);
+    }
+
+    /**
+     * Tests the {@link CastorUnmarshaller#unmarshal(Source)} method when validation fails.
+     * <p/>
+     * {@link JAXBException} is expected.
+     *
+     * @throws Exception if any error occurs during test
+     */
+    @Test(expected = JAXBException.class)
+    public void testUnmarshalStreamSourceInputStreamWithValidationError() throws Exception {
+        unmarshaller.setSchema(loadSchema(INVALID_SCHEMA_FILE));
         Entity entity = (Entity) unmarshaller.unmarshal(new ByteArrayInputStream(INPUT_XML.getBytes()));
         testEntity(entity);
     }
@@ -427,6 +669,40 @@ public class CastorUnmarshallerTest {
      * @throws Exception if any error occurs during test
      */
     @Test
+    public void testUnmarshalDOMSourceJAXBElementWithValidation() throws Exception {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Node document = builder.parse(new InputSource(new StringReader(INPUT_XML)));
+
+        unmarshaller.setSchema(loadSchema(SCHEMA_FILE));
+        JAXBElement<Entity> jaxbElement = unmarshaller.unmarshal(new DOMSource(document), Entity.class);
+        testJAXBElement(jaxbElement);
+    }
+
+    /**
+     * Tests the {@link CastorUnmarshaller#unmarshal(Source, Class)} method when validation fails.
+     * <p/>
+     * {@link JAXBException} is expected.
+     *
+     * @throws Exception if any error occurs during test
+     */
+    @Test(expected = JAXBException.class)
+    public void testUnmarshalDOMSourceJAXBElementWithValidationError() throws Exception {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Node document = builder.parse(new InputSource(new StringReader(INPUT_XML)));
+
+        unmarshaller.setSchema(loadSchema(INVALID_SCHEMA_FILE));
+        JAXBElement<Entity> jaxbElement = unmarshaller.unmarshal(new DOMSource(document), Entity.class);
+        testJAXBElement(jaxbElement);
+    }
+
+    /**
+     * Tests the {@link CastorUnmarshaller#unmarshal(Source, Class)} method.
+     *
+     * @throws Exception if any error occurs during test
+     */
+    @Test
     public void testUnmarshalStreamSourceReaderJAXBElement() throws Exception {
         JAXBElement<Entity> jaxbElement = unmarshaller.unmarshal(new StreamSource(new StringReader(INPUT_XML)),
                 Entity.class);
@@ -439,7 +715,63 @@ public class CastorUnmarshallerTest {
      * @throws Exception if any error occurs during test
      */
     @Test
+    public void testUnmarshalStreamSourceReaderJAXBElementWithValidation() throws Exception {
+        unmarshaller.setSchema(loadSchema(SCHEMA_FILE));
+        JAXBElement<Entity> jaxbElement = unmarshaller.unmarshal(new StreamSource(new StringReader(INPUT_XML)),
+                Entity.class);
+        testJAXBElement(jaxbElement);
+    }
+
+    /**
+     * Tests the {@link CastorUnmarshaller#unmarshal(Source, Class)} method when validation fails.
+     * <p/>
+     * {@link JAXBException} is expected.
+     *
+     * @throws Exception if any error occurs during test
+     */
+    @Test(expected = JAXBException.class)
+    public void testUnmarshalStreamSourceReaderJAXBElementWithValidationError() throws Exception {
+        unmarshaller.setSchema(loadSchema(INVALID_SCHEMA_FILE));
+        JAXBElement<Entity> jaxbElement = unmarshaller.unmarshal(new StreamSource(new StringReader(INPUT_XML)),
+                Entity.class);
+        testJAXBElement(jaxbElement);
+    }
+
+    /**
+     * Tests the {@link CastorUnmarshaller#unmarshal(Source, Class)} method.
+     *
+     * @throws Exception if any error occurs during test
+     */
+    @Test
     public void testUnmarshalStreamSourceInputStreamJAXBElement() throws Exception {
+        JAXBElement<Entity> jaxbElement = unmarshaller.unmarshal(new StreamSource(
+                new ByteArrayInputStream(INPUT_XML.getBytes())), Entity.class);
+        testJAXBElement(jaxbElement);
+    }
+
+    /**
+     * Tests the {@link CastorUnmarshaller#unmarshal(Source, Class)} method.
+     *
+     * @throws Exception if any error occurs during test
+     */
+    @Test
+    public void testUnmarshalStreamSourceInputStreamJAXBElementWithValidation() throws Exception {
+        unmarshaller.setSchema(loadSchema(SCHEMA_FILE));
+        JAXBElement<Entity> jaxbElement = unmarshaller.unmarshal(new StreamSource(
+                new ByteArrayInputStream(INPUT_XML.getBytes())), Entity.class);
+        testJAXBElement(jaxbElement);
+    }
+
+    /**
+     * Tests the {@link CastorUnmarshaller#unmarshal(Source, Class)} method when validation fails.
+     * <p/>
+     * {@link JAXBException} is expected.
+     *
+     * @throws Exception if any error occurs during test
+     */
+    @Test(expected = JAXBException.class)
+    public void testUnmarshalStreamSourceInputStreamJAXBElementWithValidationError() throws Exception {
+        unmarshaller.setSchema(loadSchema(INVALID_SCHEMA_FILE));
         JAXBElement<Entity> jaxbElement = unmarshaller.unmarshal(new StreamSource(
                 new ByteArrayInputStream(INPUT_XML.getBytes())), Entity.class);
         testJAXBElement(jaxbElement);
@@ -483,5 +815,21 @@ public class CastorUnmarshallerTest {
     private void testJAXBElement(JAXBElement<Entity> jaxbElement) {
         assertNotNull("Entity can not be null.", jaxbElement);
         testEntity(jaxbElement.getValue());
+    }
+
+    /**
+     * Loads the schema for the {@link Entity} class.
+     *
+     * @param schemaFile the path to the schema file
+     *
+     * @return the loaded schema
+     *
+     * @throws org.xml.sax.SAXException if any error occurs during loading the schema
+     */
+    private Schema loadSchema(String schemaFile) throws SAXException {
+
+        SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+
+        return schemaFactory.newSchema(getClass().getResource(schemaFile));
     }
 }
