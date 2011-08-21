@@ -511,6 +511,14 @@ public class JaxbFieldNature extends OoFieldNature implements JaxbFieldNaturePro
         return (String) getProperty(MIME_TYPE);
     }
 
+    public Class getXmlJavaTypeAdapter() {
+        return (Class) getProperty(XML_JAVA_TYPE_ADAPTER);
+    }
+
+    public void setXmlJavaTypeAdapter(Class clazz) {
+        setProperty(XML_JAVA_TYPE_ADAPTER, clazz);
+    }
+
     public void addElement(final String name, final String namespace, final boolean nillable, final boolean required,
             final Class type, final String defaultValue) {
         List<Element> elements = (List<Element>) getProperty(ELEMENTS);

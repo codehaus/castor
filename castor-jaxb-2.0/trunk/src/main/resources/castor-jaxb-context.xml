@@ -47,6 +47,7 @@
             <ref bean="xmlAttachmentRefFieldProcessor"/>
             <ref bean="xmlInlineBinaryDataFieldProcessor"/>
             <ref bean="xmlEnumValueFieldProcessor"/>
+            <ref bean="xmlJavaTypeAdapterProcessor"/>
         </list>
     </property>
   </bean>

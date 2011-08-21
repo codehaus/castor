@@ -84,7 +84,6 @@ public class CastorMarshaller implements Marshaller {
 
         // assigns the namesake field
         this.context = context;
-
     }
 
     /**
@@ -276,28 +275,30 @@ public class CastorMarshaller implements Marshaller {
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("unchecked")
     public void setAdapter(XmlAdapter adapter) {
+        CastorJAXBUtils.checkNotNull(adapter, "adapter");
 
-        // TODO implement
-        throw new UnsupportedOperationException("Marshaller.setAdapter method is unsupported.");
+        setAdapter((Class<XmlAdapter>) adapter.getClass(), adapter);
     }
 
     /**
      * {@inheritDoc}
      */
     public <A extends XmlAdapter> void setAdapter(Class<A> type, A adapter) {
+        CastorJAXBUtils.checkNotNull(type, "type");
 
-        // TODO implement
-        throw new UnsupportedOperationException("Marshaller.setAdapter method is unsupported.");
+        context.getJaxbAdapterRegistry().setAdapter(type, adapter);
     }
 
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("unchecked")
     public <A extends XmlAdapter> A getAdapter(Class<A> type) {
+        CastorJAXBUtils.checkNotNull(type, "type");
 
-        // TODO implement
-        throw new UnsupportedOperationException("Marshaller.getAdapter method is unsupported.");
+        return (A) context.getJaxbAdapterRegistry().getAdapter(type);
     }
 
     /**
