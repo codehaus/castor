@@ -73,4 +73,5 @@ public interface JaxbFieldNatureProperties {
     String ANY_ELEMENT_LAX = "ANY_ELEMENT_LAX";
     String ANY_ELEMENT_DOM_HANDLER = "ANY_ELEMENT_DOM_HANDLER";
     String MIME_TYPE = "MIME_TYPE";
+    String XML_JAVA_TYPE_ADAPTER = "XML_JAVA_TYPE_ADAPTER";
 }

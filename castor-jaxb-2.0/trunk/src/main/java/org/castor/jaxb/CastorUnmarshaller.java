@@ -321,18 +321,16 @@ public class CastorUnmarshaller implements Unmarshaller {
      * {@inheritDoc}
      */
     public void setValidating(boolean validating) throws JAXBException {
-        // TODO the setValidating method has been detracted in JAXB 2
 
-        // does nothing
+        throw new UnsupportedOperationException("Unmarshaller.setValidating method is unsupported.");
     }
 
     /**
      * {@inheritDoc}
      */
     public boolean isValidating() throws JAXBException {
-        // TODO the setValidating method has been detracted in JAXB 2
 
-        return false;
+        throw new UnsupportedOperationException("Unmarshaller.isValidating method is unsupported.");
     }
 
     /**
@@ -388,25 +386,30 @@ public class CastorUnmarshaller implements Unmarshaller {
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("unchecked")
     public void setAdapter(XmlAdapter adapter) {
-        // TODO implement
-        throw new UnsupportedOperationException("Unmarshaller.setAdapter method is unsupported.");
+        CastorJAXBUtils.checkNotNull(adapter, "adapter");
+
+        setAdapter((Class<XmlAdapter>) adapter.getClass(), adapter);
     }
 
     /**
      * {@inheritDoc}
      */
     public <A extends XmlAdapter> void setAdapter(Class<A> type, A adapter) {
-        // TODO implement
-        throw new UnsupportedOperationException("Unmarshaller.setAdapter method is unsupported.");
+        CastorJAXBUtils.checkNotNull(type, "type");
+
+        context.getJaxbAdapterRegistry().setAdapter(type, adapter);
     }
 
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("unchecked")
     public <A extends XmlAdapter> A getAdapter(Class<A> type) {
-        // TODO implement
-        throw new UnsupportedOperationException("Unmarshaller.getAdapter method is unsupported.");
+        CastorJAXBUtils.checkNotNull(type, "type");
+
+        return (A) context.getJaxbAdapterRegistry().getAdapter(type);
     }
 
     /**

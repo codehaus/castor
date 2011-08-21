@@ -19,6 +19,7 @@ import org.castor.jaxb.naming.JAXBJavaNaming;
 import org.castor.jaxb.naming.JAXBXmlNaming;
 import org.castor.jaxb.reflection.ClassDescriptorBuilder;
 import org.castor.jaxb.reflection.ClassInfoBuilder;
+import org.castor.jaxb.resolver.JAXBAdapterRegistry;
 import org.castor.jaxb.resolver.JAXBClassResolverCommand;
 import org.castor.jaxb.resolver.JAXBPackageResolverCommand;
 import org.castor.jaxb.resolver.JAXBResolverStrategy;
@@ -57,6 +58,11 @@ public class CastorJAXBContext extends JAXBContext {
     private XMLContext xmlContext;
 
     /**
+     * Represents a registry used to add instances of {@link javax.xml.bind.annotation.adapters.XmlAdapter}.
+     */
+    private JAXBAdapterRegistry jaxbAdapterRegistry;
+
+    /**
      * Creates new instance of {@link CastorJAXBContext} class.
      */
     CastorJAXBContext() {
@@ -68,6 +74,7 @@ public class CastorJAXBContext extends JAXBContext {
         
         JavaNaming javaNaming = context.getBean("jaxbJavaNaming", JAXBJavaNaming.class);
         XMLNaming xmlNaming = context.getBean("jaxbXmlNaming", JAXBXmlNaming.class);
+        jaxbAdapterRegistry = context.getBean("jaxbAdapterRegistry", JAXBAdapterRegistry.class);
 
         internalContext.setJavaNaming(javaNaming);
         internalContext.setXMLNaming(xmlNaming);
@@ -202,5 +209,14 @@ public class CastorJAXBContext extends JAXBContext {
     org.exolab.castor.xml.Unmarshaller createCastorUnmarshaller() {
 
         return xmlContext.createUnmarshaller();
+    }
+
+    /**
+     * Retrieves the {@link JAXBAdapterRegistry} for this context.
+     * @return {@link JAXBAdapterRegistry} for this context
+     */
+    JAXBAdapterRegistry getJaxbAdapterRegistry() {
+
+        return jaxbAdapterRegistry;
     }
 }

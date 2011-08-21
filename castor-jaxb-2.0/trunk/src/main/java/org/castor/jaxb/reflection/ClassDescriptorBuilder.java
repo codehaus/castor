@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlAccessOrder;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorOrder;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.castor.jaxb.exceptions.ReflectionException;
@@ -34,6 +35,7 @@ import org.castor.jaxb.reflection.info.JaxbClassNature;
 import org.castor.jaxb.reflection.info.JaxbFieldNature;
 import org.castor.jaxb.reflection.info.JaxbPackageNature;
 import org.castor.jaxb.reflection.info.JaxbPackageNature.NamespaceInfo;
+import org.castor.jaxb.resolver.JAXBAdapterRegistry;
 import org.castor.xml.XMLNaming;
 import org.exolab.castor.mapping.CollectionHandler;
 import org.exolab.castor.mapping.FieldHandler;
@@ -65,6 +67,12 @@ public final class ClassDescriptorBuilder {
      */
     @Autowired
     private XMLNaming xmlNaming;
+
+    /**
+     * Represents the registry with adapter instances.
+     */
+    @Autowired
+    private JAXBAdapterRegistry jaxbAdapterRegistry;
 
     /**
      * Default constructor.
@@ -217,7 +225,7 @@ public final class ClassDescriptorBuilder {
         }
 
         // TODO: refactor as it does not resolve class transitivity
-        // TODO: problem is that we do not have informtion about the ClassInfo of the decöard type
+        // TODO: problem is that we do not have informtion about the ClassInfo of the decï¿½ard type
         ClassInfo owningClassInfo = jaxbFieldNature.getFieldInfo().getParentClassInfo();
         if (owningClassInfo.hasNature(JaxbClassNature.class.getName())) {
             JaxbClassNature classNature = new JaxbClassNature(owningClassInfo);
@@ -252,7 +260,8 @@ public final class ClassDescriptorBuilder {
         JAXBFieldHandlerImpl fieldHandler = new JAXBFieldHandlerImpl();
         // fieldHandler.setType(type);
         // fieldHandler.setTypeFactory(typeFactoryClass, typeFactoryMethod);
-        // fieldHandler.setXmlAdapter(xmlAdapter);
+        fieldHandler.setXmlAdapter(getXmlAdapter(jaxbFieldNature));
+
         if (jaxbFieldNature.isPureField()) {
             fieldHandler.setField(jaxbFieldNature.getField());
         } else {
@@ -520,5 +529,38 @@ public final class ClassDescriptorBuilder {
             throw e;
         }
         return type;
+    }
+
+    /**
+     * Retrieves the xml adapter if it was specified in {@link JaxbFieldNature}.
+     *
+     * @param jaxbFieldNature the {@link JaxbFieldNature} describing the field
+     *
+     * @return the {@link XmlAdapter} instance or null
+     */
+    private XmlAdapter getXmlAdapter(JaxbFieldNature jaxbFieldNature) {
+
+        XmlAdapter xmlAdapter;
+
+        try {
+            if (jaxbFieldNature.getXmlJavaTypeAdapter() != null) {
+                xmlAdapter = jaxbAdapterRegistry.getAdapter(jaxbFieldNature.getXmlJavaTypeAdapter());
+
+                // if there were no adapter then tries to create new instance of the adapter by
+                // instantiating the class using the default constructor
+                if (xmlAdapter == null) {
+
+                    xmlAdapter = (XmlAdapter) jaxbFieldNature.getXmlJavaTypeAdapter().newInstance();
+                }
+
+                return xmlAdapter;
+            }
+        } catch (InstantiationException e) {
+            // ignores exception
+        } catch (IllegalAccessException e) {
+            // ignores exception
+        }
+
+        return null;
     }
 }
