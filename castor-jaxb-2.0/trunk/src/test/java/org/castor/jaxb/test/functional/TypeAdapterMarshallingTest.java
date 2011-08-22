@@ -27,8 +27,14 @@ import org.xml.sax.SAXException;
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 /**
+ * Tests the support of {@link javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter}.
  *
+ * @author Jakub Narloch, jmnarloch AT gmail DOT org
+ * @version 1.0
  */
 public class TypeAdapterMarshallingTest extends BaseFunctionalTest {
 
@@ -53,7 +59,26 @@ public class TypeAdapterMarshallingTest extends BaseFunctionalTest {
 
         String actualXml = marshal(element);
 
-        System.out.println(actualXml);
         assertXmlEquals("Marshaller written invalid result.", expectedXml, actualXml);
+    }
+
+    @Test
+    public void testXmlJavaFieldAdapterWithRegisteredInstance() throws Exception {
+        String expectedXml = "<element><value xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+                + "xmlns:java=\"http://java.sun.com\" xsi:type=\"java:java.lang.String\">custom</value>"
+                + "</element>";
+
+        CustomTypeAdapter adapter = new CustomTypeAdapter();
+        marshaller.setAdapter(adapter);
+
+        ElementWithAdapter element = new ElementWithAdapter();
+        element.setCustomType(new CustomType());
+        element.getCustomType().setValue("custom");
+
+        String actualXml = marshal(element);
+
+        assertXmlEquals("Marshaller written invalid result.", expectedXml, actualXml);
+        assertTrue("Adapter hasn't been used", adapter.isUnmarshalled());
+        assertFalse("Adapter has been used incorrectly", adapter.isMarshalled());
     }
 }
