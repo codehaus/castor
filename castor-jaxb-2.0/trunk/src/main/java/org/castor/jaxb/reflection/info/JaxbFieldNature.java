@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.DomHandler;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 
 /**
@@ -511,11 +512,24 @@ public class JaxbFieldNature extends OoFieldNature implements JaxbFieldNaturePro
         return (String) getProperty(MIME_TYPE);
     }
 
-    public Class getXmlJavaTypeAdapter() {
-        return (Class) getProperty(XML_JAVA_TYPE_ADAPTER);
+    /**
+     * Gets the name of class that extends the {@link XmlAdapter} that should be
+     * used for handling this concrete field.
+     *
+     * @return the class of the handler to be used for this field
+     */
+    @SuppressWarnings("unchecked")
+    public Class<? extends XmlAdapter> getXmlJavaTypeAdapter() {
+        return (Class<? extends XmlAdapter>) getProperty(XML_JAVA_TYPE_ADAPTER);
     }
 
-    public void setXmlJavaTypeAdapter(Class clazz) {
+    /**
+     * Sets the name of class that extends the {@link XmlAdapter} that should be
+     * used for handling this concrete field.
+     *
+     * @param clazz the class of the handler to be used for this field
+     */
+    public void setXmlJavaTypeAdapter(Class<? extends XmlAdapter> clazz) {
         setProperty(XML_JAVA_TYPE_ADAPTER, clazz);
     }
 

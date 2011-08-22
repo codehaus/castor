@@ -256,11 +256,17 @@ public final class ClassDescriptorBuilder {
                     "Argument fieldInfo must not be null.");
            throw e;
         }
+        Class<? extends XmlAdapter> adapterClass;
+
         // TypeInfo typeInfo = buildTypeInfo(fieldInfo);
         JAXBFieldHandlerImpl fieldHandler = new JAXBFieldHandlerImpl();
+        fieldHandler.setJaxbAdapterRegistry(jaxbAdapterRegistry);
         // fieldHandler.setType(type);
         // fieldHandler.setTypeFactory(typeFactoryClass, typeFactoryMethod);
-        fieldHandler.setXmlAdapter(getXmlAdapter(jaxbFieldNature));
+        adapterClass = getXmlAdapterClass(jaxbFieldNature);
+        if(adapterClass != null) {
+            fieldHandler.setXmlAdapterClass(getXmlAdapterClass(jaxbFieldNature));
+        }
 
         if (jaxbFieldNature.isPureField()) {
             fieldHandler.setField(jaxbFieldNature.getField());
@@ -538,29 +544,9 @@ public final class ClassDescriptorBuilder {
      *
      * @return the {@link XmlAdapter} instance or null
      */
-    private XmlAdapter getXmlAdapter(JaxbFieldNature jaxbFieldNature) {
+    @SuppressWarnings("unchecked")
+    private Class<? extends XmlAdapter> getXmlAdapterClass(JaxbFieldNature jaxbFieldNature) {
 
-        XmlAdapter xmlAdapter;
-
-        try {
-            if (jaxbFieldNature.getXmlJavaTypeAdapter() != null) {
-                xmlAdapter = jaxbAdapterRegistry.getAdapter(jaxbFieldNature.getXmlJavaTypeAdapter());
-
-                // if there were no adapter then tries to create new instance of the adapter by
-                // instantiating the class using the default constructor
-                if (xmlAdapter == null) {
-
-                    xmlAdapter = (XmlAdapter) jaxbFieldNature.getXmlJavaTypeAdapter().newInstance();
-                }
-
-                return xmlAdapter;
-            }
-        } catch (InstantiationException e) {
-            // ignores exception
-        } catch (IllegalAccessException e) {
-            // ignores exception
-        }
-
-        return null;
+        return jaxbFieldNature.getXmlJavaTypeAdapter();
     }
 }

@@ -23,15 +23,29 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
  */
 public class CustomTypeAdapter extends XmlAdapter<CustomType, String> {
 
-    @Override
-    public String unmarshal(CustomType customType) throws Exception {
-        return customType.getValue();
-    }
+    private boolean marshalled;
+
+    private boolean unmarshalled;
 
     @Override
     public CustomType marshal(String value) throws Exception {
+        marshalled = true;
         CustomType customType = new CustomType();
         customType.setValue(value);
         return customType;
+    }
+
+    @Override
+    public String unmarshal(CustomType customType) throws Exception {
+        unmarshalled = true;
+        return customType.getValue();
+    }
+
+    public boolean isMarshalled() {
+        return marshalled;
+    }
+
+    public boolean isUnmarshalled() {
+        return unmarshalled;
     }
 }

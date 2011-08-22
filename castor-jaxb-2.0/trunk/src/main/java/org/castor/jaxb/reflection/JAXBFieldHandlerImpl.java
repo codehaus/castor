@@ -15,36 +15,33 @@
  */
 package org.castor.jaxb.reflection;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-
 import org.castor.jaxb.exceptions.AdapterException;
+import org.castor.jaxb.resolver.JAXBAdapterRegistry;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.ValidityException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.annotation.adapters.XmlAdapter;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 /**
- * This JAXB specific field handler is instantiated for every class
- * that is mapped.
- * 
+ * This JAXB specific field handler is instantiated for every class that is mapped.
+ *
  * @author Joachim Grueneis, jgrueneis AT codehaus DOT org
  * @version $Id$
  */
 public class JAXBFieldHandlerImpl implements FieldHandler {
     public final Logger LOG = LoggerFactory.getLogger(this.getClass());
-    
+
     /** The type of the field. */
     private Class < ? > _type;
     /** Factory to create instances of the Field. */
     private Class < ? > _typeFactoryClass;
     /** Factory method name to create instances of the Field. */
     private String _typeFactoryMethod;
-    /** If a JAXB conform XmlAdapter is available - use it. */
-    private XmlAdapter < Object , Object > _xmlAdapter;
     /** The Field to set or get directly - no access methods given! */
     private Field _field;
     /** Get Method to access the property. */
@@ -53,12 +50,23 @@ public class JAXBFieldHandlerImpl implements FieldHandler {
     private Method _setMethod;
 
     /**
+     * The class that extends the {@link XmlAdapter} used for handling marshalling and unmarshalling of this
+     * concrete field.
+     */
+    private Class<? extends XmlAdapter> adapterClass;
+
+    /**
+     * The instance of {@link JAXBAdapterRegistry} used for retrieving the adapters.
+     */
+    private JAXBAdapterRegistry jaxbAdapterRegistry;
+
+    /**
      * Empty default constructor.
      */
     public JAXBFieldHandlerImpl() {
         super();
     }
-    
+
     /**
      * No validity checking in JAXB!!
      * {@inheritDoc}
@@ -75,7 +83,7 @@ public class JAXBFieldHandlerImpl implements FieldHandler {
     /**
      * Either the value of object can be extracted or a JAXB specific adapter
      * will be used.
-     * 
+     *
      * {@inheritDoc}
      * @see org.exolab.castor.mapping.FieldHandler#getValue(java.lang.Object)
      */
@@ -129,9 +137,9 @@ public class JAXBFieldHandlerImpl implements FieldHandler {
             throw ex;
         }
         // then use the XmlAdapter if one is set
-        if (_xmlAdapter != null) {
+        if (adapterClass != null) {
             try {
-                return _xmlAdapter.unmarshal(value);
+                return getXmlAdapter().unmarshal(value);
             } catch (Exception e) {
                 AdapterException ex = new AdapterException(
                         "Call to XmlAdapter.unmarshal failed", e);
@@ -153,7 +161,7 @@ public class JAXBFieldHandlerImpl implements FieldHandler {
         if (_typeFactoryClass != null && _typeFactoryMethod != null) {
             try {
                 Object typeFactory = _typeFactoryClass.newInstance();
-                Method factoryMethod = 
+                Method factoryMethod =
                     _typeFactoryClass.getMethod(_typeFactoryMethod, new Class[] {});
                 return factoryMethod.invoke(typeFactory, new Object[]{});
             } catch (InstantiationException e) {
@@ -228,9 +236,9 @@ public class JAXBFieldHandlerImpl implements FieldHandler {
         // an XMLAdapter is specified, so it is the first step... transforming
         // from value type to bound type...
         Object marshalAbleValue;
-        if (_xmlAdapter != null) {
+        if (adapterClass != null) {
             try {
-                marshalAbleValue = _xmlAdapter.marshal(value);
+                marshalAbleValue = getXmlAdapter().marshal(value);
             } catch (Exception e) {
                 AdapterException ex = new AdapterException(
                         "Call to XmlAdapter.marshal failed", e);
@@ -296,13 +304,16 @@ public class JAXBFieldHandlerImpl implements FieldHandler {
     }
     /**
      * To set the Class.Field to work with.
+     *
      * @param field the Class.Field to fill
      */
     public void setField(final Field field) {
         _field = field;
     }
+
     /**
      * The setter and getter of the property.
+     *
      * @param getMethod getter of the property
      * @param setMethod setter of the property
      */
@@ -310,11 +321,50 @@ public class JAXBFieldHandlerImpl implements FieldHandler {
         _getMethod = getMethod;
         _setMethod = setMethod;
     }
+
     /**
-     * The XmlAdapter to use for un-/marshalling.
-     * @param xmlAdapter the XmlAdapter to use for un-/marshalling
+     * Sets the adapter class for this hanlder, that should be used for marshalling and unmarshalling.
+     *
+     * @param adapterClass the {@link XmlAdapter} class
      */
-    public void setXmlAdapter(final XmlAdapter xmlAdapter) {
-        _xmlAdapter = xmlAdapter;
+    public void setXmlAdapterClass(Class<? extends XmlAdapter> adapterClass) {
+        this.adapterClass = adapterClass;
+    }
+
+    /**
+     * Sets the instance of {@link JAXBAdapterRegistry} used to retrieve the adapter instance.
+     * @param jaxbAdapterRegistry the {@link JAXBAdapterRegistry} used for retrieving the adapter instances.
+     */
+    public void setJaxbAdapterRegistry(JAXBAdapterRegistry jaxbAdapterRegistry) {
+        this.jaxbAdapterRegistry = jaxbAdapterRegistry;
+    }
+
+    /**
+     * Retrieves the xml adapter if it was specified in {@link org.castor.jaxb.reflection.info.JaxbFieldNature}.
+     *
+     * @return the {@link XmlAdapter} instance or null
+     */
+    private XmlAdapter getXmlAdapter() {
+
+        XmlAdapter xmlAdapter;
+
+        try {
+            xmlAdapter = jaxbAdapterRegistry.getAdapter(adapterClass);
+
+            // if there were no adapter then tries to create new instance of the adapter by
+            // instantiating the class using the default constructor
+            if (xmlAdapter == null) {
+
+                xmlAdapter = adapterClass.newInstance();
+            }
+
+            return xmlAdapter;
+        } catch (InstantiationException e) {
+            // ignores exception
+        } catch (IllegalAccessException e) {
+            // ignores exception
+        }
+
+        return null;
     }
 }

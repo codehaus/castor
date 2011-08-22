@@ -15,11 +15,13 @@
  */
 package org.castor.jaxb.reflection;
 
+import org.castor.jaxb.resolver.JAXBAdapterRegistry;
 import org.junit.Assert;
 import org.castor.jaxb.exceptions.AdapterException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -34,11 +36,16 @@ import java.lang.reflect.Method;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath:/castor-jaxb-test-context.xml" })
 public class JAXBFieldHandlerTest {
+
     private JAXBFieldHandlerImpl _fh;
+
+    @Autowired
+    private JAXBAdapterRegistry jaxbAdapterRegistry;
 
     @Before
     public void setUp() {
         _fh = new JAXBFieldHandlerImpl();
+        _fh.setJaxbAdapterRegistry(jaxbAdapterRegistry);
     }
     /**
      * Tests that a not initialized field handler does return the expected
@@ -160,7 +167,7 @@ public class JAXBFieldHandlerTest {
     public void testXmlAdapterSetValue() {
         Song s = new Song();
         setMethodsIntoFieldHandler(_fh);
-        _fh.setXmlAdapter(new ArtistAdapter());
+        _fh.setXmlAdapterClass(ArtistAdapter.class);
         _fh.setValue(s, "Hugo");
         Assert.assertNotNull(s.getArtist());
     }
@@ -172,7 +179,7 @@ public class JAXBFieldHandlerTest {
         Song s = new Song();
         s.setArtist(a);
         setMethodsIntoFieldHandler(_fh);
-        _fh.setXmlAdapter(new ArtistAdapter());
+        _fh.setXmlAdapterClass(ArtistAdapter.class);
         Object result = _fh.getValue(s);
         Assert.assertNotNull(result);
     }
