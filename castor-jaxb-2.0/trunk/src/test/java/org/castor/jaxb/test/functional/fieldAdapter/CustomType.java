@@ -16,9 +16,6 @@
 
 package org.castor.jaxb.test.functional.fieldAdapter;
 
-/**
- *
- */
 public class CustomType {
 
     private String value;

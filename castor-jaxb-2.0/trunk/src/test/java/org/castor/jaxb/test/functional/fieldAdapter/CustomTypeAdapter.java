@@ -18,9 +18,6 @@ package org.castor.jaxb.test.functional.fieldAdapter;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-/**
- *
- */
 public class CustomTypeAdapter extends XmlAdapter<CustomType, String> {
 
     private boolean marshalled;
