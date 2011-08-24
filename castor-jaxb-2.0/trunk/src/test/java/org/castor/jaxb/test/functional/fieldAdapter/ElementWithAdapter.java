@@ -22,9 +22,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-/**
- *
- */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "element")
 public class ElementWithAdapter {
