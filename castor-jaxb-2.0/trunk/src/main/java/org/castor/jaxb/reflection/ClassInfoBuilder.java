@@ -82,19 +82,6 @@ public final class ClassInfoBuilder {
     @Qualifier("jaxbJavaNaming")
     private JavaNaming javaNaming;
 
-    // /**
-    // * Creates the required annotation processing services.
-    // */
-    // public ClassInfoBuilder() {
-    // super();
-    // // packageAnnotationProcessingService = new
-    // PackageAnnotationProcessingServiceImpl();
-    // // classAnnotationProcessingService = new
-    // ClassAnnotationProcessingServiceImpl();
-    // // fieldAnnotationProcessingService = new
-    // FieldAnnotationProcessingServiceImpl();
-    // }
-
     /**
      * Build the ClassInfo representation for a Class.
      * 
