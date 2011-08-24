@@ -340,15 +340,6 @@
 				<configuration>
 					<source>1.5</source>
 					<target>1.5</target>
-					<!--
-						<excludes> <exclude
-						implementation="java.lang.String">SourceGenerator/**</exclude>
-						</excludes> <testExcludes> <exclude
-						implementation="java.lang.String">xml/MasterTestSuite/**</exclude>
-						<exclude
-						implementation="java.lang.String">xml/RegressionTestSuite/**</exclude>
-						</testExcludes>
-					-->
 				</configuration>
 			</plugin>
 			<plugin>
